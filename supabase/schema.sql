@@ -72,5 +72,28 @@ insert into public.games (id, name, min_players, max_players, min_time, max_time
  ('hoplo','Hoplomachus: Victorum',1,4,30,120,14,false)
 on conflict (id) do nothing;
 
+-- ===== v4: modalita' serata (tavoli) e data di arrivo dei giochi =====
+alter table public.games add column if not exists added_at timestamptz;
+create table if not exists public.tables (
+  id text primary key, date date not null, evening text,
+  game_id text references public.games(id) on update cascade,
+  host_id text references public.members(id) on update cascade,
+  seats int not null default 4, start_time text, note text,
+  players jsonb not null default '[]'::jsonb,
+  status text not null default 'open' check (status in ('open','closed')),
+  play_id text, created_at timestamptz not null default now());
+alter table public.tables enable row level security;
+drop policy if exists "tables_read" on public.tables;
+create policy "tables_read" on public.tables for select to anon, authenticated using (true);
+-- chiunque apre un tavolo, si unisce o lo lascia (insert/update); solo admin cancella
+drop policy if exists "tables_insert_all" on public.tables;
+create policy "tables_insert_all" on public.tables for insert to anon, authenticated with check (true);
+drop policy if exists "tables_update_all" on public.tables;
+create policy "tables_update_all" on public.tables for update to anon, authenticated using (true) with check (true);
+drop policy if exists "tables_admin_delete" on public.tables;
+create policy "tables_admin_delete" on public.tables for delete to authenticated using (public.is_admin());
+grant select, insert, update on public.tables to anon, authenticated;
+grant delete on public.tables to authenticated;
+
 -- PRIMO ADMIN: dopo aver creato l'utente in Authentication > Users, eseguire (con la sua email):
 -- insert into public.admins (email) values ('nome@esempio.it') on conflict do nothing;

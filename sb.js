@@ -2,10 +2,12 @@
 // Lavora su una copia locale (cache) e invia le differenze a Supabase; se offline
 // le mette in coda e le sincronizza al ritorno della connessione.
 const MAP={
- games:{t:'games',to:g=>({id:g.id,name:g.name,min_players:g.min,max_players:g.max,min_time:g.minT,max_time:g.maxT,age:g.age,coop:!!g.coop,bgg_id:g.bggId??null,thumb:g.thumb??null}),
-  from:r=>({id:r.id,name:r.name,min:r.min_players,max:r.max_players,minT:r.min_time,maxT:r.max_time,age:r.age,coop:r.coop,bggId:r.bgg_id,thumb:r.thumb})},
+ games:{t:'games',to:g=>({id:g.id,added_at:g.addedAt||null,name:g.name,min_players:g.min,max_players:g.max,min_time:g.minT,max_time:g.maxT,age:g.age,coop:!!g.coop,bgg_id:g.bggId??null,thumb:g.thumb??null}),
+  from:r=>({id:r.id,addedAt:r.added_at,name:r.name,min:r.min_players,max:r.max_players,minT:r.min_time,maxT:r.max_time,age:r.age,coop:r.coop,bggId:r.bgg_id,thumb:r.thumb})},
  members:{t:'members',to:m=>({id:m.id,nome:m.nome,cognome:m.cognome||null,soprannome:m.soprannome||null,tessera:m.tessera||null,active:m.active!==false}),
   from:r=>({id:r.id,nome:r.nome,cognome:r.cognome||'',soprannome:r.soprannome||'',tessera:r.tessera||'',active:r.active})},
+ tables:{t:'tables',to:t=>({id:t.id,date:t.date,evening:t.evening,game_id:t.gameId,host_id:t.hostId,seats:t.seats,start_time:t.time||null,note:t.note||null,players:t.players||[],status:t.status||'open',play_id:t.playId||null,created_at:t.createdAt||new Date().toISOString()}),
+  from:r=>({id:r.id,date:r.date,evening:r.evening,gameId:r.game_id,hostId:r.host_id,seats:r.seats,time:r.start_time||'',note:r.note||'',players:r.players||[],status:r.status,playId:r.play_id,createdAt:r.created_at})},
  plays:{t:'plays',to:p=>({id:p.id,game_id:p.gameId,date:p.date,evening:p.evening,coop:!!p.coop,group_win:p.groupWin??null,scenario:p.scenario||null,players:p.players,note:p.note||null,created_at:p.createdAt||new Date().toISOString(),updated_at:p.updatedAt||null}),
   from:r=>({id:r.id,gameId:r.game_id,date:r.date,evening:r.evening,coop:r.coop,groupWin:r.group_win,scenario:r.scenario||'',players:r.players||[],note:r.note||'',createdAt:r.created_at,updatedAt:r.updated_at})}};
 const isMissing=e=>e&&(e.code==='PGRST205'||e.code==='42P01'||/does not exist|Could not find the table/i.test(e.message||''));
@@ -27,8 +29,8 @@ const SupabaseAdapter={
   try{while(q.length){const e=await this.run(q[0]);if(e&&isNet(e)){DB.setStatus('offline');break}if(e){denied++;console.warn('Supabase',e)}q.shift();this.setQueue(q)}
    if(!q.length){DB.setStatus('online');await this.refresh()}}finally{this.flushing=false}
   if(denied)toast&&toast('Alcune modifiche non sono state accettate dal database (servono i permessi admin)')},
- async refresh(){const d={version:2,games:[],members:[],plays:[],admin:null};
-  for(const k of Object.keys(MAP)){const {data,error}=await this.client.from(MAP[k].t).select('*');if(error)throw error;d[k]=data.map(MAP[k].from)}
+ async refresh(){const d={version:2,games:[],members:[],plays:[],tables:[],admin:null};
+  for(const k of Object.keys(MAP)){const {data,error}=await this.client.from(MAP[k].t).select('*');if(error&&k==='tables'&&isMissing(error)){DB.tablesMissing=true;d.tables=[];continue}if(error)throw error;d[k]=data.map(MAP[k].from)}
   if(this.queue().length)return;await this.cache.replaceAll(d)},
  async init(){const c=window.PERGIOCO_CONFIG||{};if(!c.supabaseUrl||!c.supabaseAnonKey)return 'local';
   if(!window.supabase){return (await this.cache._load())?'offline':'local'}
@@ -41,7 +43,7 @@ const SupabaseAdapter={
  async isAdmin(){const {data:s}=await this.client.auth.getSession();if(!s.session)return false;const {data,error}=await this.client.rpc('is_admin');return !error&&data===true},
  // migrazione una tantum dei dati locali del telefono
  async uploadLocal(){const l=JSON.parse(localStorage.getItem(LocalAdapter.key)||'null');if(!l)return 0;let n=0;
-  for(const k of ['games','members','plays'])for(const x of l[k]||[]){const e=await this.run({k,op:'upsert',row:MAP[k].to(x)});if(e)throw e;n++}
+  for(const k of ['games','members','plays','tables'])for(const x of l[k]||[]){const e=await this.run({k,op:'upsert',row:MAP[k].to(x)});if(e)throw e;n++}
   localStorage.setItem('pergioco-migrated',new Date().toISOString());await this.refresh();return n}};
 // Avvio: sceglie l'adapter. Senza configurazione o con tabelle mancanti resta tutto locale come prima.
 DB.mode='local';DB.status='local';DB.onStatus=()=>{};

@@ -12,7 +12,7 @@ const LocalAdapter={
  key:'pergioco-db-v1',
  _load(){try{return JSON.parse(localStorage.getItem(this.key))}catch(e){return null}},
  _save(d){localStorage.setItem(this.key,JSON.stringify(d))},
- async getAll(){let d=this._load();if(!d){d={version:2,games:SEED_GAMES,plays:[],members:[],admin:null};this._save(d)}if(!d.members){d.members=[];d.admin=null;d.version=2;this._save(d)}return d},
+ async getAll(){let d=this._load();if(!d){d={version:2,games:SEED_GAMES,plays:[],members:[],admin:null};this._save(d)}if(!d.members){d.members=[];d.admin=null;d.version=2;this._save(d)}if(!d.tables){d.tables=[];this._save(d)}return d},
  async replaceAll(d){this._save(d)},
 };
 async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
@@ -22,9 +22,13 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const DB={adapter:LocalAdapter,
  async games(){return (await this.adapter.getAll()).games.slice().sort((a,b)=>a.name.localeCompare(b.name))},
  async plays(){return (await this.adapter.getAll()).plays.slice().sort((a,b)=>b.date.localeCompare(a.date))},
- async addGame(g){const d=await this.adapter.getAll();g.id=uid();d.games.push(g);await this.adapter.replaceAll(d);return g},
+ async addGame(g){const d=await this.adapter.getAll();g.id=uid();g.addedAt=new Date().toISOString();d.games.push(g);await this.adapter.replaceAll(d);return g},
  async addPlay(p){const d=await this.adapter.getAll();p.id=uid();p.createdAt=new Date().toISOString();setWinners(p);
   d.plays.push(p);await this.adapter.replaceAll(d);return p},
+ // --- Tavoli della modalita' serata ---
+ async allTables(){return (await this.adapter.getAll()).tables||[]},
+ async saveTable(t){const d=await this.adapter.getAll();d.tables=d.tables||[];if(t.id){const i=d.tables.findIndex(x=>x.id===t.id);d.tables[i]={...d.tables[i],...t}}else{t.id=uid();t.status='open';t.createdAt=new Date().toISOString();d.tables.push(t)}await this.adapter.replaceAll(d);return t},
+ async deleteTable(id){const d=await this.adapter.getAll();d.tables=(d.tables||[]).filter(t=>t.id!==id);await this.adapter.replaceAll(d)},
  async deletePlay(id){const d=await this.adapter.getAll();d.plays=d.plays.filter(p=>p.id!==id);await this.adapter.replaceAll(d)},
  // --- Soci (modificabili solo dal pannello admin) ---
  async members(){return (await this.adapter.getAll()).members.slice().sort((a,b)=>memberName(a).localeCompare(memberName(b)))},
@@ -50,3 +54,28 @@ const Stats={
   return Object.values(m).map(o=>({...o,presences:o.dates.size,distinct:Object.keys(o.games).length,fav:Object.entries(o.games).sort((a,b)=>b[1]-a[1])}))},
  gameCounts(games,plays){return games.map(g=>({game:g,n:plays.filter(p=>p.gameId===g.id).length})).sort((a,b)=>b.n-a.n)}
 };
+
+// Badge: calcolati dai dati, mai salvati
+const BADGES=[
+ ['prima','🎲','Prima partita','Gioca la prima partita',s=>s.plays>=1],
+ ['vittoria','🥇','Prima vittoria','Vinci una partita',s=>s.wins>=1],
+ ['p10','🔟','10 partite','Gioca 10 partite',s=>s.plays>=10],
+ ['p25','🎯','25 partite','Gioca 25 partite',s=>s.plays>=25],
+ ['p50','💯','50 partite','Gioca 50 partite',s=>s.plays>=50],
+ ['g5','🧭','Curioso','Prova 5 giochi diversi',s=>s.distinct>=5],
+ ['g10','🗺️','Viaggiatore','Prova 10 giochi diversi',s=>s.distinct>=10],
+ ['g20','🌍','Enciclopedia','Prova 20 giochi diversi',s=>s.distinct>=20],
+ ['gio','🌙','Fedelissimo','Gioca 5 serate di giovedì',s=>s.thu>=5],
+ ['dom','☀️','Domenicale','Gioca 5 domeniche',s=>s.sun>=5],
+ ['rec','🏆','Recordman','Detieni un record di punteggio',s=>s.records>=1],
+ ['coop','🤝','Cooperativo','Vinci 5 partite cooperative',s=>s.coopWins>=5],
+ ['host','🏠','Padrone di casa','Ospita 5 tavoli in serata',s=>s.hosted>=5],
+ ['expl','🚀','Esploratore','Gioca un gioco il giorno in cui arriva',s=>s.explorer]];
+const Badges={
+ stats(key,{plays,games,tables}){const mine=plays.filter(p=>p.players.some(x=>Stats.key(x)===key));const me=p=>p.players.find(x=>Stats.key(x)===key);
+  const dates=ev=>new Set(mine.filter(p=>p.evening===ev).map(p=>p.date)).size;
+  return{plays:mine.length,wins:mine.filter(p=>me(p).winner).length,distinct:new Set(mine.map(p=>p.gameId)).size,thu:dates('Giovedì'),sun:dates('Domenica'),
+   coopWins:mine.filter(p=>p.coop&&me(p).winner).length,records:Stats.records(games,plays).filter(r=>Stats.key(r.best.p)===key).length,
+   hosted:(tables||[]).filter(t=>'m:'+t.hostId===key).length,explorer:mine.some(p=>{const g=games.find(g=>g.id===p.gameId);return g&&g.addedAt&&g.addedAt.slice(0,10)===p.date})}},
+ list(key,ctx){const s=this.stats(key,ctx);return BADGES.map(([id,icon,name,desc,f])=>({id,icon,name,desc,on:!!f(s)}))},
+ unlocked(key,ctx){return this.list(key,ctx).filter(b=>b.on).map(b=>b.id)}};
