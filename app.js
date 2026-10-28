@@ -62,17 +62,21 @@ async giocatori(){const gs=await DB.games(),ms=await DB.members(),all=Stats.play
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati solo su questo telefono. Esportate spesso un backup.</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div>
- <h2>🔒 Pannello admin</h2><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v2 · Associazione PerGioco, Ragusa</div>`;
+ <h2>🔒 Pannello admin</h2><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v3 · Associazione PerGioco, Ragusa</div>`;
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(!f||!confirm('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
- const A=$('#adm');
- if(!hp){A.innerHTML=`<p class="muted">Primo accesso: scegliete un PIN admin (almeno 4 cifre).</p><label>Nuovo PIN</label><input id="p1" type="password" inputmode="numeric"><label>Ripeti PIN</label><input id="p2" type="password" inputmode="numeric"><button class="p" id="ps">Imposta PIN</button>`;
+ const A=$('#adm');const R=!!DB.remote&&DB.status==='online';
+ if(R&&!admin)admin=await DB.remote.isAdmin();
+ if(R&&!admin){A.innerHTML=`<p class="muted">Accesso admin con l'account Supabase.</p><label>Email</label><input id="le" type="email" autocomplete="username"><label>Password</label><input id="lp" type="password" autocomplete="current-password"><button class="p" id="lg">Entra</button>`;
+  $('#lg').onclick=async()=>{let ok;try{ok=await DB.remote.signIn($('#le').value.trim(),$('#lp').value)}catch(err){return toast('Accesso non riuscito: '+err.message)}
+   if(!ok){await DB.remote.signOut();return toast('Questo utente non è tra gli admin')}admin=true;go('altro')};return}
+ if(!R&&!hp){A.innerHTML=`<p class="muted">Primo accesso: scegliete un PIN admin (almeno 4 cifre).</p><label>Nuovo PIN</label><input id="p1" type="password" inputmode="numeric"><label>Ripeti PIN</label><input id="p2" type="password" inputmode="numeric"><button class="p" id="ps">Imposta PIN</button>`;
   $('#ps').onclick=async()=>{const a=$('#p1').value;if(!/^\d{4,}$/.test(a))return toast('Il PIN deve avere almeno 4 cifre');if(a!==$('#p2').value)return toast('I PIN non coincidono');await DB.setPin(a);admin=true;toast('PIN impostato');go('altro')};return}
  if(!admin){A.innerHTML=`<label>PIN admin</label><input id="pi" type="password" inputmode="numeric"><button class="p" id="pe">Entra</button>`;
   $('#pe').onclick=async()=>{if(await DB.checkPin($('#pi').value)){admin=true;go('altro')}else toast('PIN errato')};return}
  const ms=await DB.members(),leg=await DB.legacyNames(),gs=await DB.games(),ps=await DB.plays();let edit=null,gf='';
  const tabs=`<div class="row"><div class="seg" id="atab"><button data-a="soci" class="${adminTab==='soci'?'on':''}">Soci</button><button data-a="partite" class="${adminTab==='partite'?'on':''}">Partite</button></div><button class="s" id="out" style="flex:0 0 auto">Esci</button></div>`;
- const bind=()=>{$('#out').onclick=()=>{admin=false;go('altro')};$('#atab').onclick=e=>{if(e.target.dataset.a){adminTab=e.target.dataset.a;draw()}}};
+ const bind=()=>{$('#out').onclick=async()=>{admin=false;if(R)await DB.remote.signOut();go('altro')};$('#atab').onclick=e=>{if(e.target.dataset.a){adminTab=e.target.dataset.a;draw()}}};
  const drawPlays=()=>{const l=ps.filter(p=>!gf||p.gameId===gf);A.innerHTML=tabs+`<label>Filtra per gioco</label><select id="gf"><option value="">Tutti i giochi (${ps.length})</option>${gs.map(g=>`<option value="${g.id}"${g.id===gf?' selected':''}>${esc(g.name)}</option>`)}</select>
  <div style="margin-top:8px">${l.map(p=>`<div class="rec"><span>${esc(gname(gs,p.gameId))}<br><span class="muted">${fmt(p.date)} · ${p.evening} · ${p.players.map(x=>esc(Stats.label(x,ms))+(x.score!=null&&x.score!==''?' '+x.score:'')).join(', ')}</span></span><span style="flex:0 0 auto"><button class="s" data-pe="${p.id}">✏️</button> <button class="s" data-pd="${p.id}">🗑</button></span></div>`).join('')||'<p class="muted">Nessuna partita.</p>'}</div>`;bind();
   $('#gf').onchange=e=>{gf=e.target.value;drawPlays()};
@@ -85,16 +89,23 @@ async altro(){const hp=await DB.hasPin();
  <div style="margin-top:12px">${ms.map(m=>`<div class="rec"><span>${esc(memberName(m))}${m.soprannome?`<br><span class="muted">${esc(m.nome+' '+(m.cognome||''))}</span>`:''}${m.tessera?` <span class="chip">#${esc(m.tessera)}</span>`:''}${m.active?'':' <span class="chip off">disattivato</span>'}</span>
   <span style="flex:0 0 auto"><button class="s" data-e="${m.id}">✏️</button> <button class="s" data-t="${m.id}">${m.active?'Disattiva':'Riattiva'}</button></span></div>`).join('')||'<p class="muted">Nessun socio.</p>'}</div>
  ${leg.length?`<label style="margin-top:14px"><b>Collega a socio</b>: nomi delle partite registrate prima dell'elenco soci</label>${leg.map(([n,c],i)=>`<div class="prow"><input disabled value="${esc(n)} (${c})"><select id="lk${i}"><option value="">Scegli…</option>${ms.map(m=>`<option value="${m.id}">${esc(memberName(m))}</option>`)}<option value="guest">È un ospite</option></select><button class="s" data-l="${i}">✓</button></div>`).join('')}`:''}
- <label style="margin-top:14px"><b>Cambia PIN</b></label><div class="row"><input id="np" type="password" inputmode="numeric" placeholder="Nuovo PIN"><button class="s" id="cp" style="flex:0 0 auto">Cambia</button></div>`;bind();
+ ${R?`<label style="margin-top:14px"><b>Dati di questo telefono</b></label>${localStorage.getItem('pergioco-migrated')?'<p class="muted">Già caricati su Supabase.</p>':'<button class="p" id="mig">Carica i dati di questo telefono su Supabase</button>'}`:`<label style="margin-top:14px"><b>Cambia PIN</b></label><div class="row"><input id="np" type="password" inputmode="numeric" placeholder="Nuovo PIN"><button class="s" id="cp" style="flex:0 0 auto">Cambia</button></div>`}`;bind();
  if($('#mx'))$('#mx').onclick=()=>{edit=null;drawSoci()};
  $('#msv').onclick=async()=>{const nome=$('#mn').value.trim();if(!nome)return toast('Il nome è obbligatorio');await DB.saveMember({...(edit||{}),nome,cognome:$('#mc2').value.trim(),soprannome:$('#mso').value.trim(),tessera:$('#mt').value.trim()});toast(edit?'Socio aggiornato':'Socio aggiunto');go('altro')};
  A.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{edit=ms.find(m=>m.id===b.dataset.e);drawSoci()});
  A.querySelectorAll('[data-t]').forEach(b=>b.onclick=async()=>{const m=ms.find(x=>x.id===b.dataset.t);await DB.saveMember({id:m.id,active:!m.active});go('altro')});
  A.querySelectorAll('[data-l]').forEach(b=>b.onclick=async()=>{const v=$('#lk'+b.dataset.l).value;if(!v)return toast('Scegli un socio');await DB.linkName(leg[b.dataset.l][0],v);toast('Collegato');go('altro')});
- $('#cp').onclick=async()=>{const a=$('#np').value;if(!/^\d{4,}$/.test(a))return toast('Il PIN deve avere almeno 4 cifre');await DB.setPin(a);toast('PIN cambiato');$('#np').value=''}};
+ if($('#mig'))$('#mig').onclick=async()=>{if(!confirm('Caricare su Supabase giochi, soci e partite salvati su questo telefono?'))return;try{const n=await DB.remote.uploadLocal();toast(n+' elementi caricati');go('altro')}catch(err){toast('Errore: '+err.message)}};
+ if($('#cp'))$('#cp').onclick=async()=>{const a=$('#np').value;if(!/^\d{4,}$/.test(a))return toast('Il PIN deve avere almeno 4 cifre');await DB.setPin(a);toast('PIN cambiato');$('#np').value=''}};
  const draw=()=>adminTab==='partite'?drawPlays():drawSoci();draw()}
 };
 function go(v){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));location.hash=v;views[v]();scrollTo(0,0)}
 $('#tabs').onclick=e=>{const b=e.target.closest('button');b&&go(b.dataset.v)};
-go(views[location.hash.slice(1)]?location.hash.slice(1):'ludoteca');
+const cfg=!!((window.PERGIOCO_CONFIG||{}).supabaseUrl&&(window.PERGIOCO_CONFIG||{}).supabaseAnonKey);
+DB.onStatus=()=>{const el=$('#status');if(!el)return;const q=DB.remote?DB.remote.queue().length:0;let t='';
+ if(DB.status==='missing')t='⚠️ Database non ancora configurato: i dati restano su questo telefono.';
+ else if(DB.status==='offline')t='📴 Offline'+(q?`: ${q} modifiche in attesa di sincronizzazione`:': dati salvati sul telefono');
+ else if(DB.status==='local'&&cfg)t='⚠️ Database non raggiungibile: i dati restano su questo telefono.';
+ else if(q)t=`🔄 ${q} modifiche in sincronizzazione…`;el.textContent=t;el.hidden=!t};
+(async()=>{try{await DB.init()}catch(e){console.warn(e)}go(views[location.hash.slice(1)]?location.hash.slice(1):'ludoteca')})();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');

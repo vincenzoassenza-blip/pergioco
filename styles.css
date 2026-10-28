@@ -22,3 +22,4 @@ nav button span{font-size:11px;margin-top:2px}nav button.on{color:var(--b);font-
 .prow{display:flex;gap:6px;margin-bottom:6px}.prow input:first-child{flex:2}.prow input{flex:1}.prow button{flex:0 0 40px}
 
 .chip.pick{border:0;font-size:14px;padding:7px 12px}.chip.on{background:var(--b);color:#fff}.chip.off{background:#eee;color:#999}.warn{color:#b3261e;font-size:13px}
+#status{background:#fff4d6;color:#6b4e00;font-size:13px;padding:8px 14px;text-align:center}
