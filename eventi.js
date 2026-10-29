@@ -73,20 +73,20 @@ async function evDetail(e,p,i){const staff=adminMode(),ms=await DB.members(),mn=
  if(q('#evedit'))q('#evedit').onclick=()=>{o.close();evForm(e)};
  if(q('#evpr'))q('#evpr').onclick=()=>{o.close();evStaff(e)}}
 function evForm(e){const nuovo=!e.id;
- const o=openPanel(`<h3>${nuovo?'Nuovo evento':'Modifica evento'}</h3><form id="evf">
+ const o=openPanel(`<h3>${nuovo?'Nuovo evento':'Modifica evento'}</h3><form id="evf" novalidate>
  <label>Titolo *</label><input name="titolo" required maxlength="120" value="${esc(e.titolo||'')}">
  <label>Descrizione</label><textarea name="descrizione" rows="3">${esc(e.descrizione||'')}</textarea>
  <div class="row dtrow"><div><label>Inizio (ora italiana) *</label><input name="inizio" type="datetime-local" required value="${toInput(e.inizio)}"></div><div><label>Chiusura prenotazioni *</label><input name="chiusura" type="datetime-local" required value="${toInput(e.chiusura)}"></div></div>
  <label>Luogo</label><input name="luogo" value="${esc(e.luogo||'')}">
  <label>Locandina (link https, facoltativo)</label><input name="immagine" type="url" placeholder="https://…" value="${esc(e.immagine||'')}">
- <div class="row"><div><label>Posti massimi *</label><input name="posti" type="number" min="1" max="1000" required value="${e.posti||20}"></div><div><label>Quota € (facolt.)</label><input name="quota" type="number" min="0" step="0.5" value="${e.quota??''}"></div><div><label>Caparra € (facolt.)</label><input name="caparra" type="number" min="0" step="0.5" value="${e.caparra??''}"></div></div>
+ <div class="row"><div><label>Posti massimi *</label><input name="posti"${nA('int',1,1000,'Posti massimi',' required')} value="${e.posti||20}"></div><div><label>Quota € (facolt.)</label><input name="quota"${nA('dec',0,10000,'Quota')} value="${String(e.quota??'').replace('.',',')}"></div><div><label>Caparra € (facolt.)</label><input name="caparra"${nA('dec',0,10000,'Caparra')} value="${String(e.caparra??'').replace('.',',')}"></div></div>
  <label class="lchk"><input type="checkbox" name="solo_soci"${e.solo_soci?' checked':''}> Solo soci in regola con la quota (dal Libro soci)</label>
  <label class="lchk"><input type="checkbox" name="ospiti"${e.ospiti?' checked':''}> Ospiti ammessi (max 1 per persona)</label>
  <label class="lchk"><input type="checkbox" name="torneo"${e.torneo?' checked':''}> È un torneo</label>
  <p class="muted">Con quota o caparra le prenotazioni restano «in attesa di conferma» (tengono il posto) finché lo staff non conferma la caparra ricevuta di persona.</p>
  <div class="mbt">${!nuovo&&!e.annullato?'<button type="button" class="danger" id="evdel">Annulla evento</button>':''}<button type="button" class="s" data-close>Chiudi</button><button class="p">Salva</button></div></form>`);
  const f=o.querySelector('#evf');
- f.onsubmit=async ev=>{ev.preventDefault();const F=new FormData(f),n=k=>F.get(k)===''?null:+F.get(k);
+ f.onsubmit=async ev=>{ev.preventDefault();if(!numForm(f))return;const F=new FormData(f),n=k=>F.get(k).trim()===''?null:+F.get(k).replace(',','.');
   const d={titolo:F.get('titolo').trim(),descrizione:F.get('descrizione').trim()||null,luogo:F.get('luogo').trim()||null,immagine:F.get('immagine').trim()||null,inizio:fromInput(F.get('inizio')),chiusura:fromInput(F.get('chiusura')),posti:+F.get('posti'),quota:n('quota'),caparra:n('caparra'),solo_soci:!!F.get('solo_soci'),ospiti:!!F.get('ospiti'),torneo:!!F.get('torneo')};
   if(e.id)d.id=e.id;
   if((nuovo||d.inizio!==e.inizio)&&new Date(d.inizio)<new Date())return modal('La data dell\'evento non può essere nel passato.',{cancel:false});
@@ -106,7 +106,7 @@ async function evStaff(e){const ms=await DB.members(),mn=id=>{const m=ms.find(m=
  ${ps.map(row).join('')||'<p class="muted">Nessuna prenotazione.</p>'}
  <div class="mbt"><button class="s" id="evcsv">⬇️ CSV</button><button class="s" data-close>Chiudi</button></div>`,true);
  const again=()=>{o.close();evStaff(e)};
- o.querySelectorAll('[data-cap]').forEach(b=>b.onclick=async()=>{const v=await askText('Importo della caparra ricevuta di persona (€):',String(e.caparra??e.quota??''));if(v==null)return;const n=+String(v).replace(',','.');if(!(n>=0)||String(v).trim()==='')return toast('Importo non valido');
+ o.querySelectorAll('[data-cap]').forEach(b=>b.onclick=async()=>{const v=await askText('Importo della caparra ricevuta di persona (€):',String(e.caparra??e.quota??'').replace('.',','),'dec');if(v==null)return;const n=+String(v).replace(',','.');if(!/^\d+([.,]\d{1,2})?$/.test(String(v).trim())||n>10000)return modal('⚠️ «Importo caparra» deve essere un importo in euro (es. 12,50) tra 0 e 10000. Hai scritto: «'+esc(String(v))+'».',{cancel:false});
   try{await EV.staff(b.dataset.cap,'conferma_caparra',n);toast('Prenotazione confermata');again()}catch(x){toast(evMsg(x))}});
  o.querySelectorAll('[data-rif]').forEach(b=>b.onclick=async()=>{if(!await ask('Annullare questa prenotazione? Il posto passa al primo in lista d\'attesa.'))return;try{await EV.staff(b.dataset.rif,'rifiuta');toast('Prenotazione annullata');again()}catch(x){toast(evMsg(x))}});
  o.querySelectorAll('[data-pres]').forEach(c=>c.onchange=async()=>{try{await EV.staff(c.dataset.pres,'presente',null,c.checked);toast(c.checked?'Segnato presente':'Presenza tolta')}catch(x){c.checked=!c.checked;toast(evMsg(x))}});

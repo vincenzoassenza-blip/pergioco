@@ -111,3 +111,6 @@ body.mlock{position:fixed;left:0;right:0;overflow:hidden}
 .xpbar{height:9px;background:#e4e0d6;border-radius:5px;overflow:hidden;margin:8px 0 4px}.xpbar i{display:block;height:100%;border-radius:5px}
 .vgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:4px 0 10px}.vb{padding:10px 0;border-radius:8px;border:1px solid #ccc;background:#fff;font-size:16px;font-weight:700}.vb.on{background:#f5b700;border-color:#f5b700;color:#222}
 .rprompt{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:950;background:#fff;border-radius:12px;box-shadow:0 4px 18px #0003;padding:10px 12px;display:flex;gap:8px;align-items:center;animation:fi .2s}.rprompt span{flex:1;font-size:14px}.rprompt button{flex:0 0 auto;width:auto;padding:8px 12px}
+/* v14 campi numerici */
+input.bad{border-color:#b3261e!important;background:#fdecea;box-shadow:0 0 0 2px #b3261e33}
+input.nflash{animation:nfl .4s}@keyframes nfl{0%,100%{background:#fff}40%{background:#fdecea}}
