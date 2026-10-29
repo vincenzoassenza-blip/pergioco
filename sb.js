@@ -46,6 +46,7 @@ const SupabaseAdapter={
  async signIn(email,password){const {error}=await this.client.auth.signInWithPassword({email,password});if(error)throw error;return this.isAdmin()},
  async signOut(){await this.client.auth.signOut()},
  async isAdmin(){const {data:s}=await this.client.auth.getSession();if(!s.session){this.modCached=false;return this.adminCached=false}const {data,error}=await this.client.rpc('is_admin');const a=!error&&data===true;if(a&&!this.adminCached){this.adminCached=true;try{await this.refresh()}catch(e){}}this.adminCached=a;let m=false;if(!a){const r=await this.client.rpc('is_moderator');m=!r.error&&r.data===true}this.modCached=m;return a||m},
+ async searchMembers(q){const {data,error}=await this.client.rpc('search_members',{p_q:q});if(error)throw error;return (data||[]).map(r=>r.id)},
  async moderators(){const {data,error}=await this.client.rpc('admin_moderators');if(error)throw error;return (data||[]).map(x=>typeof x==='string'?x:x.admin_moderators)},
  async setModerator(email,on){const {error}=await this.client.rpc('admin_set_moderator',{p_email:email,p_on:on});if(error)throw error},
  // --- account dei soci ---

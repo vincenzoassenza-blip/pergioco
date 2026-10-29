@@ -26,8 +26,8 @@ function pickMembers(ms,selected,title,max){return new Promise(res=>{const sel=n
  <input id="pkq" placeholder="Cerca per nome, cognome o soprannome…"><div id="pkl" class="pkl"></div><div class="row"><button class="s" id="pkx">Annulla</button><button class="p" id="pko">Conferma</button></div></div>`;
  document.body.append(w);let q='';
  const draw=()=>{w.querySelector('#pkn').textContent=sel.size+(max?'/'+max:'')+' selezionati';
-  const l=list.filter(m=>!q||[m.nome,m.cognome,m.soprannome].some(f=>norm(f).includes(q))||norm(memberName(m)).includes(q));
-  w.querySelector('#pkl').innerHTML=l.map(m=>`<div class="pki" data-id="${m.id}"><input type="checkbox" tabindex="-1"${sel.has(m.id)?' checked':''}> <span>${esc(memberName(m))}</span></div>`).join('')||'<p class="muted">Nessun socio trovato</p>'};
+  const l=q?list.filter(m=>norm([m.nome,m.cognome,m.soprannome,m.nome].join(' ')).includes(q)||norm(memberName(m)).includes(q)).slice(0,20):list.filter(m=>sel.has(m.id)).concat(list.filter(m=>!sel.has(m.id)).slice(0,Math.max(0,20-sel.size)));
+  w.querySelector('#pkl').innerHTML=(!q&&list.length>l.length?'<p class="muted">Scrivi per cercare tra tutti i '+list.length+' soci.</p>':'')+l.map(m=>`<div class="pki" data-id="${m.id}"><input type="checkbox" tabindex="-1"${sel.has(m.id)?' checked':''}> <span>${esc(memberName(m))}</span></div>`).join('')||'<p class="muted">Nessun socio trovato</p>'};
  w.querySelector('#pkq').oninput=e=>{q=norm(e.target.value.trim());draw()};
  w.querySelector('#pkl').onclick=e=>{const r=e.target.closest('.pki');if(!r)return;e.preventDefault();const id=r.dataset.id;if(sel.has(id))sel.delete(id);else{if(max&&sel.size>=max)return toast('Tavolo pieno');sel.add(id)}draw()};
  const close=v=>{w.remove();res(v)};w.querySelector('#pkx').onclick=()=>close(null);w.querySelector('#pko').onclick=()=>close([...sel]);w.onclick=e=>e.target===w&&close(null);draw()})}
@@ -89,8 +89,14 @@ async giocatori(){const gs=await DB.games(),ms=await DB.members(),bc=await badge
  const card=p=>`<div class="card"><div class="row">${p.member?`<a class="pv" data-pv="${p.key.slice(2)}">${avatarHtml(ms.find(m=>'m:'+m.id===p.key),28)} ${esc(p.name)}</a>`:`<b>${esc(p.name)}</b>`}<span class="muted" style="text-align:right">${p.presences} serat${p.presences==1?'a':'e'}</span></div>
  <div class="chips"><span class="chip">🎲 ${p.plays} partite</span><span class="chip">🏆 ${p.wins} vittorie</span><span class="chip">${Math.round(p.wins/p.plays*100)}%</span></div>
  <div class="muted" style="margin-top:8px">Preferiti: ${p.fav.slice(0,3).map(([id,n])=>esc(gname(gs,id))+' ('+n+')').join(', ')}</div>${p.member?(()=>{const bl=Badges.list(p.key,bc);return`<details class="bd"><summary>🏅 Badge ${bl.filter(b=>b.on).length}/${bl.length} ${bl.filter(b=>b.on).map(b=>b.icon).join('')}</summary><div class="badges">${bl.map(b=>`<div class="badge${b.on?'':' off'}"><div class="bi">${b.on?b.icon:'🔒'}</div><b>${esc(b.name)}</b><small>${esc(b.desc)}</small></div>`).join('')}</div></details>`})():''}</div>`;
- const m=all.filter(p=>p.member),g=all.filter(p=>!p.member);
- V.innerHTML=`<h2>Soci</h2>`+(m.map(card).join('')||'<p class="muted">I profili compaiono dopo la prima partita registrata.</p>')+(g.length?`<h2>Ospiti e nomi non collegati</h2>`+g.map(card).join(''):'')},
+ const myId=DB.remote?(await DB.remote.user())?.id:null,me=ms.find(m=>myId&&m.userId===myId),mine=me&&all.find(p=>p.key==='m:'+me.id);
+ const mini=m=>`<div class="rec"><a class="pv" data-pv="${m.id}">${avatarHtml(m,28)} ${esc(`${m.nome} ${m.cognome||''}`.trim())}${m.soprannome?` <span class="muted">(${esc(m.soprannome)})</span>`:''}</a></div>`;
+ V.innerHTML=`<h2>Io</h2>${mine?card(mine):me?`<div class="card">${mini(me)}<p class="muted">Ancora nessuna partita registrata.</p></div>`:'<div class="card muted">Il tuo account non è collegato a una scheda socio.</div>'}
+ <h2>Cerca un socio</h2><input id="gq" placeholder="Nome, cognome o soprannome (almeno 2 lettere)" autocomplete="off"><div id="gr" class="card" style="margin-top:8px"><p class="muted">Scrivi almeno 2 lettere per cercare tra i soci.</p></div>`;
+ let tk=0;$('#gq').oninput=e=>{const q=e.target.value.trim(),k=++tk,R=$('#gr');if(q.length<2){R.innerHTML='<p class="muted">Scrivi almeno 2 lettere per cercare tra i soci.</p>';return}
+  setTimeout(async()=>{if(k!==tk)return;let ids;try{if(DB.remote&&DB.status==='online')ids=await DB.remote.searchMembers(q)}catch(err){}
+   if(!ids){const n=norm(q);ids=ms.filter(m=>norm([m.nome,m.cognome,m.soprannome,m.nome].join(' ')).includes(n)).slice(0,20).map(m=>m.id)}
+   if(k!==tk)return;const l=ids.map(id=>ms.find(m=>m.id===id)).filter(Boolean);R.innerHTML=l.map(mini).join('')+(l.length===20?'<p class="muted">Mostrati i primi 20: affina la ricerca.</p>':'')||'<p class="muted">Nessun socio trovato.</p>'},250)}},
 async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=>m.active),ts=await DB.allTables();const ne=nextEvening();window._ser=window._ser||ne;const S=window._ser;
  const mn=id=>{const m=all.find(m=>m.id===id);return m?memberName(m):'?'};
  const open=ts.filter(t=>t.date===S.date&&t.evening===S.evening);const pres=new Set();open.forEach(t=>(t.players||[]).forEach(p=>pres.add(p.memberId?'m:'+p.memberId:'g:'+p.name)));
@@ -115,7 +121,7 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<div id="bkp" hidden><h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati solo su questo telefono. Esportate spesso un backup.</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div></div>
- <h2 id="pt">🔒 Pannello admin</h2><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v10 · Associazione PerGioco, Ragusa</div>`;
+ <h2 id="pt">🔒 Pannello admin</h2><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v10.1 · Associazione PerGioco, Ragusa</div>`;
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(!f||!await ask('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
  const A=$('#adm');const R=!!DB.remote&&DB.status==='online';
