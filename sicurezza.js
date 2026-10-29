@@ -1,5 +1,5 @@
 // v15 — sicurezza degli input: pulizia testi, lunghezze massime, incolla, URL sicuri, CSV, errori globali.
-const TXT_MAX={gn:100,sc:100,nt:1000,tn:300,pkq:100,q:100,gq:100,lq2:100,mn:60,mc2:60,mso:40,es:40,mt:30,le:254,ae:254,me2:254,lp:72,ap:72,ap2:72,p1:12,p2:12,pi:12,np:12,ac:14,evgn:80,
+const TXT_MAX={gn:100,sc:100,nt:1000,du:4,tn:300,pkq:100,q:100,gq:100,lq2:100,mn:60,mc2:60,mso:40,es:40,mt:30,le:254,ae:254,me2:254,lp:72,ap:72,ap2:72,p1:12,p2:12,pi:12,np:12,ac:14,evgn:80,
  titolo:120,descrizione:3000,luogo:150,immagine:500,nome:60,cognome:60,luogo_nascita:100,codice_fiscale:16,indirizzo:200,comune:100,provincia:2,numero_tessera:30,motivo_uscita:300,attivita:300,assicurazione:200,cap:5};
 const TXT_LABEL={titolo:'Titolo',descrizione:'Descrizione',luogo:'Luogo',immagine:'Locandina',nome:'Nome',cognome:'Cognome',soprannome:'Soprannome',luogo_nascita:'Luogo di nascita',indirizzo:'Indirizzo',comune:'Comune',numero_tessera:'N. tessera',motivo_uscita:'Motivo uscita',attivita:'Attività',assicurazione:'Assicurazione',note:'Note',scenario:'Scenario',name:'Nome gioco',tessera:'Tessera',ospite:'Ospite',codice_fiscale:'Codice fiscale',provincia:'Provincia'};
 // limiti per colonna del DB (uguali ai CHECK di migrate-v15.sql)
