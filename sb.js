@@ -2,8 +2,8 @@
 // Lavora su una copia locale (cache) e invia le differenze a Supabase; se offline
 // le mette in coda e le sincronizza al ritorno della connessione.
 const MAP={
- games:{t:'games',to:g=>({id:g.id,added_at:g.addedAt||null,name:g.name,min_players:g.min,max_players:g.max,min_time:g.minT,max_time:g.maxT,age:g.age,coop:!!g.coop,bgg_id:g.bggId??null,thumb:g.thumb??null}),
-  from:r=>({id:r.id,addedAt:r.added_at,name:r.name,min:r.min_players,max:r.max_players,minT:r.min_time,maxT:r.max_time,age:r.age,coop:r.coop,bggId:r.bgg_id,thumb:r.thumb})},
+ games:{t:'games',to:g=>({id:g.id,added_at:g.addedAt||null,name:g.name,min_players:g.min,max_players:g.max,min_time:g.minT,max_time:g.maxT,age:g.age,coop:!!g.coop,bgg_id:g.bggId??null,thumb:g.thumb??null,play_time:g.playTime??null,year:g.year??null,best_players:g.best??null,rec_players:g.rec??null,categories:g.categories??null,mechanics:g.mechanics??null,is_expansion:!!g.isExp}),
+  from:r=>({id:r.id,addedAt:r.added_at,name:r.name,min:r.min_players,max:r.max_players,minT:r.min_time,maxT:r.max_time,age:r.age,coop:r.coop,bggId:r.bgg_id,thumb:r.thumb,playTime:r.play_time??null,year:r.year??null,best:r.best_players||[],rec:r.rec_players||[],categories:r.categories||[],mechanics:r.mechanics||[],isExp:!!r.is_expansion})},
  members:{t:'members',cols:'id,nome,cognome,soprannome,active,created_at,user_id,avatar,color,fav_game_id',
   // tessera e user_id si inviano solo se noti (la tessera non e' leggibile dai non admin)
   to:m=>{const r={id:m.id,nome:m.nome,cognome:m.cognome||null,soprannome:m.soprannome||null,active:m.active!==false};if(m.tessera!==undefined)r.tessera=m.tessera||null;if(m.userId!==undefined)r.user_id=m.userId||null;if(m.avatar!==undefined)r.avatar=m.avatar||null;if(m.color!==undefined)r.color=m.color||null;if(m.favGameId!==undefined)r.fav_game_id=m.favGameId||null;return r},

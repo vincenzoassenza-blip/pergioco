@@ -3,3 +3,4 @@ docs/
 *.csv
 *.xlsx
 !vendor/**
+data/
