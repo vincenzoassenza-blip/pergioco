@@ -115,3 +115,25 @@ body.mlock{position:fixed;left:0;right:0;overflow:hidden}
 input.bad{border-color:#b3261e!important;background:#fdecea;box-shadow:0 0 0 2px #b3261e33}
 input.nflash{animation:nfl .4s}@keyframes nfl{0%,100%{background:#fff}40%{background:#fdecea}}
 .pfchips{display:flex;flex-wrap:wrap;gap:6px}.pfbar label{font-size:12px}
+/* v17 — desktop e mouse */
+button:not(:disabled),summary,select,a[href],a.pv,label[for],input[type=checkbox],input[type=radio],input[type=file],input[type=date],[data-gp],[data-pv],[data-ev],[data-act],[data-pe],[data-pd],[role=button]{cursor:pointer}
+button:disabled{cursor:not-allowed}
+:focus-visible{outline:3px solid #2f6fdb;outline-offset:2px}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline-offset:0}
+@media (hover:hover) and (pointer:fine){
+ button:not(:disabled):hover{filter:brightness(.93)}
+ nav button:hover{color:var(--b);background:#f1f4fa}
+ [data-gp]:hover,[data-ev]:hover,.lrow:hover,.evc:hover,.pki:hover,#mieiev .evrow:hover{background:#f6f8fc}
+ .card[data-gp]:hover,.evc:hover{box-shadow:0 2px 10px #0002}
+ *{scrollbar-width:thin}
+}
+@media (min-width:900px){
+ header{padding-left:max(18px,calc(50% - 320px));padding-right:max(18px,calc(50% - 320px))}
+ #modebtn{right:max(14px,calc(50% - 316px))}
+ nav{justify-content:center}
+ nav button{flex:0 1 92px}
+ .modal{justify-content:center;align-items:center}
+ .modal .sheet{max-width:640px;border-radius:16px}
+ .mbox.wide{max-width:640px}
+ .gph{max-width:640px;margin:0 auto;box-sizing:border-box}
+}
