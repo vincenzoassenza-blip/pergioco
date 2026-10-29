@@ -137,3 +137,4 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline-offset:0
  .mbox.wide{max-width:640px}
  .gph{max-width:640px;margin:0 auto;box-sizing:border-box}
 }
+.dday{margin:6px 0 2px;color:var(--b)}

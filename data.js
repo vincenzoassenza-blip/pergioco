@@ -95,8 +95,8 @@ const BADGES=[
  ['critico','✍️','Critico','Vota 10 giochi',s=>s.rated>=10]];
 const Badges={
  stats(key,{plays,games,tables,ratings}){const mine=plays.filter(p=>p.players.some(x=>Stats.key(x)===key));const me=p=>p.players.find(x=>Stats.key(x)===key);
-  const dates=ev=>new Set(mine.filter(p=>p.evening===ev).map(p=>p.date)).size;
-  return{plays:mine.length,wins:mine.filter(p=>me(p).winner).length,distinct:new Set(mine.map(p=>p.gameId)).size,thu:dates('Giovedì'),sun:dates('Domenica'),
+  const dates=wd=>new Set(mine.filter(p=>new Date(String(p.date).slice(0,10)+'T12:00').getDay()===wd).map(p=>p.date)).size;
+  return{plays:mine.length,wins:mine.filter(p=>me(p).winner).length,distinct:new Set(mine.map(p=>p.gameId)).size,thu:dates(4),sun:dates(0),
    coopWins:mine.filter(p=>p.coop&&me(p).winner).length,records:Stats.records(games,plays).filter(r=>Stats.key(r.best.p)===key).length,
    hosted:(tables||[]).filter(t=>'m:'+t.hostId===key).length,explorer:mine.some(p=>{const g=games.find(g=>g.id===p.gameId);return g&&g.addedAt&&g.addedAt.slice(0,10)===p.date}),rated:(ratings||[]).filter(x=>'m:'+x.member_id===key).length}},
  // progresso verso il badge: [valore attuale, obiettivo]
@@ -113,4 +113,4 @@ const Profile={
   const tb=(tables||[]).filter(t=>(t.players||[]).some(x=>x.memberId===memberId)||t.hostId===memberId);
   return{key,plays:mine,n:mine.length,wins,pct:mine.length?Math.round(wins/mine.length*100):0,
    topGames:Object.entries(gc).sort((a,b)=>b[1]-a[1]||gt[a[0]]-gt[b[0]]).slice(0,5),partners:Object.values(pc).sort((a,b)=>b.n-a.n||a.t-b.t).slice(0,5),
-   tables:tb.length,evenings:new Set([...mine.map(p=>p.date+'|'+p.evening),...tb.map(t=>t.date+'|'+t.evening)]).size,hosted:tb.filter(t=>t.hostId===memberId).length}}};
+   tables:tb.length,evenings:new Set([...mine.map(p=>p.date),...tb.map(t=>t.date)]).size,hosted:tb.filter(t=>t.hostId===memberId).length}}};
