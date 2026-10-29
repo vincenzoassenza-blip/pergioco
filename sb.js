@@ -4,10 +4,10 @@
 const MAP={
  games:{t:'games',to:g=>({id:g.id,added_at:g.addedAt||null,name:g.name,min_players:g.min,max_players:g.max,min_time:g.minT,max_time:g.maxT,age:g.age,coop:!!g.coop,bgg_id:g.bggId??null,thumb:g.thumb??null}),
   from:r=>({id:r.id,addedAt:r.added_at,name:r.name,min:r.min_players,max:r.max_players,minT:r.min_time,maxT:r.max_time,age:r.age,coop:r.coop,bggId:r.bgg_id,thumb:r.thumb})},
- members:{t:'members',cols:'id,nome,cognome,soprannome,active,user_id,avatar,color,fav_game_id',
+ members:{t:'members',cols:'id,nome,cognome,soprannome,active,created_at,user_id,avatar,color,fav_game_id',
   // tessera e user_id si inviano solo se noti (la tessera non e' leggibile dai non admin)
   to:m=>{const r={id:m.id,nome:m.nome,cognome:m.cognome||null,soprannome:m.soprannome||null,active:m.active!==false};if(m.tessera!==undefined)r.tessera=m.tessera||null;if(m.userId!==undefined)r.user_id=m.userId||null;if(m.avatar!==undefined)r.avatar=m.avatar||null;if(m.color!==undefined)r.color=m.color||null;if(m.favGameId!==undefined)r.fav_game_id=m.favGameId||null;return r},
-  from:r=>({id:r.id,nome:r.nome,cognome:r.cognome||'',soprannome:r.soprannome||'',tessera:r.tessera===undefined?undefined:(r.tessera||''),active:r.active,userId:r.user_id===undefined?undefined:r.user_id,avatar:r.avatar||'',color:r.color||'',favGameId:r.fav_game_id||''})},
+  from:r=>({id:r.id,nome:r.nome,cognome:r.cognome||'',soprannome:r.soprannome||'',tessera:r.tessera===undefined?undefined:(r.tessera||''),active:r.active,userId:r.user_id===undefined?undefined:r.user_id,avatar:r.avatar||'',color:r.color||'',favGameId:r.fav_game_id||'',createdAt:r.created_at||undefined})},
  tables:{t:'tables',to:t=>({id:t.id,date:t.date,evening:t.evening,game_id:t.gameId,host_id:t.hostId,seats:t.seats,start_time:t.time||null,note:t.note||null,players:t.players||[],status:t.status||'open',play_id:t.playId||null,created_at:t.createdAt||new Date().toISOString()}),
   from:r=>({id:r.id,date:r.date,evening:r.evening,gameId:r.game_id,hostId:r.host_id,seats:r.seats,time:r.start_time||'',note:r.note||'',players:r.players||[],status:r.status,playId:r.play_id,createdAt:r.created_at})},
  plays:{t:'plays',to:p=>({id:p.id,game_id:p.gameId,date:p.date,evening:p.evening,coop:!!p.coop,group_win:p.groupWin??null,scenario:p.scenario||null,players:p.players,note:p.note||null,created_at:p.createdAt||new Date().toISOString(),updated_at:p.updatedAt||null}),

@@ -5,6 +5,11 @@ const fmt=d=>new Date(d+'T12:00').toLocaleDateString('it-IT',{day:'numeric',mont
 const toast=t=>{const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),2200)};
 const gname=(gs,id)=>(gs.find(g=>g.id===id)||{}).name||'?';
 let admin=false,adminTab='soci';
+// modalita' admin/utente (solo per chi e' admin), scelta salvata sul telefono
+const uiMode=()=>localStorage.getItem('pergioco-mode')||'admin';
+const adminMode=()=>admin&&uiMode()!=='user';
+function setMode(m){localStorage.setItem('pergioco-mode',m);drawModeBtn();toast(m==='user'?'Modalità utente':'Modalità admin');const v=location.hash.slice(1);go(views[v]?v:'ludoteca')}
+function drawModeBtn(){const b=document.getElementById('modebtn');if(!b)return;b.hidden=!admin;b.textContent=uiMode()==='user'?'👤 Modalità utente':'🔧 Modalità admin';document.body.classList.toggle('adm',adminMode())}
 const playRow=(p,gs,ms)=>`<div class="rec"><span>${esc(gname(gs,p.gameId))}<br><span class="muted">${fmt(p.date)} · ${p.evening}${p.scenario?' · '+esc(p.scenario):''}</span></span><span class="win">${p.coop?(p.groupWin?'Vittoria':'Sconfitta'):esc(p.players.filter(x=>x.winner).map(x=>Stats.label(x,ms)).join(', '))}</span></div>`;
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 // Selettore soci: lista alfabetica con checkbox e ricerca (nome/cognome/soprannome, senza accenti)
@@ -67,7 +72,7 @@ async nuova(ed){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m
   const r=await DB.addPlay(p);if(ed&&ed.fromTable)await DB.saveTable({id:ed.fromTable,status:'closed',playId:r.id});badgeNew(before,keys);const w=r.players.filter(x=>x.winner).map(x=>Stats.label(x,all));toast(coop?(win?'Vittoria del gruppo! 🎉':'Sconfitta… alla prossima!'):`Vince ${w.join(' e ')||'—'} 🏆`);go('record')}},
 async record(){const gs=await DB.games(),ps=await DB.plays(),ms=await DB.members(),all=Stats.players(ps,ms),pl=all.filter(p=>p.member);const rec=Stats.records(gs,ps),gc=Stats.gameCounts(gs,ps).filter(x=>x.n);
  const top=pl.slice().sort((a,b)=>b.presences-a.presences)[0],var_=pl.slice().sort((a,b)=>b.distinct-a.distinct)[0],ng=all.length-pl.length;
- V.innerHTML=`<h2>Record</h2><div class="row"><div class="card"><div class="muted">Partite</div><div class="big">${ps.length}</div></div><div class="card"><div class="muted">Soci</div><div class="big">${pl.length}</div></div><div class="card"><div class="muted">Ospiti</div><div class="big">${ng}</div></div></div>
+ V.innerHTML=`<h2>Record</h2>${adminMode()?'<button class="s" onclick="go(\'stats\')" style="width:100%;margin-bottom:10px">📊 Statistiche associazione (admin)</button>':''}<div class="row"><div class="card"><div class="muted">Partite</div><div class="big">${ps.length}</div></div><div class="card"><div class="muted">Soci</div><div class="big">${pl.length}</div></div><div class="card"><div class="muted">Ospiti</div><div class="big">${ng}</div></div></div>
  <div class="card"><b>⭐ Socio più presente</b><div class="rec"><span>${top?`<a class="pv" data-pv="${top.key.slice(2)}">${esc(top.name)}</a>`:'—'}</span><span class="win">${top?top.presences+(top.presences==1?' serata':' serate'):''}</span></div>
  <b>🧭 Più giochi diversi</b><div class="rec"><span>${var_?`<a class="pv" data-pv="${var_.key.slice(2)}">${esc(var_.name)}</a>`:'—'}</span><span class="win">${var_?var_.distinct+' giochi':''}</span></div></div>
  <div class="card"><b>🏆 Punteggio più alto per gioco</b>${rec.length?rec.map(r=>`<div class="rec"><span>${esc(r.game.name)}<br><span class="muted">${esc(Stats.label(r.best.p,ms))} · ${fmt(r.best.date)}</span></span><span class="big">${r.best.score}</span></div>`).join(''):'<p class="muted">Ancora nessun punteggio.</p>'}</div>
@@ -86,7 +91,7 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
  <div class="chips"><span class="chip">🪑 ${open.filter(t=>t.status==='open').length} tavoli aperti</span><span class="chip">🙋 ${pres.size} presenti</span></div></div>
  <div id="tl">${open.map(t=>{const n=(t.players||[]).length,full=n>=t.seats,g=gs.find(g=>g.id===t.gameId)||{};return`<div class="card tavolo${t.status!=='open'?' closed':''}"><div class="row"><b>${esc(g.name||'?')}</b><span class="muted" style="text-align:right">${t.time?'🕗 '+esc(t.time)+' · ':''}${t.status==='open'?(full?'<b>Pieno</b>':(t.seats-n)+' posti liberi'):'✅ Chiuso'}</span></div>
   <div class="muted">🏠 <a class="pv" data-pv="${t.hostId}">${esc(mn(t.hostId))}</a>${t.note?' · '+esc(t.note):''}</div><div class="chips">${(t.players||[]).map(p=>`<span class="chip">${esc(p.memberId?mn(p.memberId):p.name+' (ospite)')}</span>`).join('')}<span class="chip">${n}/${t.seats}</span></div>
-  ${t.status==='open'?`<div class="row" style="margin-top:8px"><button class="s" data-j="${t.id}">👥 Unisciti / lascia</button><button class="s" data-o="${t.id}"${full?' disabled':''}>+ Ospite</button></div><button class="p" data-c="${t.id}">🏁 Chiudi e registra</button>`:''}${admin?`<button class="s" data-x="${t.id}" style="width:100%;margin-top:6px">🗑 Elimina tavolo</button>`:''}</div>`}).join('')||'<p class="muted">Nessun tavolo per questa serata. Aprine uno!</p>'}</div>
+  ${t.status==='open'?`<div class="row" style="margin-top:8px"><button class="s" data-j="${t.id}">👥 Unisciti / lascia</button><button class="s" data-o="${t.id}"${full?' disabled':''}>+ Ospite</button></div><button class="p" data-c="${t.id}">🏁 Chiudi e registra</button>`:''}${adminMode()?`<button class="s" data-x="${t.id}" style="width:100%;margin-top:6px">🗑 Elimina tavolo</button>`:''}</div>`}).join('')||'<p class="muted">Nessun tavolo per questa serata. Aprine uno!</p>'}</div>
  <details class="card" id="nt"${open.length?'':' open'}><summary><b>➕ Apri un tavolo</b></summary>${ms.length?`<label>Chi ospita (tu)</label><select id="th">${ms.slice().sort((a,b)=>memberName(a).localeCompare(memberName(b),'it')).map(m=>`<option value="${m.id}">${esc(memberName(m))}</option>`)}</select>
   <label>Gioco</label><select id="tg">${gs.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`)}</select><div class="row"><div><label>Posti</label><input id="tp" type="number" min="1" value="${gs[0]?.max||4}"></div><div><label>Inizio (facolt.)</label><input id="tt" type="time"></div></div>
   <label>Nota (facoltativa)</label><input id="tn" placeholder="es. spiego io le regole"><button class="p" id="tsv">Apri il tavolo</button>`:'<p class="warn">Nessun socio in elenco: un admin deve aggiungerli.</p>'}</details>`;
@@ -97,27 +102,28 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
  V.querySelectorAll('[data-j]').forEach(b=>b.onclick=async()=>{const t=T(b.dataset.j),guests=t.players.filter(p=>!p.memberId);const ids=await pickMembers(ms,t.players.filter(p=>p.memberId).map(p=>p.memberId),'Giocatori al tavolo',t.seats-guests.length);if(!ids)return;
   if(!ids.includes(t.hostId)&&!confirm('Il padrone di casa lascia il tavolo?'))return;await DB.saveTable({id:t.id,players:[...ids.map(memberId=>({memberId})),...guests]});go('serata')});
  V.querySelectorAll('[data-o]').forEach(b=>b.onclick=async()=>{const t=T(b.dataset.o);if(t.players.length>=t.seats)return toast('Tavolo pieno');const n=(prompt('Nome dell\'ospite')||'').trim();if(!n)return;await DB.saveTable({id:t.id,players:[...t.players,{guest:true,name:n}]});go('serata')});
- V.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const t=T(b.dataset.c);if(!admin&&!confirm('Sei '+mn(t.hostId)+' (padrone di casa)? Chiudi il tavolo e registra la partita.'))return;
+ V.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const t=T(b.dataset.c);if(!adminMode()&&!confirm('Sei '+mn(t.hostId)+' (padrone di casa)? Chiudi il tavolo e registra la partita.'))return;
   views.nuova({fromTable:t.id,gameId:t.gameId,date:t.date,evening:t.evening,players:t.players.map(p=>p.memberId?{memberId:p.memberId}:{guest:true,name:p.name})})});
  V.querySelectorAll('[data-x]').forEach(b=>b.onclick=async()=>{if(!confirm('Eliminare il tavolo?'))return;await DB.deleteTable(b.dataset.x);toast('Tavolo eliminato');go('serata')})},
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati solo su questo telefono. Esportate spesso un backup.</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div>
- <h2>🔒 Pannello admin</h2><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v7 · Associazione PerGioco, Ragusa</div>`;
+ <h2>🔒 Pannello admin</h2><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v8 · Associazione PerGioco, Ragusa</div>`;
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(!f||!confirm('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
  const A=$('#adm');const R=!!DB.remote&&DB.status==='online';
- if(R&&!admin)admin=await DB.remote.isAdmin();
+ if(R&&!admin){admin=await DB.remote.isAdmin();drawModeBtn()}
+ if(admin&&uiMode()==='user'){A.innerHTML=`<p class="muted">Sei in <b>modalità utente</b>: vedi l'app come un socio qualsiasi.</p><button class="p" id="tm">🔧 Passa a modalità admin</button>`;$('#tm').onclick=()=>setMode('admin');return}
  if(R&&!admin){A.innerHTML=`<p class="muted">Accesso admin con l'account Supabase.</p><label>Email</label><input id="le" type="email" autocomplete="username"><label>Password</label><input id="lp" type="password" autocomplete="current-password"><button class="p" id="lg">Entra</button>`;
   $('#lg').onclick=async()=>{let ok;try{ok=await DB.remote.signIn($('#le').value.trim(),$('#lp').value)}catch(err){return toast('Accesso non riuscito: '+err.message)}
-   if(!ok){await DB.remote.signOut();return toast('Questo utente non è tra gli admin')}admin=true;go('altro')};return}
+   if(!ok){await DB.remote.signOut();return toast('Questo utente non è tra gli admin')}admin=true;drawModeBtn();go('altro')};return}
  if(!R&&!hp){A.innerHTML=`<p class="muted">Primo accesso: scegliete un PIN admin (almeno 4 cifre).</p><label>Nuovo PIN</label><input id="p1" type="password" inputmode="numeric"><label>Ripeti PIN</label><input id="p2" type="password" inputmode="numeric"><button class="p" id="ps">Imposta PIN</button>`;
   $('#ps').onclick=async()=>{const a=$('#p1').value;if(!/^\d{4,}$/.test(a))return toast('Il PIN deve avere almeno 4 cifre');if(a!==$('#p2').value)return toast('I PIN non coincidono');await DB.setPin(a);admin=true;toast('PIN impostato');go('altro')};return}
  if(!admin){A.innerHTML=`<label>PIN admin</label><input id="pi" type="password" inputmode="numeric"><button class="p" id="pe">Entra</button>`;
-  $('#pe').onclick=async()=>{if(await DB.checkPin($('#pi').value)){admin=true;go('altro')}else toast('PIN errato')};return}
+  $('#pe').onclick=async()=>{if(await DB.checkPin($('#pi').value)){admin=true;drawModeBtn();go('altro')}else toast('PIN errato')};return}
  const ms=await DB.members(),leg=await DB.legacyNames(),gs=await DB.games(),ps=await DB.plays();let edit=null,gf='';
- const tabs=`<div class="row"><div class="seg" id="atab"><button data-a="soci" class="${adminTab==='soci'?'on':''}">Soci</button><button data-a="partite" class="${adminTab==='partite'?'on':''}">Partite</button>${R?`<button data-a="account" class="${adminTab==='account'?'on':''}">Codici</button>`:''}</div><button class="s" id="out" style="flex:0 0 auto">Esci</button></div>`;
- const bind=()=>{$('#out').onclick=async()=>{admin=false;if(R)await DB.remote.signOut();go('altro')};$('#atab').onclick=e=>{if(e.target.dataset.a){adminTab=e.target.dataset.a;draw()}}};
+ const tabs=`<button class="s" id="ast" style="width:100%;margin-bottom:8px">📊 Statistiche associazione</button><div class="row"><div class="seg" id="atab"><button data-a="soci" class="${adminTab==='soci'?'on':''}">Soci</button><button data-a="partite" class="${adminTab==='partite'?'on':''}">Partite</button>${R?`<button data-a="account" class="${adminTab==='account'?'on':''}">Codici</button>`:''}</div><button class="s" id="out" style="flex:0 0 auto">Esci</button></div>`;
+ const bind=()=>{$('#ast').onclick=()=>go('stats');$('#out').onclick=async()=>{admin=false;drawModeBtn();if(R)await DB.remote.signOut();go('altro')};$('#atab').onclick=e=>{if(e.target.dataset.a){adminTab=e.target.dataset.a;draw()}}};
  const drawPlays=()=>{const l=ps.filter(p=>!gf||p.gameId===gf);A.innerHTML=tabs+`<label>Filtra per gioco</label><select id="gf"><option value="">Tutti i giochi (${ps.length})</option>${gs.map(g=>`<option value="${g.id}"${g.id===gf?' selected':''}>${esc(g.name)}</option>`)}</select>
  <div style="margin-top:8px">${l.map(p=>`<div class="rec"><span>${esc(gname(gs,p.gameId))}<br><span class="muted">${fmt(p.date)} · ${p.evening} · ${p.players.map(x=>esc(Stats.label(x,ms))+(x.score!=null&&x.score!==''?' '+x.score:'')).join(', ')}</span></span><span style="flex:0 0 auto"><button class="s" data-pe="${p.id}">✏️</button> <button class="s" data-pd="${p.id}">🗑</button></span></div>`).join('')||'<p class="muted">Nessuna partita.</p>'}</div>`;bind();
   $('#gf').onchange=e=>{gf=e.target.value;drawPlays()};
@@ -138,28 +144,54 @@ async altro(){const hp=await DB.hasPin();
  A.querySelectorAll('[data-l]').forEach(b=>b.onclick=async()=>{const v=$('#lk'+b.dataset.l).value;if(!v)return toast('Scegli un socio');await DB.linkName(leg[b.dataset.l][0],v);toast('Collegato');go('altro')});
  if($('#mig'))$('#mig').onclick=async()=>{if(!confirm('Caricare su Supabase giochi, soci e partite salvati su questo telefono?'))return;try{const n=await DB.remote.uploadLocal();toast(n+' elementi caricati');go('altro')}catch(err){toast('Errore: '+err.message)}};
  if($('#cp'))$('#cp').onclick=async()=>{const a=$('#np').value;if(!/^\d{4,}$/.test(a))return toast('Il PIN deve avere almeno 4 cifre');await DB.setPin(a);toast('PIN cambiato');$('#np').value=''}};
- const drawAcc=async()=>{let cs=[];try{cs=await DB.remote.codes()}catch(e){A.innerHTML=tabs+'<p class="warn">Codici non disponibili (serve l\'accesso admin; se persiste eseguire supabase/migrate-v7.sql). ('+esc(e.message)+')</p>';bind();return}
+ const drawAcc=async()=>{const myUid=(await DB.remote.user())?.id;let cs=[];try{cs=await DB.remote.codes()}catch(e){A.innerHTML=tabs+'<p class="warn">Codici non disponibili (serve l\'accesso admin; se persiste eseguire supabase/migrate-v7.sql). ('+esc(e.message)+')</p>';bind();return}
   const C=new Map(cs.map(c=>[c.member_id,c])),mn=id=>memberName(ms.find(m=>m.id===id));
   A.innerHTML=tabs+`<p class="muted">Ogni socio si registra con il suo <b>codice</b> personale (monouso). Generalo, copialo e mandaglielo tu (WhatsApp, a voce…). Per una password dimenticata rigenera il codice: il socio lo usa in Profilo → «Password dimenticata».</p>
   ${ms.filter(m=>m.active||m.userId).map(m=>{const c=C.get(m.id);const st=m.userId?'✅ registrato':'⏳ non registrato';
    return`<div class="rec"><span>${avatarHtml(m,24)} ${esc(memberName(m))}<br><span class="muted">${st}${c?` · codice ${c.used_at?'usato ('+esc(c.used_for||'')+')':'<b class="code">'+esc(c.code)+'</b> da usare'}`:''}</span></span>
-   <span style="flex:0 0 auto;text-align:right">${c&&!c.used_at?`<button class="s" data-cc="${m.id}">📋</button> `:''}<button class="s" data-cg="${m.id}">${c?'🔄':'🔑 Codice'}</button>${m.userId?` <button class="s" data-ul="${m.id}">Scollega</button>`:''}</span></div>`}).join('')||'<p class="muted">Nessun socio.</p>'}`;bind();
+   <span style="flex:0 0 auto;text-align:right">${c&&!c.used_at?`<button class="s" data-cc="${m.id}">📋</button> `:''}<button class="s" data-cg="${m.id}">${c?'🔄':'🔑 Codice'}</button>${m.userId?` <button class="s" data-ul="${m.id}">Scollega</button>`:(myUid&&!ms.some(x=>x.userId===myUid)?` <button class="s" data-me="${m.id}">🙋 Sono io</button>`:'')}</span></div>`}).join('')||'<p class="muted">Nessun socio.</p>'}`;bind();
   const copy=async(t,m)=>{const msg=`Ciao ${m.nome}! Il tuo codice per registrarti all'app PerGioco è ${t}\nApri https://vincenzoassenza-blip.github.io/pergioco/#profilo → Registrati`;try{await navigator.clipboard.writeText(msg);toast('Messaggio con il codice copiato')}catch(e){prompt('Copia il messaggio:',msg)}};
   A.querySelectorAll('[data-cc]').forEach(b=>b.onclick=()=>copy(C.get(b.dataset.cc).code,ms.find(m=>m.id===b.dataset.cc)));
   A.querySelectorAll('[data-cg]').forEach(b=>b.onclick=async()=>{const id=b.dataset.cg;if(C.get(id)&&!confirm('Generare un nuovo codice? Quello vecchio smette di funzionare.'))return;try{const c=await DB.remote.newCode(id);await copy(c,ms.find(m=>m.id===id));drawAcc()}catch(e){toast('Errore: '+e.message)}});
+  A.querySelectorAll('[data-me]').forEach(b=>b.onclick=async()=>{if(!confirm('Collegare il tuo account a '+mn(b.dataset.me)+'?'))return;try{await DB.remote.setLink(b.dataset.me,myUid);toast('Account collegato');go('altro')}catch(e){toast('Errore: '+e.message)}});
   A.querySelectorAll('[data-ul]').forEach(b=>b.onclick=async()=>{if(!confirm('Scollegare l\'account da '+mn(b.dataset.ul)+'? Per rientrare servirà un nuovo codice.'))return;try{await DB.remote.setLink(b.dataset.ul,null);toast('Account scollegato');go('altro')}catch(e){toast('Errore: '+e.message)}})};
  const draw=()=>adminTab==='partite'?drawPlays():adminTab==='account'&&R?drawAcc():drawSoci();draw()},
+async stats(){if(!adminMode()){V.innerHTML='<h2>Statistiche associazione</h2><p class="muted">Disponibili solo in modalità admin.</p>';return}
+ const gs=await DB.games(),ps=await DB.plays(),ms=await DB.members(),ts=await DB.allTables(),ctx={plays:ps,games:gs,tables:ts};
+ const ev=new Set(ps.map(p=>p.date+'|'+p.evening)),guests=new Set();ps.forEach(p=>p.players.forEach(x=>{if(!x.memberId&&x.name)guests.add(norm(x.name))}));
+ const act=new Set();ps.forEach(p=>p.players.forEach(x=>x.memberId&&act.add(x.memberId)));
+ const mo={};ps.forEach(p=>{const k=p.date.slice(0,7);mo[k]=mo[k]||{n:0,e:new Set()};mo[k].n++;mo[k].e.add(p.date+'|'+p.evening)});
+ const nm={};ms.forEach(m=>{if(m.createdAt){const k=m.createdAt.slice(0,7);nm[k]=(nm[k]||0)+1}});
+ const pl=Stats.players(ps,ms).filter(p=>p.member).sort((a,b)=>b.plays-a.plays),gc=Stats.gameCounts(gs,ps).filter(x=>x.n);
+ const coop=ps.filter(p=>p.coop).length,avgP=ps.length?Math.round(ps.reduce((a,p)=>a+p.players.length,0)/ps.length*10)/10:0;
+ const bdg=ms.reduce((a,m)=>a+Badges.unlocked('m:'+m.id,ctx).length,0),dur=ps.filter(p=>p.duration).map(p=>+p.duration);
+ const box=(l,v)=>`<div class="card"><div class="muted">${l}</div><div class="big">${v}</div></div>`;
+ V.innerHTML=`<button class="s" id="bk">← Indietro</button><h2 style="margin-top:10px">📊 Statistiche associazione</h2>
+ <div class="row">${box('Partite',ps.length)}${box('Serate',ev.size)}${box('Giochi',gs.length)}</div>
+ <div class="row">${box('Soci',ms.length)}${box('Soci attivi',ms.filter(m=>m.active).length)}${box('Ospiti',guests.size)}</div>
+ <div class="row">${box('Hanno giocato',act.size)}${box('Media giocatori',avgP)}${box('Badge sbloccati',bdg)}</div>
+ <div class="card"><b>📅 Partite e serate per mese</b>${bars(Object.keys(mo).sort().map(k=>[mlab(k),mo[k].n,mo[k].e.size]),' serate')}</div>
+ <div class="card"><b>🤝 Cooperative vs competitive</b><div class="split"><i style="width:${ps.length?Math.round(coop/ps.length*100):0}%"></i></div><div class="rec"><span>🤝 Cooperative ${coop}</span><span>⚔️ Competitive ${ps.length-coop}</span></div></div>
+ <div class="card"><b>🎲 Giochi più giocati</b>${bars(gc.slice(0,10).map(x=>[x.game.name,x.n]))}</div>
+ <div class="card"><b>⭐ Soci più attivi</b>${bars(pl.slice(0,10).map(p=>[p.name,p.plays,p.wins]),' vitt.')}</div>
+ <div class="card"><b>🆕 Nuovi soci per mese</b>${bars(Object.keys(nm).sort().map(k=>[mlab(k),nm[k]]))}</div>
+ <div class="card"><b>🪑 Modalità Serata</b><div class="rec"><span>Tavoli aperti in totale</span><b>${ts.length}</b></div><div class="rec"><span>Ancora aperti</span><b>${ts.filter(t=>t.status==='open').length}</b></div><div class="rec"><span>Chiusi e registrati</span><b>${ts.filter(t=>t.status==='closed').length}</b></div></div>
+ <div class="card"><b>⏱ Durata media partita</b><p class="muted">${dur.length?Math.round(dur.reduce((a,b)=>a+b,0)/dur.length)+' minuti':'Non disponibile: le partite non registrano ancora la durata.'}</p></div>`;
+ $('#bk').onclick=()=>history.length>1?history.back():go('altro')},
 async profilo(){const id=window._pv;const gs=await DB.games(),ms=await DB.members(),ctx=await badgeCtx();
- if(id){const m=ms.find(x=>x.id===id);V.innerHTML=`<button class="s" id="bk">← Indietro</button>`+(m?profileHtml(m,ctx,ms,gs):'<p class="muted">Socio non trovato.</p>');$('#bk').onclick=()=>history.length>1?history.back():go('giocatori');return}
+ if(id){const m=ms.find(x=>x.id===id);V.innerHTML=`<button class="s" id="bk">← Indietro</button>`+(m?profileHtml(m,ctx,ms,gs)+(adminMode()?await adminStatsHtml(m,ctx,ms,gs):''):'<p class="muted">Socio non trovato.</p>');$('#bk').onclick=()=>history.length>1?history.back():go('giocatori');return}
  const R=!!DB.remote&&DB.status==='online';
  if(!R){V.innerHTML=`<h2>Profilo</h2><div class="card"><p class="muted">Per registrarti e avere la tua pagina personale serve la connessione al database. Riprova quando sei online.</p></div>`;return}
  const u=await DB.remote.user();
  if(!u)return authForm();
  const me=ms.find(m=>m.userId===u.id);
  const out=`<button class="s" id="lo" style="width:100%;margin-top:6px">Esci (${esc(u.email)})</button>`;
- const bindOut=()=>$('#lo').onclick=async()=>{await DB.remote.signOut();admin=false;toast('Sei uscito');go('profilo')};
+ if(u&&!admin&&DB.remote){admin=await DB.remote.isAdmin();drawModeBtn()}
+ const bindOut=()=>$('#lo').onclick=async()=>{await DB.remote.signOut();admin=false;drawModeBtn();toast('Sei uscito');go('profilo')};
  if(DB.v6Missing){V.innerHTML=`<h2>Profilo</h2><p class="warn">Il database non è ancora aggiornato: un admin deve eseguire supabase/migrate-v6.sql su Supabase.</p>${out}`;return bindOut()}
- if(!me){V.innerHTML=`<h2>Profilo</h2><div class="card"><p class="muted">Questo account non è collegato a nessuna scheda socio. Chiedi a un admin un codice e registrati con quello.</p></div>${out}`;return bindOut()}
+ if(!me){if(admin){const free=ms.filter(m=>!m.userId);V.innerHTML=`<h2>Profilo</h2><div class="card"><p class="muted">Il tuo account admin non è ancora collegato a una scheda socio.</p><label>Collega il mio account a questo socio</label><select id="sm"><option value="">Scegli…</option>${free.map(m=>`<option value="${m.id}">${esc(memberName(m))}</option>`).join('')}</select><button class="p" id="smg">Collega</button></div>${out}`;bindOut();
+   $('#smg').onclick=async()=>{const id=$('#sm').value;if(!id)return toast('Scegli la tua scheda');try{await DB.remote.setLink(id,u.id);toast('Account collegato 🎉');go('profilo')}catch(e){toast('Errore: '+e.message)}};return}
+  V.innerHTML=`<h2>Profilo</h2><div class="card"><p class="muted">Questo account non è collegato a nessuna scheda socio. Chiedi a un admin un codice e registrati con quello.</p></div>${out}`;return bindOut()}
  const AV=['🎲','🐉','🧙','🦊','🐺','🦁','🐙','🤖','👑','🧩','⚔️','🛡️','🚀','🌟','🍀','🎩'],CO=['#14254a','#2a4785','#1e7a43','#b3261e','#c46a00','#6a1b9a','#00796b','#455a64'];let av=me.avatar||'',co=me.color||'';
  V.innerHTML=`<h2>Il mio profilo</h2>`+profileHtml(me,ctx,ms,gs)+`<details class="card" id="ed"><summary><b>✏️ Modifica profilo</b></summary>
  <label>Soprannome</label><input id="es" maxlength="40" value="${esc(me.soprannome||'')}"><label>Avatar</label><div class="avs" id="eav"><button data-a="" class="${av?'':'on'}">Aa</button>${AV.map(a=>`<button data-a="${a}" class="${a===av?'on':''}">${a}</button>`).join('')}</div>
@@ -197,6 +229,25 @@ function authForm(){let mode=window._am||'login';const T={login:'Entra',signup:'
   try{if(mode==='signup')await DB.remote.signUp(code,em,pw);else if(mode==='reset'){await DB.remote.resetWithCode(code,em,pw);await DB.remote.signIn(em,pw)}else await DB.remote.signIn(em,pw);
    window._am='login';toast(mode==='signup'?'Benvenuto in PerGioco! 🎉':mode==='reset'?'Password aggiornata':'Bentornato!');go('profilo')}
   catch(e){$('#ago').disabled=false;const m=e.message||'';toast(/Invalid login/i.test(m)?'Email o password errate':/already registered/i.test(m)?'Questa email è già registrata':/Database error|Codice non valido/i.test(m)?'Codice non valido o già usato':m)}}}
+const bars=(rows,unit='')=>{const mx=Math.max(1,...rows.map(r=>r[1]));return`<div class="bars">${rows.map(([l,v,v2])=>`<div class="bar"><span>${esc(l)}</span><i style="width:${Math.round(v/mx*100)}%"></i><b>${v}${v2!=null?` <small class="muted">· ${v2}${unit}</small>`:''}</b></div>`).join('')||'<p class="muted">—</p>'}</div>`};
+const MESI=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];const mlab=k=>{const [y,m]=k.split('-');return MESI[+m-1]+' '+y.slice(2)};
+// date di sblocco dei badge: si rigiocano le partite in ordine cronologico
+function badgeDates(memberId,ctx){const key='m:'+memberId,out={};const ds=[...new Set([...ctx.plays.filter(p=>p.players.some(x=>x.memberId===memberId)).map(p=>p.date),...(ctx.tables||[]).filter(t=>t.hostId===memberId).map(t=>t.date)])].sort();
+ ds.forEach(d=>{const c={plays:ctx.plays.filter(p=>p.date<=d),games:ctx.games,tables:(ctx.tables||[]).filter(t=>t.date<=d)};Badges.list(key,c).forEach(b=>{if(b.on&&!out[b.id])out[b.id]=d})});return out}
+async function adminStatsHtml(m,ctx,ms,gs){const s=Profile.stats(m.id,ctx),me=p=>p.players.find(x=>x.memberId===m.id)||{};
+ const pg={};s.plays.forEach(p=>{const o=pg[p.gameId]=pg[p.gameId]||{n:0,w:0,sc:[]};o.n++;if(me(p).winner)o.w++;const v=me(p).score;if(v!=null&&v!==''&&!isNaN(+v))o.sc.push(+v)});
+ const mo={};s.plays.forEach(p=>{const k=p.date.slice(0,7);mo[k]=mo[k]||[0,0];mo[k][0]++;if(me(p).winner)mo[k][1]++});
+ const tb=(ctx.tables||[]).filter(t=>t.hostId===m.id||(t.players||[]).some(x=>x.memberId===m.id)),bd=badgeDates(m.id,ctx),bl=Badges.list('m:'+m.id,ctx);
+ let cs=null;if(DB.remote&&DB.status==='online'){try{cs=(await DB.remote.codes()).find(c=>c.member_id===m.id)||false}catch(e){}}
+ const last=s.plays[0];
+ return`<h2 style="margin-top:16px">🔧 Statistiche complete (solo admin)</h2>
+ <div class="card adm-only"><b>🔒 Dati riservati</b><div class="rec"><span>N. tessera</span><b>${esc(m.tessera||'—')}</b></div><div class="rec"><span>Stato socio</span><b>${m.active?'attivo':'disattivato'}</b></div>
+ <div class="rec"><span>Account app</span><b>${m.userId?'✅ registrato':'⏳ non registrato'}</b></div><div class="rec"><span>Codice</span><b>${cs===null?'—':cs===false?'non generato':cs.used_at?'usato ('+esc(cs.used_for||'')+', '+fmt(cs.used_at.slice(0,10))+')':'da usare (generato il '+fmt(cs.created_at.slice(0,10))+')'}</b></div>
+ <div class="rec"><span>Ultima partita</span><b>${last?esc(gname(gs,last.gameId))+' · '+fmt(last.date):'—'}</b></div></div>
+ <div class="card"><b>🎲 Per gioco</b><div class="tbl"><div class="th"><span>Gioco</span><span>Part.</span><span>Vitt.</span><span>Media</span><span>Max</span><span>Min</span></div>${Object.entries(pg).sort((a,b)=>b[1].n-a[1].n).map(([g,o])=>{const a=o.sc.length?o.sc.reduce((x,y)=>x+y,0)/o.sc.length:null;return`<div><span>${esc(gname(gs,g))}</span><span>${o.n}</span><span>${o.w}</span><span>${a==null?'—':Math.round(a*10)/10}</span><span>${o.sc.length?Math.max(...o.sc):'—'}</span><span>${o.sc.length?Math.min(...o.sc):'—'}</span></div>`}).join('')||'<p class="muted">—</p>'}</div></div>
+ <div class="card"><b>📈 Andamento mensile</b> <span class="muted">(partite · vittorie)</span>${bars(Object.keys(mo).sort().map(k=>[mlab(k),mo[k][0],mo[k][1]]),' vitt.')}</div>
+ <div class="card"><b>🪑 Serate e tavoli</b><div class="rec"><span>Serate frequentate</span><b>${s.evenings}</b></div><div class="rec"><span>Tavoli ospitati</span><b>${s.hosted}</b></div><div class="rec"><span>Tavoli a cui si è unito</span><b>${tb.filter(t=>t.hostId!==m.id).length}</b></div></div>
+ <div class="card"><b>🏅 Badge e date di sblocco</b>${bl.map(b=>`<div class="rec"><span>${b.on?b.icon:'🔒'} ${esc(b.name)}</span><span class="muted">${b.on?(bd[b.id]?fmt(bd[b.id]):'✓'):(b.goal?b.cur+'/'+b.goal:'—')}</span></div>`).join('')}</div>`}
 function openProfile(id){window._pv=id;go('profilo')}
 document.addEventListener('click',e=>{const a=e.target.closest('[data-pv]');if(a){e.preventDefault();openProfile(a.dataset.pv)}});
 function go(v){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));location.hash=v;views[v]();scrollTo(0,0)}
@@ -208,5 +259,6 @@ DB.onStatus=()=>{const el=$('#status');if(!el)return;const q=DB.remote?DB.remote
  else if(DB.status==='offline')t='📴 Offline'+(q?`: ${q} modifiche in attesa di sincronizzazione`:': dati salvati sul telefono');
  else if(DB.status==='local'&&cfg)t='⚠️ Database non raggiungibile: i dati restano su questo telefono.';
  else if(q)t=`🔄 ${q} modifiche in sincronizzazione…`;el.textContent=t;el.hidden=!t};
-(async()=>{try{await DB.init()}catch(e){console.warn(e)}go(START.includes('access_token')||START.includes('type=')?'profilo':views[START.slice(1)]?START.slice(1):'ludoteca')})();
+$('#modebtn').onclick=()=>setMode(uiMode()==='user'?'admin':'user');
+(async()=>{try{await DB.init();if(DB.remote&&DB.status==='online'){admin=await DB.remote.isAdmin();drawModeBtn()}}catch(e){console.warn(e)}go(START.includes('access_token')||START.includes('type=')?'profilo':views[START.slice(1)]?START.slice(1):'ludoteca')})();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
