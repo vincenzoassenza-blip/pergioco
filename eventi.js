@@ -51,7 +51,7 @@ async function eventi(){navSerata();
  V.querySelectorAll('[data-ev]').forEach(c=>c.onclick=()=>evDetail(es.find(e=>e.id===c.dataset.ev),myP(c.dataset.ev),info[c.dataset.ev]))}
 async function evDetail(e,p,i){const staff=adminMode(),ms=await DB.members(),mn=id=>{const m=ms.find(m=>m.id===id);return m?memberName(m):'Socio'};
  i=i||await EV.info(e.id).catch(()=>null);const aperto=!e.annullato&&new Date(e.chiusura)>new Date(),attiva=p&&ATTIVE.includes(p.stato);
- const nomi=(i&&i.nomi||[]).map(n=>esc(mn(n.member_id))+(n.ospite?' <span class="muted">+1 ospite</span>':''));
+ const nomi=(i&&i.nomi||[]).map(n=>esc(mn(n.member_id))+lv(n.member_id)+(n.ospite?' <span class="muted">+1 ospite</span>':''));
  const o=openPanel(`${e.immagine?`<img class="evimg big" src="${esc(e.immagine)}" alt="Locandina" onerror="this.remove()">`:''}<h3>${esc(e.titolo)}</h3>
  <p>📅 <b>${esc(evData(e.inizio))}</b>${e.luogo?`<br>📍 ${esc(e.luogo)}`:''}<br>⏰ Prenotazioni fino a ${esc(evData(e.chiusura))}</p>
  ${e.descrizione?`<p class="evdesc">${esc(e.descrizione)}</p>`:''}
@@ -98,7 +98,7 @@ async function evStaff(e){const ms=await DB.members(),mn=id=>{const m=ms.find(m=
  let ps;try{ps=await EV.prenotati(e.id)}catch(x){return toast(evMsg(x))}
  const ord={confermata:0,in_attesa_conferma:1,attesa:2,annullata:3,rifiutata:4};ps.sort((a,b)=>ord[a.stato]-ord[b.stato]||a.created_at.localeCompare(b.created_at));
  const occ=ps.filter(p=>p.stato==='confermata'||p.stato==='in_attesa_conferma').reduce((s,p)=>s+1+(p.ospite?1:0),0),pres=ps.filter(p=>p.presente).reduce((s,p)=>s+1+(p.ospite?1:0),0);
- const row=p=>`<div class="evrow"><div><b>${esc(mn(p.member_id))}</b>${p.ospite?` <span class="muted">+ ${esc(p.ospite)}</span>`:''}<br>${stBadge(p.stato)}${p.caparra_at?`<br><small class="muted">Caparra ${euro(p.caparra_importo)} ricevuta da ${esc(p.caparra_da)} il ${esc(evData(p.caparra_at))}</small>`:''}</div><div class="evbtn">
+ const row=p=>`<div class="evrow"><div><b>${esc(mn(p.member_id))}${lv(p.member_id)}</b>${p.ospite?` <span class="muted">+ ${esc(p.ospite)}</span>`:''}<br>${stBadge(p.stato)}${p.caparra_at?`<br><small class="muted">Caparra ${euro(p.caparra_importo)} ricevuta da ${esc(p.caparra_da)} il ${esc(evData(p.caparra_at))}</small>`:''}</div><div class="evbtn">
  ${p.stato==='in_attesa_conferma'?`<button class="p" data-cap="${p.id}">💶 Conferma caparra ricevuta</button>`:''}
  ${p.stato==='confermata'?`<label class="lchk"><input type="checkbox" data-pres="${p.id}"${p.presente?' checked':''}> Presente</label>`:''}
  ${ATTIVE.includes(p.stato)?`<button class="s" data-rif="${p.id}">Annulla</button>`:''}</div></div>`;

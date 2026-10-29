@@ -105,3 +105,9 @@ input:disabled,select:disabled,textarea:disabled{background:#f1f3f7;color:#4a516
 body.mlock{position:fixed;left:0;right:0;overflow:hidden}
 .dtrow{flex-wrap:wrap}.dtrow>div{flex:1 1 100%;min-width:0}.dtrow input{width:100%;min-width:0;box-sizing:border-box}
 @media(min-width:560px){.dtrow>div{flex:1 1 45%}}
+/* v13 livelli e voti */
+.lv{display:inline-block;color:#fff;font-size:10px;font-weight:700;line-height:1;padding:3px 5px;border-radius:6px;vertical-align:middle;margin-left:3px;white-space:nowrap;letter-spacing:.2px}
+.lv.lvb{font-size:13px;padding:4px 8px;margin-left:0}
+.xpbar{height:9px;background:#e4e0d6;border-radius:5px;overflow:hidden;margin:8px 0 4px}.xpbar i{display:block;height:100%;border-radius:5px}
+.vgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:4px 0 10px}.vb{padding:10px 0;border-radius:8px;border:1px solid #ccc;background:#fff;font-size:16px;font-weight:700}.vb.on{background:#f5b700;border-color:#f5b700;color:#222}
+.rprompt{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:950;background:#fff;border-radius:12px;box-shadow:0 4px 18px #0003;padding:10px 12px;display:flex;gap:8px;align-items:center;animation:fi .2s}.rprompt span{flex:1;font-size:14px}.rprompt button{flex:0 0 auto;width:auto;padding:8px 12px}
