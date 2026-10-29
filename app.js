@@ -15,6 +15,9 @@ function modal(msg,{input=false,def='',cancel=true}={}){return new Promise(res=>
  o.querySelector('.mtx').textContent=msg;const i=o.querySelector('.min');if(i)i.value=def;document.body.appendChild(o);(i||o.querySelector('[data-k="1"]')).focus();if(i)i.select();
  const end=v=>{o.remove();document.removeEventListener('keydown',kd);res(v)};const kd=e=>{if(e.key==='Escape')end(input?null:false);if(e.key==='Enter')end(input?i.value:true)};document.addEventListener('keydown',kd);
  o.onclick=e=>{if(e.target===o)end(input?null:false);const k=e.target.dataset.k;if(k)end(k==='1'?(input?i.value:true):(input?null:false))}})}
+// tasto Indietro di Android/browser: chiude la finestra aperta sopra la pagina
+const _bk=[];let _bkSkip=0;function backClose(fn){history.pushState({ov:1},'');_bk.push(fn);return()=>{const i=_bk.indexOf(fn);if(i<0)return;_bk.splice(i,1);_bkSkip++;history.back()}}
+addEventListener('popstate',()=>{if(_bkSkip){_bkSkip--;return}const f=_bk.pop();if(f)f()});
 const ask=m=>modal(m),askText=(m,d='')=>modal(m,{input:true,def:d});
 function isMod(){return !!(admin&&DB.remote&&DB.remote.modCached)}
 function drawModeBtn(){const b=document.getElementById('modebtn');if(!b)return;b.hidden=!admin;b.textContent=uiMode()==='user'?'👤 Modalità utente':isMod()?'🛡 Modalità moderatore':'🔧 Modalità admin';document.body.classList.toggle('adm',adminMode())}
@@ -121,7 +124,7 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<div id="bkp" hidden><h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati sul server dell'associazione. Qui puoi scaricarne una copia manuale in JSON (non include i Libri sociali).</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div></div>
- <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2><button class="danger" id="out" hidden>⎋ Esci</button></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v11.1 · Associazione PerGioco, Ragusa</div>`;
+ <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2><button class="danger" id="out" hidden>⎋ Esci</button></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v11.2 · Associazione PerGioco, Ragusa</div>`;
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(!f||!await ask('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
  const A=$('#adm');const R=!!DB.remote&&DB.status==='online';
@@ -307,4 +310,4 @@ async function gamePage(g,ps){const ms=await DB.members(),mine=ps.filter(p=>p.ga
  <div class="card"><b>🏆 Record</b>${r?`<div class="rec"><span>${esc(Stats.label(r.best.p,ms))}<br><span class="muted">${fmt(r.best.date)}</span></span><b class="big">${r.best.score}</b></div>`:'<p class="muted">Ancora nessun punteggio.</p>'}</div>
  ${t.length?`<div class="card"><b>📊 Top 5 punteggi</b>${t.map((x,k)=>`<div class="rec"><span>${['🥇','🥈','🥉','4.','5.'][k]} ${esc(Stats.label(x.p,ms))} <span class="muted">· ${fmt(x.date)}</span></span><b>${x.score}</b></div>`).join('')}</div>`:''}
  <div class="card"><b>🕑 Ultime partite</b>${last.map(p=>playRow(p,[g],ms)).join('')||'<p class="muted">Mai giocato finora.</p>'}</div></div>`;
- o.querySelector('.gpb').onclick=()=>o.remove();document.body.appendChild(o)}
+ const rel=backClose(()=>o.remove());o.querySelector('.gpb').onclick=()=>{rel();o.remove()};document.body.appendChild(o)}
