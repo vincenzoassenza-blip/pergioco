@@ -76,7 +76,7 @@ function evForm(e){const nuovo=!e.id;
  const o=openPanel(`<h3>${nuovo?'Nuovo evento':'Modifica evento'}</h3><form id="evf">
  <label>Titolo *</label><input name="titolo" required maxlength="120" value="${esc(e.titolo||'')}">
  <label>Descrizione</label><textarea name="descrizione" rows="3">${esc(e.descrizione||'')}</textarea>
- <div class="row"><div><label>Inizio (ora italiana) *</label><input name="inizio" type="datetime-local" required value="${toInput(e.inizio)}"></div><div><label>Chiusura prenotazioni *</label><input name="chiusura" type="datetime-local" required value="${toInput(e.chiusura)}"></div></div>
+ <div class="row dtrow"><div><label>Inizio (ora italiana) *</label><input name="inizio" type="datetime-local" required value="${toInput(e.inizio)}"></div><div><label>Chiusura prenotazioni *</label><input name="chiusura" type="datetime-local" required value="${toInput(e.chiusura)}"></div></div>
  <label>Luogo</label><input name="luogo" value="${esc(e.luogo||'')}">
  <label>Locandina (link https, facoltativo)</label><input name="immagine" type="url" placeholder="https://…" value="${esc(e.immagine||'')}">
  <div class="row"><div><label>Posti massimi *</label><input name="posti" type="number" min="1" max="1000" required value="${e.posti||20}"></div><div><label>Quota € (facolt.)</label><input name="quota" type="number" min="0" step="0.5" value="${e.quota??''}"></div><div><label>Caparra € (facolt.)</label><input name="caparra" type="number" min="0" step="0.5" value="${e.caparra??''}"></div></div>

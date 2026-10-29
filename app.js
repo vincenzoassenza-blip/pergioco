@@ -313,3 +313,13 @@ async function gamePage(g,ps){const ms=await DB.members(),mine=ps.filter(p=>p.ga
  ${t.length?`<div class="card"><b>📊 Top 5 punteggi</b>${t.map((x,k)=>`<div class="rec"><span>${['🥇','🥈','🥉','4.','5.'][k]} ${esc(Stats.label(x.p,ms))} <span class="muted">· ${fmt(x.date)}</span></span><b>${x.score}</b></div>`).join('')}</div>`:''}
  <div class="card"><b>🕑 Ultime partite</b>${last.map(p=>playRow(p,[g],ms)).join('')||'<p class="muted">Mai giocato finora.</p>'}</div></div>`;
  const rel=backClose(()=>o.remove());o.querySelector('.gpb').onclick=()=>{rel();o.remove()};document.body.appendChild(o)}
+// v12.1: blocco scroll pagina, footer fisso dei pulsanti e tastiera per tutte le finestre
+(()=>{let y=0;const sel='.mdl,.modal';
+ const tag=b=>{if(!b)return;const c=[...b.querySelectorAll('.mbt,[data-close]')].pop();const f=c&&(c.classList.contains('mbt')?c:c.parentElement);if(f&&f!==b&&!f.classList.contains('mfoot'))f.classList.add('mfoot')};
+ const sync=()=>{const open=document.querySelector(sel);document.querySelectorAll('.mdl .mbox').forEach(tag);
+  if(open&&!document.body.classList.contains('mlock')){y=scrollY;document.body.style.top=-y+'px';document.body.classList.add('mlock')}
+  else if(!open&&document.body.classList.contains('mlock')){document.body.classList.remove('mlock');document.body.style.top='';scrollTo(0,y)}};
+ new MutationObserver(sync).observe(document.body,{childList:true,subtree:true});
+ const vv=window.visualViewport;if(vv){const f=()=>document.documentElement.style.setProperty('--vvh',vv.height+'px');vv.addEventListener('resize',f);f()}
+ document.addEventListener('focusin',e=>{if(e.target.closest&&e.target.closest('.mbox,.sheet')&&/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))setTimeout(()=>e.target.scrollIntoView({block:'center'}),300)});
+})();
