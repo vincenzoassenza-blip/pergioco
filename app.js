@@ -103,7 +103,7 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati solo su questo telefono. Esportate spesso un backup.</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div>
- <h2>🔒 Pannello admin</h2><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v6 · Associazione PerGioco, Ragusa</div>`;
+ <h2>🔒 Pannello admin</h2><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v7 · Associazione PerGioco, Ragusa</div>`;
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(!f||!confirm('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
  const A=$('#adm');const R=!!DB.remote&&DB.status==='online';
@@ -116,7 +116,7 @@ async altro(){const hp=await DB.hasPin();
  if(!admin){A.innerHTML=`<label>PIN admin</label><input id="pi" type="password" inputmode="numeric"><button class="p" id="pe">Entra</button>`;
   $('#pe').onclick=async()=>{if(await DB.checkPin($('#pi').value)){admin=true;go('altro')}else toast('PIN errato')};return}
  const ms=await DB.members(),leg=await DB.legacyNames(),gs=await DB.games(),ps=await DB.plays();let edit=null,gf='';
- const tabs=`<div class="row"><div class="seg" id="atab"><button data-a="soci" class="${adminTab==='soci'?'on':''}">Soci</button><button data-a="partite" class="${adminTab==='partite'?'on':''}">Partite</button>${R?`<button data-a="account" class="${adminTab==='account'?'on':''}">Account</button>`:''}</div><button class="s" id="out" style="flex:0 0 auto">Esci</button></div>`;
+ const tabs=`<div class="row"><div class="seg" id="atab"><button data-a="soci" class="${adminTab==='soci'?'on':''}">Soci</button><button data-a="partite" class="${adminTab==='partite'?'on':''}">Partite</button>${R?`<button data-a="account" class="${adminTab==='account'?'on':''}">Codici</button>`:''}</div><button class="s" id="out" style="flex:0 0 auto">Esci</button></div>`;
  const bind=()=>{$('#out').onclick=async()=>{admin=false;if(R)await DB.remote.signOut();go('altro')};$('#atab').onclick=e=>{if(e.target.dataset.a){adminTab=e.target.dataset.a;draw()}}};
  const drawPlays=()=>{const l=ps.filter(p=>!gf||p.gameId===gf);A.innerHTML=tabs+`<label>Filtra per gioco</label><select id="gf"><option value="">Tutti i giochi (${ps.length})</option>${gs.map(g=>`<option value="${g.id}"${g.id===gf?' selected':''}>${esc(g.name)}</option>`)}</select>
  <div style="margin-top:8px">${l.map(p=>`<div class="rec"><span>${esc(gname(gs,p.gameId))}<br><span class="muted">${fmt(p.date)} · ${p.evening} · ${p.players.map(x=>esc(Stats.label(x,ms))+(x.score!=null&&x.score!==''?' '+x.score:'')).join(', ')}</span></span><span style="flex:0 0 auto"><button class="s" data-pe="${p.id}">✏️</button> <button class="s" data-pd="${p.id}">🗑</button></span></div>`).join('')||'<p class="muted">Nessuna partita.</p>'}</div>`;bind();
@@ -138,13 +138,16 @@ async altro(){const hp=await DB.hasPin();
  A.querySelectorAll('[data-l]').forEach(b=>b.onclick=async()=>{const v=$('#lk'+b.dataset.l).value;if(!v)return toast('Scegli un socio');await DB.linkName(leg[b.dataset.l][0],v);toast('Collegato');go('altro')});
  if($('#mig'))$('#mig').onclick=async()=>{if(!confirm('Caricare su Supabase giochi, soci e partite salvati su questo telefono?'))return;try{const n=await DB.remote.uploadLocal();toast(n+' elementi caricati');go('altro')}catch(err){toast('Errore: '+err.message)}};
  if($('#cp'))$('#cp').onclick=async()=>{const a=$('#np').value;if(!/^\d{4,}$/.test(a))return toast('Il PIN deve avere almeno 4 cifre');await DB.setPin(a);toast('PIN cambiato');$('#np').value=''}};
- const drawAcc=async()=>{const rq=await DB.remote.requests(),lk=ms.filter(m=>m.userId);const mn=id=>memberName(ms.find(m=>m.id===id));
-  A.innerHTML=tabs+(DB.v6Missing?'<p class="warn">Eseguire supabase/migrate-v6.sql nel SQL Editor di Supabase.</p>':'')+`<label><b>Richieste di collegamento</b></label>${rq.map(r=>`<div class="rec"><span>${esc(r.email||'?')} → ${esc(mn(r.member_id))}${r.note?`<br><span class="muted">${esc(r.note)}</span>`:''}</span><span style="flex:0 0 auto"><button class="s" data-ra="${r.id}">✓ Collega</button> <button class="s" data-rr="${r.id}">✕</button></span></div>`).join('')||'<p class="muted">Nessuna richiesta in attesa.</p>'}
-  <label style="margin-top:14px"><b>Soci con account collegato</b> (${lk.length})</label>${lk.map(m=>`<div class="rec"><span>${avatarHtml(m,24)} ${esc(memberName(m))}</span><button class="s" data-ul="${m.id}" style="flex:0 0 auto">Scollega</button></div>`).join('')||'<p class="muted">Nessuno.</p>'}
-  <p class="muted">Il socio può collegarsi da solo dalla scheda Profilo inserendo il proprio numero di tessera, oppure inviare una richiesta che approvate qui.</p>`;bind();
-  A.querySelectorAll('[data-ra]').forEach(b=>b.onclick=async()=>{const r=rq.find(x=>x.id==b.dataset.ra);if(ms.find(m=>m.id===r.member_id)?.userId&&!confirm('La scheda è già collegata a un altro account: sostituire?'))return;try{if(ms.find(m=>m.id===r.member_id)?.userId)await DB.remote.setLink(r.member_id,null);await DB.remote.setLink(r.member_id,r.user_id);toast('Account collegato');go('altro')}catch(e){toast('Errore: '+e.message)}});
-  A.querySelectorAll('[data-rr]').forEach(b=>b.onclick=async()=>{if(!confirm('Rifiutare la richiesta?'))return;await DB.remote.cancelRequest(b.dataset.rr);toast('Richiesta rifiutata');drawAcc()});
-  A.querySelectorAll('[data-ul]').forEach(b=>b.onclick=async()=>{if(!confirm('Scollegare l\'account da '+mn(b.dataset.ul)+'?'))return;try{await DB.remote.setLink(b.dataset.ul,null);toast('Account scollegato');go('altro')}catch(e){toast('Errore: '+e.message)}})};
+ const drawAcc=async()=>{let cs=[];try{cs=await DB.remote.codes()}catch(e){A.innerHTML=tabs+'<p class="warn">Codici non disponibili (serve l\'accesso admin; se persiste eseguire supabase/migrate-v7.sql). ('+esc(e.message)+')</p>';bind();return}
+  const C=new Map(cs.map(c=>[c.member_id,c])),mn=id=>memberName(ms.find(m=>m.id===id));
+  A.innerHTML=tabs+`<p class="muted">Ogni socio si registra con il suo <b>codice</b> personale (monouso). Generalo, copialo e mandaglielo tu (WhatsApp, a voce…). Per una password dimenticata rigenera il codice: il socio lo usa in Profilo → «Password dimenticata».</p>
+  ${ms.filter(m=>m.active||m.userId).map(m=>{const c=C.get(m.id);const st=m.userId?'✅ registrato':'⏳ non registrato';
+   return`<div class="rec"><span>${avatarHtml(m,24)} ${esc(memberName(m))}<br><span class="muted">${st}${c?` · codice ${c.used_at?'usato ('+esc(c.used_for||'')+')':'<b class="code">'+esc(c.code)+'</b> da usare'}`:''}</span></span>
+   <span style="flex:0 0 auto;text-align:right">${c&&!c.used_at?`<button class="s" data-cc="${m.id}">📋</button> `:''}<button class="s" data-cg="${m.id}">${c?'🔄':'🔑 Codice'}</button>${m.userId?` <button class="s" data-ul="${m.id}">Scollega</button>`:''}</span></div>`}).join('')||'<p class="muted">Nessun socio.</p>'}`;bind();
+  const copy=async(t,m)=>{const msg=`Ciao ${m.nome}! Il tuo codice per registrarti all'app PerGioco è ${t}\nApri https://vincenzoassenza-blip.github.io/pergioco/#profilo → Registrati`;try{await navigator.clipboard.writeText(msg);toast('Messaggio con il codice copiato')}catch(e){prompt('Copia il messaggio:',msg)}};
+  A.querySelectorAll('[data-cc]').forEach(b=>b.onclick=()=>copy(C.get(b.dataset.cc).code,ms.find(m=>m.id===b.dataset.cc)));
+  A.querySelectorAll('[data-cg]').forEach(b=>b.onclick=async()=>{const id=b.dataset.cg;if(C.get(id)&&!confirm('Generare un nuovo codice? Quello vecchio smette di funzionare.'))return;try{const c=await DB.remote.newCode(id);await copy(c,ms.find(m=>m.id===id));drawAcc()}catch(e){toast('Errore: '+e.message)}});
+  A.querySelectorAll('[data-ul]').forEach(b=>b.onclick=async()=>{if(!confirm('Scollegare l\'account da '+mn(b.dataset.ul)+'? Per rientrare servirà un nuovo codice.'))return;try{await DB.remote.setLink(b.dataset.ul,null);toast('Account scollegato');go('altro')}catch(e){toast('Errore: '+e.message)}})};
  const draw=()=>adminTab==='partite'?drawPlays():adminTab==='account'&&R?drawAcc():drawSoci();draw()},
 async profilo(){const id=window._pv;const gs=await DB.games(),ms=await DB.members(),ctx=await badgeCtx();
  if(id){const m=ms.find(x=>x.id===id);V.innerHTML=`<button class="s" id="bk">← Indietro</button>`+(m?profileHtml(m,ctx,ms,gs):'<p class="muted">Socio non trovato.</p>');$('#bk').onclick=()=>history.length>1?history.back():go('giocatori');return}
@@ -156,15 +159,7 @@ async profilo(){const id=window._pv;const gs=await DB.games(),ms=await DB.member
  const out=`<button class="s" id="lo" style="width:100%;margin-top:6px">Esci (${esc(u.email)})</button>`;
  const bindOut=()=>$('#lo').onclick=async()=>{await DB.remote.signOut();admin=false;toast('Sei uscito');go('profilo')};
  if(DB.v6Missing){V.innerHTML=`<h2>Profilo</h2><p class="warn">Il database non è ancora aggiornato: un admin deve eseguire supabase/migrate-v6.sql su Supabase.</p>${out}`;return bindOut()}
- if(!me){const rq=await DB.remote.myRequest();const free=ms.filter(m=>m.active&&!m.userId);
-  V.innerHTML=`<h2>Collega la tua scheda socio</h2><div class="card"><p class="muted">Ciao! Per sbloccare la tua pagina personale scegli la tua scheda e inserisci il tuo numero di tessera.</p>
-  <label>Chi sei?</label><select id="cm"><option value="">Scegli…</option>${free.map(m=>`<option value="${m.id}">${esc(memberName(m))}</option>`).join('')}</select>
-  <label>Numero di tessera</label><input id="ct" inputmode="numeric" placeholder="es. 12"><button class="p" id="cl">Collega</button>
-  <details style="margin-top:12px"><summary class="muted">Non ricordi il numero di tessera?</summary><p class="muted">Invia una richiesta: un admin la approverà dal pannello.</p><input id="cn" placeholder="Messaggio (facoltativo)"><button class="s" id="cr" style="width:100%;margin-top:6px">Chiedi a un admin</button></details></div>
-  ${rq?`<div class="card"><b>⏳ Richiesta in attesa</b><p class="muted">Hai chiesto di collegarti a ${esc(memberName(ms.find(m=>m.id===rq.member_id)))}.</p><button class="s" id="cx">Annulla richiesta</button></div>`:''}${out}`;bindOut();
-  $('#cl').onclick=async()=>{const m=$('#cm').value,t=$('#ct').value.trim();if(!m)return toast('Scegli la tua scheda');if(!t)return toast('Inserisci il numero di tessera');try{await DB.remote.claim(m,t);toast('Benvenuto! Scheda collegata 🎉');go('profilo')}catch(e){toast(e.message)}};
-  $('#cr').onclick=async()=>{const m=$('#cm').value;if(!m)return toast('Scegli la tua scheda');try{if(rq)await DB.remote.cancelRequest(rq.id);await DB.remote.requestLink(m,u.email,$('#cn').value.trim());toast('Richiesta inviata');go('profilo')}catch(e){toast('Errore: '+e.message)}};
-  if($('#cx'))$('#cx').onclick=async()=>{await DB.remote.cancelRequest(rq.id);go('profilo')};return}
+ if(!me){V.innerHTML=`<h2>Profilo</h2><div class="card"><p class="muted">Questo account non è collegato a nessuna scheda socio. Chiedi a un admin un codice e registrati con quello.</p></div>${out}`;return bindOut()}
  const AV=['🎲','🐉','🧙','🦊','🐺','🦁','🐙','🤖','👑','🧩','⚔️','🛡️','🚀','🌟','🍀','🎩'],CO=['#14254a','#2a4785','#1e7a43','#b3261e','#c46a00','#6a1b9a','#00796b','#455a64'];let av=me.avatar||'',co=me.color||'';
  V.innerHTML=`<h2>Il mio profilo</h2>`+profileHtml(me,ctx,ms,gs)+`<details class="card" id="ed"><summary><b>✏️ Modifica profilo</b></summary>
  <label>Soprannome</label><input id="es" maxlength="40" value="${esc(me.soprannome||'')}"><label>Avatar</label><div class="avs" id="eav"><button data-a="" class="${av?'':'on'}">Aa</button>${AV.map(a=>`<button data-a="${a}" class="${a===av?'on':''}">${a}</button>`).join('')}</div>
@@ -185,23 +180,23 @@ function profileHtml(m,ctx,ms,gs){const s=Profile.stats(m.id,ctx),bl=Badges.list
  <div class="card"><b>🎲 Giochi più giocati</b>${s.topGames.map(([g,n])=>`<div class="rec"><span>${esc(gname(gs,g))}</span><b>${n}</b></div>`).join('')||'<p class="muted">Ancora nessuna partita.</p>'}</div>
  <div class="card"><b>👥 Compagni di gioco più frequenti</b>${s.partners.map(p=>`<div class="rec"><span>${pn(p.x)}</span><b>${p.n}</b></div>`).join('')||'<p class="muted">—</p>'}</div>
  <div class="card"><b>🕑 Storico partite</b>${s.plays.map(p=>{const me=p.players.find(x=>x.memberId===m.id)||{};return`<div class="rec"><span>${esc(gname(gs,p.gameId))}<br><span class="muted">${fmt(p.date)} · ${p.evening}${me.score!=null&&me.score!==''?' · '+esc(me.score)+' punti':''}</span></span><span class="win">${me.winner?'🏆 Vittoria':(p.coop?'Sconfitta':'')}</span></div>`}).join('')||'<p class="muted">Ancora nessuna partita.</p>'}</div>`}
-function authForm(){let mode=window._am||'login';
- V.innerHTML=`<h2>Profilo</h2><div class="card"><p class="muted">Registrati per avere la tua pagina personale con statistiche e badge.</p>
- <div class="seg" id="am"><button data-m="login" class="${mode==='login'?'on':''}">Accedi</button><button data-m="signup" class="${mode==='signup'?'on':''}">Registrati</button><button data-m="magic" class="${mode==='magic'?'on':''}">Link via email</button></div>
- <label>Email</label><input id="ae" type="email" autocomplete="email">
- ${mode!=='magic'?`<label>Password${mode==='signup'?' (almeno 8 caratteri)':''}</label><input id="ap" type="password" autocomplete="${mode==='signup'?'new-password':'current-password'}">`:''}
- ${mode==='signup'?`<label>Ripeti password</label><input id="ap2" type="password" autocomplete="new-password">`:''}
- <button class="p" id="ago">${mode==='login'?'Entra':mode==='signup'?'Crea account':'Inviami il link'}</button>
- ${mode==='login'?'<button class="s" id="afp" style="width:100%;margin-top:6px">Password dimenticata?</button>':''}
- ${mode==='magic'?'<p class="muted">Ti mandiamo un link: aprilo da questo telefono e sei dentro, senza password.</p>':''}</div>`;
- $('#am').onclick=e=>{if(e.target.dataset.m){window._am=e.target.dataset.m;authForm()}};
- $('#ago').onclick=async()=>{const em=$('#ae').value.trim();if(!/^\S+@\S+\.\S+$/.test(em))return toast('Email non valida');
-  try{if(mode==='magic'){await DB.remote.magicLink(em);V.querySelector('.card').innerHTML='<b>📧 Controlla la posta</b><p class="muted">Ti abbiamo mandato un link per entrare. Aprilo da questo telefono.</p>';return}
-   const pw=$('#ap').value;if(mode==='signup'){if(pw.length<8)return toast('La password deve avere almeno 8 caratteri');if(pw!==$('#ap2').value)return toast('Le password non coincidono');
-    const r=await DB.remote.signUp(em,pw);if(!r.session){V.querySelector('.card').innerHTML='<b>📧 Conferma la tua email</b><p class="muted">Ti abbiamo mandato un\'email: apri il link per attivare l\'account, poi torna qui.</p>';return}}
-   else await DB.remote.signIn(em,pw);
-   toast('Benvenuto!');go('profilo')}catch(e){toast(/Invalid login/i.test(e.message)?'Email o password errate':/not confirmed/i.test(e.message)?'Conferma prima la tua email':e.message)}};
- if($('#afp'))$('#afp').onclick=async()=>{const em=$('#ae').value.trim();if(!em)return toast('Scrivi prima la tua email');try{await DB.remote.resetPassword(em);toast('Email per reimpostare la password inviata')}catch(e){toast(e.message)}}}
+function authForm(){let mode=window._am||'login';const T={login:'Entra',signup:'Crea account',reset:'Imposta nuova password'};
+ V.innerHTML=`<h2>Profilo</h2><div class="card"><p class="muted">${mode==='signup'?'Per registrarti ti serve il <b>codice</b> personale che ti ha dato un admin di PerGioco.':mode==='reset'?'Chiedi a un admin un nuovo codice e usalo qui con la tua email per scegliere una nuova password.':'Entra per vedere la tua pagina personale con statistiche e badge.'}</p>
+ <div class="seg" id="am"><button data-m="login" class="${mode==='login'?'on':''}">Accedi</button><button data-m="signup" class="${mode==='signup'?'on':''}">Registrati</button></div>
+ ${mode!=='login'?`<label>Codice</label><input id="ac" class="code" placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false">`:''}
+ <label>Email ${mode==='signup'?'(sarà il tuo nome utente)':''}</label><input id="ae" type="email" autocomplete="username">
+ <label>${mode==='login'?'Password':'Nuova password (almeno 8 caratteri)'}</label><input id="ap" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}">
+ ${mode!=='login'?`<label>Ripeti password</label><input id="ap2" type="password" autocomplete="new-password">`:''}
+ <button class="p" id="ago">${T[mode]}</button>
+ ${mode==='login'?'<button class="s" id="afp" style="width:100%;margin-top:6px">Password dimenticata?</button>':mode==='reset'?'<button class="s" id="abk" style="width:100%;margin-top:6px">← Torna all\'accesso</button>':''}</div>`;
+ const sw=m=>{window._am=m;authForm()};$('#am').onclick=e=>e.target.dataset.m&&sw(e.target.dataset.m);if($('#afp'))$('#afp').onclick=()=>sw('reset');if($('#abk'))$('#abk').onclick=()=>sw('login');
+ if($('#ac'))$('#ac').oninput=e=>{const v=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);e.target.value=v.match(/.{1,4}/g)?.join('-')||''};
+ $('#ago').onclick=async()=>{const em=$('#ae').value.trim(),pw=$('#ap').value;if(!/^\S+@\S+\.\S+$/.test(em))return toast('Email non valida');
+  let code='';if(mode!=='login'){code=$('#ac').value.replace(/-/g,'');if(code.length!==12)return toast('Il codice ha 12 caratteri (XXXX-XXXX-XXXX)');if(pw.length<8)return toast('La password deve avere almeno 8 caratteri');if(pw!==$('#ap2').value)return toast('Le password non coincidono')}
+  $('#ago').disabled=true;
+  try{if(mode==='signup')await DB.remote.signUp(code,em,pw);else if(mode==='reset'){await DB.remote.resetWithCode(code,em,pw);await DB.remote.signIn(em,pw)}else await DB.remote.signIn(em,pw);
+   window._am='login';toast(mode==='signup'?'Benvenuto in PerGioco! 🎉':mode==='reset'?'Password aggiornata':'Bentornato!');go('profilo')}
+  catch(e){$('#ago').disabled=false;const m=e.message||'';toast(/Invalid login/i.test(m)?'Email o password errate':/already registered/i.test(m)?'Questa email è già registrata':/Database error|Codice non valido/i.test(m)?'Codice non valido o già usato':m)}}}
 function openProfile(id){window._pv=id;go('profilo')}
 document.addEventListener('click',e=>{const a=e.target.closest('[data-pv]');if(a){e.preventDefault();openProfile(a.dataset.pv)}});
 function go(v){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));location.hash=v;views[v]();scrollTo(0,0)}

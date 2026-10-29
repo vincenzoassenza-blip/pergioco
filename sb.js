@@ -48,16 +48,14 @@ const SupabaseAdapter={
  // --- account dei soci ---
  redirect(){return location.origin+location.pathname},
  async user(){if(!this.client)return null;const {data}=await this.client.auth.getSession();return data.session?data.session.user:null},
- async signUp(email,password){const {data,error}=await this.client.auth.signUp({email,password,options:{emailRedirectTo:this.redirect()}});if(error)throw error;return data},
- async magicLink(email){const {error}=await this.client.auth.signInWithOtp({email,options:{emailRedirectTo:this.redirect()}});if(error)throw error},
- async resetPassword(email){const {error}=await this.client.auth.resetPasswordForEmail(email,{redirectTo:this.redirect()});if(error)throw error},
- async claim(memberId,tessera){const {error}=await this.client.rpc('claim_member',{p_member_id:memberId,p_tessera:tessera});if(error)throw error;await this.refresh()},
+ // registrazione: il database rifiuta qualsiasi iscrizione senza un codice valido (nessuna email inviata)
+ async signUp(code,email,password){const {data,error}=await this.client.auth.signUp({email,password,options:{data:{code}}});if(error)throw error;if(!data.session){const r=await this.client.auth.signInWithPassword({email,password});if(r.error)throw r.error}await this.refresh();return data},
+ async resetWithCode(code,email,password){const {error}=await this.client.rpc('reset_password_with_code',{p_code:code,p_email:email,p_password:password});if(error)throw error},
  async updateProfile(p){const {error}=await this.client.rpc('update_my_profile',{p_soprannome:p.soprannome,p_avatar:p.avatar,p_color:p.color,p_fav_game_id:p.favGameId});if(error)throw error;await this.refresh()},
- async myRequest(){const {data}=await this.client.from('link_requests').select('*').limit(1);return (data||[])[0]||null},
- async requestLink(memberId,email,note){const {error}=await this.client.from('link_requests').insert({member_id:memberId,email,note:note||null});if(error)throw error},
- async cancelRequest(id){const {error}=await this.client.from('link_requests').delete().eq('id',id);if(error)throw error},
- async requests(){const {data,error}=await this.client.from('link_requests').select('*').order('created_at');if(error)return[];return data},
- async setLink(memberId,userId){const {error}=await this.client.from('members').update({user_id:userId}).eq('id',memberId);if(error)throw error;if(userId)await this.client.from('link_requests').delete().eq('user_id',userId);await this.refresh()},
+ async codes(){const {data,error}=await this.client.rpc('admin_codes');if(error)throw error;return data||[]},
+ async newCode(memberId){const {data,error}=await this.client.rpc('admin_new_code',{p_member_id:memberId});if(error)throw error;return data},
+ async deleteCode(memberId){const {error}=await this.client.rpc('admin_delete_code',{p_member_id:memberId});if(error)throw error},
+ async setLink(memberId,userId){const {error}=await this.client.from('members').update({user_id:userId}).eq('id',memberId);if(error)throw error;await this.refresh()},
  // migrazione una tantum dei dati locali del telefono
  async uploadLocal(){const l=JSON.parse(localStorage.getItem(LocalAdapter.key)||'null');if(!l)return 0;let n=0;
   for(const k of ['games','members','plays','tables'])for(const x of l[k]||[]){const e=await this.run({k,op:'upsert',row:MAP[k].to(x)});if(e)throw e;n++}
