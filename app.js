@@ -57,7 +57,7 @@ async function confirmLogout(){if(await modal('Vuoi uscire dal tuo account? Dovr
 const ask=m=>modal(m),askText=(m,d='',num='')=>modal(m,{input:true,def:d,num});
 function isMod(){return !!(admin&&DB.remote&&DB.remote.modCached)}
 function drawOutBtn(){const b=document.getElementById('outbtn');if(!b)return;b.onclick=confirmLogout;if(!DB.remote){b.hidden=true;return}DB.remote.user().then(u=>{b.hidden=!u;if(u)b.title='Esci ('+u.email+')'}).catch(()=>{b.hidden=true})}
-function drawModeBtn(){drawOutBtn();const b=document.getElementById('modebtn');if(!b)return;b.hidden=!admin;b.textContent=uiMode()==='user'?'👤 Modalità utente':isMod()?'🛡 Modalità moderatore':'🔧 Modalità admin';document.body.classList.toggle('adm',adminMode())}
+function drawModeBtn(){drawOutBtn();{const n=document.getElementById('navaltro');if(n)n.textContent=admin?'Gestione':'Altro'}const b=document.getElementById('modebtn');if(!b)return;b.hidden=!admin;b.textContent=uiMode()==='user'?'👤 Modalità utente':isMod()?'🛡 Modalità moderatore':'🔧 Modalità admin';document.body.classList.toggle('adm',adminMode())}
 const playRow=(p,gs,ms)=>`<div class="rec"><span>${esc(gname(gs,p.gameId))}<br><span class="muted">${fmt(p.date)} · ${dayName(p.date)}${p.scenario?' · '+esc(p.scenario):''}${durOk(p.duration)?' · ⏱ '+durOk(p.duration)+' min':''}</span></span><span class="win">${p.coop?(p.groupWin?'Vittoria':'Sconfitta'):p.players.filter(x=>x.winner).map(x=>lbH(x,ms)).join(', ')}</span></div>`;
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 // Selettore soci: lista alfabetica con checkbox e ricerca (nome/cognome/soprannome, senza accenti)
@@ -162,7 +162,7 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<div id="bkp" hidden><h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati sul server dell'associazione. Qui puoi scaricarne una copia manuale in JSON (non include i Libri sociali).</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div></div>
- <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v20 · Associazione PerGioco, Ragusa</div>`;
+ <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v21 · Associazione PerGioco, Ragusa</div>`;
  
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(f&&f.size>IMP_MAX_MB*1048576)return modal(`⚠️ Il file è troppo grande (massimo ${IMP_MAX_MB} MB).`,{cancel:false});if(!f||!await ask('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
