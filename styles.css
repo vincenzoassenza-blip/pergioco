@@ -46,7 +46,7 @@ a.pv{color:var(--b);font-weight:700;text-decoration:none;cursor:pointer}
 .pg{height:5px;background:#ddd;border-radius:3px;margin:5px 6px 2px;overflow:hidden}.pg i{display:block;height:100%;background:var(--b2)}
 nav button{font-size:18px;min-width:0}
 .code{font-family:ui-monospace,Menlo,monospace;letter-spacing:1px}
-header{position:sticky}#modebtn{position:absolute;right:14px;top:calc(16px + env(safe-area-inset-top));border:1px solid #fff6;background:#fff2;color:#fff;border-radius:20px;padding:6px 12px;font-size:13px;font-weight:600}
+header{position:sticky}#modebtn,#outbtn{border:1px solid #fff6;background:#fff2;color:#fff;border-radius:20px;padding:6px 12px;font-size:13px;font-weight:600}
 body.adm header{background:#5a1a1a}
 .bars{margin-top:8px}.bar{display:grid;grid-template-columns:90px 1fr auto;gap:8px;align-items:center;font-size:13px;margin:5px 0}.bar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar i{display:block;height:14px;border-radius:7px;background:linear-gradient(90deg,var(--b2),var(--b));min-width:3px}
@@ -129,7 +129,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline-offset:0
 }
 @media (min-width:900px){
  header{padding-left:max(18px,calc(50% - 320px));padding-right:max(18px,calc(50% - 320px))}
- #modebtn{right:max(14px,calc(50% - 316px))}
+ .hbtns{right:max(14px,calc(50% - 316px))}
  nav{justify-content:center}
  nav button{flex:0 1 92px}
  .modal{justify-content:center;align-items:center}
@@ -138,3 +138,11 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline-offset:0
  .gph{max-width:640px;margin:0 auto;box-sizing:border-box}
 }
 .dday{margin:6px 0 2px;color:var(--b)}
+
+/* v19 — pulsanti intestazione: modalità + esci */
+.hbtns{position:absolute;right:14px;top:calc(16px + env(safe-area-inset-top));display:flex;gap:6px;align-items:center}
+#modebtn[hidden],#outbtn[hidden]{display:none}
+#outbtn{white-space:nowrap}
+@media(max-width:420px){.hbtns{right:10px;gap:4px}#modebtn,#outbtn{padding:5px 9px;font-size:12px}}
+@media(max-width:360px){#outbtn span{display:none}}
+@media (min-width:900px){.hbtns{right:max(14px,calc(50% - 316px))}}

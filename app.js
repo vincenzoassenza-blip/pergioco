@@ -56,7 +56,8 @@ addEventListener('popstate',()=>{if(_bkSkip){_bkSkip--;if(!_bkSkip)for(;_bkPend;
 async function confirmLogout(){if(await modal('Vuoi uscire dal tuo account? Dovrai inserire di nuovo email e password.'))DB.logout()}
 const ask=m=>modal(m),askText=(m,d='',num='')=>modal(m,{input:true,def:d,num});
 function isMod(){return !!(admin&&DB.remote&&DB.remote.modCached)}
-function drawModeBtn(){const b=document.getElementById('modebtn');if(!b)return;b.hidden=!admin;b.textContent=uiMode()==='user'?'👤 Modalità utente':isMod()?'🛡 Modalità moderatore':'🔧 Modalità admin';document.body.classList.toggle('adm',adminMode())}
+function drawOutBtn(){const b=document.getElementById('outbtn');if(!b)return;b.onclick=confirmLogout;if(!DB.remote){b.hidden=true;return}DB.remote.user().then(u=>{b.hidden=!u;if(u)b.title='Esci ('+u.email+')'}).catch(()=>{b.hidden=true})}
+function drawModeBtn(){drawOutBtn();const b=document.getElementById('modebtn');if(!b)return;b.hidden=!admin;b.textContent=uiMode()==='user'?'👤 Modalità utente':isMod()?'🛡 Modalità moderatore':'🔧 Modalità admin';document.body.classList.toggle('adm',adminMode())}
 const playRow=(p,gs,ms)=>`<div class="rec"><span>${esc(gname(gs,p.gameId))}<br><span class="muted">${fmt(p.date)} · ${dayName(p.date)}${p.scenario?' · '+esc(p.scenario):''}${durOk(p.duration)?' · ⏱ '+durOk(p.duration)+' min':''}</span></span><span class="win">${p.coop?(p.groupWin?'Vittoria':'Sconfitta'):p.players.filter(x=>x.winner).map(x=>lbH(x,ms)).join(', ')}</span></div>`;
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 // Selettore soci: lista alfabetica con checkbox e ricerca (nome/cognome/soprannome, senza accenti)
@@ -161,8 +162,8 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<div id="bkp" hidden><h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati sul server dell'associazione. Qui puoi scaricarne una copia manuale in JSON (non include i Libri sociali).</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div></div>
- <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2><button class="danger" id="out" hidden>⎋ Esci</button></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v18 · Associazione PerGioco, Ragusa</div><button class="danger" id="out2" hidden style="width:100%">⎋ Esci / Logout</button>`;
- if(DB.remote)DB.remote.user().then(u=>{const b=$('#out2');if(u&&b){b.hidden=false;b.onclick=confirmLogout}}).catch(()=>{});
+ <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v19 · Associazione PerGioco, Ragusa</div>`;
+ 
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(f&&f.size>IMP_MAX_MB*1048576)return modal(`⚠️ Il file è troppo grande (massimo ${IMP_MAX_MB} MB).`,{cancel:false});if(!f||!await ask('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
  const A=$('#adm');const R=!!DB.remote&&DB.status==='online';
@@ -178,7 +179,7 @@ async altro(){const hp=await DB.hasPin();
   $('#ps').onclick=async()=>{const a=$('#p1').value;if(!/^\d{4,}$/.test(a))return toast('Il PIN deve avere almeno 4 cifre');if(a!==$('#p2').value)return toast('I PIN non coincidono');await DB.setPin(a);admin=true;toast('PIN impostato');go('altro')};return}
  if(!admin){A.innerHTML=`<label>PIN admin</label><input id="pi" type="password" inputmode="numeric"><button class="p" id="pe">Entra</button>`;
   $('#pe').onclick=async()=>{if(await DB.checkPin($('#pi').value)){admin=true;drawModeBtn();go('altro')}else toast('PIN errato')};return}
- $('#out').hidden=false;$('#out').onclick=confirmLogout;const ms=await DB.members(),leg=await DB.legacyNames(),gs=await DB.games(),ps=await DB.plays();let edit=null,gf='';
+ const ms=await DB.members(),leg=await DB.legacyNames(),gs=await DB.games(),ps=await DB.plays();let edit=null,gf='';
  const TB=()=>`<button class="s" id="ast" style="width:100%;margin-bottom:8px">📊 Statistiche associazione</button>${!R?'':'<button class="s" id="alib" style="width:100%;margin-bottom:8px">📚 Libri sociali (soci e volontari)'+(isMod()?' · sola lettura':'')+'</button>'}<div><div class="seg" id="atab"><button data-a="soci" class="${adminTab==='soci'?'on':''}">Soci</button>${isMod()?'':`<button data-a="partite" class="${adminTab==='partite'?'on':''}">Partite</button>`}${R?`<button data-a="account" class="${adminTab==='account'?'on':''}">Codici</button>`:''}${R&&!isMod()?`<button data-a="mods" class="${adminTab==='mods'?'on':''}">Moderatori</button>`:''}</div></div>`;
  const bind=()=>{$('#ast').onclick=()=>go('stats');if($('#alib'))$('#alib').onclick=()=>go('libri');$('#atab').onclick=e=>{if(e.target.dataset.a){adminTab=e.target.dataset.a;draw()}}};
  const drawPlays=()=>{const l=ps.filter(p=>!gf||p.gameId===gf);A.innerHTML=TB()+`<label>Filtra per gioco</label><select id="gf"><option value="">Tutti i giochi (${ps.length})</option>${gs.map(g=>`<option value="${g.id}"${g.id===gf?' selected':''}>${esc(g.name)}</option>`)}</select>
@@ -253,9 +254,9 @@ async profilo(){const id=window._pv;const gs=await DB.games(),ms=await DB.member
  const u=await DB.remote.user();
  if(!u)return authForm();
  const me=ms.find(m=>m.userId===u.id);
- const out=`<button class="danger" id="lo" style="width:100%;margin-top:10px">⎋ Esci / Logout (${esc(u.email)})</button>`;
+ const out='';
  if(u&&!admin&&DB.remote){admin=await DB.remote.isAdmin();drawModeBtn()}
- const bindOut=()=>$('#lo').onclick=confirmLogout;
+ const bindOut=()=>{};
  if(DB.v6Missing){V.innerHTML=`<h2>Profilo</h2><p class="warn">Il database non è ancora aggiornato: un admin deve eseguire supabase/migrate-v6.sql su Supabase.</p>${out}`;return bindOut()}
  if(!me){if(admin){const free=ms.filter(m=>!m.userId);V.innerHTML=`<h2>Profilo</h2><div class="card"><p class="muted">Il tuo account admin non è ancora collegato a una scheda socio.</p><label>Collega il mio account a questo socio</label><select id="sm"><option value="">Scegli…</option>${free.map(m=>`<option value="${m.id}">${esc(memberName(m))}</option>`).join('')}</select><button class="p" id="smg">Collega</button></div>${out}`;bindOut();
    $('#smg').onclick=async()=>{const id=$('#sm').value;if(!id)return toast('Scegli la tua scheda');try{await DB.remote.setLink(id,u.id);toast('Account collegato 🎉');go('profilo')}catch(e){toast('Errore: '+e.message)}};return}
@@ -327,7 +328,7 @@ function gate(){document.body.classList.add('gate');$('#modebtn').hidden=true;co
  if(m==='auth')return authForm();
  V.innerHTML=`<div class="card" style="margin-top:30px;text-align:center"><h2>🎲 PerGioco</h2><p class="muted">${m==='missing'?'Il database non è configurato correttamente.':'Serve una connessione a internet per accedere la prima volta.'}</p><button class="p" data-act="reload">Riprova</button></div>`}
 const STAFF_VIEWS=['libri','stats'];
-function go(v){if(document.body.classList.contains('gate'))return gate();if(!views[v])v='ludoteca';if(STAFF_VIEWS.includes(v)&&!adminMode()){toast('🔒 Pagina riservata allo staff');v='ludoteca'}document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));window._cur=v;location.hash=v;XP.ensure().then(()=>views[v]()).catch(e=>{console.error(e);V.innerHTML=`<div class="card"><h3>⚠️ Errore nel caricamento</h3><p class="muted">${esc(e&&e.message||e)}</p><button class="p" data-act="reload">Ricarica</button></div>`});scrollTo(0,0)}
+function go(v){drawOutBtn();if(document.body.classList.contains('gate'))return gate();if(!views[v])v='ludoteca';if(STAFF_VIEWS.includes(v)&&!adminMode()){toast('🔒 Pagina riservata allo staff');v='ludoteca'}document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));window._cur=v;location.hash=v;XP.ensure().then(()=>views[v]()).catch(e=>{console.error(e);V.innerHTML=`<div class="card"><h3>⚠️ Errore nel caricamento</h3><p class="muted">${esc(e&&e.message||e)}</p><button class="p" data-act="reload">Ricarica</button></div>`});scrollTo(0,0)}
 $('#tabs').onclick=e=>{const b=e.target.closest('button');if(b){window._pv=null;go(b.dataset.v)}};
 addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(document.body.classList.contains('gate'))return;if(v!=='profilo')window._pv=null;if(window._cur!==v)go(views[v]?v:'ludoteca')});
 const cfg=!!((window.PERGIOCO_CONFIG||{}).supabaseUrl&&(window.PERGIOCO_CONFIG||{}).supabaseAnonKey);

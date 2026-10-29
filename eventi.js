@@ -98,8 +98,8 @@ async function evStaff(e){const ms=await DB.members(),mn=id=>{const m=ms.find(m=
  let ps;try{ps=await EV.prenotati(e.id)}catch(x){return toast(evMsg(x))}
  const ord={confermata:0,in_attesa_conferma:1,attesa:2,annullata:3,rifiutata:4};ps.sort((a,b)=>ord[a.stato]-ord[b.stato]||a.created_at.localeCompare(b.created_at));
  const occ=ps.filter(p=>p.stato==='confermata'||p.stato==='in_attesa_conferma').reduce((s,p)=>s+1+(p.ospite?1:0),0),pres=ps.filter(p=>p.presente).reduce((s,p)=>s+1+(p.ospite?1:0),0);
- const row=p=>`<div class="evrow"><div><b>${esc(mn(p.member_id))}${lv(p.member_id)}</b>${p.ospite?` <span class="muted">+ ${esc(p.ospite)}</span>`:''}<br>${stBadge(p.stato)}${p.caparra_at?`<br><small class="muted">Caparra ${euro(p.caparra_importo)} ricevuta da ${esc(p.caparra_da)} il ${esc(evData(p.caparra_at))}</small>`:''}</div><div class="evbtn">
- ${p.stato==='in_attesa_conferma'?`<button class="p" data-cap="${p.id}">💶 Conferma caparra ricevuta</button>`:''}
+ const row=p=>`<div class="evrow"><div><b>${esc(mn(p.member_id))}${lv(p.member_id)}</b>${p.ospite?` <span class="muted">+ ${esc(p.ospite)}</span>`:''}<br>${stBadge(p.stato)}${p.caparra_at?`<br><small class="muted">Caparra ${euro(p.caparra_importo)} ricevuta da ${esc(p.caparra_da)} il ${esc(evData(p.caparra_at))}</small>`:''}${p.caparra_mod_at?`<br><small class="muted">✏️ Ultima modifica caparra: ${esc(p.caparra_mod_da)} il ${esc(evData(p.caparra_mod_at))}</small>`:''}</div><div class="evbtn">
+ ${p.stato==='in_attesa_conferma'?`<button class="p" data-cap="${p.id}">💶 Conferma caparra ricevuta</button>`:''}${p.stato==='confermata'&&p.caparra_at?`<button class="s" data-capfix="${p.id}">✏️ Correggi importo</button><button class="s" data-capundo="${p.id}">↩️ Annulla conferma caparra</button>`:''}
  ${p.stato==='confermata'?`<label class="lchk"><input type="checkbox" data-pres="${p.id}"${p.presente?' checked':''}> Presente</label>`:''}
  ${ATTIVE.includes(p.stato)?`<button class="s" data-rif="${p.id}">Annulla</button>`:''}</div></div>`;
  const o=openPanel(`<div class="hrow"><h3>👥 ${esc(e.titolo)}</h3></div><p class="muted">${esc(evData(e.inizio))} · ${occ}/${e.posti} posti occupati · ${pres} presenti</p>
@@ -108,6 +108,13 @@ async function evStaff(e){const ms=await DB.members(),mn=id=>{const m=ms.find(m=
  const again=()=>{o.close();evStaff(e)};
  o.querySelectorAll('[data-cap]').forEach(b=>b.onclick=async()=>{const v=await askText('Importo della caparra ricevuta di persona (€):',String(e.caparra??e.quota??'').replace('.',','),'dec');if(v==null)return;const n=+String(v).replace(',','.');if(!/^\d+([.,]\d{1,2})?$/.test(String(v).trim())||n>10000)return modal('⚠️ «Importo caparra» deve essere un importo in euro (es. 12,50) tra 0 e 10000. Hai scritto: «'+String(v).slice(0,40)+'».',{cancel:false});
   try{await EV.staff(b.dataset.cap,'conferma_caparra',n);toast('Prenotazione confermata');again()}catch(x){toast(evMsg(x))}});
+ const impOk=v=>{const t=String(v??'').trim();const n=+t.replace(',','.');return /^\d{1,5}([.,]\d{1,2})?$/.test(t)&&n<=10000?n:null};
+ o.querySelectorAll('[data-capfix]').forEach(b=>b.onclick=async()=>{const p=ps.find(x=>x.id===b.dataset.capfix);if(!p)return;const v=await askText('Importo corretto della caparra ricevuta (€):',String(p.caparra_importo??'').replace('.',','),'dec');if(v==null)return;const n=impOk(v);if(n==null)return modal('⚠️ L\'importo deve essere in euro (es. 12,50) tra 0 e 10000.',{cancel:false});
+  if(!await ask('Correggere la caparra da '+euro(p.caparra_importo)+' a '+euro(n)+'?'))return;
+  try{await EV.staff(p.id,'correggi_importo',n);toast('Importo corretto');again()}catch(x){toast(evMsg(x))}});
+ o.querySelectorAll('[data-capundo]').forEach(b=>b.onclick=async()=>{const p=ps.find(x=>x.id===b.dataset.capundo);if(!p)return;
+  if(!await ask('Annullare la conferma della caparra ('+euro(p.caparra_importo)+')? La prenotazione torna «in attesa di conferma» e mantiene il posto.'))return;
+  try{await EV.staff(p.id,'annulla_caparra');toast('Conferma caparra annullata');again()}catch(x){toast(evMsg(x))}});
  o.querySelectorAll('[data-rif]').forEach(b=>b.onclick=async()=>{if(!await ask('Annullare questa prenotazione? Il posto passa al primo in lista d\'attesa.'))return;try{await EV.staff(b.dataset.rif,'rifiuta');toast('Prenotazione annullata');again()}catch(x){toast(evMsg(x))}});
  o.querySelectorAll('[data-pres]').forEach(c=>c.onchange=async()=>{try{await EV.staff(c.dataset.pres,'presente',null,c.checked);toast(c.checked?'Segnato presente':'Presenza tolta')}catch(x){c.checked=!c.checked;toast(evMsg(x))}});
  o.querySelector('#evcsv').onclick=()=>{const c=csvCell;const L=[['Nome','Ospite','Stato','Prenotato il','Caparra','Caparra ricevuta da','Caparra il','Presente'].map(c).join(';')].concat(ps.map(p=>[mn(p.member_id),p.ospite,(ST[p.stato]||[,p.stato])[1].replace(/^\W+\s/,''),evData(p.created_at),p.caparra_importo,p.caparra_da,p.caparra_at?evData(p.caparra_at):'',p.presente?'Sì':'No'].map(c).join(';')));
