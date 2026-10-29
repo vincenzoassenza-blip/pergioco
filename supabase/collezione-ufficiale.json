@@ -1,2050 +1,2001 @@
 [
- {
-  "nome": "7 Wonders",
-  "anno": "2010",
-  "id_bgg": 68448,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "7",
-  "giocatori_consigliati": "3,4,5,6,7",
-  "giocatori_migliori": "4,5",
-  "durata_media": "30",
-  "durata_min": "30",
-  "durata_max": "30",
-  "eta": "10+",
-  "categorie": [
-   "Ancient",
-   "Card Game",
-   "City Building",
-   "Civilization",
-   "Economic"
-  ],
-  "meccaniche": [
-   "Closed Drafting",
-   "End Game Bonuses",
-   "Hand Management",
-   "Melding and Splaying"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/68448"
- },
- {
-  "nome": "7 Wonders: Babel",
-  "anno": "2014",
-  "id_bgg": 154638,
-  "tipo": "espansione",
-  "giocatori_min": "2",
-  "giocatori_max": "7",
-  "giocatori_consigliati": "3,4,5,6,7",
-  "giocatori_migliori": "5",
-  "durata_media": "45",
-  "durata_min": "45",
-  "durata_max": "45",
-  "eta": "10+",
-  "categorie": [
-   "Ancient",
-   "Card Game",
-   "City Building",
-   "Civilization",
-   "Expansion for Base-game"
-  ],
-  "meccaniche": [
-   "Closed Drafting",
-   "Set Collection",
-   "Simultaneous Action Selection",
-   "Variable Player Powers"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/154638"
- },
- {
-  "nome": "7 Wonders: Cities",
-  "anno": "2012",
-  "id_bgg": 111661,
-  "tipo": "espansione",
-  "giocatori_min": "2",
-  "giocatori_max": "8",
-  "giocatori_consigliati": "3,4,5,6,7,8",
-  "giocatori_migliori": "4,5",
-  "durata_media": "40",
-  "durata_min": "40",
-  "durata_max": "40",
-  "eta": "10+",
-  "categorie": [
-   "Ancient",
-   "Card Game",
-   "City Building",
-   "Civilization",
-   "Expansion for Base-game"
-  ],
-  "meccaniche": [
-   "Closed Drafting",
-   "Hand Management",
-   "Set Collection",
-   "Simultaneous Action Selection"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/111661"
- },
- {
-  "nome": "7 Wonders: Leaders",
-  "anno": "2011",
-  "id_bgg": 92539,
-  "tipo": "espansione",
-  "giocatori_min": "2",
-  "giocatori_max": "7",
-  "giocatori_consigliati": "3,4,5,6,7",
-  "giocatori_migliori": "4,5",
-  "durata_media": "40",
-  "durata_min": "40",
-  "durata_max": "40",
-  "eta": "10+",
-  "categorie": [
-   "Expansion for Base-game",
-   "Ancient",
-   "Card Game",
-   "City Building",
-   "Civilization"
-  ],
-  "meccaniche": [
-   "Closed Drafting",
-   "Hand Management",
-   "Set Collection",
-   "Simultaneous Action Selection"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/92539"
- },
- {
-  "nome": "Abyss",
-  "anno": "2014",
-  "id_bgg": 155987,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "4",
-  "durata_media": "60",
-  "durata_min": "30",
-  "durata_max": "60",
-  "eta": "10+",
-  "categorie": [
-   "Card Game",
-   "Fantasy",
-   "Mythology",
-   "Nautical"
-  ],
-  "meccaniche": [
-   "Auction / Bidding",
-   "Hand Management",
-   "Memory",
-   "Open Drafting"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/155987"
- },
- {
-  "nome": "Abyss: Kraken",
-  "anno": "2015",
-  "id_bgg": 180341,
-  "tipo": "espansione",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "4",
-  "durata_media": "60",
-  "durata_min": "30",
-  "durata_max": "60",
-  "eta": "12+",
-  "categorie": [
-   "Expansion for Base-game",
-   "Card Game",
-   "Fantasy",
-   "Mythology",
-   "Science Fiction"
-  ],
-  "meccaniche": [
-   "Auction / Bidding",
-   "Hand Management",
-   "Open Drafting",
-   "Push Your Luck"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/180341"
- },
- {
-  "nome": "Alhambra",
-  "anno": "2003",
-  "id_bgg": 6249,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "2,3,4,5",
-  "giocatori_migliori": "3",
-  "durata_media": "60",
-  "durata_min": "45",
-  "durata_max": "60",
-  "eta": "8+",
-  "categorie": [
-   "City Building",
-   "Medieval"
-  ],
-  "meccaniche": [
-   "Area Majority / Influence",
-   "Hand Management",
-   "Open Drafting",
-   "Set Collection"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/6249"
- },
- {
-  "nome": "At the Gates of Loyang",
-  "anno": "2009",
-  "id_bgg": 39683,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "1,2,3,4",
-  "giocatori_migliori": "2",
-  "durata_media": "120",
-  "durata_min": "60",
-  "durata_max": "120",
-  "eta": "12+",
-  "categorie": [
-   "Economic",
-   "Farming"
-  ],
-  "meccaniche": [
-   "Contracts",
-   "Income",
-   "Loans",
-   "Market"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/39683"
- },
- {
-  "nome": "Avalon",
-  "anno": "2003",
-  "id_bgg": 6187,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "2",
-  "giocatori_consigliati": "2",
-  "giocatori_migliori": "2",
-  "durata_media": "45",
-  "durata_min": "45",
-  "durata_max": "45",
-  "eta": "12+",
-  "categorie": [
-   "Card Game",
-   "Exploration",
-   "Fantasy"
-  ],
-  "meccaniche": [
-   "Hand Management"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/6187"
- },
- {
-  "nome": "Azul",
-  "anno": "2017",
-  "id_bgg": 230802,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "2",
-  "durata_media": "45",
-  "durata_min": "30",
-  "durata_max": "45",
-  "eta": "8+",
-  "categorie": [
-   "Abstract Strategy",
-   "Renaissance"
-  ],
-  "meccaniche": [
-   "End Game Bonuses",
-   "Grid Coverage",
-   "Open Drafting",
-   "Pattern Building"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/230802"
- },
- {
-  "nome": "Azul: Stained Glass of Sintra",
-  "anno": "2018",
-  "id_bgg": 256226,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "3",
-  "durata_media": "45",
-  "durata_min": "30",
-  "durata_max": "45",
-  "eta": "8+",
-  "categorie": [
-   "Abstract Strategy",
-   "Puzzle",
-   "Renaissance"
-  ],
-  "meccaniche": [
-   "End Game Bonuses",
-   "Modular Board",
-   "Open Drafting",
-   "Pattern Building"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/256226"
- },
- {
-  "nome": "Byzanz",
-  "anno": "2008",
-  "id_bgg": 38032,
-  "tipo": "gioco base",
-  "giocatori_min": "3",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "3,4,5,6",
-  "giocatori_migliori": "4,5",
-  "durata_media": "45",
-  "durata_min": "45",
-  "durata_max": "45",
-  "eta": "8+",
-  "categorie": [
-   "Card Game",
-   "Economic"
-  ],
-  "meccaniche": [
-   "Auction / Bidding",
-   "Auction: Turn Order Until Pass",
-   "Closed Economy Auction",
-   "Constrained Bidding"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/38032"
- },
- {
-  "nome": "The Castles of Burgundy",
-  "anno": "2011",
-  "id_bgg": 84876,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "2",
-  "durata_media": "90",
-  "durata_min": "30",
-  "durata_max": "90",
-  "eta": "12+",
-  "categorie": [
-   "Animals",
-   "Medieval",
-   "Territory Building"
-  ],
-  "meccaniche": [
-   "Delayed Purchase",
-   "Dice Rolling",
-   "End Game Bonuses",
-   "Grid Coverage"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/84876"
- },
- {
-  "nome": "Catalyst",
-  "anno": "2018",
-  "id_bgg": 254894,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "2,3,4",
-  "durata_media": "40",
-  "durata_min": "20",
-  "durata_max": "40",
-  "eta": "10+",
-  "categorie": [
-   "Card Game"
-  ],
-  "meccaniche": [
-   "Open Drafting",
-   "Set Collection"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/254894"
- },
- {
-  "nome": "Celestia",
-  "anno": "2015",
-  "id_bgg": 175117,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "3,4,5,6",
-  "giocatori_migliori": "5,6",
-  "durata_media": "30",
-  "durata_min": "30",
-  "durata_max": "30",
-  "eta": "6+",
-  "categorie": [
-   "Adventure",
-   "Aviation / Flight",
-   "Card Game",
-   "Fantasy"
-  ],
-  "meccaniche": [
-   "Betting and Bluffing",
-   "Dice Rolling",
-   "Hand Management",
-   "Hidden Victory Points"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/175117"
- },
- {
-  "nome": "Century: Spice Road",
-  "anno": "2017",
-  "id_bgg": 209685,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "2,3,4,5",
-  "giocatori_migliori": "3,4",
-  "durata_media": "45",
-  "durata_min": "30",
-  "durata_max": "45",
-  "eta": "8+",
-  "categorie": [
-   "Card Game",
-   "Economic",
-   "Medieval"
-  ],
-  "meccaniche": [
-   "Action Retrieval",
-   "Auction: Dutch",
-   "Contracts",
-   "Deck, Bag, and Pool Building"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/209685"
- },
- {
-  "nome": "Cheating Moth",
-  "anno": "2011",
-  "id_bgg": 105593,
-  "tipo": "gioco base",
-  "giocatori_min": "3",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "3,4,5",
-  "giocatori_migliori": "5",
-  "durata_media": "30",
-  "durata_min": "30",
-  "durata_max": "30",
-  "eta": "6+",
-  "categorie": [
-   "Action / Dexterity",
-   "Card Game"
-  ],
-  "meccaniche": [
-   "Hand Management"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/105593"
- },
- {
-  "nome": "Cóatl",
-  "anno": "2020",
-  "id_bgg": 274841,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "1,2,3,4",
-  "giocatori_migliori": "3",
-  "durata_media": "60",
-  "durata_min": "30",
-  "durata_max": "60",
-  "eta": "8+",
-  "categorie": [
-   "Abstract Strategy",
-   "Puzzle"
-  ],
-  "meccaniche": [
-   "Contracts",
-   "Hand Management",
-   "Once-Per-Game Abilities",
-   "Open Drafting"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/274841"
- },
- {
-  "nome": "Counterfeiters",
-  "anno": "2018",
-  "id_bgg": 257380,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "4",
-  "durata_media": "35",
-  "durata_min": "35",
-  "durata_max": "35",
-  "eta": "12+",
-  "categorie": [
-   "Animals",
-   "Card Game",
-   "Mafia"
-  ],
-  "meccaniche": [
-   "Worker Placement"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/257380"
- },
- {
-  "nome": "Crypt",
-  "anno": "2018",
-  "id_bgg": 250442,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "1,2,3,4",
-  "giocatori_migliori": "4",
-  "durata_media": "35",
-  "durata_min": "20",
-  "durata_max": "35",
-  "eta": "8+",
-  "categorie": [
-   "Card Game",
-   "Dice",
-   "Medieval",
-   "Renaissance"
-  ],
-  "meccaniche": [
-   "Area Majority / Influence",
-   "Auction / Bidding",
-   "Contracts",
-   "Dice Rolling"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/250442"
- },
- {
-  "nome": "Deckscape: Behind the Curtain",
-  "anno": "2019",
-  "id_bgg": 267735,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "1,2,3,4",
-  "giocatori_migliori": "2",
-  "durata_media": "60",
-  "durata_min": "60",
-  "durata_max": "60",
-  "eta": "12+",
-  "categorie": [
-   "Card Game",
-   "Puzzle",
-   "Real-time"
-  ],
-  "meccaniche": [
-   "Cooperative Game",
-   "Real-Time"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/267735"
- },
- {
-  "nome": "Deckscape: Heist in Venice",
-  "anno": "2018",
-  "id_bgg": 245045,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "2,3,4,5,6",
-  "giocatori_migliori": "6",
-  "durata_media": "90",
-  "durata_min": "30",
-  "durata_max": "90",
-  "eta": "12+",
-  "categorie": [
-   "Card Game",
-   "Puzzle",
-   "Real-time"
-  ],
-  "meccaniche": [
-   "Cooperative Game",
-   "Memory",
-   "Variable Player Powers"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/245045"
- },
- {
-  "nome": "Deckscape: The Fate of London",
-  "anno": "2017",
-  "id_bgg": 230498,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "1,2,3,4",
-  "giocatori_migliori": "2,3",
-  "durata_media": "60",
-  "durata_min": "60",
-  "durata_max": "60",
-  "eta": "12+",
-  "categorie": [
-   "Card Game",
-   "Puzzle",
-   "Real-time"
-  ],
-  "meccaniche": [
-   "Cooperative Game",
-   "Solo / Solitaire Game"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/230498"
- },
- {
-  "nome": "Diamant",
-  "anno": "2005",
-  "id_bgg": 15512,
-  "tipo": "gioco base",
-  "giocatori_min": "3",
-  "giocatori_max": "8",
-  "giocatori_consigliati": "3,4,5,6,7,8",
-  "giocatori_migliori": "6,7,8",
-  "durata_media": "40",
-  "durata_min": "20",
-  "durata_max": "40",
-  "eta": "6+",
-  "categorie": [
-   "Bluffing",
-   "Card Game",
-   "Exploration"
-  ],
-  "meccaniche": [
-   "Move Through Deck",
-   "Push Your Luck",
-   "Simultaneous Action Selection"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/15512"
- },
- {
-  "nome": "Dune",
-  "anno": "2019",
-  "id_bgg": 283355,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "5,6",
-  "giocatori_migliori": "6",
-  "durata_media": "180",
-  "durata_min": "120",
-  "durata_max": "180",
-  "eta": "14+",
-  "categorie": [
-   "Bluffing",
-   "Fighting",
-   "Negotiation",
-   "Novel-based",
-   "Political",
-   "Science Fiction",
-   "Wargame"
-  ],
-  "meccaniche": [
-   "Alliances",
-   "Area Majority / Influence",
-   "Area Movement",
-   "Auction / Bidding"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/283355"
- },
- {
-  "nome": "Dune: Imperium",
-  "anno": "2020",
-  "id_bgg": 316554,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "1,2,3,4",
-  "giocatori_migliori": "3,4",
-  "durata_media": "120",
-  "durata_min": "60",
-  "durata_max": "120",
-  "eta": "12+",
-  "categorie": [
-   "Movies / TV / Radio theme",
-   "Novel-based",
-   "Political",
-   "Science Fiction"
-  ],
-  "meccaniche": [
-   "Card Play Conflict Resolution",
-   "Deck, Bag, and Pool Building",
-   "Delayed Purchase",
-   "Force Commitment"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/316554"
- },
- {
-  "nome": "Dungeon Rush",
-  "anno": "2016",
-  "id_bgg": 207338,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "2,3,4,5",
-  "giocatori_migliori": "3,4",
-  "durata_media": "19",
-  "durata_min": "13",
-  "durata_max": "19",
-  "eta": "6+",
-  "categorie": [
-   "Action / Dexterity",
-   "Card Game",
-   "Fantasy",
-   "Fighting",
-   "Humor",
-   "Real-time"
-  ],
-  "meccaniche": [
-   "Melding and Splaying",
-   "Set Collection",
-   "Variable Player Powers"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/207338"
- },
- {
-  "nome": "Fiasco",
-  "anno": "2003",
-  "id_bgg": 11038,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "4",
-  "giocatori_migliori": "4",
-  "durata_media": "15",
-  "durata_min": "15",
-  "durata_max": "15",
-  "eta": "12+",
-  "categorie": [
-   "Card Game",
-   "Renaissance"
-  ],
-  "meccaniche": [
-   "Trick-taking"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/11038"
- },
- {
-  "nome": "Fields of Green",
-  "anno": "2016",
-  "id_bgg": 200954,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "2",
-  "durata_media": "45",
-  "durata_min": "45",
-  "durata_max": "45",
-  "eta": "10+",
-  "categorie": [
-   "Card Game",
-   "City Building",
-   "Farming"
-  ],
-  "meccaniche": [
-   "Closed Drafting",
-   "Simultaneous Action Selection",
-   "Tile Placement",
-   "Variable Phase Order"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/200954"
- },
- {
-  "nome": "Flamme Rouge",
-  "anno": "2016",
-  "id_bgg": 199478,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "4",
-  "durata_media": "45",
-  "durata_min": "30",
-  "durata_max": "45",
-  "eta": "8+",
-  "categorie": [
-   "Racing",
-   "Sports"
-  ],
-  "meccaniche": [
-   "Catch the Leader",
-   "Hand Management",
-   "Modular Board",
-   "Programmed Movement"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/199478"
- },
- {
-  "nome": "Four Against Darkness",
-  "anno": "2016",
-  "id_bgg": 197097,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "1",
-  "giocatori_consigliati": "1",
-  "giocatori_migliori": "1",
-  "durata_media": "75",
-  "durata_min": "45",
-  "durata_max": "75",
-  "eta": "8+",
-  "categorie": [
-   "Adventure",
-   "Book",
-   "Exploration",
-   "Fantasy",
-   "Print & Play"
-  ],
-  "meccaniche": [
-   "Dice Rolling",
-   "Grid Movement",
-   "Paper-and-Pencil",
-   "Solo / Solitaire Game"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/197097"
- },
- {
-  "nome": "The Game",
-  "anno": "2015",
-  "id_bgg": 173090,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "1,2,3,4,5",
-  "giocatori_migliori": "3",
-  "durata_media": "20",
-  "durata_min": "20",
-  "durata_max": "20",
-  "eta": "8+",
-  "categorie": [
-   "Card Game",
-   "Number"
-  ],
-  "meccaniche": [
-   "Communication Limits",
-   "Cooperative Game",
-   "Hand Management",
-   "Solo / Solitaire Game"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/173090"
- },
- {
-  "nome": "The Game: Extreme",
-  "anno": "2016",
-  "id_bgg": 209325,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "1,2,3,4,5",
-  "giocatori_migliori": "2",
-  "durata_media": "30",
-  "durata_min": "20",
-  "durata_max": "30",
-  "eta": "8+",
-  "categorie": [
-   "Card Game",
-   "Number"
-  ],
-  "meccaniche": [
-   "Cooperative Game",
-   "Hand Management"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/209325"
- },
- {
-  "nome": "El Grande",
-  "anno": "1995",
-  "id_bgg": 93,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "3,4,5",
-  "giocatori_migliori": "5",
-  "durata_media": "120",
-  "durata_min": "60",
-  "durata_max": "120",
-  "eta": "12+",
-  "categorie": [
-   "Medieval"
-  ],
-  "meccaniche": [
-   "Action Drafting",
-   "Area Majority / Influence",
-   "Auction / Bidding",
-   "Hand Management"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/93"
- },
- {
-  "nome": "Le Havre",
-  "anno": "2008",
-  "id_bgg": 35677,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "1,2,3,4",
-  "giocatori_migliori": "3",
-  "durata_media": "150",
-  "durata_min": "30",
-  "durata_max": "150",
-  "eta": "12+",
-  "categorie": [
-   "City Building",
-   "Economic",
-   "Industry / Manufacturing",
-   "Nautical"
-  ],
-  "meccaniche": [
-   "Automatic Resource Growth",
-   "End Game Bonuses",
-   "Increase Value of Unchosen Resources",
-   "Loans"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/35677"
- },
- {
-  "nome": "Le Havre: Le Grand Hameau",
-  "anno": "2010",
-  "id_bgg": 65996,
-  "tipo": "espansione",
-  "giocatori_min": "1",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "1,2,3,4",
-  "giocatori_migliori": "3",
-  "durata_media": "150",
-  "durata_min": "150",
-  "durata_max": "150",
-  "eta": "12+",
-  "categorie": [
-   "Expansion for Base-game",
-   "Economic",
-   "Industry / Manufacturing"
-  ],
-  "meccaniche": [
-   "Worker Placement"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/65996"
- },
- {
-  "nome": "Hive",
-  "anno": "2001",
-  "id_bgg": 2655,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "2",
-  "giocatori_consigliati": "2",
-  "giocatori_migliori": "2",
-  "durata_media": "20",
-  "durata_min": "20",
-  "durata_max": "20",
-  "eta": "8+",
-  "categorie": [
-   "Abstract Strategy",
-   "Animals"
-  ],
-  "meccaniche": [
-   "Enclosure",
-   "Grid Movement",
-   "Hexagon Grid",
-   "Pattern Movement"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/2655"
- },
- {
-  "nome": "Honshū",
-  "anno": "2016",
-  "id_bgg": 207336,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "2,3,4,5",
-  "giocatori_migliori": "4",
-  "durata_media": "30",
-  "durata_min": "30",
-  "durata_max": "30",
-  "eta": "8+",
-  "categorie": [
-   "Card Game",
-   "City Building",
-   "Territory Building"
-  ],
-  "meccaniche": [
-   "Auction / Bidding",
-   "Closed Drafting",
-   "End Game Bonuses",
-   "Hand Management"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/207336"
- },
- {
-  "nome": "Imagine",
-  "anno": "2015",
-  "id_bgg": 191894,
-  "tipo": "gioco base",
-  "giocatori_min": "3",
-  "giocatori_max": "8",
-  "giocatori_consigliati": "3,4,5,6,7,8",
-  "giocatori_migliori": "4,5,6",
-  "durata_media": "20",
-  "durata_min": "20",
-  "durata_max": "20",
-  "eta": "8+",
-  "categorie": [
-   "Deduction",
-   "Party Game"
-  ],
-  "meccaniche": [
-   "Acting",
-   "Team-Based Game"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/191894"
- },
- {
-  "nome": "Intrigue",
-  "anno": "1994",
-  "id_bgg": 265,
-  "tipo": "gioco base",
-  "giocatori_min": "3",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "4,5",
-  "giocatori_migliori": "5",
-  "durata_media": "45",
-  "durata_min": "45",
-  "durata_max": "45",
-  "eta": "12+",
-  "categorie": [
-   "Negotiation",
-   "Renaissance"
-  ],
-  "meccaniche": [
-   "Area Majority / Influence",
-   "Auction / Bidding",
-   "Bribery",
-   "Hand Management"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/265"
- },
- {
-  "nome": "Jamaica",
-  "anno": "2007",
-  "id_bgg": 28023,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "3,4,5,6",
-  "giocatori_migliori": "5,6",
-  "durata_media": "60",
-  "durata_min": "30",
-  "durata_max": "60",
-  "eta": "8+",
-  "categorie": [
-   "Nautical",
-   "Pirates"
-  ],
-  "meccaniche": [
-   "Dice Rolling",
-   "Hand Management",
-   "Hidden Victory Points",
-   "Race"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/28023"
- },
- {
-  "nome": "Just One",
-  "anno": "2018",
-  "id_bgg": 254640,
-  "tipo": "gioco base",
-  "giocatori_min": "3",
-  "giocatori_max": "7",
-  "giocatori_consigliati": "4,5,6,7",
-  "giocatori_migliori": "6,7",
-  "durata_media": "60",
-  "durata_min": "20",
-  "durata_max": "60",
-  "eta": "8+",
-  "categorie": [
-   "Deduction",
-   "Party Game",
-   "Word Game"
-  ],
-  "meccaniche": [
-   "Communication Limits",
-   "Cooperative Game",
-   "Deduction",
-   "Paper-and-Pencil"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/254640"
- },
- {
-  "nome": "Keyflower",
-  "anno": "2012",
-  "id_bgg": 122515,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "2,3,4,5,6",
-  "giocatori_migliori": "4",
-  "durata_media": "120",
-  "durata_min": "90",
-  "durata_max": "120",
-  "eta": "12+",
-  "categorie": [
-   "City Building",
-   "Economic",
-   "Renaissance",
-   "Territory Building",
-   "Transportation"
-  ],
-  "meccaniche": [
-   "Auction / Bidding",
-   "Auction: Fixed Placement",
-   "Auction: Multiple Lot",
-   "Constrained Bidding"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/122515"
- },
- {
-  "nome": "KeyForge: Call of the Archons",
-  "anno": "2018",
-  "id_bgg": 257501,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "2",
-  "giocatori_consigliati": "2",
-  "giocatori_migliori": "2",
-  "durata_media": "45",
-  "durata_min": "15",
-  "durata_max": "45",
-  "eta": "10+",
-  "categorie": [
-   "Card Game",
-   "Collectible Components",
-   "Fantasy",
-   "Fighting"
-  ],
-  "meccaniche": [
-   "Hand Management",
-   "Take That"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/257501"
- },
- {
-  "nome": "Kingdomino",
-  "anno": "2016",
-  "id_bgg": 204583,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "2,4",
-  "durata_media": "25",
-  "durata_min": "15",
-  "durata_max": "25",
-  "eta": "6+",
-  "categorie": [
-   "Abstract Strategy",
-   "Medieval",
-   "Puzzle",
-   "Territory Building"
-  ],
-  "meccaniche": [
-   "Enclosure",
-   "Matching",
-   "Open Drafting",
-   "Tile Placement"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/204583"
- },
- {
-  "nome": "Matrimonio Reale",
-  "anno": "2016",
-  "id_bgg": 199969,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "8",
-  "giocatori_consigliati": "",
-  "giocatori_migliori": "",
-  "durata_media": "30",
-  "durata_min": "20",
-  "durata_max": "30",
-  "eta": "8+",
-  "categorie": [
-   "Fantasy",
-   "Humor",
-   "Party Game"
-  ],
-  "meccaniche": [
-   "Acting",
-   "Area Movement",
-   "Open Drafting",
-   "Player Elimination"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/199969"
- },
- {
-  "nome": "Modern Art",
-  "anno": "1992",
-  "id_bgg": 118,
-  "tipo": "gioco base",
-  "giocatori_min": "3",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "3,4,5",
-  "giocatori_migliori": "4,5",
-  "durata_media": "45",
-  "durata_min": "45",
-  "durata_max": "45",
-  "eta": "10+",
-  "categorie": [
-   "Card Game",
-   "Economic"
-  ],
-  "meccaniche": [
-   "Auction / Bidding",
-   "Auction: English",
-   "Auction: Once Around",
-   "Auction: Sealed Bid"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/118"
- },
- {
-  "nome": "Monopoly City",
-  "anno": "2009",
-  "id_bgg": 41186,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "2,3,4,5,6",
-  "giocatori_migliori": "3,4",
-  "durata_media": "75",
-  "durata_min": "75",
-  "durata_max": "75",
-  "eta": "8+",
-  "categorie": [
-   "City Building",
-   "Economic",
-   "Electronic",
-   "Negotiation"
-  ],
-  "meccaniche": [
-   "Auction / Bidding",
-   "Dice Rolling",
-   "Roll / Spin and Move",
-   "Set Collection"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/41186"
- },
- {
-  "nome": "Munchkin Cthulhu",
-  "anno": "2008",
-  "id_bgg": 25071,
-  "tipo": "gioco base",
-  "giocatori_min": "3",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "3,4,5,6",
-  "giocatori_migliori": "4",
-  "durata_media": "90",
-  "durata_min": "90",
-  "durata_max": "90",
-  "eta": "12+",
-  "categorie": [
-   "Card Game",
-   "Fighting",
-   "Horror",
-   "Humor"
-  ],
-  "meccaniche": [
-   "Dice Rolling",
-   "Trading",
-   "Variable Player Powers"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/25071"
- },
- {
-  "nome": "Mystic Vale",
-  "anno": "2016",
-  "id_bgg": 194607,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "2",
-  "durata_media": "45",
-  "durata_min": "45",
-  "durata_max": "45",
-  "eta": "10+",
-  "categorie": [
-   "Card Game",
-   "Fantasy"
-  ],
-  "meccaniche": [
-   "Deck, Bag, and Pool Building",
-   "End Game Bonuses",
-   "Hand Management",
-   "Layering"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/194607"
- },
- {
-  "nome": "Netrunner",
-  "anno": "1996",
-  "id_bgg": 1301,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "2",
-  "giocatori_consigliati": "2",
-  "giocatori_migliori": "2",
-  "durata_media": "45",
-  "durata_min": "45",
-  "durata_max": "45",
-  "eta": "12+",
-  "categorie": [
-   "Card Game",
-   "Collectible Components",
-   "Science Fiction"
-  ],
-  "meccaniche": [
-   "Action Points"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/1301"
- },
- {
-  "nome": "Nobi Nobi Magic",
-  "anno": "2021",
-  "id_bgg": 379982,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "",
-  "giocatori_migliori": "",
-  "durata_media": "60",
-  "durata_min": "30",
-  "durata_max": "60",
-  "eta": "10+",
-  "categorie": [
-   "Fantasy"
-  ],
-  "meccaniche": [
-   "Role Playing"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/379982"
- },
- {
-  "nome": "Oh My Goods!",
-  "anno": "2015",
-  "id_bgg": 183840,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "2",
-  "durata_media": "30",
-  "durata_min": "30",
-  "durata_max": "30",
-  "eta": "10+",
-  "categorie": [
-   "Card Game",
-   "Economic",
-   "Medieval"
-  ],
-  "meccaniche": [
-   "Action Queue",
-   "Contracts",
-   "End Game Bonuses",
-   "Hand Management"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/183840"
- },
- {
-  "nome": "Photosynthesis",
-  "anno": "2017",
-  "id_bgg": 218603,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "3",
-  "durata_media": "60",
-  "durata_min": "30",
-  "durata_max": "60",
-  "eta": "10+",
-  "categorie": [
-   "Abstract Strategy",
-   "Economic"
-  ],
-  "meccaniche": [
-   "Action Points",
-   "Area Majority / Influence",
-   "Bias",
-   "End Game Bonuses"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/218603"
- },
- {
-  "nome": "Race for the Galaxy",
-  "anno": "2007",
-  "id_bgg": 28143,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "2",
-  "durata_media": "60",
-  "durata_min": "30",
-  "durata_max": "60",
-  "eta": "12+",
-  "categorie": [
-   "Card Game",
-   "Civilization",
-   "Economic",
-   "Science Fiction",
-   "Space Exploration"
-  ],
-  "meccaniche": [
-   "End Game Bonuses",
-   "Follow",
-   "Hand Management",
-   "Income"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/28143"
- },
- {
-  "nome": "Race for the Galaxy: Alien Artifacts",
-  "anno": "2013",
-  "id_bgg": 92932,
-  "tipo": "espansione",
-  "giocatori_min": "2",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "2,3,4,5",
-  "giocatori_migliori": "2,3",
-  "durata_media": "45",
-  "durata_min": "45",
-  "durata_max": "45",
-  "eta": "12+",
-  "categorie": [
-   "Expansion for Base-game",
-   "Card Game",
-   "Civilization",
-   "Economic",
-   "Science Fiction",
-   "Space Exploration"
-  ],
-  "meccaniche": [
-   "Grid Movement",
-   "Hand Management",
-   "Simultaneous Action Selection",
-   "Tile Placement"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/92932"
- },
- {
-  "nome": "Race for the Galaxy: Expansion and Brinkmanship",
-  "anno": "2022",
-  "id_bgg": 270439,
-  "tipo": "espansione",
-  "giocatori_min": "1",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "1,2,3,4,5",
-  "giocatori_migliori": "2",
-  "durata_media": "60",
-  "durata_min": "30",
-  "durata_max": "60",
-  "eta": "12+",
-  "categorie": [
-   "Expansion for Base-game",
-   "Card Game",
-   "Civilization",
-   "Economic",
-   "Science Fiction",
-   "Space Exploration"
-  ],
-  "meccaniche": [
-   "Hand Management",
-   "Simultaneous Action Selection",
-   "Variable Phase Order",
-   "Variable Player Powers"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/270439"
- },
- {
-  "nome": "Railroad Ink: Deep Blue Edition",
-  "anno": "2018",
-  "id_bgg": 245654,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "6",
-  "giocatori_consigliati": "1,2,3,4,5,6",
-  "giocatori_migliori": "2",
-  "durata_media": "30",
-  "durata_min": "20",
-  "durata_max": "30",
-  "eta": "8+",
-  "categorie": [
-   "Dice",
-   "Trains"
-  ],
-  "meccaniche": [
-   "Bingo",
-   "Connections",
-   "Dice Rolling",
-   "Line Drawing"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/245654"
- },
- {
-  "nome": "The Resistance: Avalon",
-  "anno": "2012",
-  "id_bgg": 128882,
-  "tipo": "gioco base",
-  "giocatori_min": "5",
-  "giocatori_max": "10",
-  "giocatori_consigliati": "5,6,7,8,9,10",
-  "giocatori_migliori": "7,8",
-  "durata_media": "30",
-  "durata_min": "30",
-  "durata_max": "30",
-  "eta": "12+",
-  "categorie": [
-   "Bluffing",
-   "Card Game",
-   "Deduction",
-   "Fantasy",
-   "Medieval",
-   "Negotiation",
-   "Party Game",
-   "Spies / Secret Agents"
-  ],
-  "meccaniche": [
-   "Finale Ending",
-   "Hidden Roles",
-   "Roles with Asymmetric Information",
-   "Simultaneous Action Selection"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/128882"
- },
- {
-  "nome": "Reykholt",
-  "anno": "2018",
-  "id_bgg": 241831,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "1,2,3,4",
-  "giocatori_migliori": "3",
-  "durata_media": "60",
-  "durata_min": "30",
-  "durata_max": "60",
-  "eta": "10+",
-  "categorie": [
-   "Farming"
-  ],
-  "meccaniche": [
-   "Scenario / Mission / Campaign Game",
-   "Solo / Solitaire Game",
-   "Worker Placement"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/241831"
- },
- {
-  "nome": "Ricochet Robots",
-  "anno": "1999",
-  "id_bgg": 51,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "99",
-  "giocatori_consigliati": "1,2,3,4,5,6,7,8,9,10,11,12",
-  "giocatori_migliori": "3,4,5,6",
-  "durata_media": "30",
-  "durata_min": "30",
-  "durata_max": "30",
-  "eta": "10+",
-  "categorie": [
-   "Abstract Strategy",
-   "Maze",
-   "Puzzle",
-   "Real-time"
-  ],
-  "meccaniche": [
-   "Grid Movement",
-   "Modular Board",
-   "Real-Time",
-   "Square Grid"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/51"
- },
- {
-  "nome": "Royal Wedding",
-  "anno": "2016",
-  "id_bgg": 199969,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "8",
-  "giocatori_consigliati": "",
-  "giocatori_migliori": "",
-  "durata_media": "30",
-  "durata_min": "20",
-  "durata_max": "30",
-  "eta": "8+",
-  "categorie": [
-   "Fantasy",
-   "Humor",
-   "Party Game"
-  ],
-  "meccaniche": [
-   "Acting",
-   "Area Movement",
-   "Open Drafting",
-   "Player Elimination"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/199969"
- },
- {
-  "nome": "Santa Maria",
-  "anno": "2017",
-  "id_bgg": 229220,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "1,2,3,4",
-  "giocatori_migliori": "3",
-  "durata_media": "90",
-  "durata_min": "45",
-  "durata_max": "90",
-  "eta": "12+",
-  "categorie": [
-   "Civilization",
-   "Farming"
-  ],
-  "meccaniche": [
-   "Dice Rolling",
-   "Network and Route Building",
-   "Open Drafting",
-   "Set Collection"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/229220"
- },
- {
-  "nome": "Seasons",
-  "anno": "2012",
-  "id_bgg": 108745,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3",
-  "giocatori_migliori": "2",
-  "durata_media": "60",
-  "durata_min": "60",
-  "durata_max": "60",
-  "eta": "12+",
-  "categorie": [
-   "Card Game",
-   "Fantasy"
-  ],
-  "meccaniche": [
-   "Closed Drafting",
-   "Dice Rolling",
-   "Die Icon Resolution",
-   "Hand Management"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/108745"
- },
- {
-  "nome": "Shadow Hunters",
-  "anno": "2005",
-  "id_bgg": 24068,
-  "tipo": "gioco base",
-  "giocatori_min": "4",
-  "giocatori_max": "8",
-  "giocatori_consigliati": "5,6,7,8",
-  "giocatori_migliori": "7,8",
-  "durata_media": "60",
-  "durata_min": "60",
-  "durata_max": "60",
-  "eta": "10+",
-  "categorie": [
-   "Adventure",
-   "Bluffing",
-   "Card Game",
-   "Deduction",
-   "Horror",
-   "Party Game"
-  ],
-  "meccaniche": [
-   "Dice Rolling",
-   "Hidden Roles",
-   "Player Elimination",
-   "Team-Based Game"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/24068"
- },
- {
-  "nome": "Smash Up",
-  "anno": "2012",
-  "id_bgg": 122522,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "3",
-  "durata_media": "45",
-  "durata_min": "45",
-  "durata_max": "45",
-  "eta": "10+",
-  "categorie": [
-   "Card Game",
-   "Fantasy",
-   "Humor",
-   "Pirates",
-   "Science Fiction",
-   "Zombies"
-  ],
-  "meccaniche": [
-   "Area Majority / Influence",
-   "Card Play Conflict Resolution",
-   "Deck Construction",
-   "Hand Management"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/122522"
- },
- {
-  "nome": "Smash Up: Monster Smash",
-  "anno": "2014",
-  "id_bgg": 160018,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "2",
-  "giocatori_consigliati": "2",
-  "giocatori_migliori": "",
-  "durata_media": "45",
-  "durata_min": "30",
-  "durata_max": "45",
-  "eta": "10+",
-  "categorie": [
-   "Card Game",
-   "Fantasy",
-   "Humor",
-   "Mythology",
-   "Science Fiction",
-   "Zombies"
-  ],
-  "meccaniche": [
-   "Area Majority / Influence",
-   "Hand Management",
-   "Take That",
-   "Variable Player Powers"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/160018"
- },
- {
-  "nome": "Star Wars: X-Wing Miniatures Game",
-  "anno": "2012",
-  "id_bgg": 103885,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "2",
-  "giocatori_consigliati": "2",
-  "giocatori_migliori": "2",
-  "durata_media": "45",
-  "durata_min": "30",
-  "durata_max": "45",
-  "eta": "10+",
-  "categorie": [
-   "Aviation / Flight",
-   "Bluffing",
-   "Collectible Components",
-   "Miniatures",
-   "Movies / TV / Radio theme",
-   "Science Fiction",
-   "Wargame"
-  ],
-  "meccaniche": [
-   "Action Queue",
-   "Critical Hits and Failures",
-   "Dice Rolling",
-   "Line of Sight"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/103885"
- },
- {
-  "nome": "Ta Yü",
-  "anno": "1999",
-  "id_bgg": 117,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,4",
-  "giocatori_migliori": "2",
-  "durata_media": "45",
-  "durata_min": "30",
-  "durata_max": "45",
-  "eta": "8+",
-  "categorie": [
-   "Abstract Strategy"
-  ],
-  "meccaniche": [
-   "Connections",
-   "Team-Based Game",
-   "Tile Placement"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/117"
- },
- {
-  "nome": "Terraforming Mars",
-  "anno": "2016",
-  "id_bgg": 167791,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "1,2,3,4",
-  "giocatori_migliori": "3",
-  "durata_media": "120",
-  "durata_min": "120",
-  "durata_max": "120",
-  "eta": "12+",
-  "categorie": [
-   "Civilization",
-   "Economic",
-   "Environmental",
-   "Industry / Manufacturing",
-   "Science Fiction",
-   "Space Exploration",
-   "Territory Building"
-  ],
-  "meccaniche": [
-   "Closed Drafting",
-   "Contracts",
-   "End Game Bonuses",
-   "Hand Management"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/167791"
- },
- {
-  "nome": "Terraforming Mars: Prelude",
-  "anno": "2018",
-  "id_bgg": 247030,
-  "tipo": "espansione",
-  "giocatori_min": "1",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "1,2,3,4,5",
-  "giocatori_migliori": "3",
-  "durata_media": "120",
-  "durata_min": "90",
-  "durata_max": "120",
-  "eta": "12+",
-  "categorie": [
-   "Expansion for Base-game",
-   "Economic",
-   "Environmental",
-   "Industry / Manufacturing",
-   "Science Fiction"
-  ],
-  "meccaniche": [
-   "Hand Management",
-   "Open Drafting",
-   "Solo / Solitaire Game",
-   "Tile Placement"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/247030"
- },
- {
-  "nome": "Tigris & Euphrates",
-  "anno": "1997",
-  "id_bgg": 42,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "4",
-  "durata_media": "120",
-  "durata_min": "60",
-  "durata_max": "120",
-  "eta": "12+",
-  "categorie": [
-   "Abstract Strategy",
-   "Ancient",
-   "Civilization",
-   "Territory Building"
-  ],
-  "meccaniche": [
-   "Area Majority / Influence",
-   "Chaining",
-   "Connections",
-   "Force Commitment"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/42"
- },
- {
-  "nome": "Tzolk'in: The Mayan Calendar",
-  "anno": "2012",
-  "id_bgg": 126163,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "4",
-  "durata_media": "90",
-  "durata_min": "90",
-  "durata_max": "90",
-  "eta": "12+",
-  "categorie": [
-   "Ancient",
-   "Civilization",
-   "Economic",
-   "Farming",
-   "Mythology"
-  ],
-  "meccaniche": [
-   "Bias",
-   "End Game Bonuses",
-   "Once-Per-Game Abilities",
-   "Track Movement"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/126163"
- },
- {
-  "nome": "Ubongo",
-  "anno": "2003",
-  "id_bgg": 16986,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "4",
-  "durata_media": "25",
-  "durata_min": "25",
-  "durata_max": "25",
-  "eta": "6+",
-  "categorie": [
-   "Puzzle",
-   "Real-time"
-  ],
-  "meccaniche": [
-   "Grid Coverage",
-   "Pattern Building",
-   "Real-Time",
-   "Set Collection"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/16986"
- },
- {
-  "nome": "VektoRace",
-  "anno": "2018",
-  "id_bgg": 256839,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "4",
-  "durata_media": "120",
-  "durata_min": "30",
-  "durata_max": "120",
-  "eta": "10+",
-  "categorie": [
-   "Racing",
-   "Sports"
-  ],
-  "meccaniche": [
-   "Action Queue",
-   "Measurement Movement",
-   "Movement Template",
-   "Race"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/256839"
- },
- {
-  "nome": "Village",
-  "anno": "2011",
-  "id_bgg": 104006,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "4",
-  "durata_media": "90",
-  "durata_min": "60",
-  "durata_max": "90",
-  "eta": "12+",
-  "categorie": [
-   "Economic",
-   "Farming",
-   "Medieval"
-  ],
-  "meccaniche": [
-   "Area Majority / Influence",
-   "Contracts",
-   "Set Collection",
-   "Turn Order: Claim Action"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/104006"
- },
- {
-  "nome": "Welcome Back to the Dungeon",
-  "anno": "2016",
-  "id_bgg": 195043,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "4",
-  "giocatori_consigliati": "2,3,4",
-  "giocatori_migliori": "3,4",
-  "durata_media": "30",
-  "durata_min": "30",
-  "durata_max": "30",
-  "eta": "8+",
-  "categorie": [
-   "Bluffing",
-   "Card Game",
-   "Fantasy",
-   "Fighting"
-  ],
-  "meccaniche": [
-   "Bids As Wagers",
-   "Memory",
-   "Player Elimination",
-   "Push Your Luck"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/195043"
- },
- {
-  "nome": "Wingspan",
-  "anno": "2019",
-  "id_bgg": 266192,
-  "tipo": "gioco base",
-  "giocatori_min": "1",
-  "giocatori_max": "5",
-  "giocatori_consigliati": "1,2,3,4",
-  "giocatori_migliori": "3",
-  "durata_media": "70",
-  "durata_min": "40",
-  "durata_max": "70",
-  "eta": "10+",
-  "categorie": [
-   "Animals",
-   "Card Game",
-   "Educational",
-   "Environmental"
-  ],
-  "meccaniche": [
-   "Action Queue",
-   "Dice Rolling",
-   "End Game Bonuses",
-   "Hand Management"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/266192"
- },
- {
-  "nome": "YINSH",
-  "anno": "2003",
-  "id_bgg": 7854,
-  "tipo": "gioco base",
-  "giocatori_min": "2",
-  "giocatori_max": "2",
-  "giocatori_consigliati": "2",
-  "giocatori_migliori": "2",
-  "durata_media": "60",
-  "durata_min": "30",
-  "durata_max": "60",
-  "eta": "8+",
-  "categorie": [
-   "Abstract Strategy"
-  ],
-  "meccaniche": [
-   "Catch the Leader",
-   "Grid Movement",
-   "Pattern Building"
-  ],
-  "url": "https://boardgamegeek.com/boardgame/7854"
- }
+  {
+    "nome": "7 Wonders",
+    "anno": "2010",
+    "id_bgg": 68448,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "7",
+    "giocatori_consigliati": "3,4,5,6,7",
+    "giocatori_migliori": "4,5",
+    "durata_media": "30",
+    "durata_min": "30",
+    "durata_max": "30",
+    "eta": "10+",
+    "categorie": [
+      "Ancient",
+      "Card Game",
+      "City Building",
+      "Civilization",
+      "Economic"
+    ],
+    "meccaniche": [
+      "Closed Drafting",
+      "End Game Bonuses",
+      "Hand Management",
+      "Melding and Splaying"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/68448"
+  },
+  {
+    "nome": "7 Wonders: Babel",
+    "anno": "2014",
+    "id_bgg": 154638,
+    "tipo": "espansione",
+    "giocatori_min": "2",
+    "giocatori_max": "7",
+    "giocatori_consigliati": "3,4,5,6,7",
+    "giocatori_migliori": "5",
+    "durata_media": "45",
+    "durata_min": "45",
+    "durata_max": "45",
+    "eta": "10+",
+    "categorie": [
+      "Ancient",
+      "Card Game",
+      "City Building",
+      "Civilization",
+      "Expansion for Base-game"
+    ],
+    "meccaniche": [
+      "Closed Drafting",
+      "Set Collection",
+      "Simultaneous Action Selection",
+      "Variable Player Powers"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/154638"
+  },
+  {
+    "nome": "7 Wonders: Cities",
+    "anno": "2012",
+    "id_bgg": 111661,
+    "tipo": "espansione",
+    "giocatori_min": "2",
+    "giocatori_max": "8",
+    "giocatori_consigliati": "3,4,5,6,7,8",
+    "giocatori_migliori": "4,5",
+    "durata_media": "40",
+    "durata_min": "40",
+    "durata_max": "40",
+    "eta": "10+",
+    "categorie": [
+      "Ancient",
+      "Card Game",
+      "City Building",
+      "Civilization",
+      "Expansion for Base-game"
+    ],
+    "meccaniche": [
+      "Closed Drafting",
+      "Hand Management",
+      "Set Collection",
+      "Simultaneous Action Selection"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/111661"
+  },
+  {
+    "nome": "7 Wonders: Leaders",
+    "anno": "2011",
+    "id_bgg": 92539,
+    "tipo": "espansione",
+    "giocatori_min": "2",
+    "giocatori_max": "7",
+    "giocatori_consigliati": "3,4,5,6,7",
+    "giocatori_migliori": "4,5",
+    "durata_media": "40",
+    "durata_min": "40",
+    "durata_max": "40",
+    "eta": "10+",
+    "categorie": [
+      "Expansion for Base-game",
+      "Ancient",
+      "Card Game",
+      "City Building",
+      "Civilization"
+    ],
+    "meccaniche": [
+      "Closed Drafting",
+      "Hand Management",
+      "Set Collection",
+      "Simultaneous Action Selection"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/92539"
+  },
+  {
+    "nome": "Abyss",
+    "anno": "2014",
+    "id_bgg": 155987,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "4",
+    "durata_media": "60",
+    "durata_min": "30",
+    "durata_max": "60",
+    "eta": "10+",
+    "categorie": [
+      "Card Game",
+      "Fantasy",
+      "Mythology",
+      "Nautical"
+    ],
+    "meccaniche": [
+      "Auction / Bidding",
+      "Hand Management",
+      "Memory",
+      "Open Drafting"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/155987"
+  },
+  {
+    "nome": "Abyss: Kraken",
+    "anno": "2015",
+    "id_bgg": 180341,
+    "tipo": "espansione",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "4",
+    "durata_media": "60",
+    "durata_min": "30",
+    "durata_max": "60",
+    "eta": "12+",
+    "categorie": [
+      "Expansion for Base-game",
+      "Card Game",
+      "Fantasy",
+      "Mythology",
+      "Science Fiction"
+    ],
+    "meccaniche": [
+      "Auction / Bidding",
+      "Hand Management",
+      "Open Drafting",
+      "Push Your Luck"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/180341"
+  },
+  {
+    "nome": "Alhambra",
+    "anno": "2003",
+    "id_bgg": 6249,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "2,3,4,5",
+    "giocatori_migliori": "3",
+    "durata_media": "60",
+    "durata_min": "45",
+    "durata_max": "60",
+    "eta": "8+",
+    "categorie": [
+      "City Building",
+      "Medieval"
+    ],
+    "meccaniche": [
+      "Area Majority / Influence",
+      "Hand Management",
+      "Open Drafting",
+      "Set Collection"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/6249"
+  },
+  {
+    "nome": "At the Gates of Loyang",
+    "anno": "2009",
+    "id_bgg": 39683,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "1,2,3,4",
+    "giocatori_migliori": "2",
+    "durata_media": "120",
+    "durata_min": "60",
+    "durata_max": "120",
+    "eta": "12+",
+    "categorie": [
+      "Economic",
+      "Farming"
+    ],
+    "meccaniche": [
+      "Contracts",
+      "Income",
+      "Loans",
+      "Market"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/39683"
+  },
+  {
+    "nome": "Azul",
+    "anno": "2017",
+    "id_bgg": 230802,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "2",
+    "durata_media": "45",
+    "durata_min": "30",
+    "durata_max": "45",
+    "eta": "8+",
+    "categorie": [
+      "Abstract Strategy",
+      "Renaissance"
+    ],
+    "meccaniche": [
+      "End Game Bonuses",
+      "Grid Coverage",
+      "Open Drafting",
+      "Pattern Building"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/230802"
+  },
+  {
+    "nome": "Azul: Stained Glass of Sintra",
+    "anno": "2018",
+    "id_bgg": 256226,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "3",
+    "durata_media": "45",
+    "durata_min": "30",
+    "durata_max": "45",
+    "eta": "8+",
+    "categorie": [
+      "Abstract Strategy",
+      "Puzzle",
+      "Renaissance"
+    ],
+    "meccaniche": [
+      "End Game Bonuses",
+      "Modular Board",
+      "Open Drafting",
+      "Pattern Building"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/256226"
+  },
+  {
+    "nome": "Byzanz",
+    "anno": "2008",
+    "id_bgg": 38032,
+    "tipo": "gioco base",
+    "giocatori_min": "3",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "3,4,5,6",
+    "giocatori_migliori": "4,5",
+    "durata_media": "45",
+    "durata_min": "45",
+    "durata_max": "45",
+    "eta": "8+",
+    "categorie": [
+      "Card Game",
+      "Economic"
+    ],
+    "meccaniche": [
+      "Auction / Bidding",
+      "Auction: Turn Order Until Pass",
+      "Closed Economy Auction",
+      "Constrained Bidding"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/38032"
+  },
+  {
+    "nome": "The Castles of Burgundy",
+    "anno": "2011",
+    "id_bgg": 84876,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "2",
+    "durata_media": "90",
+    "durata_min": "30",
+    "durata_max": "90",
+    "eta": "12+",
+    "categorie": [
+      "Animals",
+      "Medieval",
+      "Territory Building"
+    ],
+    "meccaniche": [
+      "Delayed Purchase",
+      "Dice Rolling",
+      "End Game Bonuses",
+      "Grid Coverage"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/84876"
+  },
+  {
+    "nome": "Catalyst",
+    "anno": "2018",
+    "id_bgg": 254894,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "2,3,4",
+    "durata_media": "40",
+    "durata_min": "20",
+    "durata_max": "40",
+    "eta": "10+",
+    "categorie": [
+      "Card Game"
+    ],
+    "meccaniche": [
+      "Open Drafting",
+      "Set Collection"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/254894"
+  },
+  {
+    "nome": "Celestia",
+    "anno": "2015",
+    "id_bgg": 175117,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "3,4,5,6",
+    "giocatori_migliori": "5,6",
+    "durata_media": "30",
+    "durata_min": "30",
+    "durata_max": "30",
+    "eta": "6+",
+    "categorie": [
+      "Adventure",
+      "Aviation / Flight",
+      "Card Game",
+      "Fantasy"
+    ],
+    "meccaniche": [
+      "Betting and Bluffing",
+      "Dice Rolling",
+      "Hand Management",
+      "Hidden Victory Points"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/175117"
+  },
+  {
+    "nome": "Century: Spice Road",
+    "anno": "2017",
+    "id_bgg": 209685,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "2,3,4,5",
+    "giocatori_migliori": "3,4",
+    "durata_media": "45",
+    "durata_min": "30",
+    "durata_max": "45",
+    "eta": "8+",
+    "categorie": [
+      "Card Game",
+      "Economic",
+      "Medieval"
+    ],
+    "meccaniche": [
+      "Action Retrieval",
+      "Auction: Dutch",
+      "Contracts",
+      "Deck, Bag, and Pool Building"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/209685"
+  },
+  {
+    "nome": "Cheating Moth",
+    "anno": "2011",
+    "id_bgg": 105593,
+    "tipo": "gioco base",
+    "giocatori_min": "3",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "3,4,5",
+    "giocatori_migliori": "5",
+    "durata_media": "30",
+    "durata_min": "30",
+    "durata_max": "30",
+    "eta": "6+",
+    "categorie": [
+      "Action / Dexterity",
+      "Card Game"
+    ],
+    "meccaniche": [
+      "Hand Management"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/105593"
+  },
+  {
+    "nome": "Cóatl",
+    "anno": "2020",
+    "id_bgg": 274841,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "1,2,3,4",
+    "giocatori_migliori": "3",
+    "durata_media": "60",
+    "durata_min": "30",
+    "durata_max": "60",
+    "eta": "8+",
+    "categorie": [
+      "Abstract Strategy",
+      "Puzzle"
+    ],
+    "meccaniche": [
+      "Contracts",
+      "Hand Management",
+      "Once-Per-Game Abilities",
+      "Open Drafting"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/274841"
+  },
+  {
+    "nome": "Counterfeiters",
+    "anno": "2018",
+    "id_bgg": 257380,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "4",
+    "durata_media": "35",
+    "durata_min": "35",
+    "durata_max": "35",
+    "eta": "12+",
+    "categorie": [
+      "Animals",
+      "Card Game",
+      "Mafia"
+    ],
+    "meccaniche": [
+      "Worker Placement"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/257380"
+  },
+  {
+    "nome": "Crypt",
+    "anno": "2018",
+    "id_bgg": 250442,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "1,2,3,4",
+    "giocatori_migliori": "4",
+    "durata_media": "35",
+    "durata_min": "20",
+    "durata_max": "35",
+    "eta": "8+",
+    "categorie": [
+      "Card Game",
+      "Dice",
+      "Medieval",
+      "Renaissance"
+    ],
+    "meccaniche": [
+      "Area Majority / Influence",
+      "Auction / Bidding",
+      "Contracts",
+      "Dice Rolling"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/250442"
+  },
+  {
+    "nome": "Deckscape: Behind the Curtain",
+    "anno": "2019",
+    "id_bgg": 267735,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "1,2,3,4",
+    "giocatori_migliori": "2",
+    "durata_media": "60",
+    "durata_min": "60",
+    "durata_max": "60",
+    "eta": "12+",
+    "categorie": [
+      "Card Game",
+      "Puzzle",
+      "Real-time"
+    ],
+    "meccaniche": [
+      "Cooperative Game",
+      "Real-Time"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/267735"
+  },
+  {
+    "nome": "Deckscape: Heist in Venice",
+    "anno": "2018",
+    "id_bgg": 245045,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "2,3,4,5,6",
+    "giocatori_migliori": "6",
+    "durata_media": "90",
+    "durata_min": "30",
+    "durata_max": "90",
+    "eta": "12+",
+    "categorie": [
+      "Card Game",
+      "Puzzle",
+      "Real-time"
+    ],
+    "meccaniche": [
+      "Cooperative Game",
+      "Memory",
+      "Variable Player Powers"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/245045"
+  },
+  {
+    "nome": "Deckscape: The Fate of London",
+    "anno": "2017",
+    "id_bgg": 230498,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "1,2,3,4",
+    "giocatori_migliori": "2,3",
+    "durata_media": "60",
+    "durata_min": "60",
+    "durata_max": "60",
+    "eta": "12+",
+    "categorie": [
+      "Card Game",
+      "Puzzle",
+      "Real-time"
+    ],
+    "meccaniche": [
+      "Cooperative Game",
+      "Solo / Solitaire Game"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/230498"
+  },
+  {
+    "nome": "Diamant",
+    "anno": "2005",
+    "id_bgg": 15512,
+    "tipo": "gioco base",
+    "giocatori_min": "3",
+    "giocatori_max": "8",
+    "giocatori_consigliati": "3,4,5,6,7,8",
+    "giocatori_migliori": "6,7,8",
+    "durata_media": "40",
+    "durata_min": "20",
+    "durata_max": "40",
+    "eta": "6+",
+    "categorie": [
+      "Bluffing",
+      "Card Game",
+      "Exploration"
+    ],
+    "meccaniche": [
+      "Move Through Deck",
+      "Push Your Luck",
+      "Simultaneous Action Selection"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/15512"
+  },
+  {
+    "nome": "Dune",
+    "anno": "2019",
+    "id_bgg": 283355,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "5,6",
+    "giocatori_migliori": "6",
+    "durata_media": "180",
+    "durata_min": "120",
+    "durata_max": "180",
+    "eta": "14+",
+    "categorie": [
+      "Bluffing",
+      "Fighting",
+      "Negotiation",
+      "Novel-based",
+      "Political",
+      "Science Fiction",
+      "Wargame"
+    ],
+    "meccaniche": [
+      "Alliances",
+      "Area Majority / Influence",
+      "Area Movement",
+      "Auction / Bidding"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/283355"
+  },
+  {
+    "nome": "Dune: Imperium",
+    "anno": "2020",
+    "id_bgg": 316554,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "1,2,3,4",
+    "giocatori_migliori": "3,4",
+    "durata_media": "120",
+    "durata_min": "60",
+    "durata_max": "120",
+    "eta": "12+",
+    "categorie": [
+      "Movies / TV / Radio theme",
+      "Novel-based",
+      "Political",
+      "Science Fiction"
+    ],
+    "meccaniche": [
+      "Card Play Conflict Resolution",
+      "Deck, Bag, and Pool Building",
+      "Delayed Purchase",
+      "Force Commitment"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/316554"
+  },
+  {
+    "nome": "Dungeon Rush",
+    "anno": "2016",
+    "id_bgg": 207338,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "2,3,4,5",
+    "giocatori_migliori": "3,4",
+    "durata_media": "19",
+    "durata_min": "13",
+    "durata_max": "19",
+    "eta": "6+",
+    "categorie": [
+      "Action / Dexterity",
+      "Card Game",
+      "Fantasy",
+      "Fighting",
+      "Humor",
+      "Real-time"
+    ],
+    "meccaniche": [
+      "Melding and Splaying",
+      "Set Collection",
+      "Variable Player Powers"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/207338"
+  },
+  {
+    "nome": "Fiasco",
+    "anno": "2003",
+    "id_bgg": 11038,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "4",
+    "giocatori_migliori": "4",
+    "durata_media": "15",
+    "durata_min": "15",
+    "durata_max": "15",
+    "eta": "12+",
+    "categorie": [
+      "Card Game",
+      "Renaissance"
+    ],
+    "meccaniche": [
+      "Trick-taking"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/11038"
+  },
+  {
+    "nome": "Fields of Green",
+    "anno": "2016",
+    "id_bgg": 200954,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "2",
+    "durata_media": "45",
+    "durata_min": "45",
+    "durata_max": "45",
+    "eta": "10+",
+    "categorie": [
+      "Card Game",
+      "City Building",
+      "Farming"
+    ],
+    "meccaniche": [
+      "Closed Drafting",
+      "Simultaneous Action Selection",
+      "Tile Placement",
+      "Variable Phase Order"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/200954"
+  },
+  {
+    "nome": "Flamme Rouge",
+    "anno": "2016",
+    "id_bgg": 199478,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "4",
+    "durata_media": "45",
+    "durata_min": "30",
+    "durata_max": "45",
+    "eta": "8+",
+    "categorie": [
+      "Racing",
+      "Sports"
+    ],
+    "meccaniche": [
+      "Catch the Leader",
+      "Hand Management",
+      "Modular Board",
+      "Programmed Movement"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/199478"
+  },
+  {
+    "nome": "Four Against Darkness",
+    "anno": "2016",
+    "id_bgg": 197097,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "1",
+    "giocatori_consigliati": "1",
+    "giocatori_migliori": "1",
+    "durata_media": "75",
+    "durata_min": "45",
+    "durata_max": "75",
+    "eta": "8+",
+    "categorie": [
+      "Adventure",
+      "Book",
+      "Exploration",
+      "Fantasy",
+      "Print & Play"
+    ],
+    "meccaniche": [
+      "Dice Rolling",
+      "Grid Movement",
+      "Paper-and-Pencil",
+      "Solo / Solitaire Game"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/197097"
+  },
+  {
+    "nome": "The Game",
+    "anno": "2015",
+    "id_bgg": 173090,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "1,2,3,4,5",
+    "giocatori_migliori": "3",
+    "durata_media": "20",
+    "durata_min": "20",
+    "durata_max": "20",
+    "eta": "8+",
+    "categorie": [
+      "Card Game",
+      "Number"
+    ],
+    "meccaniche": [
+      "Communication Limits",
+      "Cooperative Game",
+      "Hand Management",
+      "Solo / Solitaire Game"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/173090"
+  },
+  {
+    "nome": "The Game: Extreme",
+    "anno": "2016",
+    "id_bgg": 209325,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "1,2,3,4,5",
+    "giocatori_migliori": "2",
+    "durata_media": "30",
+    "durata_min": "20",
+    "durata_max": "30",
+    "eta": "8+",
+    "categorie": [
+      "Card Game",
+      "Number"
+    ],
+    "meccaniche": [
+      "Cooperative Game",
+      "Hand Management"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/209325"
+  },
+  {
+    "nome": "El Grande",
+    "anno": "1995",
+    "id_bgg": 93,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "3,4,5",
+    "giocatori_migliori": "5",
+    "durata_media": "120",
+    "durata_min": "60",
+    "durata_max": "120",
+    "eta": "12+",
+    "categorie": [
+      "Medieval"
+    ],
+    "meccaniche": [
+      "Action Drafting",
+      "Area Majority / Influence",
+      "Auction / Bidding",
+      "Hand Management"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/93"
+  },
+  {
+    "nome": "Le Havre",
+    "anno": "2008",
+    "id_bgg": 35677,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "1,2,3,4",
+    "giocatori_migliori": "3",
+    "durata_media": "150",
+    "durata_min": "30",
+    "durata_max": "150",
+    "eta": "12+",
+    "categorie": [
+      "City Building",
+      "Economic",
+      "Industry / Manufacturing",
+      "Nautical"
+    ],
+    "meccaniche": [
+      "Automatic Resource Growth",
+      "End Game Bonuses",
+      "Increase Value of Unchosen Resources",
+      "Loans"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/35677"
+  },
+  {
+    "nome": "Le Havre: Le Grand Hameau",
+    "anno": "2010",
+    "id_bgg": 65996,
+    "tipo": "espansione",
+    "giocatori_min": "1",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "1,2,3,4",
+    "giocatori_migliori": "3",
+    "durata_media": "150",
+    "durata_min": "150",
+    "durata_max": "150",
+    "eta": "12+",
+    "categorie": [
+      "Expansion for Base-game",
+      "Economic",
+      "Industry / Manufacturing"
+    ],
+    "meccaniche": [
+      "Worker Placement"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/65996"
+  },
+  {
+    "nome": "Hive",
+    "anno": "2001",
+    "id_bgg": 2655,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "2",
+    "giocatori_consigliati": "2",
+    "giocatori_migliori": "2",
+    "durata_media": "20",
+    "durata_min": "20",
+    "durata_max": "20",
+    "eta": "8+",
+    "categorie": [
+      "Abstract Strategy",
+      "Animals"
+    ],
+    "meccaniche": [
+      "Enclosure",
+      "Grid Movement",
+      "Hexagon Grid",
+      "Pattern Movement"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/2655"
+  },
+  {
+    "nome": "Honshū",
+    "anno": "2016",
+    "id_bgg": 207336,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "2,3,4,5",
+    "giocatori_migliori": "4",
+    "durata_media": "30",
+    "durata_min": "30",
+    "durata_max": "30",
+    "eta": "8+",
+    "categorie": [
+      "Card Game",
+      "City Building",
+      "Territory Building"
+    ],
+    "meccaniche": [
+      "Auction / Bidding",
+      "Closed Drafting",
+      "End Game Bonuses",
+      "Hand Management"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/207336"
+  },
+  {
+    "nome": "Imagine",
+    "anno": "2015",
+    "id_bgg": 191894,
+    "tipo": "gioco base",
+    "giocatori_min": "3",
+    "giocatori_max": "8",
+    "giocatori_consigliati": "3,4,5,6,7,8",
+    "giocatori_migliori": "4,5,6",
+    "durata_media": "20",
+    "durata_min": "20",
+    "durata_max": "20",
+    "eta": "8+",
+    "categorie": [
+      "Deduction",
+      "Party Game"
+    ],
+    "meccaniche": [
+      "Acting",
+      "Team-Based Game"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/191894"
+  },
+  {
+    "nome": "Intrigue",
+    "anno": "1994",
+    "id_bgg": 265,
+    "tipo": "gioco base",
+    "giocatori_min": "3",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "4,5",
+    "giocatori_migliori": "5",
+    "durata_media": "45",
+    "durata_min": "45",
+    "durata_max": "45",
+    "eta": "12+",
+    "categorie": [
+      "Negotiation",
+      "Renaissance"
+    ],
+    "meccaniche": [
+      "Area Majority / Influence",
+      "Auction / Bidding",
+      "Bribery",
+      "Hand Management"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/265"
+  },
+  {
+    "nome": "Jamaica",
+    "anno": "2007",
+    "id_bgg": 28023,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "3,4,5,6",
+    "giocatori_migliori": "5,6",
+    "durata_media": "60",
+    "durata_min": "30",
+    "durata_max": "60",
+    "eta": "8+",
+    "categorie": [
+      "Nautical",
+      "Pirates"
+    ],
+    "meccaniche": [
+      "Dice Rolling",
+      "Hand Management",
+      "Hidden Victory Points",
+      "Race"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/28023"
+  },
+  {
+    "nome": "Just One",
+    "anno": "2018",
+    "id_bgg": 254640,
+    "tipo": "gioco base",
+    "giocatori_min": "3",
+    "giocatori_max": "7",
+    "giocatori_consigliati": "4,5,6,7",
+    "giocatori_migliori": "6,7",
+    "durata_media": "60",
+    "durata_min": "20",
+    "durata_max": "60",
+    "eta": "8+",
+    "categorie": [
+      "Deduction",
+      "Party Game",
+      "Word Game"
+    ],
+    "meccaniche": [
+      "Communication Limits",
+      "Cooperative Game",
+      "Deduction",
+      "Paper-and-Pencil"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/254640"
+  },
+  {
+    "nome": "Keyflower",
+    "anno": "2012",
+    "id_bgg": 122515,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "2,3,4,5,6",
+    "giocatori_migliori": "4",
+    "durata_media": "120",
+    "durata_min": "90",
+    "durata_max": "120",
+    "eta": "12+",
+    "categorie": [
+      "City Building",
+      "Economic",
+      "Renaissance",
+      "Territory Building",
+      "Transportation"
+    ],
+    "meccaniche": [
+      "Auction / Bidding",
+      "Auction: Fixed Placement",
+      "Auction: Multiple Lot",
+      "Constrained Bidding"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/122515"
+  },
+  {
+    "nome": "KeyForge: Call of the Archons",
+    "anno": "2018",
+    "id_bgg": 257501,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "2",
+    "giocatori_consigliati": "2",
+    "giocatori_migliori": "2",
+    "durata_media": "45",
+    "durata_min": "15",
+    "durata_max": "45",
+    "eta": "10+",
+    "categorie": [
+      "Card Game",
+      "Collectible Components",
+      "Fantasy",
+      "Fighting"
+    ],
+    "meccaniche": [
+      "Hand Management",
+      "Take That"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/257501"
+  },
+  {
+    "nome": "Kingdomino",
+    "anno": "2016",
+    "id_bgg": 204583,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "2,4",
+    "durata_media": "25",
+    "durata_min": "15",
+    "durata_max": "25",
+    "eta": "6+",
+    "categorie": [
+      "Abstract Strategy",
+      "Medieval",
+      "Puzzle",
+      "Territory Building"
+    ],
+    "meccaniche": [
+      "Enclosure",
+      "Matching",
+      "Open Drafting",
+      "Tile Placement"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/204583"
+  },
+  {
+    "nome": "Matrimonio Reale",
+    "anno": "2016",
+    "id_bgg": 199969,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "8",
+    "giocatori_consigliati": "",
+    "giocatori_migliori": "",
+    "durata_media": "30",
+    "durata_min": "20",
+    "durata_max": "30",
+    "eta": "8+",
+    "categorie": [
+      "Fantasy",
+      "Humor",
+      "Party Game"
+    ],
+    "meccaniche": [
+      "Acting",
+      "Area Movement",
+      "Open Drafting",
+      "Player Elimination"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/199969"
+  },
+  {
+    "nome": "Modern Art",
+    "anno": "1992",
+    "id_bgg": 118,
+    "tipo": "gioco base",
+    "giocatori_min": "3",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "3,4,5",
+    "giocatori_migliori": "4,5",
+    "durata_media": "45",
+    "durata_min": "45",
+    "durata_max": "45",
+    "eta": "10+",
+    "categorie": [
+      "Card Game",
+      "Economic"
+    ],
+    "meccaniche": [
+      "Auction / Bidding",
+      "Auction: English",
+      "Auction: Once Around",
+      "Auction: Sealed Bid"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/118"
+  },
+  {
+    "nome": "Monopoly City",
+    "anno": "2009",
+    "id_bgg": 41186,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "2,3,4,5,6",
+    "giocatori_migliori": "3,4",
+    "durata_media": "75",
+    "durata_min": "75",
+    "durata_max": "75",
+    "eta": "8+",
+    "categorie": [
+      "City Building",
+      "Economic",
+      "Electronic",
+      "Negotiation"
+    ],
+    "meccaniche": [
+      "Auction / Bidding",
+      "Dice Rolling",
+      "Roll / Spin and Move",
+      "Set Collection"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/41186"
+  },
+  {
+    "nome": "Munchkin Cthulhu",
+    "anno": "2008",
+    "id_bgg": 25071,
+    "tipo": "gioco base",
+    "giocatori_min": "3",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "3,4,5,6",
+    "giocatori_migliori": "4",
+    "durata_media": "90",
+    "durata_min": "90",
+    "durata_max": "90",
+    "eta": "12+",
+    "categorie": [
+      "Card Game",
+      "Fighting",
+      "Horror",
+      "Humor"
+    ],
+    "meccaniche": [
+      "Dice Rolling",
+      "Trading",
+      "Variable Player Powers"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/25071"
+  },
+  {
+    "nome": "Mystic Vale",
+    "anno": "2016",
+    "id_bgg": 194607,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "2",
+    "durata_media": "45",
+    "durata_min": "45",
+    "durata_max": "45",
+    "eta": "10+",
+    "categorie": [
+      "Card Game",
+      "Fantasy"
+    ],
+    "meccaniche": [
+      "Deck, Bag, and Pool Building",
+      "End Game Bonuses",
+      "Hand Management",
+      "Layering"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/194607"
+  },
+  {
+    "nome": "Netrunner",
+    "anno": "1996",
+    "id_bgg": 1301,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "2",
+    "giocatori_consigliati": "2",
+    "giocatori_migliori": "2",
+    "durata_media": "45",
+    "durata_min": "45",
+    "durata_max": "45",
+    "eta": "12+",
+    "categorie": [
+      "Card Game",
+      "Collectible Components",
+      "Science Fiction"
+    ],
+    "meccaniche": [
+      "Action Points"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/1301"
+  },
+  {
+    "nome": "Nobi Nobi Magic",
+    "anno": "2021",
+    "id_bgg": 379982,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "",
+    "giocatori_migliori": "",
+    "durata_media": "60",
+    "durata_min": "30",
+    "durata_max": "60",
+    "eta": "10+",
+    "categorie": [
+      "Fantasy"
+    ],
+    "meccaniche": [
+      "Role Playing"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/379982"
+  },
+  {
+    "nome": "Oh My Goods!",
+    "anno": "2015",
+    "id_bgg": 183840,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "2",
+    "durata_media": "30",
+    "durata_min": "30",
+    "durata_max": "30",
+    "eta": "10+",
+    "categorie": [
+      "Card Game",
+      "Economic",
+      "Medieval"
+    ],
+    "meccaniche": [
+      "Action Queue",
+      "Contracts",
+      "End Game Bonuses",
+      "Hand Management"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/183840"
+  },
+  {
+    "nome": "Photosynthesis",
+    "anno": "2017",
+    "id_bgg": 218603,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "3",
+    "durata_media": "60",
+    "durata_min": "30",
+    "durata_max": "60",
+    "eta": "10+",
+    "categorie": [
+      "Abstract Strategy",
+      "Economic"
+    ],
+    "meccaniche": [
+      "Action Points",
+      "Area Majority / Influence",
+      "Bias",
+      "End Game Bonuses"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/218603"
+  },
+  {
+    "nome": "Race for the Galaxy",
+    "anno": "2007",
+    "id_bgg": 28143,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "2",
+    "durata_media": "60",
+    "durata_min": "30",
+    "durata_max": "60",
+    "eta": "12+",
+    "categorie": [
+      "Card Game",
+      "Civilization",
+      "Economic",
+      "Science Fiction",
+      "Space Exploration"
+    ],
+    "meccaniche": [
+      "End Game Bonuses",
+      "Follow",
+      "Hand Management",
+      "Income"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/28143"
+  },
+  {
+    "nome": "Race for the Galaxy: Alien Artifacts",
+    "anno": "2013",
+    "id_bgg": 92932,
+    "tipo": "espansione",
+    "giocatori_min": "2",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "2,3,4,5",
+    "giocatori_migliori": "2,3",
+    "durata_media": "45",
+    "durata_min": "45",
+    "durata_max": "45",
+    "eta": "12+",
+    "categorie": [
+      "Expansion for Base-game",
+      "Card Game",
+      "Civilization",
+      "Economic",
+      "Science Fiction",
+      "Space Exploration"
+    ],
+    "meccaniche": [
+      "Grid Movement",
+      "Hand Management",
+      "Simultaneous Action Selection",
+      "Tile Placement"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/92932"
+  },
+  {
+    "nome": "Race for the Galaxy: Expansion and Brinkmanship",
+    "anno": "2022",
+    "id_bgg": 270439,
+    "tipo": "espansione",
+    "giocatori_min": "1",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "1,2,3,4,5",
+    "giocatori_migliori": "2",
+    "durata_media": "60",
+    "durata_min": "30",
+    "durata_max": "60",
+    "eta": "12+",
+    "categorie": [
+      "Expansion for Base-game",
+      "Card Game",
+      "Civilization",
+      "Economic",
+      "Science Fiction",
+      "Space Exploration"
+    ],
+    "meccaniche": [
+      "Hand Management",
+      "Simultaneous Action Selection",
+      "Variable Phase Order",
+      "Variable Player Powers"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/270439"
+  },
+  {
+    "nome": "Railroad Ink: Deep Blue Edition",
+    "anno": "2018",
+    "id_bgg": 245654,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "6",
+    "giocatori_consigliati": "1,2,3,4,5,6",
+    "giocatori_migliori": "2",
+    "durata_media": "30",
+    "durata_min": "20",
+    "durata_max": "30",
+    "eta": "8+",
+    "categorie": [
+      "Dice",
+      "Trains"
+    ],
+    "meccaniche": [
+      "Bingo",
+      "Connections",
+      "Dice Rolling",
+      "Line Drawing"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/245654"
+  },
+  {
+    "nome": "The Resistance: Avalon",
+    "anno": "2012",
+    "id_bgg": 128882,
+    "tipo": "gioco base",
+    "giocatori_min": "5",
+    "giocatori_max": "10",
+    "giocatori_consigliati": "5,6,7,8,9,10",
+    "giocatori_migliori": "7,8",
+    "durata_media": "30",
+    "durata_min": "30",
+    "durata_max": "30",
+    "eta": "12+",
+    "categorie": [
+      "Bluffing",
+      "Card Game",
+      "Deduction",
+      "Fantasy",
+      "Medieval",
+      "Negotiation",
+      "Party Game",
+      "Spies / Secret Agents"
+    ],
+    "meccaniche": [
+      "Finale Ending",
+      "Hidden Roles",
+      "Roles with Asymmetric Information",
+      "Simultaneous Action Selection"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/128882"
+  },
+  {
+    "nome": "Reykholt",
+    "anno": "2018",
+    "id_bgg": 241831,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "1,2,3,4",
+    "giocatori_migliori": "3",
+    "durata_media": "60",
+    "durata_min": "30",
+    "durata_max": "60",
+    "eta": "10+",
+    "categorie": [
+      "Farming"
+    ],
+    "meccaniche": [
+      "Scenario / Mission / Campaign Game",
+      "Solo / Solitaire Game",
+      "Worker Placement"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/241831"
+  },
+  {
+    "nome": "Ricochet Robots",
+    "anno": "1999",
+    "id_bgg": 51,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "99",
+    "giocatori_consigliati": "1,2,3,4,5,6,7,8,9,10,11,12",
+    "giocatori_migliori": "3,4,5,6",
+    "durata_media": "30",
+    "durata_min": "30",
+    "durata_max": "30",
+    "eta": "10+",
+    "categorie": [
+      "Abstract Strategy",
+      "Maze",
+      "Puzzle",
+      "Real-time"
+    ],
+    "meccaniche": [
+      "Grid Movement",
+      "Modular Board",
+      "Real-Time",
+      "Square Grid"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/51"
+  },
+  {
+    "nome": "Santa Maria",
+    "anno": "2017",
+    "id_bgg": 229220,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "1,2,3,4",
+    "giocatori_migliori": "3",
+    "durata_media": "90",
+    "durata_min": "45",
+    "durata_max": "90",
+    "eta": "12+",
+    "categorie": [
+      "Civilization",
+      "Farming"
+    ],
+    "meccaniche": [
+      "Dice Rolling",
+      "Network and Route Building",
+      "Open Drafting",
+      "Set Collection"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/229220"
+  },
+  {
+    "nome": "Seasons",
+    "anno": "2012",
+    "id_bgg": 108745,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3",
+    "giocatori_migliori": "2",
+    "durata_media": "60",
+    "durata_min": "60",
+    "durata_max": "60",
+    "eta": "12+",
+    "categorie": [
+      "Card Game",
+      "Fantasy"
+    ],
+    "meccaniche": [
+      "Closed Drafting",
+      "Dice Rolling",
+      "Die Icon Resolution",
+      "Hand Management"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/108745"
+  },
+  {
+    "nome": "Shadow Hunters",
+    "anno": "2005",
+    "id_bgg": 24068,
+    "tipo": "gioco base",
+    "giocatori_min": "4",
+    "giocatori_max": "8",
+    "giocatori_consigliati": "5,6,7,8",
+    "giocatori_migliori": "7,8",
+    "durata_media": "60",
+    "durata_min": "60",
+    "durata_max": "60",
+    "eta": "10+",
+    "categorie": [
+      "Adventure",
+      "Bluffing",
+      "Card Game",
+      "Deduction",
+      "Horror",
+      "Party Game"
+    ],
+    "meccaniche": [
+      "Dice Rolling",
+      "Hidden Roles",
+      "Player Elimination",
+      "Team-Based Game"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/24068"
+  },
+  {
+    "nome": "Smash Up",
+    "anno": "2012",
+    "id_bgg": 122522,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "3",
+    "durata_media": "45",
+    "durata_min": "45",
+    "durata_max": "45",
+    "eta": "10+",
+    "categorie": [
+      "Card Game",
+      "Fantasy",
+      "Humor",
+      "Pirates",
+      "Science Fiction",
+      "Zombies"
+    ],
+    "meccaniche": [
+      "Area Majority / Influence",
+      "Card Play Conflict Resolution",
+      "Deck Construction",
+      "Hand Management"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/122522"
+  },
+  {
+    "nome": "Smash Up: Monster Smash",
+    "anno": "2014",
+    "id_bgg": 160018,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "2",
+    "giocatori_consigliati": "2",
+    "giocatori_migliori": "",
+    "durata_media": "45",
+    "durata_min": "30",
+    "durata_max": "45",
+    "eta": "10+",
+    "categorie": [
+      "Card Game",
+      "Fantasy",
+      "Humor",
+      "Mythology",
+      "Science Fiction",
+      "Zombies"
+    ],
+    "meccaniche": [
+      "Area Majority / Influence",
+      "Hand Management",
+      "Take That",
+      "Variable Player Powers"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/160018"
+  },
+  {
+    "nome": "Star Wars: X-Wing Miniatures Game",
+    "anno": "2012",
+    "id_bgg": 103885,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "2",
+    "giocatori_consigliati": "2",
+    "giocatori_migliori": "2",
+    "durata_media": "45",
+    "durata_min": "30",
+    "durata_max": "45",
+    "eta": "10+",
+    "categorie": [
+      "Aviation / Flight",
+      "Bluffing",
+      "Collectible Components",
+      "Miniatures",
+      "Movies / TV / Radio theme",
+      "Science Fiction",
+      "Wargame"
+    ],
+    "meccaniche": [
+      "Action Queue",
+      "Critical Hits and Failures",
+      "Dice Rolling",
+      "Line of Sight"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/103885"
+  },
+  {
+    "nome": "Ta Yü",
+    "anno": "1999",
+    "id_bgg": 117,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,4",
+    "giocatori_migliori": "2",
+    "durata_media": "45",
+    "durata_min": "30",
+    "durata_max": "45",
+    "eta": "8+",
+    "categorie": [
+      "Abstract Strategy"
+    ],
+    "meccaniche": [
+      "Connections",
+      "Team-Based Game",
+      "Tile Placement"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/117"
+  },
+  {
+    "nome": "Terraforming Mars",
+    "anno": "2016",
+    "id_bgg": 167791,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "1,2,3,4",
+    "giocatori_migliori": "3",
+    "durata_media": "120",
+    "durata_min": "120",
+    "durata_max": "120",
+    "eta": "12+",
+    "categorie": [
+      "Civilization",
+      "Economic",
+      "Environmental",
+      "Industry / Manufacturing",
+      "Science Fiction",
+      "Space Exploration",
+      "Territory Building"
+    ],
+    "meccaniche": [
+      "Closed Drafting",
+      "Contracts",
+      "End Game Bonuses",
+      "Hand Management"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/167791"
+  },
+  {
+    "nome": "Terraforming Mars: Prelude",
+    "anno": "2018",
+    "id_bgg": 247030,
+    "tipo": "espansione",
+    "giocatori_min": "1",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "1,2,3,4,5",
+    "giocatori_migliori": "3",
+    "durata_media": "120",
+    "durata_min": "90",
+    "durata_max": "120",
+    "eta": "12+",
+    "categorie": [
+      "Expansion for Base-game",
+      "Economic",
+      "Environmental",
+      "Industry / Manufacturing",
+      "Science Fiction"
+    ],
+    "meccaniche": [
+      "Hand Management",
+      "Open Drafting",
+      "Solo / Solitaire Game",
+      "Tile Placement"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/247030"
+  },
+  {
+    "nome": "Tigris & Euphrates",
+    "anno": "1997",
+    "id_bgg": 42,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "4",
+    "durata_media": "120",
+    "durata_min": "60",
+    "durata_max": "120",
+    "eta": "12+",
+    "categorie": [
+      "Abstract Strategy",
+      "Ancient",
+      "Civilization",
+      "Territory Building"
+    ],
+    "meccaniche": [
+      "Area Majority / Influence",
+      "Chaining",
+      "Connections",
+      "Force Commitment"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/42"
+  },
+  {
+    "nome": "Tzolk'in: The Mayan Calendar",
+    "anno": "2012",
+    "id_bgg": 126163,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "4",
+    "durata_media": "90",
+    "durata_min": "90",
+    "durata_max": "90",
+    "eta": "12+",
+    "categorie": [
+      "Ancient",
+      "Civilization",
+      "Economic",
+      "Farming",
+      "Mythology"
+    ],
+    "meccaniche": [
+      "Bias",
+      "End Game Bonuses",
+      "Once-Per-Game Abilities",
+      "Track Movement"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/126163"
+  },
+  {
+    "nome": "Ubongo",
+    "anno": "2003",
+    "id_bgg": 16986,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "4",
+    "durata_media": "25",
+    "durata_min": "25",
+    "durata_max": "25",
+    "eta": "6+",
+    "categorie": [
+      "Puzzle",
+      "Real-time"
+    ],
+    "meccaniche": [
+      "Grid Coverage",
+      "Pattern Building",
+      "Real-Time",
+      "Set Collection"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/16986"
+  },
+  {
+    "nome": "VektoRace",
+    "anno": "2018",
+    "id_bgg": 256839,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "4",
+    "durata_media": "120",
+    "durata_min": "30",
+    "durata_max": "120",
+    "eta": "10+",
+    "categorie": [
+      "Racing",
+      "Sports"
+    ],
+    "meccaniche": [
+      "Action Queue",
+      "Measurement Movement",
+      "Movement Template",
+      "Race"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/256839"
+  },
+  {
+    "nome": "Village",
+    "anno": "2011",
+    "id_bgg": 104006,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "4",
+    "durata_media": "90",
+    "durata_min": "60",
+    "durata_max": "90",
+    "eta": "12+",
+    "categorie": [
+      "Economic",
+      "Farming",
+      "Medieval"
+    ],
+    "meccaniche": [
+      "Area Majority / Influence",
+      "Contracts",
+      "Set Collection",
+      "Turn Order: Claim Action"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/104006"
+  },
+  {
+    "nome": "Welcome Back to the Dungeon",
+    "anno": "2016",
+    "id_bgg": 195043,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "4",
+    "giocatori_consigliati": "2,3,4",
+    "giocatori_migliori": "3,4",
+    "durata_media": "30",
+    "durata_min": "30",
+    "durata_max": "30",
+    "eta": "8+",
+    "categorie": [
+      "Bluffing",
+      "Card Game",
+      "Fantasy",
+      "Fighting"
+    ],
+    "meccaniche": [
+      "Bids As Wagers",
+      "Memory",
+      "Player Elimination",
+      "Push Your Luck"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/195043"
+  },
+  {
+    "nome": "Wingspan",
+    "anno": "2019",
+    "id_bgg": 266192,
+    "tipo": "gioco base",
+    "giocatori_min": "1",
+    "giocatori_max": "5",
+    "giocatori_consigliati": "1,2,3,4",
+    "giocatori_migliori": "3",
+    "durata_media": "70",
+    "durata_min": "40",
+    "durata_max": "70",
+    "eta": "10+",
+    "categorie": [
+      "Animals",
+      "Card Game",
+      "Educational",
+      "Environmental"
+    ],
+    "meccaniche": [
+      "Action Queue",
+      "Dice Rolling",
+      "End Game Bonuses",
+      "Hand Management"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/266192"
+  },
+  {
+    "nome": "YINSH",
+    "anno": "2003",
+    "id_bgg": 7854,
+    "tipo": "gioco base",
+    "giocatori_min": "2",
+    "giocatori_max": "2",
+    "giocatori_consigliati": "2",
+    "giocatori_migliori": "2",
+    "durata_media": "60",
+    "durata_min": "30",
+    "durata_max": "60",
+    "eta": "8+",
+    "categorie": [
+      "Abstract Strategy"
+    ],
+    "meccaniche": [
+      "Catch the Leader",
+      "Grid Movement",
+      "Pattern Building"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/7854"
+  }
 ]
