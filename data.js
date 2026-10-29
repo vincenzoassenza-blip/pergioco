@@ -77,5 +77,18 @@ const Badges={
   return{plays:mine.length,wins:mine.filter(p=>me(p).winner).length,distinct:new Set(mine.map(p=>p.gameId)).size,thu:dates('Giovedì'),sun:dates('Domenica'),
    coopWins:mine.filter(p=>p.coop&&me(p).winner).length,records:Stats.records(games,plays).filter(r=>Stats.key(r.best.p)===key).length,
    hosted:(tables||[]).filter(t=>'m:'+t.hostId===key).length,explorer:mine.some(p=>{const g=games.find(g=>g.id===p.gameId);return g&&g.addedAt&&g.addedAt.slice(0,10)===p.date})}},
- list(key,ctx){const s=this.stats(key,ctx);return BADGES.map(([id,icon,name,desc,f])=>({id,icon,name,desc,on:!!f(s)}))},
+ // progresso verso il badge: [valore attuale, obiettivo]
+ prog:{prima:s=>[s.plays,1],vittoria:s=>[s.wins,1],p10:s=>[s.plays,10],p25:s=>[s.plays,25],p50:s=>[s.plays,50],g5:s=>[s.distinct,5],g10:s=>[s.distinct,10],g20:s=>[s.distinct,20],
+  gio:s=>[s.thu,5],dom:s=>[s.sun,5],rec:s=>[s.records,1],coop:s=>[s.coopWins,5],host:s=>[s.hosted,5]},
+ list(key,ctx){const s=this.stats(key,ctx);return BADGES.map(([id,icon,name,desc,f])=>{const p=this.prog[id]&&this.prog[id](s);return{id,icon,name,desc,on:!!f(s),cur:p?Math.min(p[0],p[1]):null,goal:p?p[1]:null}})},
  unlocked(key,ctx){return this.list(key,ctx).filter(b=>b.on).map(b=>b.id)}};
+
+// Profilo personale di un socio (calcolato dai dati, sola lettura)
+const Profile={
+ stats(memberId,{plays,games,tables}){const key='m:'+memberId,mine=plays.filter(p=>p.players.some(x=>x.memberId===memberId));
+  const wins=mine.filter(p=>(p.players.find(x=>x.memberId===memberId)||{}).winner).length,gc={},pc={};
+  mine.forEach(p=>{gc[p.gameId]=(gc[p.gameId]||0)+1;p.players.forEach(x=>{if(x.memberId===memberId)return;const k=Stats.key(x);if(k==='g:')return;pc[k]=pc[k]||{n:0,x};pc[k].n++})});
+  const tb=(tables||[]).filter(t=>(t.players||[]).some(x=>x.memberId===memberId)||t.hostId===memberId);
+  return{key,plays:mine,n:mine.length,wins,pct:mine.length?Math.round(wins/mine.length*100):0,
+   topGames:Object.entries(gc).sort((a,b)=>b[1]-a[1]).slice(0,5),partners:Object.values(pc).sort((a,b)=>b.n-a.n).slice(0,5),
+   tables:tb.length,evenings:new Set([...mine.map(p=>p.date+'|'+p.evening),...tb.map(t=>t.date+'|'+t.evening)]).size,hosted:tb.filter(t=>t.hostId===memberId).length}}};

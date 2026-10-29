@@ -4,8 +4,10 @@
 const MAP={
  games:{t:'games',to:g=>({id:g.id,added_at:g.addedAt||null,name:g.name,min_players:g.min,max_players:g.max,min_time:g.minT,max_time:g.maxT,age:g.age,coop:!!g.coop,bgg_id:g.bggId??null,thumb:g.thumb??null}),
   from:r=>({id:r.id,addedAt:r.added_at,name:r.name,min:r.min_players,max:r.max_players,minT:r.min_time,maxT:r.max_time,age:r.age,coop:r.coop,bggId:r.bgg_id,thumb:r.thumb})},
- members:{t:'members',to:m=>({id:m.id,nome:m.nome,cognome:m.cognome||null,soprannome:m.soprannome||null,tessera:m.tessera||null,active:m.active!==false}),
-  from:r=>({id:r.id,nome:r.nome,cognome:r.cognome||'',soprannome:r.soprannome||'',tessera:r.tessera||'',active:r.active})},
+ members:{t:'members',cols:'id,nome,cognome,soprannome,active,user_id,avatar,color,fav_game_id',
+  // tessera e user_id si inviano solo se noti (la tessera non e' leggibile dai non admin)
+  to:m=>{const r={id:m.id,nome:m.nome,cognome:m.cognome||null,soprannome:m.soprannome||null,active:m.active!==false};if(m.tessera!==undefined)r.tessera=m.tessera||null;if(m.userId!==undefined)r.user_id=m.userId||null;if(m.avatar!==undefined)r.avatar=m.avatar||null;if(m.color!==undefined)r.color=m.color||null;if(m.favGameId!==undefined)r.fav_game_id=m.favGameId||null;return r},
+  from:r=>({id:r.id,nome:r.nome,cognome:r.cognome||'',soprannome:r.soprannome||'',tessera:r.tessera===undefined?undefined:(r.tessera||''),active:r.active,userId:r.user_id===undefined?undefined:r.user_id,avatar:r.avatar||'',color:r.color||'',favGameId:r.fav_game_id||''})},
  tables:{t:'tables',to:t=>({id:t.id,date:t.date,evening:t.evening,game_id:t.gameId,host_id:t.hostId,seats:t.seats,start_time:t.time||null,note:t.note||null,players:t.players||[],status:t.status||'open',play_id:t.playId||null,created_at:t.createdAt||new Date().toISOString()}),
   from:r=>({id:r.id,date:r.date,evening:r.evening,gameId:r.game_id,hostId:r.host_id,seats:r.seats,time:r.start_time||'',note:r.note||'',players:r.players||[],status:r.status,playId:r.play_id,createdAt:r.created_at})},
  plays:{t:'plays',to:p=>({id:p.id,game_id:p.gameId,date:p.date,evening:p.evening,coop:!!p.coop,group_win:p.groupWin??null,scenario:p.scenario||null,players:p.players,note:p.note||null,created_at:p.createdAt||new Date().toISOString(),updated_at:p.updatedAt||null}),
@@ -30,7 +32,9 @@ const SupabaseAdapter={
    if(!q.length){DB.setStatus('online');await this.refresh()}}finally{this.flushing=false}
   if(denied)toast&&toast('Alcune modifiche non sono state accettate dal database (servono i permessi admin)')},
  async refresh(){const d={version:2,games:[],members:[],plays:[],tables:[],admin:null};
-  for(const k of Object.keys(MAP)){const {data,error}=await this.client.from(MAP[k].t).select('*');if(error&&k==='tables'&&isMissing(error)){DB.tablesMissing=true;d.tables=[];continue}if(error)throw error;d[k]=data.map(MAP[k].from)}
+  for(const k of Object.keys(MAP)){let {data,error}=await this.client.from(MAP[k].t).select(MAP[k].cols||'*');
+   if(error&&MAP[k].cols&&(error.code==='42703'||/column/i.test(error.message||''))){DB.v6Missing=true;({data,error}=await this.client.from(MAP[k].t).select('*'))}else if(MAP[k].cols)DB.v6Missing=false;if(error&&k==='tables'&&isMissing(error)){DB.tablesMissing=true;d.tables=[];continue}if(error)throw error;d[k]=data.map(MAP[k].from)}
+  if(DB.v6Missing===false&&this.adminCached){const {data}=await this.client.rpc('admin_member_tessere');if(data){const t=new Map(data.map(x=>[x.id,x.tessera||'']));d.members.forEach(m=>{if(t.has(m.id))m.tessera=t.get(m.id)})}}
   if(this.queue().length)return;await this.cache.replaceAll(d)},
  async init(){const c=window.PERGIOCO_CONFIG||{};if(!c.supabaseUrl||!c.supabaseAnonKey)return 'local';
   if(!window.supabase){return (await this.cache._load())?'offline':'local'}
@@ -40,7 +44,20 @@ const SupabaseAdapter={
  // --- autenticazione admin (Supabase Auth, email + password) ---
  async signIn(email,password){const {error}=await this.client.auth.signInWithPassword({email,password});if(error)throw error;return this.isAdmin()},
  async signOut(){await this.client.auth.signOut()},
- async isAdmin(){const {data:s}=await this.client.auth.getSession();if(!s.session)return false;const {data,error}=await this.client.rpc('is_admin');return !error&&data===true},
+ async isAdmin(){const {data:s}=await this.client.auth.getSession();if(!s.session)return this.adminCached=false;const {data,error}=await this.client.rpc('is_admin');const a=!error&&data===true;if(a&&!this.adminCached){this.adminCached=true;try{await this.refresh()}catch(e){}}this.adminCached=a;return a},
+ // --- account dei soci ---
+ redirect(){return location.origin+location.pathname},
+ async user(){if(!this.client)return null;const {data}=await this.client.auth.getSession();return data.session?data.session.user:null},
+ async signUp(email,password){const {data,error}=await this.client.auth.signUp({email,password,options:{emailRedirectTo:this.redirect()}});if(error)throw error;return data},
+ async magicLink(email){const {error}=await this.client.auth.signInWithOtp({email,options:{emailRedirectTo:this.redirect()}});if(error)throw error},
+ async resetPassword(email){const {error}=await this.client.auth.resetPasswordForEmail(email,{redirectTo:this.redirect()});if(error)throw error},
+ async claim(memberId,tessera){const {error}=await this.client.rpc('claim_member',{p_member_id:memberId,p_tessera:tessera});if(error)throw error;await this.refresh()},
+ async updateProfile(p){const {error}=await this.client.rpc('update_my_profile',{p_soprannome:p.soprannome,p_avatar:p.avatar,p_color:p.color,p_fav_game_id:p.favGameId});if(error)throw error;await this.refresh()},
+ async myRequest(){const {data}=await this.client.from('link_requests').select('*').limit(1);return (data||[])[0]||null},
+ async requestLink(memberId,email,note){const {error}=await this.client.from('link_requests').insert({member_id:memberId,email,note:note||null});if(error)throw error},
+ async cancelRequest(id){const {error}=await this.client.from('link_requests').delete().eq('id',id);if(error)throw error},
+ async requests(){const {data,error}=await this.client.from('link_requests').select('*').order('created_at');if(error)return[];return data},
+ async setLink(memberId,userId){const {error}=await this.client.from('members').update({user_id:userId}).eq('id',memberId);if(error)throw error;if(userId)await this.client.from('link_requests').delete().eq('user_id',userId);await this.refresh()},
  // migrazione una tantum dei dati locali del telefono
  async uploadLocal(){const l=JSON.parse(localStorage.getItem(LocalAdapter.key)||'null');if(!l)return 0;let n=0;
   for(const k of ['games','members','plays','tables'])for(const x of l[k]||[]){const e=await this.run({k,op:'upsert',row:MAP[k].to(x)});if(e)throw e;n++}
