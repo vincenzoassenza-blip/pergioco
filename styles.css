@@ -114,3 +114,4 @@ body.mlock{position:fixed;left:0;right:0;overflow:hidden}
 /* v14 campi numerici */
 input.bad{border-color:#b3261e!important;background:#fdecea;box-shadow:0 0 0 2px #b3261e33}
 input.nflash{animation:nfl .4s}@keyframes nfl{0%,100%{background:#fff}40%{background:#fdecea}}
+.pfchips{display:flex;flex-wrap:wrap;gap:6px}.pfbar label{font-size:12px}

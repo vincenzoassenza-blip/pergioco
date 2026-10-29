@@ -4,6 +4,19 @@ const $=s=>document.querySelector(s),V=$('#view');
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=d=>new Date(d+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'short',year:'numeric'});
 const toast=t=>{const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),2200)};
+// v14 — filtro temporale per Record e Statistiche (ricordato sul dispositivo)
+const PF_K='pergioco-periodo',PF_L={all:'Sempre','1m':'Ultimo mese','3m':'Ultimi 3 mesi',y:'Anno corrente',c:'Personalizzato'};
+const pfGet=()=>{try{return JSON.parse(localStorage.getItem(PF_K))||{k:'all'}}catch(e){return{k:'all'}}};
+function pfRange(){const f=pfGet(),t=new Date(),iso=d=>d.toISOString().slice(0,10),m=n=>{const d=new Date(t);d.setMonth(d.getMonth()-n);return iso(d)};
+ if(f.k==='1m')return[m(1),iso(t)];if(f.k==='3m')return[m(3),iso(t)];if(f.k==='y')return[t.getFullYear()+'-01-01',t.getFullYear()+'-12-31'];if(f.k==='c')return[f.da||'0000-01-01',f.a||'9999-12-31'];return null}
+const pfIn=d=>{const r=pfRange();return!r||(d&&d.slice(0,10)>=r[0]&&d.slice(0,10)<=r[1])};
+const pf=l=>l.filter(x=>pfIn(x.date||x.createdAt));
+function pfHtml(){const f=pfGet(),r=pfRange();return`<div class="card pfbar"><div class="pfchips">${Object.keys(PF_L).map(k=>`<button class="chip pick${f.k===k?' on':''}" data-pf="${k}">${PF_L[k]}</button>`).join('')}</div>
+ ${f.k==='c'?`<div class="row" style="margin-top:8px"><div><label>Da</label><input type="date" id="pfda" value="${f.da||''}"></div><div><label>A</label><input type="date" id="pfa" value="${f.a||''}"></div></div>`:''}
+ <div class="muted" style="font-size:12px;margin-top:6px">📅 ${r?`Dati dal ${fmt(r[0].startsWith('0000')?'2000-01-01':r[0])} al ${fmt(r[1].startsWith('9999')?new Date().toISOString().slice(0,10):r[1])}`:'Tutti i dati'}</div></div>`}
+function pfSet(o){localStorage.setItem(PF_K,JSON.stringify({...pfGet(),...o}));const y=scrollY;views[window._cur||'record']();setTimeout(()=>scrollTo(0,y),50)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-pf]');if(b)pfSet({k:b.dataset.pf})});
+document.addEventListener('change',e=>{if(e.target.id==='pfda'||e.target.id==='pfa'){const da=$('#pfda').value,aa=$('#pfa').value;if(da&&aa&&da>aa){e.target.classList.add('bad');return modal('⚠️ La data «Da» deve essere precedente alla data «A».',{cancel:false})}pfSet({da,a:aa})}});
 // v14 — campi numerici: solo cifre durante digitazione/incolla + validazione al salvataggio
 const NUMK={int:['numeric','un numero intero'],dig:['numeric','un numero'],dec:['decimal','un importo (es. 12,50)'],sdec:['decimal','un numero (anche negativo o con decimali)']};
 const nA=(k,min,max,label,extra='')=>` type="text" inputmode="${NUMK[k][0]}" data-num="${k}"${min!=null?` data-min="${min}"`:''}${max!=null?` data-max="${max}"`:''} data-label="${label}" autocomplete="off"${extra}`;
@@ -101,10 +114,10 @@ async nuova(ed){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m
   const keys=players.filter(x=>x.memberId).map(x=>'m:'+x.memberId),before=await badgeSnap();
   if(ed&&ed.id){p.id=ed.id;await DB.updatePlay(p);badgeNew(before,keys);toast('Partita aggiornata');adminTab='partite';return go('altro')}
   const r=await DB.addPlay(p);if(ed&&ed.fromTable)await DB.saveTable({id:ed.fromTable,status:'closed',playId:r.id});badgeNew(before,keys);XP.refresh();ratePrompt(r);const w=r.players.filter(x=>x.winner).map(x=>Stats.label(x,all));toast(coop?(win?'Vittoria del gruppo! 🎉':'Sconfitta… alla prossima!'):`Vince ${w.join(' e ')||'—'} 🏆`);go('record')}},
-async record(){const gs=await DB.games(),ps=await DB.plays(),ms=await DB.members(),all=Stats.players(ps,ms),pl=all.filter(p=>p.member);const rec=Stats.records(gs,ps),gc=Stats.gameCounts(gs,ps).filter(x=>x.n),O=Stats.overall(ps,ms),ng=all.length-pl.length;
+async record(){const gs=await DB.games(),ps=pf(await DB.plays()),ms=await DB.members(),all=Stats.players(ps,ms),pl=all.filter(p=>p.member);const rec=Stats.records(gs,ps),gc=Stats.gameCounts(gs,ps).filter(x=>x.n),O=Stats.overall(ps,ms),ng=all.length-pl.length;
  const pv=r=>r?`<a class="pv" data-pv="${r.who.id}">${esc(r.who.name)+lv(r.who.id)}</a>`:'<span class="muted">—</span>';
  const OV=[['⭐','Più presente',O.presences,v=>v+(v==1?' serata':' serate')],['🏆','Più vittorie',O.wins,v=>v+(v==1?' vittoria':' vittorie')],['🎯','Più partite',O.plays,v=>v+(v==1?' partita':' partite')],['🔥','Serie di vittorie',O.streak,v=>v+' di fila'],['🧭','Più giochi diversi',O.distinct,v=>v+(v==1?' gioco':' giochi')],['🌙','Più partite in una serata',O.daily,v=>v+(v==1?' partita':' partite')],['📅','Serate consecutive',O.evStreak,v=>v+(v==1?' serata':' serate')],['🤝','Re dei cooperativi',O.coop,v=>v+(v==1?' vittoria coop':' vittorie coop')]];
-  V.innerHTML=`<h2>Record</h2>${adminMode()?'<button class="s" onclick="go(\'stats\')" style="width:100%;margin-bottom:10px">📊 Statistiche associazione (admin)</button>':''}<div class="row"><div class="card"><div class="muted">Partite</div><div class="big">${ps.length}</div></div><div class="card"><div class="muted">Soci</div><div class="big">${pl.length}</div></div><div class="card"><div class="muted">Ospiti</div><div class="big">${ng}</div></div></div>
+  V.innerHTML=`<h2>Record</h2>${pfHtml()}${adminMode()?'<button class="s" onclick="go(\'stats\')" style="width:100%;margin-bottom:10px">📊 Statistiche associazione (admin)</button>':''}<div class="row"><div class="card"><div class="muted">Partite</div><div class="big">${ps.length}</div></div><div class="card"><div class="muted">Soci</div><div class="big">${pl.length}</div></div><div class="card"><div class="muted">Ospiti</div><div class="big">${ng}</div></div></div>
  <h3 class="rsec">🏅 Record assoluti</h3><div class="rov">${OV.map(([ic,t,r,f])=>`<div class="roc"><span class="roi">${ic}</span><span class="rot">${t}</span><span class="roh">${pv(r)}</span><span class="rov2">${r?f(r.value):''}</span></div>`).join('')}</div>
 `},
 async giocatori(){const gs=await DB.games(),ms=await DB.members(),bc=await badgeCtx(),all=Stats.players(await DB.plays(),ms).sort((a,b)=>b.plays-a.plays||b.presences-a.presences||a.tP-b.tP);
@@ -207,16 +220,16 @@ async altro(){const hp=await DB.hasPin();
  if(isMod()&&(adminTab==='partite'||adminTab==='mods'))adminTab='soci';
  const draw=()=>adminTab==='mods'&&R?drawMods():isMod()?(adminTab==='account'&&R?drawAcc():drawSociMod()):adminTab==='partite'?drawPlays():adminTab==='account'&&R?drawAcc():drawSoci();draw()},
 async stats(){if(!adminMode()){V.innerHTML='<h2>Statistiche associazione</h2><p class="muted">Disponibili solo in modalità admin.</p>';return}
- const gs=await DB.games(),ps=await DB.plays(),ms=await DB.members(),ts=await DB.allTables(),ctx={plays:ps,games:gs,tables:ts};
+ const gs=await DB.games(),ps=pf(await DB.plays()),ms=await DB.members(),ts=pf(await DB.allTables()),ctx={plays:ps,games:gs,tables:ts};
  const ev=new Set(ps.map(p=>p.date+'|'+p.evening)),guests=new Set();ps.forEach(p=>p.players.forEach(x=>{if(!x.memberId&&x.name)guests.add(norm(x.name))}));
  const act=new Set();ps.forEach(p=>p.players.forEach(x=>x.memberId&&act.add(x.memberId)));
  const mo={};ps.forEach(p=>{const k=p.date.slice(0,7);mo[k]=mo[k]||{n:0,e:new Set()};mo[k].n++;mo[k].e.add(p.date+'|'+p.evening)});
- const nm={};ms.forEach(m=>{if(m.createdAt){const k=m.createdAt.slice(0,7);nm[k]=(nm[k]||0)+1}});
+ const nm={};ms.forEach(m=>{if(m.createdAt&&pfIn(m.createdAt)){const k=m.createdAt.slice(0,7);nm[k]=(nm[k]||0)+1}});
  const pl=Stats.players(ps,ms).filter(p=>p.member).sort((a,b)=>b.plays-a.plays||b.presences-a.presences||a.tP-b.tP),gc=Stats.gameCounts(gs,ps).filter(x=>x.n);
  const coop=ps.filter(p=>p.coop).length,avgP=ps.length?Math.round(ps.reduce((a,p)=>a+p.players.length,0)/ps.length*10)/10:0;
  const bdg=ms.reduce((a,m)=>a+Badges.unlocked('m:'+m.id,ctx).length,0),dur=ps.filter(p=>p.duration).map(p=>+p.duration);
  const box=(l,v)=>`<div class="card"><div class="muted">${l}</div><div class="big">${v}</div></div>`;
- V.innerHTML=`<button class="s" id="bk">← Indietro</button><h2 style="margin-top:10px">📊 Statistiche associazione</h2>
+ V.innerHTML=`<button class="s" id="bk">← Indietro</button><h2 style="margin-top:10px">📊 Statistiche associazione</h2>${pfHtml()}
  <div class="row">${box('Partite',ps.length)}${box('Serate',ev.size)}${box('Giochi',gs.length)}</div>
  <div class="row">${box('Soci',ms.length)}${box('Soci attivi',ms.filter(m=>m.active).length)}${box('Ospiti',guests.size)}</div>
  <div class="row">${box('Hanno giocato',act.size)}${box('Media giocatori',avgP)}${box('Badge sbloccati',bdg)}</div>
