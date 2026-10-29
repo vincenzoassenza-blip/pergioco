@@ -71,3 +71,13 @@ body.gate nav,body.gate #status,body.gate header{display:none}body.gate main{pad
 .gph{position:sticky;top:0;background:inherit;padding:10px 12px;z-index:1}.gpb{width:auto}
 .gpc{padding:0 12px 30px;max-width:640px;margin:0 auto}
 .gpt{display:flex;gap:12px;align-items:center;margin-bottom:10px}.gpt img{width:84px;height:84px;border-radius:14px;object-fit:cover;flex:none}
+.mbox.wide{max-width:560px;max-height:88vh;overflow:auto}.lbx h3{margin:4px 0 8px}.lbx h4{margin:12px 0 4px}
+.lsum{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.lsum span{background:#eef1f8;border-radius:10px;padding:4px 8px;font-size:13px;font-weight:600}
+.lwarn{background:#fff6e0;border:2px solid #f0b429;border-radius:12px;padding:8px 12px;margin:8px 0;font-size:14px}.lerr{background:#fdecec;border:2px solid #d64545;border-radius:12px;padding:8px 12px;margin:8px 0;font-size:14px}
+.lwarn p,.lerr p{margin:6px 0 2px}.lbl{margin:2px 0 4px;padding-left:18px}.lchk{display:flex;gap:8px;align-items:center;font-weight:600;margin:10px 0}.lchk input{width:auto}
+.lban{background:#fdecec;border:2px solid #d64545;border-radius:12px;padding:10px;margin-bottom:10px;font-size:14px}.lban .s{padding:4px 10px;margin-left:4px}
+.lbad{font-size:12px;font-weight:700;border-radius:10px;padding:3px 8px;white-space:nowrap}.lbad.ok{background:#e3f6e8;color:#1e7a3a}.lbad.ko{background:#fdecec;color:#b42323}.lbad.out{background:#eceff3;color:#555}
+.lrow{cursor:pointer}.lact{gap:6px;margin-top:6px;flex-wrap:wrap}.lact .s,.lact .p{flex:1 1 auto;font-size:13px;padding:8px}.ldel{color:#b42323}.laud{max-height:60vh;overflow:auto}
+#lprint{position:fixed;inset:0;background:#fff;z-index:2000;overflow:auto;padding:16px;color:#000;font-size:12px}#lprint table{border-collapse:collapse;width:100%}#lprint th,#lprint td{border:1px solid #999;padding:4px;text-align:left;vertical-align:top}#lprint th{background:#eee}
+.lph{border-bottom:2px solid #000;margin-bottom:8px;padding-bottom:6px}.lph h2{margin:6px 0 2px}.lpf{font-size:11px;color:#444;margin-top:10px}
+@media print{body.lprinting>*:not(#lprint){display:none!important}#lprint{position:static;padding:0}.noprint{display:none!important}@page{size:A4 landscape;margin:12mm}}

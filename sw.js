@@ -1,6 +1,6 @@
-const C='pergioco-v10-5';
+const C='pergioco-v11';
 const CDN='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
-const A=['./','./index.html','./styles.css','./config.js','./data.js','./sb.js','./app.js','./manifest.json','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png'];
+const A=['./','./index.html','./styles.css','./config.js','./data.js','./sb.js','./app.js','./libri.js','./vendor/xlsx.full.min.js','./manifest.json','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A).then(()=>c.add(CDN).catch(()=>{}))));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))));self.clients.claim()});
 // solo i file dell'app e la libreria Supabase vanno in cache; le chiamate al database no
