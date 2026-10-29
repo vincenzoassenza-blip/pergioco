@@ -53,3 +53,7 @@ body.adm header{background:#5a1a1a}
 .split{height:16px;border-radius:8px;background:#f2b134;overflow:hidden;margin:8px 0}.split i{display:block;height:100%;background:#1e7a43}
 .tbl{font-size:13px;margin-top:6px}.tbl>div{display:grid;grid-template-columns:2.2fr repeat(5,1fr);gap:4px;padding:5px 0;border-bottom:1px solid #eef}.tbl .th{font-weight:700;color:var(--m)}.tbl span:not(:first-child){text-align:right}
 .adm-only{border:2px dashed #b3261e55}
+.mdl{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;animation:fi .15s}
+.mbox{background:#fff;border-radius:16px;padding:18px;width:100%;max-width:380px;box-shadow:0 10px 40px #0005}.mtt{font-weight:800;font-size:18px;color:var(--b);margin-bottom:8px}
+.mtx{white-space:pre-wrap;margin-bottom:12px;line-height:1.4}.min{width:100%;margin-bottom:12px}.mbt{display:flex;gap:8px;justify-content:flex-end}.mbt button{width:auto;margin:0;padding:10px 18px}
+@keyframes fi{from{opacity:0}}
