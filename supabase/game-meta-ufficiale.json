@@ -1,0 +1,2966 @@
+[
+ {
+  "bgg_id": 68448,
+  "game_id": "bgg-68448",
+  "nome": "7 Wonders",
+  "espansione": false,
+  "weight": 2.31,
+  "best_players": [
+   4,
+   5
+  ],
+  "rec_players": [
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "min_age": 10,
+  "lang_dep": 0,
+  "rank": 117,
+  "bgg_avg": 7.66,
+  "mechanics": [
+   "Closed Drafting",
+   "End Game Bonuses",
+   "Hand Management",
+   "Melding and Splaying",
+   "Multi-Use Cards",
+   "Neighbor Scope",
+   "Once-Per-Game Abilities",
+   "Score-and-Reset Game",
+   "Set Collection",
+   "Simultaneous Action Selection",
+   "Tags",
+   "Tech Trees / Tech Tracks",
+   "Variable Player Powers",
+   "Variable Set-up"
+  ],
+  "categories": [
+   "Ancient",
+   "Card Game",
+   "City Building",
+   "Civilization",
+   "Economic"
+  ],
+  "subdomains": [
+   "Family Games",
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 154638,
+  "game_id": "bgg-154638",
+  "nome": "7 Wonders: Babel",
+  "espansione": true,
+  "weight": 2.65,
+  "best_players": [
+   5
+  ],
+  "rec_players": [
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "min_age": 10,
+  "lang_dep": 0,
+  "rank": null,
+  "bgg_avg": 6.83,
+  "mechanics": [
+   "Closed Drafting",
+   "Set Collection",
+   "Simultaneous Action Selection",
+   "Variable Player Powers"
+  ],
+  "categories": [
+   "Ancient",
+   "Card Game",
+   "City Building",
+   "Civilization",
+   "Expansion for Base-game"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 111661,
+  "game_id": "bgg-111661",
+  "nome": "7 Wonders: Cities",
+  "espansione": true,
+  "weight": 2.34,
+  "best_players": [
+   4,
+   5
+  ],
+  "rec_players": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "min_age": 10,
+  "lang_dep": 0,
+  "rank": null,
+  "bgg_avg": 7.8,
+  "mechanics": [
+   "Closed Drafting",
+   "Hand Management",
+   "Set Collection",
+   "Simultaneous Action Selection",
+   "Team-Based Game",
+   "Variable Player Powers"
+  ],
+  "categories": [
+   "Ancient",
+   "Card Game",
+   "City Building",
+   "Civilization",
+   "Expansion for Base-game"
+  ],
+  "subdomains": [
+   "Family Games",
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 92539,
+  "game_id": "bgg-92539",
+  "nome": "7 Wonders: Leaders",
+  "espansione": true,
+  "weight": 2.27,
+  "best_players": [
+   4,
+   5
+  ],
+  "rec_players": [
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "min_age": 13,
+  "lang_dep": 0,
+  "rank": null,
+  "bgg_avg": 7.81,
+  "mechanics": [
+   "Closed Drafting",
+   "Hand Management",
+   "Set Collection",
+   "Simultaneous Action Selection",
+   "Variable Player Powers"
+  ],
+  "categories": [
+   "Expansion for Base-game",
+   "Ancient",
+   "Card Game",
+   "City Building",
+   "Civilization"
+  ],
+  "subdomains": [
+   "Family Games",
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 155987,
+  "game_id": "bgg-155987",
+  "nome": "Abyss",
+  "espansione": false,
+  "weight": 2.32,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 14,
+  "lang_dep": 2,
+  "rank": 453,
+  "bgg_avg": 7.32,
+  "mechanics": [
+   "Auction / Bidding",
+   "Hand Management",
+   "Memory",
+   "Open Drafting",
+   "Push Your Luck",
+   "Set Collection"
+  ],
+  "categories": [
+   "Card Game",
+   "Fantasy",
+   "Mythology",
+   "Nautical"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 2
+ },
+ {
+  "bgg_id": 180341,
+  "game_id": "bgg-180341",
+  "nome": "Abyss: Kraken",
+  "espansione": true,
+  "weight": 2.48,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 14,
+  "lang_dep": 2,
+  "rank": null,
+  "bgg_avg": 7.66,
+  "mechanics": [
+   "Auction / Bidding",
+   "Hand Management",
+   "Open Drafting",
+   "Push Your Luck",
+   "Set Collection"
+  ],
+  "categories": [
+   "Expansion for Base-game",
+   "Card Game",
+   "Fantasy",
+   "Mythology",
+   "Science Fiction"
+  ],
+  "subdomains": [
+   "Family Games",
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 2
+ },
+ {
+  "bgg_id": 6249,
+  "game_id": "bgg-6249",
+  "nome": "Alhambra",
+  "espansione": false,
+  "weight": 2.1,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   2,
+   3,
+   4,
+   5
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 616,
+  "bgg_avg": 7.04,
+  "mechanics": [
+   "Area Majority / Influence",
+   "Hand Management",
+   "Open Drafting",
+   "Set Collection",
+   "Tile Placement"
+  ],
+  "categories": [
+   "City Building",
+   "Medieval"
+  ],
+  "subdomains": [
+   "Family Games",
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 39683,
+  "game_id": "bgg-39683",
+  "nome": "At the Gates of Loyang",
+  "espansione": false,
+  "weight": 3.11,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "min_age": 10,
+  "lang_dep": 2,
+  "rank": 497,
+  "bgg_avg": 7.35,
+  "mechanics": [
+   "Contracts",
+   "Income",
+   "Loans",
+   "Market",
+   "Open Drafting",
+   "Solo / Solitaire Game",
+   "Turn Order: Progressive"
+  ],
+  "categories": [
+   "Economic",
+   "Farming"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 230802,
+  "game_id": "bgg-230802",
+  "nome": "Azul",
+  "espansione": false,
+  "weight": 1.77,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 99,
+  "bgg_avg": 7.71,
+  "mechanics": [
+   "End Game Bonuses",
+   "Grid Coverage",
+   "Open Drafting",
+   "Pattern Building",
+   "Set Collection",
+   "Square Grid",
+   "Tile Placement",
+   "Turn Order: Claim Action"
+  ],
+  "categories": [
+   "Abstract Strategy",
+   "Renaissance"
+  ],
+  "subdomains": [
+   "Abstract Games",
+   "Family Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 256226,
+  "game_id": "bgg-256226",
+  "nome": "Azul: Stained Glass of Sintra",
+  "espansione": false,
+  "weight": 2.02,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 520,
+  "bgg_avg": 7.28,
+  "mechanics": [
+   "End Game Bonuses",
+   "Modular Board",
+   "Open Drafting",
+   "Pattern Building",
+   "Set Collection",
+   "Tile Placement",
+   "Turn Order: Claim Action"
+  ],
+  "categories": [
+   "Abstract Strategy",
+   "Puzzle",
+   "Renaissance"
+  ],
+  "subdomains": [
+   "Abstract Games",
+   "Family Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 38032,
+  "game_id": "bgg-38032",
+  "nome": "Byzanz",
+  "espansione": false,
+  "weight": 1.53,
+  "best_players": [
+   4,
+   5
+  ],
+  "rec_players": [
+   3,
+   4,
+   5,
+   6
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 3731,
+  "bgg_avg": 6.62,
+  "mechanics": [
+   "Auction / Bidding",
+   "Auction: Turn Order Until Pass",
+   "Closed Economy Auction",
+   "Constrained Bidding",
+   "Hand Management",
+   "Open Drafting",
+   "Set Collection"
+  ],
+  "categories": [
+   "Card Game",
+   "Economic"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 84876,
+  "game_id": "bgg-84876",
+  "nome": "The Castles of Burgundy",
+  "espansione": false,
+  "weight": 2.97,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 12,
+  "lang_dep": 0,
+  "rank": 17,
+  "bgg_avg": 8.16,
+  "mechanics": [
+   "Delayed Purchase",
+   "Dice Rolling",
+   "End Game Bonuses",
+   "Grid Coverage",
+   "Hexagon Grid",
+   "Open Drafting",
+   "Pattern Building",
+   "Tile Placement",
+   "Turn Order: Stat-Based",
+   "Variable Set-up",
+   "Worker Placement with Dice Workers"
+  ],
+  "categories": [
+   "Animals",
+   "Medieval",
+   "Territory Building"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 2
+ },
+ {
+  "bgg_id": 254894,
+  "game_id": "bgg-254894",
+  "nome": "Catalyst",
+  "espansione": false,
+  "weight": 2,
+  "best_players": [
+   2,
+   3,
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 10,
+  "lang_dep": 0,
+  "rank": 8762,
+  "bgg_avg": 6.62,
+  "mechanics": [
+   "Open Drafting",
+   "Set Collection"
+  ],
+  "categories": [
+   "Card Game"
+  ],
+  "subdomains": [
+   "Family Games",
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 175117,
+  "game_id": "bgg-175117",
+  "nome": "Celestia",
+  "espansione": false,
+  "weight": 1.32,
+  "best_players": [
+   5,
+   6
+  ],
+  "rec_players": [
+   3,
+   4,
+   5,
+   6
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 1006,
+  "bgg_avg": 6.92,
+  "mechanics": [
+   "Betting and Bluffing",
+   "Dice Rolling",
+   "Hand Management",
+   "Hidden Victory Points",
+   "Push Your Luck"
+  ],
+  "categories": [
+   "Adventure",
+   "Aviation / Flight",
+   "Card Game",
+   "Fantasy"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 1,
+  "luck": 2
+ },
+ {
+  "bgg_id": 209685,
+  "game_id": "bgg-209685",
+  "nome": "Century: Spice Road",
+  "espansione": false,
+  "weight": 1.8,
+  "best_players": [
+   3,
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4,
+   5
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 396,
+  "bgg_avg": 7.29,
+  "mechanics": [
+   "Action Retrieval",
+   "Auction: Dutch",
+   "Contracts",
+   "Deck, Bag, and Pool Building",
+   "End Game Bonuses",
+   "Hand Management",
+   "Increase Value of Unchosen Resources",
+   "Open Drafting",
+   "Set Collection",
+   "Variable Set-up"
+  ],
+  "categories": [
+   "Card Game",
+   "Economic",
+   "Medieval"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 105593,
+  "game_id": "bgg-105593",
+  "nome": "Cheating Moth",
+  "espansione": false,
+  "weight": 1.16,
+  "best_players": [
+   5
+  ],
+  "rec_players": [
+   3,
+   4,
+   5,
+   6
+  ],
+  "min_age": 7,
+  "lang_dep": 0,
+  "rank": 2745,
+  "bgg_avg": 6.39,
+  "mechanics": [
+   "Hand Management"
+  ],
+  "categories": [
+   "Action / Dexterity",
+   "Card Game"
+  ],
+  "subdomains": [
+   "Party Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 274841,
+  "game_id": "bgg-274841",
+  "nome": "Cóatl",
+  "espansione": false,
+  "weight": 2.03,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "min_age": 10,
+  "lang_dep": 0,
+  "rank": 2136,
+  "bgg_avg": 6.83,
+  "mechanics": [
+   "Contracts",
+   "Hand Management",
+   "Once-Per-Game Abilities",
+   "Open Drafting",
+   "Pattern Building",
+   "Set Collection"
+  ],
+  "categories": [
+   "Abstract Strategy",
+   "Puzzle"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 257380,
+  "game_id": "bgg-257380",
+  "nome": "Counterfeiters",
+  "espansione": false,
+  "weight": 2.05,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 13,
+  "lang_dep": 0,
+  "rank": 4615,
+  "bgg_avg": 6.79,
+  "mechanics": [
+   "Worker Placement"
+  ],
+  "categories": [
+   "Animals",
+   "Card Game",
+   "Mafia"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 250442,
+  "game_id": "bgg-250442",
+  "nome": "Crypt",
+  "espansione": false,
+  "weight": 1.5,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "min_age": 14,
+  "lang_dep": 1,
+  "rank": 2993,
+  "bgg_avg": 6.52,
+  "mechanics": [
+   "Area Majority / Influence",
+   "Auction / Bidding",
+   "Contracts",
+   "Dice Rolling",
+   "End Game Bonuses",
+   "Open Drafting",
+   "Push Your Luck",
+   "Set Collection",
+   "Solo / Solitaire Game",
+   "Tags",
+   "Turn Order: Progressive",
+   "Variable Set-up",
+   "Worker Placement with Dice Workers"
+  ],
+  "categories": [
+   "Card Game",
+   "Dice",
+   "Medieval",
+   "Renaissance"
+  ],
+  "subdomains": [
+   "Family Games",
+   "Strategy Games"
+  ],
+  "interaction": 2,
+  "luck": 2
+ },
+ {
+  "bgg_id": 267735,
+  "game_id": "bgg-267735",
+  "nome": "Deckscape: Behind the Curtain",
+  "espansione": false,
+  "weight": 1.86,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "min_age": 12,
+  "lang_dep": 3,
+  "rank": 3511,
+  "bgg_avg": 6.83,
+  "mechanics": [
+   "Cooperative Game",
+   "Real-Time"
+  ],
+  "categories": [
+   "Card Game",
+   "Puzzle",
+   "Real-time"
+  ],
+  "subdomains": [
+   "Thematic Games"
+  ],
+  "interaction": 0,
+  "luck": 0
+ },
+ {
+  "bgg_id": 245045,
+  "game_id": "bgg-245045",
+  "nome": "Deckscape: Heist in Venice",
+  "espansione": false,
+  "weight": 1.62,
+  "best_players": [
+   6
+  ],
+  "rec_players": [
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "min_age": 12,
+  "lang_dep": 3,
+  "rank": 3061,
+  "bgg_avg": 6.64,
+  "mechanics": [
+   "Cooperative Game",
+   "Memory",
+   "Variable Player Powers"
+  ],
+  "categories": [
+   "Card Game",
+   "Puzzle",
+   "Real-time"
+  ],
+  "subdomains": [
+   "Thematic Games"
+  ],
+  "interaction": 0,
+  "luck": 0
+ },
+ {
+  "bgg_id": 230498,
+  "game_id": "bgg-230498",
+  "nome": "Deckscape: The Fate of London",
+  "espansione": false,
+  "weight": 1.97,
+  "best_players": [
+   2,
+   3
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "min_age": 12,
+  "lang_dep": 3,
+  "rank": 4723,
+  "bgg_avg": 6.14,
+  "mechanics": [
+   "Cooperative Game",
+   "Solo / Solitaire Game"
+  ],
+  "categories": [
+   "Card Game",
+   "Puzzle",
+   "Real-time"
+  ],
+  "subdomains": [
+   "Thematic Games"
+  ],
+  "interaction": 0,
+  "luck": 0
+ },
+ {
+  "bgg_id": 15512,
+  "game_id": "bgg-15512",
+  "nome": "Diamant",
+  "espansione": false,
+  "weight": 1.11,
+  "best_players": [
+   6,
+   7,
+   8
+  ],
+  "rec_players": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 906,
+  "bgg_avg": 6.85,
+  "mechanics": [
+   "Move Through Deck",
+   "Push Your Luck",
+   "Simultaneous Action Selection"
+  ],
+  "categories": [
+   "Bluffing",
+   "Card Game",
+   "Exploration"
+  ],
+  "subdomains": [
+   "Family Games",
+   "Party Games"
+  ],
+  "interaction": 1,
+  "luck": 2
+ },
+ {
+  "bgg_id": 283355,
+  "game_id": "bgg-283355",
+  "nome": "Dune",
+  "espansione": false,
+  "weight": 3.98,
+  "best_players": [
+   6
+  ],
+  "rec_players": [
+   5,
+   6
+  ],
+  "min_age": 14,
+  "lang_dep": 2,
+  "rank": 217,
+  "bgg_avg": 7.91,
+  "mechanics": [
+   "Alliances",
+   "Area Majority / Influence",
+   "Area Movement",
+   "Auction / Bidding",
+   "Bribery",
+   "Card Play Conflict Resolution",
+   "Force Commitment",
+   "Map Deformation",
+   "Negotiation",
+   "Predictive Bid",
+   "Roles with Asymmetric Information",
+   "Take That",
+   "Variable Player Powers"
+  ],
+  "categories": [
+   "Bluffing",
+   "Fighting",
+   "Negotiation",
+   "Novel-based",
+   "Political",
+   "Science Fiction",
+   "Wargame"
+  ],
+  "subdomains": [
+   "Strategy Games",
+   "Thematic Games"
+  ],
+  "interaction": 2,
+  "luck": 0
+ },
+ {
+  "bgg_id": 316554,
+  "game_id": "bgg-316554",
+  "nome": "Dune: Imperium",
+  "espansione": false,
+  "weight": 3.08,
+  "best_players": [
+   3,
+   4
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "min_age": 14,
+  "lang_dep": 2,
+  "rank": 6,
+  "bgg_avg": 8.41,
+  "mechanics": [
+   "Card Play Conflict Resolution",
+   "Deck, Bag, and Pool Building",
+   "Delayed Purchase",
+   "Force Commitment",
+   "Increase Value of Unchosen Resources",
+   "Multi-Use Cards",
+   "Open Drafting",
+   "Ownership",
+   "Race",
+   "Solo / Solitaire Game",
+   "Tags",
+   "Take That",
+   "Turn Order: Progressive",
+   "Variable Player Powers",
+   "Worker Placement"
+  ],
+  "categories": [
+   "Movies / TV / Radio theme",
+   "Novel-based",
+   "Political",
+   "Science Fiction"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 2,
+  "luck": 0
+ },
+ {
+  "bgg_id": 207338,
+  "game_id": "bgg-207338",
+  "nome": "Dungeon Rush",
+  "espansione": false,
+  "weight": 1.27,
+  "best_players": [
+   3,
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4,
+   5
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 7014,
+  "bgg_avg": 6.24,
+  "mechanics": [
+   "Melding and Splaying",
+   "Set Collection",
+   "Variable Player Powers"
+  ],
+  "categories": [
+   "Action / Dexterity",
+   "Card Game",
+   "Fantasy",
+   "Fighting",
+   "Humor",
+   "Real-time"
+  ],
+  "subdomains": [
+   "Party Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 11038,
+  "game_id": "bgg-11038",
+  "nome": "Fiasco",
+  "espansione": false,
+  "weight": 1.2,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   4
+  ],
+  "min_age": 12,
+  "lang_dep": 0,
+  "rank": 9726,
+  "bgg_avg": 6.9,
+  "mechanics": [
+   "Trick-taking"
+  ],
+  "categories": [
+   "Card Game",
+   "Renaissance"
+  ],
+  "subdomains": [],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 200954,
+  "game_id": "bgg-200954",
+  "nome": "Fields of Green",
+  "espansione": false,
+  "weight": 2.59,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 12,
+  "lang_dep": 2,
+  "rank": 1339,
+  "bgg_avg": 7.11,
+  "mechanics": [
+   "Closed Drafting",
+   "Simultaneous Action Selection",
+   "Tile Placement",
+   "Variable Phase Order"
+  ],
+  "categories": [
+   "Card Game",
+   "City Building",
+   "Farming"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 199478,
+  "game_id": "bgg-199478",
+  "nome": "Flamme Rouge",
+  "espansione": false,
+  "weight": 1.71,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 295,
+  "bgg_avg": 7.47,
+  "mechanics": [
+   "Catch the Leader",
+   "Hand Management",
+   "Modular Board",
+   "Programmed Movement",
+   "Race",
+   "Simulation",
+   "Simultaneous Action Selection",
+   "Track Movement"
+  ],
+  "categories": [
+   "Racing",
+   "Sports"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 197097,
+  "game_id": "bgg-197097",
+  "nome": "Four Against Darkness",
+  "espansione": false,
+  "weight": 2.1,
+  "best_players": [
+   1
+  ],
+  "rec_players": [
+   1,
+   2
+  ],
+  "min_age": null,
+  "lang_dep": 3,
+  "rank": 2338,
+  "bgg_avg": 7.53,
+  "mechanics": [
+   "Dice Rolling",
+   "Grid Movement",
+   "Paper-and-Pencil",
+   "Solo / Solitaire Game"
+  ],
+  "categories": [
+   "Adventure",
+   "Book",
+   "Exploration",
+   "Fantasy",
+   "Print & Play"
+  ],
+  "subdomains": [
+   "Thematic Games"
+  ],
+  "interaction": 1,
+  "luck": 2
+ },
+ {
+  "bgg_id": 173090,
+  "game_id": "bgg-173090",
+  "nome": "The Game",
+  "espansione": false,
+  "weight": 1.24,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 1354,
+  "bgg_avg": 6.71,
+  "mechanics": [
+   "Communication Limits",
+   "Cooperative Game",
+   "Hand Management",
+   "Solo / Solitaire Game"
+  ],
+  "categories": [
+   "Card Game",
+   "Number"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 0,
+  "luck": 0
+ },
+ {
+  "bgg_id": 209325,
+  "game_id": "bgg-209325",
+  "nome": "The Game: Extreme",
+  "espansione": false,
+  "weight": 1.34,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 2919,
+  "bgg_avg": 6.9,
+  "mechanics": [
+   "Cooperative Game",
+   "Hand Management"
+  ],
+  "categories": [
+   "Card Game",
+   "Number"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 0,
+  "luck": 0
+ },
+ {
+  "bgg_id": 93,
+  "game_id": "bgg-93",
+  "nome": "El Grande",
+  "espansione": false,
+  "weight": 2.93,
+  "best_players": [
+   5
+  ],
+  "rec_players": [
+   3,
+   4,
+   5
+  ],
+  "min_age": 12,
+  "lang_dep": 2,
+  "rank": 101,
+  "bgg_avg": 7.77,
+  "mechanics": [
+   "Action Drafting",
+   "Area Majority / Influence",
+   "Auction / Bidding",
+   "Hand Management",
+   "Open Drafting",
+   "Selection Order Bid",
+   "Simultaneous Action Selection",
+   "Take That",
+   "Turn Order: Auction"
+  ],
+  "categories": [
+   "Medieval"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 2,
+  "luck": 0
+ },
+ {
+  "bgg_id": 35677,
+  "game_id": "bgg-35677",
+  "nome": "Le Havre",
+  "espansione": false,
+  "weight": 3.71,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "min_age": 12,
+  "lang_dep": 2,
+  "rank": 84,
+  "bgg_avg": 7.83,
+  "mechanics": [
+   "Automatic Resource Growth",
+   "End Game Bonuses",
+   "Increase Value of Unchosen Resources",
+   "Loans",
+   "Ownership",
+   "Solo / Solitaire Game",
+   "Worker Placement"
+  ],
+  "categories": [
+   "City Building",
+   "Economic",
+   "Industry / Manufacturing",
+   "Nautical"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 65996,
+  "game_id": "bgg-65996",
+  "nome": "Le Havre: Le Grand Hameau",
+  "espansione": true,
+  "weight": 3.43,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "min_age": 12,
+  "lang_dep": 2,
+  "rank": null,
+  "bgg_avg": 7.81,
+  "mechanics": [
+   "Worker Placement"
+  ],
+  "categories": [
+   "Expansion for Base-game",
+   "Economic",
+   "Industry / Manufacturing"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 2655,
+  "game_id": "bgg-2655",
+  "nome": "Hive",
+  "espansione": false,
+  "weight": 2.31,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   2
+  ],
+  "min_age": 9,
+  "lang_dep": 0,
+  "rank": 338,
+  "bgg_avg": 7.31,
+  "mechanics": [
+   "Enclosure",
+   "Grid Movement",
+   "Hexagon Grid",
+   "Pattern Movement",
+   "Pieces as Map",
+   "Three Dimensional Movement",
+   "Tile Placement"
+  ],
+  "categories": [
+   "Abstract Strategy",
+   "Animals"
+  ],
+  "subdomains": [
+   "Abstract Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 207336,
+  "game_id": "bgg-207336",
+  "nome": "Honshū",
+  "espansione": false,
+  "weight": 1.92,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4,
+   5
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 1499,
+  "bgg_avg": 6.88,
+  "mechanics": [
+   "Auction / Bidding",
+   "Closed Drafting",
+   "End Game Bonuses",
+   "Hand Management",
+   "Layering",
+   "Melding and Splaying",
+   "Pattern Building",
+   "Selection Order Bid",
+   "Trick-taking",
+   "Variable Set-up"
+  ],
+  "categories": [
+   "Card Game",
+   "City Building",
+   "Territory Building"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 191894,
+  "game_id": "bgg-191894",
+  "nome": "Imagine",
+  "espansione": false,
+  "weight": 1.06,
+  "best_players": [
+   4,
+   5,
+   6
+  ],
+  "rec_players": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "min_age": 12,
+  "lang_dep": 2,
+  "rank": 1815,
+  "bgg_avg": 6.81,
+  "mechanics": [
+   "Acting",
+   "Team-Based Game"
+  ],
+  "categories": [
+   "Deduction",
+   "Party Game"
+  ],
+  "subdomains": [
+   "Party Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 265,
+  "game_id": "bgg-265",
+  "nome": "Intrigue",
+  "espansione": false,
+  "weight": 1.92,
+  "best_players": [
+   5
+  ],
+  "rec_players": [
+   4,
+   5
+  ],
+  "min_age": 14,
+  "lang_dep": 0,
+  "rank": 3347,
+  "bgg_avg": 6.39,
+  "mechanics": [
+   "Area Majority / Influence",
+   "Auction / Bidding",
+   "Bribery",
+   "Hand Management",
+   "Negotiation"
+  ],
+  "categories": [
+   "Negotiation",
+   "Renaissance"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 2,
+  "luck": 0
+ },
+ {
+  "bgg_id": 28023,
+  "game_id": "bgg-28023",
+  "nome": "Jamaica",
+  "espansione": false,
+  "weight": 1.66,
+  "best_players": [
+   5,
+   6
+  ],
+  "rec_players": [
+   3,
+   4,
+   5,
+   6
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 656,
+  "bgg_avg": 7.06,
+  "mechanics": [
+   "Dice Rolling",
+   "Hand Management",
+   "Hidden Victory Points",
+   "Race",
+   "Roll / Spin and Move",
+   "Simultaneous Action Selection",
+   "Take That",
+   "Track Movement",
+   "Turn Order: Progressive",
+   "Victory Points as a Resource"
+  ],
+  "categories": [
+   "Nautical",
+   "Pirates"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 2,
+  "luck": 2
+ },
+ {
+  "bgg_id": 254640,
+  "game_id": "bgg-254640",
+  "nome": "Just One",
+  "espansione": false,
+  "weight": 1.03,
+  "best_players": [
+   6,
+   7
+  ],
+  "rec_players": [
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "min_age": 8,
+  "lang_dep": 4,
+  "rank": 160,
+  "bgg_avg": 7.59,
+  "mechanics": [
+   "Communication Limits",
+   "Cooperative Game",
+   "Deduction",
+   "Paper-and-Pencil",
+   "Score-and-Reset Game"
+  ],
+  "categories": [
+   "Deduction",
+   "Party Game",
+   "Word Game"
+  ],
+  "subdomains": [
+   "Party Games"
+  ],
+  "interaction": 0,
+  "luck": 0
+ },
+ {
+  "bgg_id": 122515,
+  "game_id": "bgg-122515",
+  "nome": "Keyflower",
+  "espansione": false,
+  "weight": 3.33,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "min_age": 12,
+  "lang_dep": 0,
+  "rank": 138,
+  "bgg_avg": 7.71,
+  "mechanics": [
+   "Auction / Bidding",
+   "Auction: Fixed Placement",
+   "Auction: Multiple Lot",
+   "Constrained Bidding",
+   "End Game Bonuses",
+   "Modular Board",
+   "Network and Route Building",
+   "Ownership",
+   "Pick-up and Deliver",
+   "Selection Order Bid",
+   "Set Collection",
+   "Tile Placement",
+   "Turn Order: Auction",
+   "Variable Set-up",
+   "Worker Placement",
+   "Worker Placement, Different Worker Types"
+  ],
+  "categories": [
+   "City Building",
+   "Economic",
+   "Renaissance",
+   "Territory Building",
+   "Transportation"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 257501,
+  "game_id": "bgg-257501",
+  "nome": "KeyForge: Call of the Archons",
+  "espansione": false,
+  "weight": 2.49,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   2
+  ],
+  "min_age": 14,
+  "lang_dep": 3,
+  "rank": 890,
+  "bgg_avg": 7.06,
+  "mechanics": [
+   "Hand Management",
+   "Take That"
+  ],
+  "categories": [
+   "Card Game",
+   "Collectible Components",
+   "Fantasy",
+   "Fighting"
+  ],
+  "subdomains": [
+   "Customizable Games"
+  ],
+  "interaction": 2,
+  "luck": 0
+ },
+ {
+  "bgg_id": 204583,
+  "game_id": "bgg-204583",
+  "nome": "Kingdomino",
+  "espansione": false,
+  "weight": 1.24,
+  "best_players": [
+   2,
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 335,
+  "bgg_avg": 7.29,
+  "mechanics": [
+   "Enclosure",
+   "Matching",
+   "Open Drafting",
+   "Tile Placement",
+   "Turn Order: Claim Action"
+  ],
+  "categories": [
+   "Abstract Strategy",
+   "Medieval",
+   "Puzzle",
+   "Territory Building"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 199969,
+  "game_id": "bgg-199969",
+  "nome": "Matrimonio Reale",
+  "espansione": false,
+  "weight": null,
+  "best_players": [],
+  "rec_players": [],
+  "min_age": 8,
+  "lang_dep": null,
+  "rank": null,
+  "bgg_avg": 5.22,
+  "mechanics": [
+   "Acting",
+   "Area Movement",
+   "Open Drafting",
+   "Player Elimination"
+  ],
+  "categories": [
+   "Fantasy",
+   "Humor",
+   "Party Game"
+  ],
+  "subdomains": [],
+  "interaction": 2,
+  "luck": 0
+ },
+ {
+  "bgg_id": 118,
+  "game_id": "bgg-118",
+  "nome": "Modern Art",
+  "espansione": false,
+  "weight": 2.27,
+  "best_players": [
+   4,
+   5
+  ],
+  "rec_players": [
+   3,
+   4,
+   5
+  ],
+  "min_age": 10,
+  "lang_dep": 0,
+  "rank": 224,
+  "bgg_avg": 7.53,
+  "mechanics": [
+   "Auction / Bidding",
+   "Auction: English",
+   "Auction: Once Around",
+   "Auction: Sealed Bid",
+   "Auction: Turn Order Until Pass",
+   "Commodity Speculation",
+   "Hand Management",
+   "Victory Points as a Resource"
+  ],
+  "categories": [
+   "Card Game",
+   "Economic"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 41186,
+  "game_id": "bgg-41186",
+  "nome": "Monopoly City",
+  "espansione": false,
+  "weight": 2.08,
+  "best_players": [
+   3,
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "min_age": 8,
+  "lang_dep": 1,
+  "rank": 29361,
+  "bgg_avg": 5.57,
+  "mechanics": [
+   "Auction / Bidding",
+   "Dice Rolling",
+   "Roll / Spin and Move",
+   "Set Collection",
+   "Trading"
+  ],
+  "categories": [
+   "City Building",
+   "Economic",
+   "Electronic",
+   "Negotiation"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 2,
+  "luck": 2
+ },
+ {
+  "bgg_id": 25071,
+  "game_id": "bgg-25071",
+  "nome": "Munchkin Cthulhu",
+  "espansione": false,
+  "weight": 1.72,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   3,
+   4,
+   5,
+   6
+  ],
+  "min_age": 10,
+  "lang_dep": 3,
+  "rank": 4102,
+  "bgg_avg": 6.2,
+  "mechanics": [
+   "Dice Rolling",
+   "Trading",
+   "Variable Player Powers"
+  ],
+  "categories": [
+   "Card Game",
+   "Fighting",
+   "Horror",
+   "Humor"
+  ],
+  "subdomains": [
+   "Thematic Games"
+  ],
+  "interaction": 1,
+  "luck": 2
+ },
+ {
+  "bgg_id": 194607,
+  "game_id": "bgg-194607",
+  "nome": "Mystic Vale",
+  "espansione": false,
+  "weight": 2.26,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 14,
+  "lang_dep": 2,
+  "rank": 604,
+  "bgg_avg": 7.23,
+  "mechanics": [
+   "Deck, Bag, and Pool Building",
+   "End Game Bonuses",
+   "Hand Management",
+   "Layering",
+   "Open Drafting",
+   "Push Your Luck",
+   "Tags"
+  ],
+  "categories": [
+   "Card Game",
+   "Fantasy"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 2
+ },
+ {
+  "bgg_id": 1301,
+  "game_id": "bgg-1301",
+  "nome": "Netrunner",
+  "espansione": false,
+  "weight": 2.93,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   2
+  ],
+  "min_age": 10,
+  "lang_dep": 3,
+  "rank": 1447,
+  "bgg_avg": 7.45,
+  "mechanics": [
+   "Action Points"
+  ],
+  "categories": [
+   "Card Game",
+   "Collectible Components",
+   "Science Fiction"
+  ],
+  "subdomains": [
+   "Customizable Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 379982,
+  "game_id": "bgg-379982",
+  "nome": "Nobi Nobi Magic",
+  "espansione": false,
+  "weight": null,
+  "best_players": [],
+  "rec_players": [],
+  "min_age": 10,
+  "lang_dep": null,
+  "rank": 19505,
+  "bgg_avg": 7.53,
+  "mechanics": [
+   "Role Playing"
+  ],
+  "categories": [
+   "Fantasy"
+  ],
+  "subdomains": [],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 183840,
+  "game_id": "bgg-183840",
+  "nome": "Oh My Goods!",
+  "espansione": false,
+  "weight": 2.3,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 10,
+  "lang_dep": 0,
+  "rank": 864,
+  "bgg_avg": 6.99,
+  "mechanics": [
+   "Action Queue",
+   "Contracts",
+   "End Game Bonuses",
+   "Hand Management",
+   "Income",
+   "Multi-Use Cards",
+   "Open Drafting",
+   "Push Your Luck",
+   "Set Collection",
+   "Turn Order: Progressive",
+   "Variable Set-up"
+  ],
+  "categories": [
+   "Card Game",
+   "Economic",
+   "Medieval"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 2
+ },
+ {
+  "bgg_id": 218603,
+  "game_id": "bgg-218603",
+  "nome": "Photosynthesis",
+  "espansione": false,
+  "weight": 2.27,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 10,
+  "lang_dep": 0,
+  "rank": 834,
+  "bgg_avg": 6.92,
+  "mechanics": [
+   "Action Points",
+   "Area Majority / Influence",
+   "Bias",
+   "End Game Bonuses",
+   "Hexagon Grid",
+   "Income",
+   "Turn Order: Progressive"
+  ],
+  "categories": [
+   "Abstract Strategy",
+   "Economic"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 28143,
+  "game_id": "bgg-28143",
+  "nome": "Race for the Galaxy",
+  "espansione": false,
+  "weight": 2.99,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 12,
+  "lang_dep": 1,
+  "rank": 95,
+  "bgg_avg": 7.74,
+  "mechanics": [
+   "End Game Bonuses",
+   "Follow",
+   "Hand Management",
+   "Income",
+   "Market",
+   "Multi-Use Cards",
+   "Simultaneous Action Selection",
+   "Tags",
+   "Variable Phase Order"
+  ],
+  "categories": [
+   "Card Game",
+   "Civilization",
+   "Economic",
+   "Science Fiction",
+   "Space Exploration"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 92932,
+  "game_id": "bgg-92932",
+  "nome": "Race for the Galaxy: Alien Artifacts",
+  "espansione": true,
+  "weight": 2.94,
+  "best_players": [
+   2,
+   3
+  ],
+  "rec_players": [
+   2,
+   3,
+   4,
+   5
+  ],
+  "min_age": 13,
+  "lang_dep": 1,
+  "rank": null,
+  "bgg_avg": 7.55,
+  "mechanics": [
+   "Grid Movement",
+   "Hand Management",
+   "Simultaneous Action Selection",
+   "Tile Placement",
+   "Variable Player Powers"
+  ],
+  "categories": [
+   "Expansion for Base-game",
+   "Card Game",
+   "Civilization",
+   "Economic",
+   "Science Fiction",
+   "Space Exploration"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 270439,
+  "game_id": "bgg-270439",
+  "nome": "Race for the Galaxy: Expansion and Brinkmanship",
+  "espansione": true,
+  "weight": 3.21,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "min_age": 12,
+  "lang_dep": 2,
+  "rank": null,
+  "bgg_avg": 8.41,
+  "mechanics": [
+   "Hand Management",
+   "Simultaneous Action Selection",
+   "Variable Phase Order",
+   "Variable Player Powers"
+  ],
+  "categories": [
+   "Expansion for Base-game",
+   "Card Game",
+   "Civilization",
+   "Economic",
+   "Science Fiction",
+   "Space Exploration"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 245654,
+  "game_id": "bgg-245654",
+  "nome": "Railroad Ink: Deep Blue Edition",
+  "espansione": false,
+  "weight": 1.47,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 644,
+  "bgg_avg": 7.14,
+  "mechanics": [
+   "Bingo",
+   "Connections",
+   "Dice Rolling",
+   "Line Drawing",
+   "Network and Route Building",
+   "Paper-and-Pencil",
+   "Simultaneous Action Selection",
+   "Solo / Solitaire Game"
+  ],
+  "categories": [
+   "Dice",
+   "Trains"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 1,
+  "luck": 2
+ },
+ {
+  "bgg_id": 128882,
+  "game_id": "bgg-128882",
+  "nome": "The Resistance: Avalon",
+  "espansione": false,
+  "weight": 1.74,
+  "best_players": [
+   7,
+   8
+  ],
+  "rec_players": [
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ],
+  "min_age": 13,
+  "lang_dep": 1,
+  "rank": 240,
+  "bgg_avg": 7.49,
+  "mechanics": [
+   "Finale Ending",
+   "Hidden Roles",
+   "Roles with Asymmetric Information",
+   "Simultaneous Action Selection",
+   "Team-Based Game",
+   "Traitor Game",
+   "Variable Player Powers",
+   "Voting"
+  ],
+  "categories": [
+   "Bluffing",
+   "Card Game",
+   "Deduction",
+   "Fantasy",
+   "Medieval",
+   "Negotiation",
+   "Party Game",
+   "Spies / Secret Agents"
+  ],
+  "subdomains": [
+   "Party Games"
+  ],
+  "interaction": 2,
+  "luck": 0
+ },
+ {
+  "bgg_id": 241831,
+  "game_id": "bgg-241831",
+  "nome": "Reykholt",
+  "espansione": false,
+  "weight": 2.17,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "min_age": 12,
+  "lang_dep": 2,
+  "rank": 2223,
+  "bgg_avg": 6.68,
+  "mechanics": [
+   "Scenario / Mission / Campaign Game",
+   "Solo / Solitaire Game",
+   "Worker Placement"
+  ],
+  "categories": [
+   "Farming"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 51,
+  "game_id": "bgg-51",
+  "nome": "Ricochet Robots",
+  "espansione": false,
+  "weight": 2.37,
+  "best_players": [
+   3,
+   4,
+   5,
+   6
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "min_age": 10,
+  "lang_dep": 0,
+  "rank": 929,
+  "bgg_avg": 7.04,
+  "mechanics": [
+   "Grid Movement",
+   "Modular Board",
+   "Real-Time",
+   "Square Grid",
+   "Turn Order: Stat-Based",
+   "Variable Set-up"
+  ],
+  "categories": [
+   "Abstract Strategy",
+   "Maze",
+   "Puzzle",
+   "Real-time"
+  ],
+  "subdomains": [
+   "Abstract Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 229220,
+  "game_id": "bgg-229220",
+  "nome": "Santa Maria",
+  "espansione": false,
+  "weight": 3.03,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "min_age": 12,
+  "lang_dep": 0,
+  "rank": 550,
+  "bgg_avg": 7.45,
+  "mechanics": [
+   "Dice Rolling",
+   "Network and Route Building",
+   "Open Drafting",
+   "Set Collection",
+   "Tile Placement",
+   "Variable Player Powers"
+  ],
+  "categories": [
+   "Civilization",
+   "Farming"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 2
+ },
+ {
+  "bgg_id": 108745,
+  "game_id": "bgg-108745",
+  "nome": "Seasons",
+  "espansione": false,
+  "weight": 2.78,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   2,
+   3
+  ],
+  "min_age": 14,
+  "lang_dep": 3,
+  "rank": 365,
+  "bgg_avg": 7.33,
+  "mechanics": [
+   "Closed Drafting",
+   "Dice Rolling",
+   "Die Icon Resolution",
+   "Hand Management",
+   "Open Drafting",
+   "Tags",
+   "Take That",
+   "Turn Order: Progressive",
+   "Victory Points as a Resource"
+  ],
+  "categories": [
+   "Card Game",
+   "Fantasy"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 2,
+  "luck": 2
+ },
+ {
+  "bgg_id": 24068,
+  "game_id": "bgg-24068",
+  "nome": "Shadow Hunters",
+  "espansione": false,
+  "weight": 1.82,
+  "best_players": [
+   7,
+   8
+  ],
+  "rec_players": [
+   5,
+   6,
+   7,
+   8
+  ],
+  "min_age": 13,
+  "lang_dep": 2,
+  "rank": 1381,
+  "bgg_avg": 6.82,
+  "mechanics": [
+   "Dice Rolling",
+   "Hidden Roles",
+   "Player Elimination",
+   "Team-Based Game",
+   "Variable Player Powers"
+  ],
+  "categories": [
+   "Adventure",
+   "Bluffing",
+   "Card Game",
+   "Deduction",
+   "Horror",
+   "Party Game"
+  ],
+  "subdomains": [
+   "Party Games"
+  ],
+  "interaction": 2,
+  "luck": 2
+ },
+ {
+  "bgg_id": 122522,
+  "game_id": "bgg-122522",
+  "nome": "Smash Up",
+  "espansione": false,
+  "weight": 2.06,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 12,
+  "lang_dep": 3,
+  "rank": 1345,
+  "bgg_avg": 6.69,
+  "mechanics": [
+   "Area Majority / Influence",
+   "Card Play Conflict Resolution",
+   "Deck Construction",
+   "Hand Management",
+   "Kill Steal",
+   "Open Drafting",
+   "Take That",
+   "Variable Player Powers",
+   "Variable Set-up"
+  ],
+  "categories": [
+   "Card Game",
+   "Fantasy",
+   "Humor",
+   "Pirates",
+   "Science Fiction",
+   "Zombies"
+  ],
+  "subdomains": [
+   "Family Games",
+   "Strategy Games"
+  ],
+  "interaction": 2,
+  "luck": 0
+ },
+ {
+  "bgg_id": 160018,
+  "game_id": "bgg-160018",
+  "nome": "Smash Up: Monster Smash",
+  "espansione": false,
+  "weight": 2.19,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   2,
+   3
+  ],
+  "min_age": 12,
+  "lang_dep": 3,
+  "rank": 1420,
+  "bgg_avg": 7.25,
+  "mechanics": [
+   "Area Majority / Influence",
+   "Hand Management",
+   "Take That",
+   "Variable Player Powers"
+  ],
+  "categories": [
+   "Card Game",
+   "Fantasy",
+   "Humor",
+   "Mythology",
+   "Science Fiction",
+   "Zombies"
+  ],
+  "subdomains": [
+   "Family Games",
+   "Strategy Games"
+  ],
+  "interaction": 2,
+  "luck": 0
+ },
+ {
+  "bgg_id": 103885,
+  "game_id": "bgg-103885",
+  "nome": "Star Wars: X-Wing Miniatures Game",
+  "espansione": false,
+  "weight": 2.49,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   2,
+   3
+  ],
+  "min_age": 14,
+  "lang_dep": 2,
+  "rank": 206,
+  "bgg_avg": 7.62,
+  "mechanics": [
+   "Action Queue",
+   "Critical Hits and Failures",
+   "Dice Rolling",
+   "Line of Sight",
+   "Movement Template",
+   "Player Elimination",
+   "Simulation",
+   "Simultaneous Action Selection",
+   "Variable Player Powers"
+  ],
+  "categories": [
+   "Aviation / Flight",
+   "Bluffing",
+   "Collectible Components",
+   "Miniatures",
+   "Movies / TV / Radio theme",
+   "Science Fiction",
+   "Wargame"
+  ],
+  "subdomains": [
+   "Customizable Games",
+   "Wargames"
+  ],
+  "interaction": 2,
+  "luck": 2
+ },
+ {
+  "bgg_id": 117,
+  "game_id": "bgg-117",
+  "nome": "Ta Yü",
+  "espansione": false,
+  "weight": 2.07,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   2,
+   4
+  ],
+  "min_age": 10,
+  "lang_dep": 0,
+  "rank": 2877,
+  "bgg_avg": 6.95,
+  "mechanics": [
+   "Connections",
+   "Team-Based Game",
+   "Tile Placement"
+  ],
+  "categories": [
+   "Abstract Strategy"
+  ],
+  "subdomains": [
+   "Abstract Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 167791,
+  "game_id": "bgg-167791",
+  "nome": "Terraforming Mars",
+  "espansione": false,
+  "weight": 3.27,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "min_age": 12,
+  "lang_dep": 3,
+  "rank": 9,
+  "bgg_avg": 8.33,
+  "mechanics": [
+   "Closed Drafting",
+   "Contracts",
+   "End Game Bonuses",
+   "Hand Management",
+   "Hexagon Grid",
+   "Income",
+   "Solo / Solitaire Game",
+   "Tags",
+   "Take That",
+   "Tile Placement",
+   "Turn Order: Progressive",
+   "Variable Player Powers",
+   "Variable Set-up"
+  ],
+  "categories": [
+   "Civilization",
+   "Economic",
+   "Environmental",
+   "Industry / Manufacturing",
+   "Science Fiction",
+   "Space Exploration",
+   "Territory Building"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 2,
+  "luck": 0
+ },
+ {
+  "bgg_id": 247030,
+  "game_id": "bgg-247030",
+  "nome": "Terraforming Mars: Prelude",
+  "espansione": true,
+  "weight": 2.56,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "min_age": 12,
+  "lang_dep": 2,
+  "rank": null,
+  "bgg_avg": 8.85,
+  "mechanics": [
+   "Hand Management",
+   "Open Drafting",
+   "Solo / Solitaire Game",
+   "Tile Placement"
+  ],
+  "categories": [
+   "Expansion for Base-game",
+   "Economic",
+   "Environmental",
+   "Industry / Manufacturing",
+   "Science Fiction"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 42,
+  "game_id": "bgg-42",
+  "nome": "Tigris & Euphrates",
+  "espansione": false,
+  "weight": 3.47,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 14,
+  "lang_dep": 0,
+  "rank": 135,
+  "bgg_avg": 7.71,
+  "mechanics": [
+   "Area Majority / Influence",
+   "Chaining",
+   "Connections",
+   "Force Commitment",
+   "Hand Management",
+   "Hidden Victory Points",
+   "Highest-Lowest Scoring",
+   "Income",
+   "Set Collection",
+   "Square Grid",
+   "Take That",
+   "Tile Placement"
+  ],
+  "categories": [
+   "Abstract Strategy",
+   "Ancient",
+   "Civilization",
+   "Territory Building"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 2,
+  "luck": 0
+ },
+ {
+  "bgg_id": 126163,
+  "game_id": "bgg-126163",
+  "nome": "Tzolk'in: The Mayan Calendar",
+  "espansione": false,
+  "weight": 3.66,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 13,
+  "lang_dep": 0,
+  "rank": 77,
+  "bgg_avg": 7.84,
+  "mechanics": [
+   "Bias",
+   "End Game Bonuses",
+   "Once-Per-Game Abilities",
+   "Track Movement",
+   "Turn Order: Claim Action",
+   "Worker Placement"
+  ],
+  "categories": [
+   "Ancient",
+   "Civilization",
+   "Economic",
+   "Farming",
+   "Mythology"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 16986,
+  "game_id": "bgg-16986",
+  "nome": "Ubongo",
+  "espansione": false,
+  "weight": 1.5,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 8,
+  "lang_dep": 0,
+  "rank": 1594,
+  "bgg_avg": 6.66,
+  "mechanics": [
+   "Grid Coverage",
+   "Pattern Building",
+   "Real-Time",
+   "Set Collection"
+  ],
+  "categories": [
+   "Puzzle",
+   "Real-time"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 256839,
+  "game_id": "bgg-256839",
+  "nome": "VektoRace",
+  "espansione": false,
+  "weight": 2.11,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4,
+   5
+  ],
+  "min_age": 12,
+  "lang_dep": 0,
+  "rank": 4416,
+  "bgg_avg": 7.28,
+  "mechanics": [
+   "Action Queue",
+   "Measurement Movement",
+   "Movement Template",
+   "Race",
+   "Simulation"
+  ],
+  "categories": [
+   "Racing",
+   "Sports"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 104006,
+  "game_id": "bgg-104006",
+  "nome": "Village",
+  "espansione": false,
+  "weight": 3.06,
+  "best_players": [
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 12,
+  "lang_dep": 0,
+  "rank": 250,
+  "bgg_avg": 7.48,
+  "mechanics": [
+   "Area Majority / Influence",
+   "Contracts",
+   "Set Collection",
+   "Turn Order: Claim Action",
+   "Worker Placement",
+   "Worker Placement, Different Worker Types"
+  ],
+  "categories": [
+   "Economic",
+   "Farming",
+   "Medieval"
+  ],
+  "subdomains": [
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ },
+ {
+  "bgg_id": 195043,
+  "game_id": "bgg-195043",
+  "nome": "Welcome Back to the Dungeon",
+  "espansione": false,
+  "weight": 1.3,
+  "best_players": [
+   3,
+   4
+  ],
+  "rec_players": [
+   2,
+   3,
+   4
+  ],
+  "min_age": 10,
+  "lang_dep": 1,
+  "rank": 2020,
+  "bgg_avg": 6.69,
+  "mechanics": [
+   "Bids As Wagers",
+   "Memory",
+   "Player Elimination",
+   "Push Your Luck"
+  ],
+  "categories": [
+   "Bluffing",
+   "Card Game",
+   "Fantasy",
+   "Fighting"
+  ],
+  "subdomains": [
+   "Family Games"
+  ],
+  "interaction": 2,
+  "luck": 2
+ },
+ {
+  "bgg_id": 266192,
+  "game_id": "bgg-266192",
+  "nome": "Wingspan",
+  "espansione": false,
+  "weight": 2.48,
+  "best_players": [
+   3
+  ],
+  "rec_players": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "min_age": 10,
+  "lang_dep": 3,
+  "rank": 38,
+  "bgg_avg": 7.99,
+  "mechanics": [
+   "Action Queue",
+   "Dice Rolling",
+   "End Game Bonuses",
+   "Hand Management",
+   "Open Drafting",
+   "Set Collection",
+   "Solo / Solitaire Game",
+   "Turn Order: Progressive"
+  ],
+  "categories": [
+   "Animals",
+   "Card Game",
+   "Educational",
+   "Environmental"
+  ],
+  "subdomains": [
+   "Family Games",
+   "Strategy Games"
+  ],
+  "interaction": 1,
+  "luck": 2
+ },
+ {
+  "bgg_id": 7854,
+  "game_id": "bgg-7854",
+  "nome": "YINSH",
+  "espansione": false,
+  "weight": 2.62,
+  "best_players": [
+   2
+  ],
+  "rec_players": [
+   2
+  ],
+  "min_age": 9,
+  "lang_dep": 0,
+  "rank": 263,
+  "bgg_avg": 7.7,
+  "mechanics": [
+   "Catch the Leader",
+   "Grid Movement",
+   "Pattern Building"
+  ],
+  "categories": [
+   "Abstract Strategy"
+  ],
+  "subdomains": [
+   "Abstract Games"
+  ],
+  "interaction": 1,
+  "luck": 0
+ }
+]
