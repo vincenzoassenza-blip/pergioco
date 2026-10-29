@@ -18,6 +18,7 @@ function modal(msg,{input=false,def='',cancel=true}={}){return new Promise(res=>
 // tasto Indietro di Android/browser: chiude la finestra aperta sopra la pagina
 const _bk=[];let _bkSkip=0,_bkPend=0;const _bkPush=()=>history.pushState({ov:1},'');function backClose(fn){if(_bkSkip)_bkPend++;else _bkPush();_bk.push(fn);return()=>{const i=_bk.indexOf(fn);if(i<0)return;_bk.splice(i,1);_bkSkip++;history.back()}}
 addEventListener('popstate',()=>{if(_bkSkip){_bkSkip--;if(!_bkSkip)for(;_bkPend;_bkPend--)_bkPush();return}const f=_bk.pop();if(f)f()});
+async function confirmLogout(){if(await modal('Vuoi uscire dal tuo account? Dovrai inserire di nuovo email e password.'))DB.logout()}
 const ask=m=>modal(m),askText=(m,d='')=>modal(m,{input:true,def:d});
 function isMod(){return !!(admin&&DB.remote&&DB.remote.modCached)}
 function drawModeBtn(){const b=document.getElementById('modebtn');if(!b)return;b.hidden=!admin;b.textContent=uiMode()==='user'?'👤 Modalità utente':isMod()?'🛡 Modalità moderatore':'🔧 Modalità admin';document.body.classList.toggle('adm',adminMode())}
@@ -124,7 +125,8 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<div id="bkp" hidden><h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati sul server dell'associazione. Qui puoi scaricarne una copia manuale in JSON (non include i Libri sociali).</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div></div>
- <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2><button class="danger" id="out" hidden>⎋ Esci</button></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v12 · Associazione PerGioco, Ragusa</div>`;
+ <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2><button class="danger" id="out" hidden>⎋ Esci</button></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v12.1 · Associazione PerGioco, Ragusa</div><button class="danger" id="out2" hidden style="width:100%">⎋ Esci / Logout</button>`;
+ if(DB.remote)DB.remote.user().then(u=>{const b=$('#out2');if(u&&b){b.hidden=false;b.onclick=confirmLogout}}).catch(()=>{});
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(!f||!await ask('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
  const A=$('#adm');const R=!!DB.remote&&DB.status==='online';
@@ -140,8 +142,8 @@ async altro(){const hp=await DB.hasPin();
   $('#ps').onclick=async()=>{const a=$('#p1').value;if(!/^\d{4,}$/.test(a))return toast('Il PIN deve avere almeno 4 cifre');if(a!==$('#p2').value)return toast('I PIN non coincidono');await DB.setPin(a);admin=true;toast('PIN impostato');go('altro')};return}
  if(!admin){A.innerHTML=`<label>PIN admin</label><input id="pi" type="password" inputmode="numeric"><button class="p" id="pe">Entra</button>`;
   $('#pe').onclick=async()=>{if(await DB.checkPin($('#pi').value)){admin=true;drawModeBtn();go('altro')}else toast('PIN errato')};return}
- $('#out').hidden=false;$('#out').onclick=()=>DB.logout();const ms=await DB.members(),leg=await DB.legacyNames(),gs=await DB.games(),ps=await DB.plays();let edit=null,gf='';
- const TB=()=>`<button class="s" id="ast" style="width:100%;margin-bottom:8px">📊 Statistiche associazione</button>${isMod()||!R?'':'<button class="s" id="alib" style="width:100%;margin-bottom:8px">📚 Libri sociali (soci e volontari)</button>'}<div><div class="seg" id="atab"><button data-a="soci" class="${adminTab==='soci'?'on':''}">Soci</button>${isMod()?'':`<button data-a="partite" class="${adminTab==='partite'?'on':''}">Partite</button>`}${R?`<button data-a="account" class="${adminTab==='account'?'on':''}">Codici</button>`:''}${R&&!isMod()?`<button data-a="mods" class="${adminTab==='mods'?'on':''}">Moderatori</button>`:''}</div></div>`;
+ $('#out').hidden=false;$('#out').onclick=confirmLogout;const ms=await DB.members(),leg=await DB.legacyNames(),gs=await DB.games(),ps=await DB.plays();let edit=null,gf='';
+ const TB=()=>`<button class="s" id="ast" style="width:100%;margin-bottom:8px">📊 Statistiche associazione</button>${!R?'':'<button class="s" id="alib" style="width:100%;margin-bottom:8px">📚 Libri sociali (soci e volontari)'+(isMod()?' · sola lettura':'')+'</button>'}<div><div class="seg" id="atab"><button data-a="soci" class="${adminTab==='soci'?'on':''}">Soci</button>${isMod()?'':`<button data-a="partite" class="${adminTab==='partite'?'on':''}">Partite</button>`}${R?`<button data-a="account" class="${adminTab==='account'?'on':''}">Codici</button>`:''}${R&&!isMod()?`<button data-a="mods" class="${adminTab==='mods'?'on':''}">Moderatori</button>`:''}</div></div>`;
  const bind=()=>{$('#ast').onclick=()=>go('stats');if($('#alib'))$('#alib').onclick=()=>go('libri');$('#atab').onclick=e=>{if(e.target.dataset.a){adminTab=e.target.dataset.a;draw()}}};
  const drawPlays=()=>{const l=ps.filter(p=>!gf||p.gameId===gf);A.innerHTML=TB()+`<label>Filtra per gioco</label><select id="gf"><option value="">Tutti i giochi (${ps.length})</option>${gs.map(g=>`<option value="${g.id}"${g.id===gf?' selected':''}>${esc(g.name)}</option>`)}</select>
  <div style="margin-top:8px">${l.map(p=>`<div class="rec"><span>${esc(gname(gs,p.gameId))}<br><span class="muted">${fmt(p.date)} · ${p.evening} · ${p.players.map(x=>esc(Stats.label(x,ms))+(x.score!=null&&x.score!==''?' '+x.score:'')).join(', ')}</span></span><span style="flex:0 0 auto"><button class="s" data-pe="${p.id}">✏️</button> <button class="s" data-pd="${p.id}">🗑</button></span></div>`).join('')||'<p class="muted">Nessuna partita.</p>'}</div>`;bind();
@@ -215,9 +217,9 @@ async profilo(){const id=window._pv;const gs=await DB.games(),ms=await DB.member
  const u=await DB.remote.user();
  if(!u)return authForm();
  const me=ms.find(m=>m.userId===u.id);
- const out=`<button class="s" id="lo" style="width:100%;margin-top:6px">Esci (${esc(u.email)})</button>`;
+ const out=`<button class="danger" id="lo" style="width:100%;margin-top:10px">⎋ Esci / Logout (${esc(u.email)})</button>`;
  if(u&&!admin&&DB.remote){admin=await DB.remote.isAdmin();drawModeBtn()}
- const bindOut=()=>$('#lo').onclick=()=>DB.logout();
+ const bindOut=()=>$('#lo').onclick=confirmLogout;
  if(DB.v6Missing){V.innerHTML=`<h2>Profilo</h2><p class="warn">Il database non è ancora aggiornato: un admin deve eseguire supabase/migrate-v6.sql su Supabase.</p>${out}`;return bindOut()}
  if(!me){if(admin){const free=ms.filter(m=>!m.userId);V.innerHTML=`<h2>Profilo</h2><div class="card"><p class="muted">Il tuo account admin non è ancora collegato a una scheda socio.</p><label>Collega il mio account a questo socio</label><select id="sm"><option value="">Scegli…</option>${free.map(m=>`<option value="${m.id}">${esc(memberName(m))}</option>`).join('')}</select><button class="p" id="smg">Collega</button></div>${out}`;bindOut();
    $('#smg').onclick=async()=>{const id=$('#sm').value;if(!id)return toast('Scegli la tua scheda');try{await DB.remote.setLink(id,u.id);toast('Account collegato 🎉');go('profilo')}catch(e){toast('Errore: '+e.message)}};return}
