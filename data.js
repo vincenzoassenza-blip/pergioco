@@ -16,7 +16,7 @@ const LocalAdapter={
  async replaceAll(d){this._save(d)},
 };
 async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
-const memberName=m=>m?(m.soprannome||`${m.nome} ${m.cognome||''}`.trim()):'?';
+const memberName=m=>m?(`${m.nome} ${m.cognome||''}`.trim()+(m.soprannome?` (${m.soprannome})`:'')):'?';
 function setWinners(p){if(!p.coop){const s=p.players.filter(x=>x.score!==null&&x.score!=='');const top=Math.max(...s.map(x=>+x.score));p.players.forEach(x=>x.winner=s.length>0&&+x.score===top)}else p.players.forEach(x=>x.winner=!!p.groupWin)}
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const DB={adapter:LocalAdapter,
