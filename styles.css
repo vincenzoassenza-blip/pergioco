@@ -87,3 +87,11 @@ body.gate nav,body.gate #status,body.gate header{display:none}body.gate main{pad
 .danger{background:#fff;color:#c62828;border:2px solid #c62828;border-radius:10px;padding:7px 14px;font-weight:700;font-size:14px;flex:0 0 auto}.danger:active{background:#fdecec}
 #atab{flex-wrap:wrap}#atab button{min-width:0;white-space:nowrap}
 @media(max-width:420px){.lform .row,.qrow{flex-wrap:wrap}.qrow>*{flex:1 1 40%}}
+/* v12 eventi */
+.evseg{margin-bottom:8px}.evc{cursor:pointer;padding:0;overflow:hidden}.evc .evt{padding:12px 14px}.evx{opacity:.6}
+.evimg{display:block;width:100%;max-height:150px;object-fit:cover}.evimg.big{max-height:240px;border-radius:10px;margin-bottom:8px}
+.evtags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.evb{display:inline-block;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600;background:#e7ecf7;color:var(--b)}
+.evb.ok{background:#e3f6e8;color:#1d7a3a}.evb.pend{background:#fff1cc;color:#8a5a00}.evb.wait{background:#e6e9ff;color:#3b3fa8}.evb.off{background:#eee;color:#666}
+.evdesc{white-space:pre-wrap}.evact{flex-wrap:wrap}.evrow{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #eee}.evrow>div{min-width:0}
+.evbtn{display:flex;flex-direction:column;gap:6px;align-items:flex-end}.evbtn button{padding:7px 10px;font-size:13px}#mieiev .evrow{cursor:pointer}
+#evnew{width:auto;flex:none}

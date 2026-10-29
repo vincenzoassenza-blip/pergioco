@@ -16,8 +16,8 @@ function modal(msg,{input=false,def='',cancel=true}={}){return new Promise(res=>
  const end=v=>{o.remove();document.removeEventListener('keydown',kd);res(v)};const kd=e=>{if(e.key==='Escape')end(input?null:false);if(e.key==='Enter')end(input?i.value:true)};document.addEventListener('keydown',kd);
  o.onclick=e=>{if(e.target===o)end(input?null:false);const k=e.target.dataset.k;if(k)end(k==='1'?(input?i.value:true):(input?null:false))}})}
 // tasto Indietro di Android/browser: chiude la finestra aperta sopra la pagina
-const _bk=[];let _bkSkip=0;function backClose(fn){history.pushState({ov:1},'');_bk.push(fn);return()=>{const i=_bk.indexOf(fn);if(i<0)return;_bk.splice(i,1);_bkSkip++;history.back()}}
-addEventListener('popstate',()=>{if(_bkSkip){_bkSkip--;return}const f=_bk.pop();if(f)f()});
+const _bk=[];let _bkSkip=0,_bkPend=0;const _bkPush=()=>history.pushState({ov:1},'');function backClose(fn){if(_bkSkip)_bkPend++;else _bkPush();_bk.push(fn);return()=>{const i=_bk.indexOf(fn);if(i<0)return;_bk.splice(i,1);_bkSkip++;history.back()}}
+addEventListener('popstate',()=>{if(_bkSkip){_bkSkip--;if(!_bkSkip)for(;_bkPend;_bkPend--)_bkPush();return}const f=_bk.pop();if(f)f()});
 const ask=m=>modal(m),askText=(m,d='')=>modal(m,{input:true,def:d});
 function isMod(){return !!(admin&&DB.remote&&DB.remote.modCached)}
 function drawModeBtn(){const b=document.getElementById('modebtn');if(!b)return;b.hidden=!admin;b.textContent=uiMode()==='user'?'👤 Modalità utente':isMod()?'🛡 Modalità moderatore':'🔧 Modalità admin';document.body.classList.toggle('adm',adminMode())}
@@ -124,7 +124,7 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<div id="bkp" hidden><h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati sul server dell'associazione. Qui puoi scaricarne una copia manuale in JSON (non include i Libri sociali).</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div></div>
- <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2><button class="danger" id="out" hidden>⎋ Esci</button></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v11.2 · Associazione PerGioco, Ragusa</div>`;
+ <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2><button class="danger" id="out" hidden>⎋ Esci</button></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v12 · Associazione PerGioco, Ragusa</div>`;
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(!f||!await ask('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
  const A=$('#adm');const R=!!DB.remote&&DB.status==='online';
@@ -287,9 +287,9 @@ document.addEventListener('click',e=>{const a=e.target.closest('[data-pv]');if(a
 function gate(){document.body.classList.add('gate');$('#modebtn').hidden=true;const m=DB.mode;
  if(m==='auth')return authForm();
  V.innerHTML=`<div class="card" style="margin-top:30px;text-align:center"><h2>🎲 PerGioco</h2><p class="muted">${m==='missing'?'Il database non è configurato correttamente.':'Serve una connessione a internet per accedere la prima volta.'}</p><button class="p" onclick="location.reload()">Riprova</button></div>`}
-function go(v){if(document.body.classList.contains('gate'))return gate();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));location.hash=v;views[v]();scrollTo(0,0)}
+function go(v){if(document.body.classList.contains('gate'))return gate();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));window._cur=v;location.hash=v;views[v]();scrollTo(0,0)}
 $('#tabs').onclick=e=>{const b=e.target.closest('button');if(b){window._pv=null;go(b.dataset.v)}};
-addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(document.body.classList.contains('gate'))return;if(v!=='profilo')window._pv=null;if(views[v]&&!document.querySelector(`nav button.on[data-v="${v}"]`))go(v)});
+addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(document.body.classList.contains('gate'))return;if(v!=='profilo')window._pv=null;if(views[v]&&window._cur!==v)go(v)});
 const cfg=!!((window.PERGIOCO_CONFIG||{}).supabaseUrl&&(window.PERGIOCO_CONFIG||{}).supabaseAnonKey);
 DB.onStatus=()=>{const el=$('#status');if(!el)return;const q=DB.remote?DB.remote.queue().length:0;let t='';
  if(DB.status==='missing')t='⚠️ Database non ancora configurato: i dati restano su questo telefono.';
