@@ -42,7 +42,7 @@ const DB={adapter:LocalAdapter,
  async checkPin(pin){const a=(await this.adapter.getAll()).admin;return !!a&&a.hash===await sha256(a.salt+pin)},
  async updatePlay(p){const d=await this.adapter.getAll();setWinners(p);const i=d.plays.findIndex(x=>x.id===p.id);d.plays[i]={...d.plays[i],...p,updatedAt:new Date().toISOString()};await this.adapter.replaceAll(d)},
  async export(){return JSON.stringify(await this.adapter.getAll(),null,2)},
- async import(txt){const d=JSON.parse(txt);if(!Array.isArray(d.games)||!Array.isArray(d.plays))throw Error('File non valido');await this.adapter.replaceAll(d)},
+ async import(txt){let d;try{d=JSON.parse(txt)}catch(e){throw Error('il file non è un backup valido')}if(!d||!Array.isArray(d.games)||!Array.isArray(d.plays)||[d.games,d.plays,d.members||[],d.tables||[]].some(a=>!Array.isArray(a)||a.some(x=>!x||typeof x!=='object'||typeof x.id!=='string')))throw Error('File non valido');await this.adapter.replaceAll(d)},
 };
 // Statistiche pure (indipendenti dallo storage)
 const Stats={

@@ -1,8 +1,8 @@
 const romeToday=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date());
 const START=location.hash;
 const $=s=>document.querySelector(s),V=$('#view');
-const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const fmt=d=>new Date(d+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'short',year:'numeric'});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=d=>{const x=new Date(String(d??'').slice(0,10)+'T12:00');return isNaN(x)?'—':x.toLocaleDateString('it-IT',{day:'numeric',month:'short',year:'numeric'})};
 const toast=t=>{const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.append(e);setTimeout(()=>e.remove(),2200)};
 // v14 — filtro temporale per Record e Statistiche (ricordato sul dispositivo)
 const PF_K='pergioco-periodo',PF_L={all:'Sempre','1m':'Ultimo mese','3m':'Ultimi 3 mesi',y:'Anno corrente',c:'Personalizzato'};
@@ -117,7 +117,7 @@ async nuova(ed){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m
 async record(){const gs=await DB.games(),ps=pf(await DB.plays()),ms=await DB.members(),all=Stats.players(ps,ms),pl=all.filter(p=>p.member);const rec=Stats.records(gs,ps),gc=Stats.gameCounts(gs,ps).filter(x=>x.n),O=Stats.overall(ps,ms),ng=all.length-pl.length;
  const pv=r=>r?`<a class="pv" data-pv="${r.who.id}">${esc(r.who.name)+lv(r.who.id)}</a>`:'<span class="muted">—</span>';
  const OV=[['⭐','Più presente',O.presences,v=>v+(v==1?' serata':' serate')],['🏆','Più vittorie',O.wins,v=>v+(v==1?' vittoria':' vittorie')],['🎯','Più partite',O.plays,v=>v+(v==1?' partita':' partite')],['🔥','Serie di vittorie',O.streak,v=>v+' di fila'],['🧭','Più giochi diversi',O.distinct,v=>v+(v==1?' gioco':' giochi')],['🌙','Più partite in una serata',O.daily,v=>v+(v==1?' partita':' partite')],['📅','Serate consecutive',O.evStreak,v=>v+(v==1?' serata':' serate')],['🤝','Re dei cooperativi',O.coop,v=>v+(v==1?' vittoria coop':' vittorie coop')]];
-  V.innerHTML=`<h2>Record</h2>${pfHtml()}${adminMode()?'<button class="s" onclick="go(\'stats\')" style="width:100%;margin-bottom:10px">📊 Statistiche associazione (admin)</button>':''}<div class="row"><div class="card"><div class="muted">Partite</div><div class="big">${ps.length}</div></div><div class="card"><div class="muted">Soci</div><div class="big">${pl.length}</div></div><div class="card"><div class="muted">Ospiti</div><div class="big">${ng}</div></div></div>
+  V.innerHTML=`<h2>Record</h2>${pfHtml()}${adminMode()?'<button class="s" data-act="go:stats" style="width:100%;margin-bottom:10px">📊 Statistiche associazione (admin)</button>':''}<div class="row"><div class="card"><div class="muted">Partite</div><div class="big">${ps.length}</div></div><div class="card"><div class="muted">Soci</div><div class="big">${pl.length}</div></div><div class="card"><div class="muted">Ospiti</div><div class="big">${ng}</div></div></div>
  <h3 class="rsec">🏅 Record assoluti</h3><div class="rov">${OV.map(([ic,t,r,f])=>`<div class="roc"><span class="roi">${ic}</span><span class="rot">${t}</span><span class="roh">${pv(r)}</span><span class="rov2">${r?f(r.value):''}</span></div>`).join('')}</div>
 `},
 async giocatori(){const gs=await DB.games(),ms=await DB.members(),bc=await badgeCtx(),all=Stats.players(await DB.plays(),ms).sort((a,b)=>b.plays-a.plays||b.presences-a.presences||a.tP-b.tP);
@@ -156,10 +156,10 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<div id="bkp" hidden><h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati sul server dell'associazione. Qui puoi scaricarne una copia manuale in JSON (non include i Libri sociali).</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div></div>
- <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2><button class="danger" id="out" hidden>⎋ Esci</button></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v14 · Associazione PerGioco, Ragusa</div><button class="danger" id="out2" hidden style="width:100%">⎋ Esci / Logout</button>`;
+ <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2><button class="danger" id="out" hidden>⎋ Esci</button></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v15 · Associazione PerGioco, Ragusa</div><button class="danger" id="out2" hidden style="width:100%">⎋ Esci / Logout</button>`;
  if(DB.remote)DB.remote.user().then(u=>{const b=$('#out2');if(u&&b){b.hidden=false;b.onclick=confirmLogout}}).catch(()=>{});
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
- $('#im').onchange=async e=>{const f=e.target.files[0];if(!f||!await ask('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
+ $('#im').onchange=async e=>{const f=e.target.files[0];if(f&&f.size>IMP_MAX_MB*1048576)return modal(`⚠️ Il file è troppo grande (massimo ${IMP_MAX_MB} MB).`,{cancel:false});if(!f||!await ask('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
  const A=$('#adm');const R=!!DB.remote&&DB.status==='online';
  if(R&&!admin){admin=await DB.remote.isAdmin();drawModeBtn()}
  $('#bkp').hidden=!(admin&&adminMode()&&!isMod());
@@ -320,8 +320,8 @@ function openProfile(id){window._pv=id;go('profilo')}
 document.addEventListener('click',e=>{const a=e.target.closest('[data-pv]');if(a){e.preventDefault();openProfile(a.dataset.pv)}});
 function gate(){document.body.classList.add('gate');$('#modebtn').hidden=true;const m=DB.mode;
  if(m==='auth')return authForm();
- V.innerHTML=`<div class="card" style="margin-top:30px;text-align:center"><h2>🎲 PerGioco</h2><p class="muted">${m==='missing'?'Il database non è configurato correttamente.':'Serve una connessione a internet per accedere la prima volta.'}</p><button class="p" onclick="location.reload()">Riprova</button></div>`}
-function go(v){if(document.body.classList.contains('gate'))return gate();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));window._cur=v;location.hash=v;XP.ensure().then(()=>views[v]());scrollTo(0,0)}
+ V.innerHTML=`<div class="card" style="margin-top:30px;text-align:center"><h2>🎲 PerGioco</h2><p class="muted">${m==='missing'?'Il database non è configurato correttamente.':'Serve una connessione a internet per accedere la prima volta.'}</p><button class="p" data-act="reload">Riprova</button></div>`}
+function go(v){if(document.body.classList.contains('gate'))return gate();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));window._cur=v;location.hash=v;XP.ensure().then(()=>views[v]()).catch(e=>{console.error(e);V.innerHTML=`<div class="card"><h3>⚠️ Errore nel caricamento</h3><p class="muted">${esc(e&&e.message||e)}</p><button class="p" data-act="reload">Ricarica</button></div>`});scrollTo(0,0)}
 $('#tabs').onclick=e=>{const b=e.target.closest('button');if(b){window._pv=null;go(b.dataset.v)}};
 addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(document.body.classList.contains('gate'))return;if(v!=='profilo')window._pv=null;if(views[v]&&window._cur!==v)go(v)});
 const cfg=!!((window.PERGIOCO_CONFIG||{}).supabaseUrl&&(window.PERGIOCO_CONFIG||{}).supabaseAnonKey);
@@ -339,7 +339,7 @@ async function gamePage(g,ps){const ms=await DB.members(),mine=ps.filter(p=>p.ga
  const coop=mine.filter(p=>p.coop),cw=coop.filter(p=>p.groupWin??p.players.some(x=>x.winner)).length;
  const o=document.createElement('div');o.className='gpg';
  o.innerHTML=`<div class="gph"><button class="s gpb">‹ Indietro</button></div><div class="gpc">
- <div class="gpt">${g.thumb?`<img src="${esc(g.thumb)}" alt="">`:`<span class="rgi" style="background:${col(g.name)}">${esc(g.name[0]||'?')}</span>`}<div><h2 style="margin:0">${esc(g.name)}</h2><div class="chips"><span class="chip">👥 ${g.min}–${g.max}</span><span class="chip">⏱ ${g.minT}–${g.maxT} min</span><span class="chip">🎂 ${g.age}+</span>${g.coop?'<span class="chip coop">Cooperativo</span>':''}</div></div></div>
+ <div class="gpt">${safeUrl(g.thumb,true)?`<img src="${esc(safeUrl(g.thumb,true))}" alt="">`:`<span class="rgi" style="background:${col(g.name)}">${esc(g.name[0]||'?')}</span>`}<div><h2 style="margin:0">${esc(g.name)}</h2><div class="chips"><span class="chip">👥 ${g.min}–${g.max}</span><span class="chip">⏱ ${g.minT}–${g.maxT} min</span><span class="chip">🎂 ${g.age}+</span>${g.coop?'<span class="chip coop">Cooperativo</span>':''}</div></div></div>
  <div class="row"><div class="card"><div class="muted">Partite giocate</div><div class="big">${mine.length}</div></div>${coop.length?`<div class="card"><div class="muted">Vittorie del gruppo</div><div class="big">${Math.round(cw/coop.length*100)}%</div><div class="muted">${cw}/${coop.length} coop</div></div>`:''}</div>
  <div class="card"><b>🏆 Record</b>${r?`<div class="rec"><span>${lbH(r.best.p,ms)}<br><span class="muted">${fmt(r.best.date)}</span></span><b class="big">${r.best.score}</b></div>`:'<p class="muted">Ancora nessun punteggio.</p>'}</div>
  ${t.length?`<div class="card"><b>📊 Top 5 punteggi</b>${t.map((x,k)=>`<div class="rec"><span>${['🥇','🥈','🥉','4.','5.'][k]} ${lbH(x.p,ms)} <span class="muted">· ${fmt(x.date)}</span></span><b>${x.score}</b></div>`).join('')}</div>`:''}

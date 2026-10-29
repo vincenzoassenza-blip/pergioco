@@ -12,10 +12,10 @@ const EV={
  async save(e){const q=e.id?EV.c().from('eventi').update(e).eq('id',e.id):EV.c().from('eventi').insert(e);const {error}=await q;if(error)throw error},
  async presenze(mid){const {data}=await EV.c().rpc('evento_presenze',{p_member:mid});return data||{eventi:0,tornei:0}}};
 const TZ='Europe/Rome';
-const evData=iso=>new Date(iso).toLocaleString('it-IT',{timeZone:TZ,weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-const toInput=iso=>iso?new Date(iso).toLocaleString('sv-SE',{timeZone:TZ}).slice(0,16).replace(' ','T'):'';
+const evData=iso=>isNaN(new Date(iso))?'—':new Date(iso).toLocaleString('it-IT',{timeZone:TZ,weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const toInput=iso=>iso&&!isNaN(new Date(iso))?new Date(iso).toLocaleString('sv-SE',{timeZone:TZ}).slice(0,16).replace(' ','T'):'';
 // "2026-11-05T21:00" letto come ora di Roma -> ISO UTC (indipendente dal fuso del telefono)
-function fromInput(v){if(!v)return null;const [d,t]=v.split('T'),[y,mo,da]=d.split('-').map(Number),[h,mi]=t.split(':').map(Number);const g=Date.UTC(y,mo-1,da,h,mi);
+function fromInput(v){if(!v||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(v))return null;const [d,t]=v.split('T'),[y,mo,da]=d.split('-').map(Number),[h,mi]=t.split(':').map(Number);const g=Date.UTC(y,mo-1,da,h,mi);
  const w=new Date(g).toLocaleString('sv-SE',{timeZone:TZ}).replace(' ','T')+'Z';return new Date(g-(Date.parse(w)-g)).toISOString()}
 const euro=n=>n==null||n===''?'':'€ '+Number(n).toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2});
 const hasQuota=e=>(+e.quota||0)>0||(+e.caparra||0)>0;
@@ -30,7 +30,7 @@ function ics(e){const z=d=>new Date(d).toISOString().replace(/[-:]/g,'').replace
  const t=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//PerGioco//IT','BEGIN:VEVENT','UID:'+e.id+'@pergioco','DTSTAMP:'+z(Date.now()),'DTSTART:'+z(e.inizio),'DTEND:'+z(new Date(e.inizio).getTime()+3*36e5),'SUMMARY:'+x(e.titolo),e.luogo?'LOCATION:'+x(e.luogo):'',e.descrizione?'DESCRIPTION:'+x(e.descrizione):'','END:VEVENT','END:VCALENDAR'].filter(Boolean).join('\r\n');
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/calendar'}));a.download=(e.titolo||'evento').replace(/[^\w-]+/g,'_')+'.ics';document.body.append(a);a.click();a.remove()}
 const card=(e,p,i)=>{const fut=new Date(e.inizio)>new Date(),chiuso=new Date(e.chiusura)<new Date();
- return`<div class="card evc${e.annullato?' evx':''}" data-ev="${e.id}">${e.immagine?`<img class="evimg" src="${esc(e.immagine)}" alt="" loading="lazy" onerror="this.remove()">`:''}<div class="evt"><b>${esc(e.titolo)}</b>
+ return`<div class="card evc${e.annullato?' evx':''}" data-ev="${e.id}">${safeUrl(e.immagine)?`<img class="evimg" src="${esc(safeUrl(e.immagine))}" alt="" loading="lazy" referrerpolicy="no-referrer">`:''}<div class="evt"><b>${esc(e.titolo)}</b>
  <div class="muted">📅 ${esc(evData(e.inizio))}${e.luogo?` · 📍 ${esc(e.luogo)}`:''}</div>
  <div class="evtags">${e.annullato?'<span class="evb off">Evento annullato</span>':''}${e.torneo?'<span class="evb t">🏆 Torneo</span>':''}${e.solo_soci?'<span class="evb t">Solo soci in regola</span>':''}${hasQuota(e)?`<span class="evb t">${e.quota?'Quota '+euro(e.quota):'Caparra '+euro(e.caparra)}</span>`:'<span class="evb t">Gratuito</span>'}${i?`<span class="evb t">${i.occupati}/${e.posti} posti${i.attesa?` · ${i.attesa} in attesa`:''}</span>`:''}${!fut&&!e.annullato?`<span class="evb t">✔ ${i?i.presenti:0} presenti</span>`:chiuso&&!e.annullato?'<span class="evb off">Prenotazioni chiuse</span>':''}</div>
  ${p?stBadge(p.stato):''}</div></div>`};
@@ -52,13 +52,13 @@ async function eventi(){navSerata();
 async function evDetail(e,p,i){const staff=adminMode(),ms=await DB.members(),mn=id=>{const m=ms.find(m=>m.id===id);return m?memberName(m):'Socio'};
  i=i||await EV.info(e.id).catch(()=>null);const aperto=!e.annullato&&new Date(e.chiusura)>new Date(),attiva=p&&ATTIVE.includes(p.stato);
  const nomi=(i&&i.nomi||[]).map(n=>esc(mn(n.member_id))+lv(n.member_id)+(n.ospite?' <span class="muted">+1 ospite</span>':''));
- const o=openPanel(`${e.immagine?`<img class="evimg big" src="${esc(e.immagine)}" alt="Locandina" onerror="this.remove()">`:''}<h3>${esc(e.titolo)}</h3>
+ const o=openPanel(`${safeUrl(e.immagine)?`<img class="evimg big" src="${esc(safeUrl(e.immagine))}" alt="Locandina" referrerpolicy="no-referrer">`:''}<h3>${esc(e.titolo)}</h3>
  <p>📅 <b>${esc(evData(e.inizio))}</b>${e.luogo?`<br>📍 ${esc(e.luogo)}`:''}<br>⏰ Prenotazioni fino a ${esc(evData(e.chiusura))}</p>
  ${e.descrizione?`<p class="evdesc">${esc(e.descrizione)}</p>`:''}
  <div class="evtags">${e.annullato?'<span class="evb off">Evento annullato</span>':''}${e.torneo?'<span class="evb t">🏆 Torneo</span>':''}${e.solo_soci?'<span class="evb t">Solo soci in regola con la quota</span>':'<span class="evb t">Aperto a tutti</span>'}${e.ospiti?'<span class="evb t">Ospiti ammessi (max 1)</span>':''}${i?`<span class="evb t">${i.occupati}/${e.posti} posti${i.attesa?` · ${i.attesa} in lista d'attesa`:''}</span>`:''}</div>
  ${hasQuota(e)?`<div class="lwarn">💶 ${e.quota?`Quota di partecipazione: <b>${euro(e.quota)}</b>. `:''}${e.caparra?`Caparra: <b>${euro(e.caparra)}</b>. `:''}La prenotazione diventa <b>confermata</b> solo dopo che hai versato la caparra di persona a un admin o moderatore. Nessun pagamento nell'app.</div>`:''}
  ${p?`<p>La tua prenotazione: ${stBadge(p.stato)}${p.ospite?` <span class="muted">· con ${esc(p.ospite)}</span>`:''}</p>`:''}
- <div class="mbt evact">${aperto&&!attiva?`${e.ospiti?'<label class="lchk"><input type="checkbox" id="evg"> Porto un ospite</label><input id="evgn" placeholder="Nome dell\'ospite" hidden>':''}<button class="p" id="evbook">🎟 Prenota</button>`:''}
+ <div class="mbt evact">${aperto&&!attiva?`${e.ospiti?'<label class="lchk"><input type="checkbox" id="evg"> Porto un ospite</label><input id="evgn" maxlength="80" placeholder="Nome dell\'ospite" hidden>':''}<button class="p" id="evbook">🎟 Prenota</button>`:''}
  ${aperto&&attiva?'<button class="danger" id="evcanc">Annulla prenotazione</button>':''}${!aperto&&!e.annullato&&!attiva?'<p class="muted">Prenotazioni chiuse.</p>':''}
  ${!e.annullato&&new Date(e.inizio)>new Date()?'<button class="s" id="evics">📆 Aggiungi al calendario</button>':''}</div>
  ${nomi.length?`<details><summary>Chi partecipa (${nomi.length})</summary><ul class="lbl">${nomi.map(n=>`<li>${n}</li>`).join('')}</ul></details>`:''}
@@ -75,10 +75,10 @@ async function evDetail(e,p,i){const staff=adminMode(),ms=await DB.members(),mn=
 function evForm(e){const nuovo=!e.id;
  const o=openPanel(`<h3>${nuovo?'Nuovo evento':'Modifica evento'}</h3><form id="evf" novalidate>
  <label>Titolo *</label><input name="titolo" required maxlength="120" value="${esc(e.titolo||'')}">
- <label>Descrizione</label><textarea name="descrizione" rows="3">${esc(e.descrizione||'')}</textarea>
+ <label>Descrizione</label><textarea name="descrizione" rows="3" maxlength="3000">${esc(e.descrizione||'')}</textarea>
  <div class="row dtrow"><div><label>Inizio (ora italiana) *</label><input name="inizio" type="datetime-local" required value="${toInput(e.inizio)}"></div><div><label>Chiusura prenotazioni *</label><input name="chiusura" type="datetime-local" required value="${toInput(e.chiusura)}"></div></div>
- <label>Luogo</label><input name="luogo" value="${esc(e.luogo||'')}">
- <label>Locandina (link https, facoltativo)</label><input name="immagine" type="url" placeholder="https://…" value="${esc(e.immagine||'')}">
+ <label>Luogo</label><input name="luogo" maxlength="150" value="${esc(e.luogo||'')}">
+ <label>Locandina (link https, facoltativo)</label><input name="immagine" type="url" maxlength="500" placeholder="https://…" value="${esc(e.immagine||'')}">
  <div class="row"><div><label>Posti massimi *</label><input name="posti"${nA('int',1,1000,'Posti massimi',' required')} value="${e.posti||20}"></div><div><label>Quota € (facolt.)</label><input name="quota"${nA('dec',0,10000,'Quota')} value="${String(e.quota??'').replace('.',',')}"></div><div><label>Caparra € (facolt.)</label><input name="caparra"${nA('dec',0,10000,'Caparra')} value="${String(e.caparra??'').replace('.',',')}"></div></div>
  <label class="lchk"><input type="checkbox" name="solo_soci"${e.solo_soci?' checked':''}> Solo soci in regola con la quota (dal Libro soci)</label>
  <label class="lchk"><input type="checkbox" name="ospiti"${e.ospiti?' checked':''}> Ospiti ammessi (max 1 per persona)</label>
@@ -88,10 +88,10 @@ function evForm(e){const nuovo=!e.id;
  const f=o.querySelector('#evf');
  f.onsubmit=async ev=>{ev.preventDefault();if(!numForm(f))return;const F=new FormData(f),n=k=>F.get(k).trim()===''?null:+F.get(k).replace(',','.');
   const d={titolo:F.get('titolo').trim(),descrizione:F.get('descrizione').trim()||null,luogo:F.get('luogo').trim()||null,immagine:F.get('immagine').trim()||null,inizio:fromInput(F.get('inizio')),chiusura:fromInput(F.get('chiusura')),posti:+F.get('posti'),quota:n('quota'),caparra:n('caparra'),solo_soci:!!F.get('solo_soci'),ospiti:!!F.get('ospiti'),torneo:!!F.get('torneo')};
-  if(e.id)d.id=e.id;
+  if(e.id)d.id=e.id;if(!d.titolo)return modal('Il titolo è obbligatorio.',{cancel:false});if(!d.inizio||!d.chiusura)return modal('Inserisci data e ora di inizio e di chiusura prenotazioni valide.',{cancel:false});
   if((nuovo||d.inizio!==e.inizio)&&new Date(d.inizio)<new Date())return modal('La data dell\'evento non può essere nel passato.',{cancel:false});
   if(new Date(d.chiusura)>new Date(d.inizio))return modal('La chiusura delle prenotazioni deve essere prima dell\'inizio.',{cancel:false});
-  if(d.immagine&&!/^https:\/\//.test(d.immagine))return modal('Il link della locandina deve iniziare con https://',{cancel:false});
+  if(d.immagine&&!safeUrl(d.immagine))return modal('Il link della locandina deve iniziare con https://',{cancel:false});
   try{await EV.save(d);toast('Evento salvato');o.close();eventi()}catch(x){modal(evMsg(x),{cancel:false})}};
  if(o.querySelector('#evdel'))o.querySelector('#evdel').onclick=async()=>{if(!await ask('Annullare l\'evento? Resterà visibile come «annullato» e non si potrà più prenotare.'))return;try{await EV.save({id:e.id,annullato:true});toast('Evento annullato');o.close();eventi()}catch(x){toast(evMsg(x))}}}
 async function evStaff(e){const ms=await DB.members(),mn=id=>{const m=ms.find(m=>m.id===id);return m?memberName(m):'(socio non collegato)'};
@@ -106,11 +106,11 @@ async function evStaff(e){const ms=await DB.members(),mn=id=>{const m=ms.find(m=
  ${ps.map(row).join('')||'<p class="muted">Nessuna prenotazione.</p>'}
  <div class="mbt"><button class="s" id="evcsv">⬇️ CSV</button><button class="s" data-close>Chiudi</button></div>`,true);
  const again=()=>{o.close();evStaff(e)};
- o.querySelectorAll('[data-cap]').forEach(b=>b.onclick=async()=>{const v=await askText('Importo della caparra ricevuta di persona (€):',String(e.caparra??e.quota??'').replace('.',','),'dec');if(v==null)return;const n=+String(v).replace(',','.');if(!/^\d+([.,]\d{1,2})?$/.test(String(v).trim())||n>10000)return modal('⚠️ «Importo caparra» deve essere un importo in euro (es. 12,50) tra 0 e 10000. Hai scritto: «'+esc(String(v))+'».',{cancel:false});
+ o.querySelectorAll('[data-cap]').forEach(b=>b.onclick=async()=>{const v=await askText('Importo della caparra ricevuta di persona (€):',String(e.caparra??e.quota??'').replace('.',','),'dec');if(v==null)return;const n=+String(v).replace(',','.');if(!/^\d+([.,]\d{1,2})?$/.test(String(v).trim())||n>10000)return modal('⚠️ «Importo caparra» deve essere un importo in euro (es. 12,50) tra 0 e 10000. Hai scritto: «'+String(v).slice(0,40)+'».',{cancel:false});
   try{await EV.staff(b.dataset.cap,'conferma_caparra',n);toast('Prenotazione confermata');again()}catch(x){toast(evMsg(x))}});
  o.querySelectorAll('[data-rif]').forEach(b=>b.onclick=async()=>{if(!await ask('Annullare questa prenotazione? Il posto passa al primo in lista d\'attesa.'))return;try{await EV.staff(b.dataset.rif,'rifiuta');toast('Prenotazione annullata');again()}catch(x){toast(evMsg(x))}});
  o.querySelectorAll('[data-pres]').forEach(c=>c.onchange=async()=>{try{await EV.staff(c.dataset.pres,'presente',null,c.checked);toast(c.checked?'Segnato presente':'Presenza tolta')}catch(x){c.checked=!c.checked;toast(evMsg(x))}});
- o.querySelector('#evcsv').onclick=()=>{const c=v=>`"${String(v??'').replace(/"/g,'""')}"`;const L=[['Nome','Ospite','Stato','Prenotato il','Caparra','Caparra ricevuta da','Caparra il','Presente'].map(c).join(';')].concat(ps.map(p=>[mn(p.member_id),p.ospite,(ST[p.stato]||[,p.stato])[1].replace(/^\W+\s/,''),evData(p.created_at),p.caparra_importo,p.caparra_da,p.caparra_at?evData(p.caparra_at):'',p.presente?'Sì':'No'].map(c).join(';')));
+ o.querySelector('#evcsv').onclick=()=>{const c=csvCell;const L=[['Nome','Ospite','Stato','Prenotato il','Caparra','Caparra ricevuta da','Caparra il','Presente'].map(c).join(';')].concat(ps.map(p=>[mn(p.member_id),p.ospite,(ST[p.stato]||[,p.stato])[1].replace(/^\W+\s/,''),evData(p.created_at),p.caparra_importo,p.caparra_da,p.caparra_at?evData(p.caparra_at):'',p.presente?'Sì':'No'].map(c).join(';')));
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+L.join('\r\n')],{type:'text/csv'}));a.download='prenotati-'+e.titolo.replace(/[^\w-]+/g,'_')+'.csv';document.body.append(a);a.click();a.remove()}}
 // "I miei eventi" in fondo al proprio Profilo
 async function mieiEventiHtml(){try{const [mine,es]=await Promise.all([EV.mine(),EV.list()]);const u=await DB.remote.user(),me=(await DB.members()).find(m=>u&&m.userId===u.id);const pz=me?await EV.presenze(me.id):{eventi:0,tornei:0};
