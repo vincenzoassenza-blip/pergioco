@@ -38,7 +38,7 @@ const badgeNew=async(before,keys)=>{const c=await badgeCtx(),ms=await DB.members
 const nextEvening=()=>{const d=new Date(),wd=d.getDay();const add=wd===4||wd===0?0:(wd<4?4-wd:7-wd);d.setDate(d.getDate()+add);return{date:d.toLocaleDateString('sv-SE'),evening:d.getDay()===4?'Giovedì':'Domenica'}};
 const views={
 async ludoteca(){const gs=await DB.games(),ps=await DB.plays();const f={n:'',t:'',q:''};
- V.innerHTML=`<h2>Ludoteca</h2><div class="card"><input id="q" placeholder="Cerca un gioco…"><div class="row" style="margin-top:8px">
+ V.innerHTML=`<h2>I nostri giochi</h2><div class="card"><input id="q" placeholder="Cerca un gioco…"><div class="row" style="margin-top:8px">
  <select id="n"><option value="">Quanti siamo?</option>${[1,2,3,4,5,6,7,8].map(i=>`<option>${i}</option>`)}</select>
  <select id="t"><option value="">Quanto tempo?</option><option value="30">30 min</option><option value="60">1 ora</option><option value="90">1h 30</option><option value="120">2 ore</option><option value="999">Tutta la sera</option></select></div></div><div id="gl"></div>
  <details class="card"><summary><b>Aggiungi un gioco</b></summary><label>Nome</label><input id="gn"><div class="row"><div><label>Giocatori min</label><input id="g1" type="number" value="1"></div><div><label>max</label><input id="g2" type="number" value="4"></div></div>
