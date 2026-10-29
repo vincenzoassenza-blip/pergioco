@@ -81,3 +81,9 @@ body.gate nav,body.gate #status,body.gate header{display:none}body.gate main{pad
 #lprint{position:fixed;inset:0;background:#fff;z-index:2000;overflow:auto;padding:16px;color:#000;font-size:12px}#lprint table{border-collapse:collapse;width:100%}#lprint th,#lprint td{border:1px solid #999;padding:4px;text-align:left;vertical-align:top}#lprint th{background:#eee}
 .lph{border-bottom:2px solid #000;margin-bottom:8px;padding-bottom:6px}.lph h2{margin:6px 0 2px}.lpf{font-size:11px;color:#444;margin-top:10px}
 @media print{body.lprinting>*:not(#lprint){display:none!important}#lprint{position:static;padding:0}.noprint{display:none!important}@page{size:A4 landscape;margin:12mm}}
+
+.row>*{min-width:0}.row input,.row select{min-width:0;width:100%}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:8px}.hrow h2{margin-right:auto}
+.danger{background:#fff;color:#c62828;border:2px solid #c62828;border-radius:10px;padding:7px 14px;font-weight:700;font-size:14px;flex:0 0 auto}.danger:active{background:#fdecec}
+#atab{flex-wrap:wrap}#atab button{min-width:0;white-space:nowrap}
+@media(max-width:420px){.lform .row,.qrow{flex-wrap:wrap}.qrow>*{flex:1 1 40%}}
