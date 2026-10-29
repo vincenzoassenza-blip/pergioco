@@ -1,4 +1,4 @@
-const C='pergioco-v9';
+const C='pergioco-v10';
 const CDN='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
 const A=['./','./index.html','./styles.css','./config.js','./data.js','./sb.js','./app.js','./manifest.json','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A).then(()=>c.add(CDN).catch(()=>{}))));self.skipWaiting()});

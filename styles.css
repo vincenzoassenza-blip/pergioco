@@ -57,3 +57,5 @@ body.adm header{background:#5a1a1a}
 .mbox{background:#fff;border-radius:16px;padding:18px;width:100%;max-width:380px;box-shadow:0 10px 40px #0005}.mtt{font-weight:800;font-size:18px;color:var(--b);margin-bottom:8px}
 .mtx{white-space:pre-wrap;margin-bottom:12px;line-height:1.4}.min{width:100%;margin-bottom:12px}.mbt{display:flex;gap:8px;justify-content:flex-end}.mbt button{width:auto;margin:0;padding:10px 18px}
 @keyframes fi{from{opacity:0}}
+body.gate nav,body.gate #status,body.gate header{display:none}body.gate main{padding-bottom:30px}
+.login-hero{text-align:center;padding:36px 10px 14px}.login-hero img{width:88px;height:88px;border-radius:22px;box-shadow:0 6px 20px #0003}.login-hero h1{margin:12px 0 4px;color:var(--b);font-size:30px}.login-hero p{color:var(--m);margin:0}

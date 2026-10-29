@@ -37,10 +37,11 @@ const SupabaseAdapter={
   if(DB.v6Missing===false&&this.adminCached){const {data}=await this.client.rpc('admin_member_tessere');if(data){const t=new Map(data.map(x=>[x.id,x.tessera||'']));d.members.forEach(m=>{if(t.has(m.id))m.tessera=t.get(m.id)})}}
   if(this.queue().length)return;await this.cache.replaceAll(d)},
  async init(){const c=window.PERGIOCO_CONFIG||{};if(!c.supabaseUrl||!c.supabaseAnonKey)return 'local';
-  if(!window.supabase){return (await this.cache._load())?'offline':'local'}
+  if(!window.supabase)return 'nolib';
   this.client=window.supabase.createClient(c.supabaseUrl,c.supabaseAnonKey);
+  const {data:ss}=await this.client.auth.getSession();if(!ss.session)return 'auth';
   try{await Promise.race([this.refresh(),new Promise((_,r)=>setTimeout(()=>r({message:'Failed: timeout'}),6000))]);return 'online'}
-  catch(e){if(isMissing(e))return 'missing';return this.cache._load()?'offline':'local'}},
+  catch(e){if(isMissing(e))return 'missing';return this.cache._load()?'offline':'nolib'}},
  // --- autenticazione admin (Supabase Auth, email + password) ---
  async signIn(email,password){const {error}=await this.client.auth.signInWithPassword({email,password});if(error)throw error;return this.isAdmin()},
  async signOut(){await this.client.auth.signOut()},
@@ -65,6 +66,7 @@ const SupabaseAdapter={
 // Avvio: sceglie l'adapter. Senza configurazione o con tabelle mancanti resta tutto locale come prima.
 DB.mode='local';DB.status='local';DB.onStatus=()=>{};
 DB.setStatus=s=>{DB.status=s;DB.onStatus()};
+DB.logout=async()=>{try{await SupabaseAdapter.flush()}catch(e){}try{await SupabaseAdapter.client.auth.signOut()}catch(e){}if(!SupabaseAdapter.queue().length)localStorage.removeItem(SupabaseAdapter.cache.key);localStorage.removeItem('pergioco-mode');location.replace(location.pathname+'#ludoteca');location.reload()};
 DB.init=async()=>{const m=await SupabaseAdapter.init();DB.mode=m;
- if(m==='online'||m==='offline'){DB.adapter=SupabaseAdapter;DB.remote=SupabaseAdapter;addEventListener('online',()=>SupabaseAdapter.flush())}
+ if(m==='online'||m==='offline'||m==='auth'){DB.adapter=SupabaseAdapter;DB.remote=SupabaseAdapter;addEventListener('online',()=>SupabaseAdapter.flush())}
  DB.setStatus(m);return m};
