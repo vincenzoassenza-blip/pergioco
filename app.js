@@ -162,7 +162,7 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<div id="bkp" hidden><h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati sul server dell'associazione. Qui puoi scaricarne una copia manuale in JSON (non include i Libri sociali).</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div></div>
- <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v19 · Associazione PerGioco, Ragusa</div>`;
+ <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2></div><div class="card" id="adm"></div><div class="card muted">Diario di PerGioco · v20 · Associazione PerGioco, Ragusa</div>`;
  
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(f&&f.size>IMP_MAX_MB*1048576)return modal(`⚠️ Il file è troppo grande (massimo ${IMP_MAX_MB} MB).`,{cancel:false});if(!f||!await ask('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
@@ -267,6 +267,13 @@ async profilo(){const id=window._pv;const gs=await DB.games(),ms=await DB.member
  <label>Colore</label><div class="avs" id="eco">${CO.map(c=>`<button data-c="${c}" class="${c===co?'on':''}" style="background:${c}"></button>`).join('')}</div>
  <label>Gioco preferito</label><select id="ef"><option value="">—</option>${gs.map(g=>`<option value="${g.id}"${g.id===me.favGameId?' selected':''}>${esc(g.name)}</option>`).join('')}</select>
  <p class="muted">Nome, cognome e tessera li modifica solo un admin.</p><button class="p" id="esv">Salva</button></details>${out}`;bindOut();
+ {const hero=V.querySelector('.card.prof'),ed=$('#ed');if(hero&&ed){hero.after(ed);ed.querySelector('summary').hidden=true;
+  const row=hero.querySelector('.row'),avEl=row&&row.firstElementChild,nm=hero.querySelector('.pname');
+  const tog=()=>{ed.open=!ed.open;pb.setAttribute('aria-expanded',ed.open);ab.setAttribute('aria-expanded',ed.open);pb.textContent=ed.open?'✕ Chiudi':'✏️ Modifica';if(ed.open){ed.scrollIntoView({block:'nearest',behavior:'smooth'});setTimeout(()=>$('#es').focus({preventScroll:true}),150)}};
+  const ab=document.createElement('button');ab.type='button';ab.className='avedit';ab.setAttribute('aria-label','Modifica profilo (avatar)');ab.setAttribute('aria-controls','ed');ab.title='Modifica profilo';
+  if(avEl){avEl.replaceWith(ab);ab.append(avEl);ab.insertAdjacentHTML('beforeend','<span class="avpen" aria-hidden="true">✏️</span>')}
+  const pb=document.createElement('button');pb.type='button';pb.className='s pedit';pb.id='pedit';pb.setAttribute('aria-controls','ed');pb.textContent='✏️ Modifica';
+  (nm?nm.parentNode:row||hero).after(pb);ab.onclick=tog;pb.onclick=tog;ed.open=false;pb.setAttribute('aria-expanded','false');ab.setAttribute('aria-expanded','false')}}
  $('#eav').onclick=e=>{const b=e.target.closest('button');if(!b)return;av=b.dataset.a;$('#eav').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
  $('#eco').onclick=e=>{const b=e.target.closest('button');if(!b)return;co=b.dataset.c;$('#eco').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
  $('#esv').onclick=async()=>{try{await DB.remote.updateProfile({soprannome:$('#es').value,avatar:av,color:co,favGameId:$('#ef').value});toast('Profilo aggiornato');go('profilo')}catch(e){toast('Errore: '+e.message)}}}
