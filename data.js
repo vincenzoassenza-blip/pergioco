@@ -47,6 +47,26 @@ const DB={adapter:LocalAdapter,
 // Statistiche pure (indipendenti dallo storage)
 const Stats={
  chrono(ps){return ps.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')||(a.createdAt||'').localeCompare(b.createdAt||'')||String(a.id).localeCompare(String(b.id)))},
+ overall(plays,members=[]){const c=Stats.chrono(plays),m={},evs=[...new Set(c.map(p=>p.date))];const ei={};evs.forEach((d,i)=>ei[d]=i);
+  c.forEach((p,i)=>p.players.forEach(x=>{if(!x.memberId)return;const o=m[x.memberId]||(m[x.memberId]={id:x.memberId,name:Stats.label(x,members),plays:0,wins:0,comp:0,coopP:0,coopW:0,games:{},dates:new Set(),cur:0,streak:0,tS:1e9,day:{},daily:0,tDay:1e9,ev:0,evLast:-9,evBest:0,tEv:1e9,tP:0,tW:1e9,tD:1e9,tG:1e9,tC:1e9});
+   o.plays++;o.tP=i;if(x.winner&&!p.coop){o.wins++;o.tW=i}
+   if(!p.coop){o.comp++;if(x.winner){o.cur++;if(o.cur>o.streak){o.streak=o.cur;o.tS=i}}else o.cur=0}
+   else{o.coopP++;if(x.winner){o.coopW++;o.tC=i}}
+   if(!o.games[p.gameId])o.tG=i;o.games[p.gameId]=1;
+   o.day[p.date]=(o.day[p.date]||0)+1;if(o.day[p.date]>o.daily){o.daily=o.day[p.date];o.tDay=i}
+   if(!o.dates.has(p.date)){o.dates.add(p.date);o.tD=i;const k=ei[p.date];o.ev=k===o.evLast+1?o.ev+1:1;o.evLast=k;if(o.ev>o.evBest){o.evBest=o.ev;o.tEv=i}}}));
+  const L=Object.values(m).map(o=>({...o,presences:o.dates.size,distinct:Object.keys(o.games).length}));
+  const best=(v,cmp)=>{const l=L.filter(o=>v(o)>0).sort((a,b)=>v(b)-v(a)||cmp(a,b));return l[0]?{who:l[0],value:v(l[0])}:null};
+  return{
+   presences:best(o=>o.presences,(a,b)=>b.plays-a.plays||a.tD-b.tD),
+   wins:best(o=>o.wins,(a,b)=>a.comp-b.comp||a.tW-b.tW),
+   plays:best(o=>o.plays,(a,b)=>b.presences-a.presences||a.tP-b.tP),
+   streak:best(o=>o.streak,(a,b)=>a.comp-b.comp||a.tS-b.tS),
+   distinct:best(o=>o.distinct,(a,b)=>b.plays-a.plays||a.tG-b.tG),
+   daily:best(o=>o.daily,(a,b)=>b.presences-a.presences||a.tDay-b.tDay),
+   evStreak:best(o=>o.evBest,(a,b)=>b.presences-a.presences||a.tEv-b.tEv),
+   coop:best(o=>o.coopW,(a,b)=>a.coopP-b.coopP||a.tC-b.tC)}},
+ topScores(gameId,plays,n=5){const out=[];Stats.chrono(plays.filter(p=>p.gameId===gameId&&!p.coop)).forEach((p,i)=>p.players.forEach(x=>{if(x.score!==''&&x.score!=null)out.push({score:+x.score,p:x,date:p.date,i})}));return out.sort((a,b)=>b.score-a.score||a.i-b.i).slice(0,n)},
  records(games,plays){return games.map(g=>{let best=null;Stats.chrono(plays.filter(p=>p.gameId===g.id&&!p.coop)).forEach(p=>p.players.forEach(x=>{if(x.score!==''&&x.score!=null&&(!best||+x.score>best.score))best={score:+x.score,p:x,date:p.date}}));return{game:g,best}}).filter(r=>r.best)},
  // chiave giocatore: socio -> 'm:id'; ospite o nome non collegato -> 'g:nome'
  key(x){return x.memberId?'m:'+x.memberId:'g:'+(x.name||'').trim()},
