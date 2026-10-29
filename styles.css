@@ -178,3 +178,4 @@ nav button .nico{width:1.25em;height:1.25em;display:block}
 .gfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
 .gclr{min-height:40px;padding:6px 14px;border-radius:20px;font-weight:700;cursor:pointer;background:#fff3d6;border:2px solid #f2a900;color:#5a3d00}
 .gclr:hover{background:#ffe7a8}
+.cwz-miss{margin:.2rem 0 .4rem;font-size:.85rem;color:#8a5a00;background:#fff6e0;border-radius:8px;padding:.3rem .5rem}
