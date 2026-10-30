@@ -88,10 +88,32 @@ Deno.serve(async (req) => {
     const out = []; for (const r of data || []) { out.push(await complete(admin, r.game_id)); await new Promise((r) => setTimeout(r, 1500)); }
     return new Response(JSON.stringify({ done: out.length, ok: out.filter((x) => x.status === "ok").length }), { headers: h });
   }
-  // chiamata dall'app: solo staff
+  // chiamata dall'app: staff (game_id) oppure qualsiasi utente autenticato (mode cerca/info)
   const auth = req.headers.get("authorization") || ""; if (!/^Bearer [\w-]+\.[\w-]+\.[\w-]+$/.test(auth)) return new Response('{"error":"non autorizzato"}', { status: 401, headers: h });
   const user = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: auth } }, auth: { persistSession: false } });
-  const { data: u } = await user.auth.getUser(); const { data: staff } = await user.rpc("is_staff");
+  const { data: u } = await user.auth.getUser();
+  // v36 — Lista desideri: ricerca e scheda BGG per qualsiasi utente autenticato (solo lettura, dati ripuliti, nessuna scrittura)
+  if (body?.mode === "cerca" || body?.mode === "info") {
+    if (!u?.user) return new Response('{"error":"non autorizzato"}', { status: 401, headers: h });
+    try {
+      if (body.mode === "cerca") {
+        const q = txt(body.q).slice(0, 60); if (q.length < 2) return new Response('{"items":[]}', { headers: h });
+        const j = await getJson(`https://boardgamegeek.com/search/boardgame?q=${encodeURIComponent(q)}&nosession=1&showcount=10`);
+        const items = (Array.isArray(j?.items) ? j.items : []).slice(0, 10).map((x: any) => ({ bgg_id: int(x?.objectid, 1, 99999999), nome: txt(x?.name), anno: int(x?.yearpublished, 1800, 2100) })).filter((x: any) => x.bgg_id && x.nome);
+        return new Response(JSON.stringify({ items }), { headers: h });
+      }
+      const id = int(body.bgg_id, 1, 99999999); if (!id) return new Response('{"error":"bgg_id non valido"}', { status: 400, headers: h });
+      const it = (await getJson(`https://api.geekdo.com/api/geekitems?objectid=${id}&objecttype=thing`))?.item;
+      const dy = (await getJson(`https://api.geekdo.com/api/dynamicinfo?objectid=${id}&objecttype=thing`))?.item;
+      if (!it) throw new Error("dati BGG assenti");
+      const th = String(it.images?.square200 || it.images?.thumb || it.imageurl || "");
+      const durata = int(it.maxplaytime, 1, 1440) ?? int(it.minplaytime, 1, 1440);
+      return new Response(JSON.stringify({ bgg_id: id, nome: txt(it.name), thumb: /^https:\/\/cf\.geekdo-images\.com\/[A-Za-z0-9_./%=:-]+$/.test(th) && th.length <= 400 ? th : null,
+        min: int(it.minplayers, 1, 20), max: int(it.maxplayers, 1, 30), durata, anno: int(it.yearpublished, 1800, 2100),
+        peso: num(dy?.polls?.boardgameweight?.averageweight, 1, 5), cat: list(it.links?.boardgamecategory, 10) }), { headers: h });
+    } catch { return new Response('{"error":"BGG non raggiungibile, riprova"}', { status: 502, headers: h }); }
+  }
+  const { data: staff } = await user.rpc("is_staff");
   if (!u?.user || staff !== true) return new Response('{"error":"solo staff"}', { status: 403, headers: h });
   const gid = typeof body?.game_id === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(body.game_id) ? body.game_id : null;
   if (!gid) return new Response('{"error":"game_id non valido"}', { status: 400, headers: h });
