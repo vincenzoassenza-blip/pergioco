@@ -166,16 +166,21 @@ const CRELAX=['','Non c\'era niente per quel numero esatto di giocatori "ideale"
 function cRecommend(games,meta,ps,A,me){for(let r=0;r<4;r++){const l=cScore(games,meta,ps,A,me,r);if(l.length){const list=l.slice(0,3);cPhrase(list,A);return{list,relax:r,notes:[CRELAX[r],cMissNote(list,A)].filter(Boolean)}}}return{list:[],relax:4,notes:[]}}
 
 // --- Interfaccia
+// v28: due modalità, scelte DOPO «Consigliami tu» (ex "semplice" = Al volo, ex "dettagliato" = Su misura)
+const CMODE={s:{n:'Al volo ⚡',d:'Poche domande veloci e via: tre giochi pronti da mettere in tavola.'},x:{n:'Su misura 🎯',d:'Qualche domanda in più su gusti e meccaniche, per il gioco cucito addosso a voi.'}};
+function cChoose(){V.innerHTML=`<div class="cwz"><div class="cwz-top"><button class="cwz-back" id="cwb" aria-label="Torna ai giochi">← Giochi</button><span class="muted">Consigliami tu</span></div>
+ <h2 id="cwq" tabindex="-1">Come preferite che vi consigli?</h2><div class="cwz-modes" role="group" aria-labelledby="cwq">${Object.entries(CMODE).map(([k,m])=>`<button class="cwz-mode" data-m="${esc(k)}"><b>${esc(m.n)}</b><span>${esc(m.d)}</span></button>`).join('')}</div></div>`;
+ $('#cwq').focus();$('#cwb').onclick=()=>go('ludoteca');V.querySelectorAll('.cwz-mode').forEach(b=>b.onclick=()=>{const m=b.dataset.m;if(Object.prototype.hasOwnProperty.call(CMODE,m))cWizard(m)})}
 async function cWizard(mode){if(!CFLOW[mode])return;const gs=await DB.games(),ps=await DB.plays(),meta=await Meta.load();let me=null;
  try{const u=DB.remote&&await DB.remote.user();if(u){const ms=await DB.members();const m=ms.find(x=>x.userId===u.id);me=m?m.id:null}}catch(e){}
  const flow=CFLOW[mode].filter(k=>k!=='x'||ps.length).filter(k=>k!=='v'||(window.Rate&&gs.some(g=>(Rate.avg(g.id)||{}).n))).filter(k=>!(k==='x'&&!me)||true);
  const A={};let i=0;
- const head=()=>`<div class="cwz-top"><button class="cwz-back" id="cwb" aria-label="Indietro">← ${i?'Indietro':'Giochi'}</button><span class="muted">${mode==='s'?'Consigliami tu':'Scelta nei dettagli'} · ${Math.min(i+1,flow.length)}/${flow.length}</span></div><div class="cwz-bar"><span style="width:${Math.round(i/flow.length*100)}%"></span></div>`;
+ const head=()=>`<div class="cwz-top"><button class="cwz-back" id="cwb" aria-label="Indietro">← ${i?'Indietro':'Modalità'}</button><span class="muted">${esc(CMODE[mode].n)} · ${Math.min(i+1,flow.length)}/${flow.length}</span></div><div class="cwz-bar"><span style="width:${Math.round(i/flow.length*100)}%"></span></div>`;
  const step=()=>{if(i>=flow.length)return result();const k=flow[i],q=CQ[k];let o=q.o;if(k==='x'&&!me)o=o.filter(x=>x[0]!=='me');
   V.innerHTML=`<div class="cwz">${head()}<h2 id="cwq" tabindex="-1">${esc(q.t)}</h2>${q.multi?`<p class="muted">Scegline fino a ${q.multi}, poi «Avanti». Puoi anche saltare.</p>`:''}
   <div class="cwz-opts${o.length>6?' many':''}" role="${q.multi?'group':'radiogroup'}" aria-labelledby="cwq">${o.map(([v,l])=>`<button class="cwz-o" data-v="${esc(v)}" ${q.multi?`aria-pressed="${(A[k]||[]).includes(v)}"`:''}>${esc(l)}</button>`).join('')}</div>
   ${q.multi?`<button class="p cwz-next" id="cwn">Avanti →</button>`:''}</div>`;
-  $('#cwq').focus();$('#cwb').onclick=()=>{if(!i)return go('ludoteca');i--;step()};
+  $('#cwq').focus();$('#cwb').onclick=()=>{if(!i)return cChoose();i--;step()};
   V.querySelectorAll('.cwz-o').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(!q.o.some(x=>x[0]===v))return;
    if(q.multi){const a=A[k]=A[k]||[];const j=a.indexOf(v);if(j>=0)a.splice(j,1);else if(a.length<q.multi)a.push(v);else return toast(`Massimo ${q.multi}`);b.setAttribute('aria-pressed',a.includes(v))}
    else{A[k]=v;i++;step()}});
@@ -186,8 +191,8 @@ async function cWizard(mode){if(!CFLOW[mode])return;const gs=await DB.games(),ps
    <p class="cwz-why">${esc(r.txt)}</p>${r.warn?`<p class="cwz-miss">⚠️ ${esc(r.warn)}</p>`:''}
    <div class="cwz-btns"><button data-see="${esc(r.g.id)}">📖 Vedi scheda</button><button class="p" data-book="${esc(r.g.id)}">📅 Prenota un tavolo con questo</button></div></div>`).join('')
    :'<p class="muted">Non ho trovato giochi adatti nemmeno allargando i criteri. Provate a cambiare qualche risposta.</p>'}
-  <div class="cwz-btns"><button id="cwr">🔄 Rifai le domande</button><button id="cwg">Torna ai giochi</button></div></div>`;
-  $('#cwb').onclick=()=>{i=flow.length-1;step()};$('#cwr').onclick=()=>{for(const k in A)delete A[k];i=0;step()};$('#cwg').onclick=()=>go('ludoteca');
+  <div class="cwz-btns"><button id="cwr">🔄 Rifai le domande</button><button id="cwm">🔀 Cambia modalità</button><button id="cwg">Torna ai giochi</button></div></div>`;
+  $('#cwb').onclick=()=>{i=flow.length-1;step()};$('#cwr').onclick=()=>{for(const k in A)delete A[k];i=0;step()};$('#cwg').onclick=()=>go('ludoteca');$('#cwm').onclick=()=>cChoose();
   V.querySelectorAll('[data-see]').forEach(b=>b.onclick=()=>{const g=gs.find(x=>x.id===b.dataset.see);if(g)gamePage(g,ps)});
   V.querySelectorAll('[data-book]').forEach(b=>b.onclick=()=>cBook(b.dataset.book))};
  step()}
@@ -196,8 +201,8 @@ function cBook(id){if(typeof id!=='string'||id.length>40)return;go('serata');let
  const d=s.closest('details');if(d)d.open=true;s.scrollIntoView({block:'center'});toast('Scegli la data e apri il tavolo')}},50)}
 // pulsanti in cima al tab Giochi
 (()=>{const _l=views.ludoteca;views.ludoteca=async function(...a){await _l.apply(this,a);const h=V.querySelector('h2');if(!h)return;
- h.insertAdjacentHTML('afterend',`<div class="card cwz-cta"><b>🎯 Non sapete cosa giocare?</b><span class="muted">Rispondete a qualche domanda e vi proponiamo 3 giochi.</span><div class="cwz-btns"><button class="p" id="cws">Consigliami tu</button><button id="cwx">Voglio scegliere nei dettagli</button></div></div>`);
- $('#cws').onclick=()=>cWizard('s');$('#cwx').onclick=()=>cWizard('x')}})();
+ h.insertAdjacentHTML('afterend',`<div class="card cwz-cta"><b>🎯 Non sapete cosa giocare?</b><span class="muted">Rispondete a qualche domanda e vi proponiamo 3 giochi.</span><div class="cwz-btns"><button class="p" id="cws">Consigliami tu</button></div></div>`);
+ $('#cws').onclick=()=>cChoose()}})();
 // dopo "Aggiungi gioco": chiede alla Edge Function i dati extra BGG (solo staff; se fallisce restano "in arrivo")
 async function cFetchMeta(gameId){const c=DB.remote&&DB.remote.client;if(!c||DB.mode!=='online'||typeof gameId!=='string')return'skip';
  try{const {data,error}=await c.functions.invoke('bgg-meta',{body:{game_id:gameId}});if(error||!data||data.status!=='ok')return'pending';Meta.map=null;return'ok'}catch(e){return'pending'}}
