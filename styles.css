@@ -137,7 +137,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline-offset:0
  .mbox.wide{max-width:640px}
  .gph{max-width:640px;margin:0 auto;box-sizing:border-box}
 }
-.dday{margin:6px 0 2px;color:var(--b)}
+.dday{margin:8px 2px 4px;color:var(--b);font-size:14px;font-weight:600;line-height:1.3}
 
 /* v19 — pulsanti intestazione: modalità + esci */
 .hbtns{position:absolute;right:14px;top:calc(16px + env(safe-area-inset-top));display:flex;gap:6px;align-items:center}
