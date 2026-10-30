@@ -1,7 +1,9 @@
 // v35 — "Coppa Antero": torneo svizzero 1 contro 1 o a tavoli da 3–4 negli Eventi. Abbinamenti, ranking e giochi sono calcolati dal server (RPC SECURITY DEFINER).
 const CP={d:null,camp:null,
  cl(){return window.CP_CLIENT||(DB.remote&&DB.remote.client)||null},
- async rpc(n,a){const c=this.cl();if(!c)throw new Error('La Coppa richiede la connessione al database');const{data,error}=await c.rpc(n,a||{});if(error)throw error;return data},
+ async rpc(n,a){const c=this.cl();if(!c)throw new Error('La Coppa richiede la connessione al database');const{data,error}=await c.rpc(n,a||{});if(error)throw error;return this.ruolo(data)},
+ // v37.3: i comandi staff valgono solo in modalità admin/moderatore (adminMode(), come il resto del pannello); in "modalità utente" si vede come un socio. Letto a ogni accesso, così cambia subito col cambio modalità
+ ruolo(d){if(d&&typeof d==='object'&&!Array.isArray(d)&&'staff' in d){const srv=!!d.staff;Object.defineProperty(d,'staff',{get:()=>srv&&typeof adminMode==='function'&&adminMode(),enumerable:true,configurable:true})}return d},
  async load(){try{if(!this.cl())return;this.d=await this.rpc('coppa_lista')||null;const u=(this.d&&this.d.coppe||[]).find(c=>c.stato==='concluso');this.camp=u?u.campione:null}catch(e){console.warn('CP',e)}},
  pt(s,q,k){const T=s===4?[3,2,1,0]:s===3?[3,1.5,0]:[1,0];let a=0;for(let i=0;i<k;i++)a+=T[q-1+i]||0;return Math.round(a/k*10)/10},
  rom(n){const v=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let o='';n=+n||0;for(const[a,r]of v)while(n>=a){o+=r;n-=a}return o},

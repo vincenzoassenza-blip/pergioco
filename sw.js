@@ -1,4 +1,4 @@
-const C='pergioco-v37.2';
+const C='pergioco-v37.3';
 const CDN='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
 const A=['./','./index.html','./styles.css?v=37.1','./config.js?v=37.1','./data.js?v=37.1','./sb.js?v=37.1','./app.js?v=37.1','./libri.js?v=37.1','./giochi.js?v=37.1','./consigliere.js?v=37.1','./equilibrio.js?v=37.1','./eventi.js?v=37.1','./xp.js?v=37.1','./sicurezza.js?v=37.1','./desktop.js?v=37.1','./stats.js?v=37.1','./antero.js?v=37.1','./coppa.js?v=37.1','./desideri.js?v=37.1','./wrapped.js?v=37.1','./vendor/xlsx.full.min.js','./manifest.json','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A.map(u=>new Request(u,{cache:'reload'}))).then(()=>c.add(CDN).catch(()=>{}))));self.skipWaiting()});
