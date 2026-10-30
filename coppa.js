@@ -5,7 +5,8 @@ const CP={d:null,camp:null,
  async load(){try{if(!this.cl())return;this.d=await this.rpc('coppa_lista')||null;const u=(this.d&&this.d.coppe||[]).find(c=>c.stato==='concluso');this.camp=u?u.campione:null}catch(e){console.warn('CP',e)}},
  pt(s,q,k){const T=s===4?[3,2,1,0]:s===3?[3,1.5,0]:[1,0];let a=0;for(let i=0;i<k;i++)a+=T[q-1+i]||0;return Math.round(a/k*10)/10},
  rom(n){const v=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let o='';n=+n||0;for(const[a,r]of v)while(n>=a){o+=r;n-=a}return o},
- turno(t){return t===5?'Turno Antero ✨':'Turno '+(typeof ANT!=='undefined'?ANT.num(t):t)},
+ turno(t){return 'Turno '+(+t||0)},
+ MISTO:false, // v35: formato misto nascosto nell'interfaccia (supportato dal DB): true per riattivarlo
  FMT:{'1v1':'1 contro 1',tavoli:'Tavoli da 3–4',misto:'Misto (2–4)','4p':'4 giocatori'},
  STATI:{bozza:'📝 Bozza',iscrizioni:'✍️ Iscrizioni aperte',in_corso:'⚔️ In corso',concluso:'👑 Conclusa'},
  // badge: stessa logica del server (member_xp)
@@ -43,8 +44,8 @@ views.coppa=async function(){clearInterval(window._cpT);const id=window._cpId||(
  const c=v.coppa,st=!!v.staff,me=v.me,gn=g=>esc((gs.find(x=>x.id===g)||{}).name||'Gioco'),nm=cpNome,inc=v.incontri||[],cur=c.stato==='in_corso'?c.turno:0,F=c.formato||'1v1',T1=F==='1v1',tav=v.tavoli||[];
  const lo=f=>f==='tavoli'?3:2,hi=f=>f==='1v1'?2:4,fit=(g,f)=>(+g.min||1)<=hi(f)&&(+g.max||99)>=lo(f),okG=g=>!g.coop&&!g.isExp&&fit(g,'misto'),pool=c.pool||[];
  const cfg=st&&c.stato!=='concluso'?`<details class="card" ${c.stato==='bozza'?'open':''}><summary><b>⚙️ Configurazione (staff)</b></summary>
-  <label>Formato</label><div class="seg" id="cpf">${['1v1','tavoli','misto'].map(f=>`<button type="button" data-f="${f}" class="${f===F?'on':''}"${c.stato!=='bozza'?' disabled':''}>${esc(CP.FMT[f])}</button>`).join('')}</div><p class="muted" id="cpfh" style="font-size:12px"></p>
-  <label>Turni (max 5)</label><select id="cpt">${[1,2,3,4,5].map(n=>`<option value="${n}"${n===c.turni?' selected':''}${n<cur?' disabled':''}>${n} — ${esc(CP.turno(n).replace('Turno ',''))}</option>`).join('')}</select>
+  <label>Formato</label><div class="seg" id="cpf">${['1v1','tavoli','misto'].filter(f=>f!=='misto'||CP.MISTO||F==='misto').map(f=>`<button type="button" data-f="${f}" class="${f===F?'on':''}"${c.stato!=='bozza'?' disabled':''}>${esc(CP.FMT[f])}</button>`).join('')}</div><p class="muted" id="cpfh" style="font-size:12px"></p>
+  <label>Turni (max 5)</label><select id="cpt">${[1,2,3,4,5].map(n=>`<option value="${n}"${n===c.turni?' selected':''}${n<cur?' disabled':''}>${n}</option>`).join('')}</select>
   <label>Pool di giochi <span class="muted" id="cpcnt"></span></label><input id="cpq" placeholder="Cerca gioco…">
   <div class="cppool">${gs.filter(okG).sort((a,b)=>a.name.localeCompare(b.name,'it')).map(g=>`<label class="cpg" data-mn="${+g.min||1}" data-mx="${+g.max||99}"><input type="checkbox" value="${esc(g.id)}"${pool.includes(g.id)?' checked':''}${c.stato==='in_corso'&&pool.includes(g.id)?' disabled':''}> ${esc(g.name)} <span class="muted">${+g.min||1}–${+g.max||'?'}</span></label>`).join('')}</div>
   <label>Durata <span class="muted">(facoltativa: la Coppa può durare giorni o settimane)</span></label><div class="row"><input type="date" id="cpdi" value="${esc(c.data_inizio||'')}" aria-label="Data inizio"><input type="date" id="cpdf" value="${esc(c.data_fine||'')}" aria-label="Data fine"></div>
