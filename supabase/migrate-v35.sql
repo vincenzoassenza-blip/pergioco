@@ -278,3 +278,6 @@ do $$ declare f text; begin
   execute 'grant execute on function public.'||f||' to authenticated'; end loop; end $$;
 -- cp_key è usata dall'indice: deve restare eseguibile (immutabile, nessun dato)
 grant execute on function public.cp_key(text[]) to authenticated;
+
+-- v35 (pubblicazione): le funzioni interne cp_* non sono eseguibili dai client (Supabase concede execute di default); resta solo cp_key (indice)
+do $$declare f record; begin for f in select p.oid::regprocedure s from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public' and p.proname like 'cp\_%' and p.proname not in ('cp_key') loop execute format('revoke execute on function %s from public,anon,authenticated',f.s); end loop; end$$;
