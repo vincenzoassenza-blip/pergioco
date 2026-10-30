@@ -224,3 +224,14 @@ body.antopen{overflow:hidden}
 .sfb{background:#fff4d6;border:1px solid #e8c766;border-radius:10px;padding:8px 10px;margin:0 0 10px;font-size:14px;color:#5a4300}
 .sfb-tag{background:#fff4d6;color:#7a5a00;border-radius:6px;padding:0 5px;font-weight:600}
 .eqme{background:#fff4d6;border-color:#e8c766}
+
+/* v32 Coppa Antero */
+.champ,a:has(> .lvchamp),b:has(> .lvchamp),.pv:has(> .lvchamp),td:has(> .lvchamp),li:has(> .lvchamp),span.chip:has(> .lvchamp),.cpp:has(> .lvchamp){color:#c9a227!important;font-weight:700;text-shadow:0 0 6px rgba(201,162,39,.35)}
+.lv.lvchamp{background:linear-gradient(135deg,#f7d774,#c9a227);color:#5a4200}
+.cpc{cursor:pointer;border:1px solid #e7c75f}.cpn{color:#c9a227;font-family:Georgia,serif}
+.cpking{text-align:center;font-size:18px;background:linear-gradient(135deg,#fff8dc,#f7e7a6);border:1px solid #e7c75f;color:#5a4200}
+.cpm{border-top:1px solid rgba(127,127,127,.2);padding:8px 0}.cpm:first-of-type{border-top:0}.cpv{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.cpp.cpw{font-weight:700}.cpp.cpw::after{content:' 🏆'}.cpp.cpl{opacity:.6}.cpm.bye{opacity:.85}.cpbtn{gap:6px;margin-top:6px}.cpbtn button{flex:1}
+.cppool{max-height:240px;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px;margin:6px 0}.cpg{display:flex;gap:6px;align-items:center;font-size:14px}
+table.cpt{width:100%;border-collapse:collapse;font-size:14px}table.cpt th,table.cpt td{padding:5px 4px;text-align:left;border-bottom:1px solid rgba(127,127,127,.15)}table.cpt tr.me{background:rgba(201,162,39,.12)}
+.cptop{margin:6px 0 0 0;padding-left:0;list-style:none}.cptop li{padding:3px 0}

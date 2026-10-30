@@ -10,10 +10,12 @@ const XP={map:{},rt:[],me:null,p:null,
    if(!a.error){const m={};(a.data||[]).forEach(r=>m[r.member_id]=r);this.map=m}
    if(!b.error)this.rt=b.data||[];
    if(u){const ms=await DB.members();const me=ms.find(m=>m.userId===u.id);this.me=me?me.id:null}}catch(e){console.warn('XP',e)}}};
-const lv=id=>{const r=id&&XP.map[id];if(!r)return'';const i=lvInfo(r.level);return` <span class="lv" style="background:${i.color}" title="${i.title} · ${r.xp} XP">Lv ${r.level}</span>`};
-const nmH=m=>esc(memberName(m))+(m?lv(m.id):'');
-const lbH=(x,ms)=>esc(Stats.label(x,ms))+(x&&x.memberId?lv(x.memberId):'');
-const XP_SRC=[['partite','🎲 Partite',10],['vittorie','🏆 Vittorie',5],['serate','🌙 Serate',15],['eventi','🎟️ Eventi (presente)',25],['tavoli','🏠 Tavoli ospitati e giocati',20],['giochi_nuovi','🧩 Giochi diversi',10],['sfide','⚖️ Sfide',10],['sfide_vinte','🥇 Sfide vinte',5],['sfavorito','🐢 Vinte da sfavorito',15],['badge','🏅 Badge',30]];
+const cpCamp=id=>!!id&&typeof CP!=='undefined'&&CP.camp===id;
+const lv=id=>{const k=cpCamp(id)?' <span class="lv lvchamp" title="Campione in carica della Coppa Antero">👑</span>':'';const r=id&&XP.map[id];if(!r)return k;const i=lvInfo(r.level);return` <span class="lv" style="background:${i.color}" title="${i.title} · ${r.xp} XP">Lv ${r.level}</span>`+k};
+const champH=(id,h)=>cpCamp(id)?`<span class="champ">${h}</span>`:h;
+const nmH=m=>champH(m&&m.id,esc(memberName(m)))+(m?lv(m.id):'');
+const lbH=(x,ms)=>champH(x&&x.memberId,esc(Stats.label(x,ms)))+(x&&x.memberId?lv(x.memberId):'');
+const XP_SRC=[['partite','🎲 Partite',10],['vittorie','🏆 Vittorie',5],['serate','🌙 Serate',15],['eventi','🎟️ Eventi (presente)',25],['tavoli','🏠 Tavoli ospitati e giocati',20],['giochi_nuovi','🧩 Giochi diversi',10],['sfide','⚖️ Sfide',10],['sfide_vinte','🥇 Sfide vinte',5],['sfavorito','🐢 Vinte da sfavorito',15],['coppa','🏆 Coppa Antero',20],['coppa_campione','👑 Campione Coppa Antero',50],['badge','🏅 Badge',30]];
 function xpCard(id){const r=XP.map[id];if(!r)return'';const i=lvInfo(r.level),a=xpFor(r.level),b=xpFor(r.level+1),pc=Math.round((r.xp-a)/(b-a)*100),d=r.dettaglio||{};
  return`<div class="card xpc"><div class="row" style="align-items:center;justify-content:space-between"><div><span class="lv lvb" style="background:${i.color}">Lv ${r.level}</span> <b style="color:${i.color}">${i.title}</b></div><b>${r.xp} XP</b></div>
  <div class="xpbar"><i style="width:${pc}%;background:${i.color}"></i></div><div class="muted" style="font-size:12px">${b-r.xp} XP al livello ${r.level+1}</div>
