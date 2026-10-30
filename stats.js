@@ -48,7 +48,7 @@ function html(m,s,full,per,ms,own){
  <p class="muted sm">Dal ${df(s.first)} al ${df(s.last)}. Ore stimate dalla durata media del gioco (BGG), non misurate${s.minN<s.n?` · ${s.n-s.minN} partite senza durata nota`:''}. Le cooperative contano come vittoria se il gruppo vince.</p>`;
  const mx=s.games[0]?s.games[0].n:1;
  o+=`<details class="std" open><summary>🎲 Giochi (${s.games.length})</summary><div class="stl">${s.games.map((g,i)=>{const sc=g.sc,av=sc.length?sc.reduce((a,b)=>a+b,0)/sc.length:null,f=v=>String(Math.round(v*10)/10).replace('.',',');
-  return `<div class="str"${i>=8?' hidden data-more':''}><div class="strh"><b>${esc(g.name)}</b><span>${g.n}×</span></div>${bar(g.n,mx)}<div class="muted sm">Vinte ${g.w} · ${pct(g.w,g.n)} · prima ${df(g.first)} · ultima ${df(g.last)}${sc.length?` · punti: max ${f(Math.max(...sc))}, media ${f(av)}, min ${f(Math.min(...sc))}`:''}</div></div>`}).join('')}</div>${s.games.length>8?`<button type="button" class="s sm" data-all>Mostra tutti (${s.games.length})</button>`:''}
+  return `<div class="str"${i>=8?' hidden data-more':''}><div class="strh"><button type="button" class="stlink" data-g="${esc(g.id)}"><b>${esc(g.name)}</b> ›</button><span>${g.n}×</span></div>${bar(g.n,mx)}<div class="muted sm">Vinte ${g.w} · ${pct(g.w,g.n)} · prima ${df(g.first)} · ultima ${df(g.last)}${sc.length?` · punti: max ${f(Math.max(...sc))}, media ${f(av)}, min ${f(Math.min(...sc))}`:''}</div></div>`}).join('')}</div>${s.games.length>8?`<button type="button" class="s sm" data-all>Mostra tutti (${s.games.length})</button>`:''}
  ${s.dusty.length?`<p class="sm"><b>🧹 Da rispolverare</b> (non giocati da oltre 60 giorni): ${s.dusty.slice(0,8).map(d=>`${esc(d.name)} <span class="muted">(${d.ago} gg)</span>`).join(', ')}</p>`:''}</details>`;
  if(full){const so=[...s.opp].sort((a,b)=>b.n-a.n),nm=id=>{const x=ms.find(y=>y.id===id);return x?esc(memberName(x)):'Ospite'},omx=so[0]?so[0].n:1;
   o+=`<details class="std"><summary>⚔️ Avversari <span class="muted sm">🔒 visibile solo a te e allo staff</span></summary>
@@ -63,11 +63,59 @@ function html(m,s,full,per,ms,own){
  <div class="stg">${box(s.bw,'serie vittorie max')}${box(s.cw,'serie vittorie attuale')}${box(s.bs,'serate di fila max')}${box(s.topM?`${MN[+s.topM[0].slice(5)-1]} ${s.topM[0].slice(0,4)}`:'—','mese più attivo'+(s.topM?` (${s.topM[1]})`:''))}${box(s.dates?String(Math.round(10*s.n/s.dates)/10).replace('.',','):'—','partite per serata')}</div></details>`;
  if(own)o+=`<label class="stpub"><input type="checkbox" id="stpub"${m.statsPub?' checked':''}><span><b>Rendi pubbliche le mie statistiche</b><br><span class="muted sm">(gli altri soci vedranno solo i numeri aggregati, mai nemesi, vittima o bilanci con le persone)</span></span></label>`;
  return o+`</div>`}
-window.StatsV33={async mount(host,m,{own,staff}){
+
+// v34: statistiche per singolo gioco
+function sline(v,lab){if(v.length<2)return '';const mx=Math.max(...v),mn=Math.min(...v),W=300,H=56,dx=W/(v.length-1),Y=y=>(H-4-(H-12)*(mx===mn?.5:(y-mn)/(mx-mn))).toFixed(1);
+ return `<svg class="stsp" viewBox="-8 0 316 ${H+4}" role="img" aria-label="${lab}"><polyline points="${v.map((y,i)=>`${(i*dx).toFixed(1)},${Y(y)}`).join(' ')}" fill="none" stroke="currentColor" stroke-width="2"/>${v.map((y,i)=>`<circle cx="${(i*dx).toFixed(1)}" cy="${Y(y)}" r="2.5"><title>${y}</title></circle>`).join('')}</svg>`}
+const f1=v=>String(Math.round(v*10)/10).replace('.',',');
+function gameMine(g,m,plays,gs,ms,full,open){
+ const mid=m.id,L=plays.filter(p=>p.gameId===g.id&&p.players.some(x=>x.memberId===mid)&&/^\d{4}-\d{2}-\d{2}$/.test(p.date||'')).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);if(!L.length)return '';
+ const me=p=>p.players.find(x=>x.memberId===mid)||{},won=p=>p.coop?!!p.groupWin:!!me(p).winner,w=L.filter(won).length;
+ const sc=L.filter(p=>!p.coop).map(p=>({s:num(me(p).score),d:p.date,p})).filter(x=>x.s!==null);
+ let best=null,worst=null;for(const x of sc){if(!best||x.s>best.s)best=x;if(!worst||x.s<worst.s)worst=x}
+ const pos=[];for(const p of L){if(p.coop)continue;const my=num(me(p).score);if(my===null)continue;const o=p.players.map(x=>num(x.score)).filter(v=>v!==null);if(o.length<2)continue;pos.push(1+o.filter(v=>v>my).length)}
+ let bw=0,cw=0;for(const p of L){if(won(p)){cw++;bw=Math.max(bw,cw)}else cw=0}
+ const mm=gmin(g);let min=0;for(const p of L)min+=durOk(p.duration)?+p.duration:(mm||0);
+ const byN=new Map();for(const p of L){const n=p.players.length;const r=byN.get(n)||{n,t:0,w:0};r.t++;if(won(p))r.w++;byN.set(n,r)}
+ const bn=[...byN.values()].sort((a,b)=>b.w/b.t-a.w/a.t||b.t-a.t)[0];
+ const O=new Map();let guest=0;for(const p of L){const iw=!!me(p).winner;for(const x of p.players){if(x.memberId===mid)continue;if(!x.memberId){guest++;continue}const o=O.get(x.memberId)||{id:x.memberId,n:0,bm:0,b:0};o.n++;if(!p.coop){if(x.winner&&!iw)o.bm++;if(iw&&!x.winner)o.b++}O.set(x.memberId,o)}}
+ const nm=id=>{const x=ms.find(y=>y.id===id);return x?esc(memberName(x)):'Ospite'},op=[...O.values()];
+ const top=op.sort((a,b)=>b.n-a.n)[0],nem=[...op].filter(o=>o.bm).sort((a,b)=>b.bm-a.bm)[0],vit=[...op].filter(o=>o.b).sort((a,b)=>b.b-a.b)[0];
+ const box=(v,l)=>`<div class="stn"><b>${v}</b><span>${l}</span></div>`,last=[...L].reverse().slice(0,5);
+ const own=m._own;
+ return `<details class="card st stg1" id="stg-mine"${open?' open':''}><summary><b>📊 ${own?'Le mie statistiche su questo gioco':'Statistiche di '+esc(memberName(m))+' su questo gioco'}</b></summary>
+ <div class="stg">${box(L.length,'partite')}${box(`${w} · ${pc(w,L.length)}`,`vittorie <span class="muted">(${L.length})</span>`)}${box(bw,'serie vittorie max')}
+ ${box(best?f1(best.s):'—','punteggio max'+(best?`<br>${df(best.d)}`:''))}${box(sc.length?f1(sc.reduce((a,b)=>a+b.s,0)/sc.length):'—','punteggio medio')}${box(worst?f1(worst.s):'—','punteggio min'+(worst?`<br>${df(worst.d)}`:''))}
+ ${box(pos.length?f1(pos.reduce((a,b)=>a+b,0)/pos.length)+'°':'—','posizione media'+(pos.length?` (${pos.length})`:''))}${box(min?`~${min/60<10?f1(min/60):Math.round(min/60)} h`:'—','ore <i>stima</i>')}${box(bn?bn.n+' giocatori':'—','dove vinci di più'+(bn?`<br>${pc(bn.w,bn.t)} (${bn.t})`:''))}</div>
+ <p class="muted sm">Prima partita ${df(L[0].date)} · ultima ${df(L[L.length-1].date)}. Posizione ricavata dal punteggio, quando c'è.</p>
+ ${sc.length>1?`<p class="sm"><b>Andamento punteggi</b></p>${sline(sc.map(x=>x.s),'Andamento dei punteggi')}`:''}
+ ${full?`<div class="stg2">${box(top?nm(top.id):'—','🤝 con chi giochi di più'+(top?` (${top.n})`:''))}${box(nem?nm(nem.id):'—','😈 nemesi'+(nem?` · ${nem.bm}×`:''))}${box(vit?nm(vit.id):'—','🎯 vittima'+(vit?` · ${vit.b}×`:''))}</div><p class="muted sm">🔒 Avversari visibili solo a te e allo staff${guest?` · + ${guest} partecipazioni di Ospite`:''}.</p>`:''}
+ <p class="sm"><b>Ultime partite</b></p>${last.map((p,i)=>`<div class="stlp"><button type="button" class="s stlb" data-lp="${i}" aria-expanded="false">${df(p.date)} · ${p.coop?(p.groupWin?'✅ vinta (coop)':'❌ persa (coop)'):(me(p).winner?'🏆 vinta':'perso')}${num(me(p).score)!==null?' · '+f1(num(me(p).score))+' pt':''}</button><div class="muted sm" hidden>${p.players.map(x=>`${x.memberId?nm(x.memberId):'Ospite'}${x.winner?' 🏆':''}${num(x.score)!==null?' '+f1(num(x.score)):''}`).join(' · ')}${p.scenario?'<br>Scenario: '+esc(p.scenario):''}</div></div>`).join('')}
+ </details>`}
+function gameAssoc(g,plays,rate){
+ const L=plays.filter(p=>p.gameId===g.id&&/^\d{4}-\d{2}-\d{2}$/.test(p.date||'')).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+ const box=(v,l)=>`<div class="stn"><b>${v}</b><span>${l}</span></div>`;
+ let o=`<details class="card st stg1" id="stg-assoc"><summary><b>🏛️ Statistiche PerGioco</b> <span class="muted sm">dati aggregati, senza nomi</span></summary>`;
+ if(!L.length)return o+`<p class="muted">Non ancora giocato in associazione.</p></details>`;
+ const dates=new Set(L.map(p=>p.date)),who=new Set(),win=new Set(),cnt=new Map(),mo=new Map();let tot=0;
+ for(const p of L){for(const x of p.players)who.add(Stats.key(x));tot+=p.players.length;cnt.set(p.players.length,(cnt.get(p.players.length)||0)+1);mo.set(p.date.slice(0,7),(mo.get(p.date.slice(0,7))||0)+1);if(!p.coop)for(const x of p.players)if(x.winner)win.add(Stats.key(x))}
+ const mode=[...cnt].sort((a,b)=>b[1]-a[1]||a[0]-b[0])[0],co=L.filter(p=>p.coop),cw=co.filter(p=>p.groupWin).length,comp=L.filter(p=>!p.coop);
+ const sc=[];for(const p of comp)for(const x of p.players){const v=num(x.score);if(v!==null)sc.push(v)}
+ const d=L.map(p=>durOk(p.duration)).filter(Boolean),gm=gmin(g),dur=d.length?Math.round(d.reduce((a,b)=>a+b,0)/d.length):gm?Math.round(gm):null;
+ o+=`<div class="stg">${box(L.length,'partite')}${box(dates.size,'serate')}${box(who.size,'giocatori diversi')}${box(f1(tot/L.length),'giocatori per partita')}${box(mode?mode[0]:'—','n° giocatori più frequente')}${box(dur?dur+' min':'—','durata'+(d.length?' media':' <i>stima</i>'))}
+ ${co.length?box(`${pc(cw,co.length)}`,`vittorie del gruppo <span class="muted">(${co.length})</span>`):''}${comp.length?box(win.size,'vincitori diversi'):''}${sc.length?box(f1(sc.reduce((a,b)=>a+b,0)/sc.length),'punteggio medio'):''}${sc.length?box(f1(Math.max(...sc)),'punteggio massimo'):''}${box(rate&&rate.n?rate.a.toFixed(1).replace('.',',')+'/10':'—','voto medio soci'+(rate&&rate.n?` (${rate.n})`:''))}</div>
+ <p class="muted sm">Prima volta ${df(L[0].date)} · ultima ${df(L[L.length-1].date)}${comp.length?` · ${win.size} persone diverse hanno vinto almeno una volta (equilibrio)`:''}.</p><p class="sm"><b>Partite per mese</b> <span class="muted">(ultimi 12 mesi)</span></p>${spark(mo)}</details>`;
+ return o}
+async function gameMount(o,g,opt){const gpc=o&&o.querySelector('.gpc');if(!gpc)return;const plays=await DB.plays(),gs=await DB.games(),ms=await DB.members();
+ const rate=typeof Rate!=='undefined'&&Rate.avg?Rate.avg(g.id):null;const anchor=gpc.querySelector('.row')||gpc.firstElementChild;
+ let h=gameAssoc(g,plays,rate);if(opt&&opt.m){opt.m._own=opt.own;h=gameMine(g,opt.m,plays,gs,ms,opt.own||opt.staff,opt.open)+h}
+ anchor.insertAdjacentHTML('afterend',h);gpc.querySelectorAll('[data-lp]').forEach(b=>b.onclick=()=>{const d=b.nextElementSibling;d.hidden=!d.hidden;b.setAttribute('aria-expanded',String(!d.hidden))})}
+window.StatsV33={gameMount,async mount(host,m,{own,staff}){
  if(!host||!m)return;const full=own||staff;if(!full&&!m.statsPub)return;
  const plays=await DB.plays(),gs=await DB.games(),ms=await DB.members();let per='sempre';
  const draw=()=>{const old=host.querySelector('#st33'),h=html(m,calc(m.id,plays,gs,per),full,per,ms,own);if(old)old.outerHTML=h;else host.insertAdjacentHTML('beforeend',h);bind()};
  const bind=()=>{const c=host.querySelector('#st33');c.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{if(!['sempre','12m','m'].includes(b.dataset.sp))return;per=b.dataset.sp;const op=[...c.querySelectorAll('details')].map(d=>d.open);draw();host.querySelectorAll('#st33 details').forEach((d,i)=>d.open=op[i])});
+  c.querySelectorAll('[data-g]').forEach(b=>b.onclick=async()=>{const g=gs.find(x=>x.id===b.dataset.g);if(!g||typeof gamePage!=='function')return;window._gsCtx={m,own,staff,open:true};try{await gamePage(g,plays)}finally{window._gsCtx=null}});
   const ma=c.querySelector('[data-all]');if(ma)ma.onclick=()=>{c.querySelectorAll('[data-more]').forEach(x=>x.hidden=false);ma.remove()};
   const cb=c.querySelector('#stpub');if(cb)cb.onchange=async()=>{const v=cb.checked;cb.disabled=true;try{if(DB.remote&&DB.remote.setStatsPub)await DB.remote.setStatsPub(v);m.statsPub=v;toast(v?'Statistiche pubbliche: gli altri vedranno solo i numeri aggregati':'Statistiche private')}catch(e){cb.checked=!v;toast('Errore: '+(e.message||''))}finally{cb.disabled=false}}};
  draw()}};

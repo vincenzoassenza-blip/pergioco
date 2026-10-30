@@ -249,3 +249,8 @@ img.imgko{display:none!important}
 .sth{background:rgba(42,71,133,calc(.08 + var(--a)*.85));color:#fff;border-radius:6px;text-align:center;padding:.3rem 0;font-size:.7rem}.sth b{display:block;font-size:.85rem}.sth span{opacity:.9}
 .stsp{width:100%;height:auto;color:#2a4785;margin:.3rem 0}.stsp text{font-size:9px;fill:#666}
 .stpub{display:flex;gap:.5rem;align-items:flex-start;margin-top:.7rem;font-weight:500}.stpub input{width:auto;margin-top:.2rem}
+/* v34 statistiche per gioco */
+.stlink{background:none;border:0;padding:0;color:inherit;text-align:left;cursor:pointer;font:inherit}.stlink b{text-decoration:underline dotted}
+.stg1 summary{cursor:pointer;padding:.2rem 0}.stg1 .stn span{line-height:1.25}
+.stlp{margin:.25rem 0}.stlb{width:100%;text-align:left;padding:.35rem .6rem;font-size:.85rem}.stlp>div{padding:.3rem .6rem}
+.rgl{display:flex;justify-content:space-between;width:100%;padding:.45rem 0;border-bottom:1px solid rgba(0,0,0,.06)}

@@ -166,7 +166,7 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<div id="bkp" hidden><h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati sul server dell'associazione. Qui puoi scaricarne una copia manuale in JSON (non include i Libri sociali).</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div></div>
- <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2></div><div class="card" id="adm"></div><div class="card muted">PerGioco · v33 · Associazione PerGioco, Ragusa</div>`;
+ <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2></div><div class="card" id="adm"></div><div class="card muted">PerGioco · v34 · Associazione PerGioco, Ragusa</div>`;
  
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(f&&f.size>IMP_MAX_MB*1048576)return modal(`⚠️ Il file è troppo grande (massimo ${IMP_MAX_MB} MB).`,{cancel:false});if(!f||!await ask('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
@@ -374,8 +374,17 @@ async function gamePage(g,ps){const ms=await DB.members(),mine=ps.filter(p=>p.ga
  document.addEventListener('focusin',e=>{if(e.target.closest&&e.target.closest('.mbox,.sheet')&&/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))setTimeout(()=>e.target.scrollIntoView({block:'center'}),300)});
 })();
 // v33: statistiche personali (stats.js caricato solo quando serve)
-function loadStats33(){return window.StatsV33?Promise.resolve():new Promise((r,j)=>{const s=document.createElement('script');s.src='stats.js?v=33';s.onload=r;s.onerror=()=>j(new Error('stats.js non caricato'));document.head.append(s)})}
+function loadStats33(){return window.StatsV33?Promise.resolve():new Promise((r,j)=>{const s=document.createElement('script');s.src='stats.js?v=34';s.onload=r;s.onerror=()=>j(new Error('stats.js non caricato'));document.head.append(s)})}
 {const _pf=views.profilo;views.profilo=async(...a)=>{await _pf(...a);try{const ms=await DB.members(),u=DB.remote&&DB.status==='online'?await DB.remote.user():null,myId=u&&u.id;let m,own=false;
  if(window._pv){m=ms.find(x=>x.id===window._pv);own=!!(m&&myId&&m.userId===myId)}else{m=myId?ms.find(x=>x.userId===myId):null;own=!!m}
  const staff=adminMode();if(!m||!(own||staff||m.statsPub)||!V.querySelector('.card.prof'))return;
  await loadStats33();const host=V.querySelector('.card.prof');const box=document.createElement('div');box.id='st33h';(host?host.parentNode:V).insertBefore(box,host?(V.querySelector('#ed')||host).nextSibling:null);await window.StatsV33.mount(box,m,{own,staff})}catch(e){console.warn('stats',e)}}}
+
+// v34: statistiche per gioco nella scheda gioco (personali + PerGioco aggregate) e giochi cliccabili in Record
+{const _gp=gamePage;gamePage=async function(g,ps){const ctx=window._gsCtx;await _gp(g,ps);try{if(!g)return;const o=[...document.querySelectorAll('.gpg')].pop();await loadStats33();let opt=ctx;
+ if(!opt){const u=DB.remote&&DB.status==='online'?await DB.remote.user():null,ms=await DB.members(),me=u&&ms.find(x=>x.userId===u.id);if(me)opt={m:me,own:true,staff:adminMode(),open:false}}
+ else if(!(opt.own||opt.staff||opt.m.statsPub))opt=null;
+ await window.StatsV33.gameMount(o,g,opt)}catch(e){console.warn('stats gioco',e)}}}
+{const _rc=views.record;views.record=async(...a)=>{await _rc(...a);try{const gs=await DB.games(),ps=pf(await DB.plays()),gc=Stats.gameCounts(gs,ps).filter(x=>x.n);if(!gc.length)return;
+ const d=document.createElement('details');d.className='card';d.id='rgames';d.innerHTML=`<summary><b>🎲 Statistiche per gioco</b> <span class="muted">(${gc.length})</span></summary>${gc.map(x=>`<button type="button" class="stlink rgl" data-rg="${esc(x.game.id)}"><span>${esc(x.game.name)}</span><span class="muted">${x.n} ›</span></button>`).join('')}`;V.append(d);
+ d.querySelectorAll('[data-rg]').forEach(b=>b.onclick=async()=>{const g=gs.find(x=>x.id===b.dataset.rg);if(g)await gamePage(g,await DB.plays())})}catch(e){console.warn('record giochi',e)}}}
