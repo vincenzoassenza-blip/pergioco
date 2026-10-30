@@ -103,7 +103,9 @@ create or replace function public.des_vota(p uuid,p_on boolean) returns void lan
 declare me text:=public.cp_me(); pa uuid; begin
  if me is null then raise exception 'Solo i soci possono votare'; end if;
  perform public.des_chiudi_scaduti(false);
- select id into pa from desideri_periodi where chiuso_at is null; if pa is null then raise exception 'La votazione è chiusa'; end if;
+ select id into pa from desideri_periodi where chiuso_at is null;
+ -- v36.1: si può votare sempre; se non c'è un periodo aperto se ne apre uno senza scadenza (la scadenza serve solo a chiudere e decretare il vincitore)
+ if pa is null then begin insert into desideri_periodi(fine,aperto_da) values(null,auth.uid()) returning id into pa; exception when unique_violation then select id into pa from desideri_periodi where chiuso_at is null; end; end if;
  if not exists(select 1 from desideri where id=p and stato in ('proposto','valutazione')) then raise exception 'Questa proposta non si può votare'; end if;
  if p_on then insert into desideri_voti(periodo_id,desiderio_id,member_id) values(pa,p,me) on conflict do nothing;
  else delete from desideri_voti where periodo_id=pa and desiderio_id=p and member_id=me; end if; end $$;
