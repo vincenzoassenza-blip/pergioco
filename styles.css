@@ -273,3 +273,5 @@ img.imgko{display:none!important}
 #wr .wrbot{display:flex;gap:8px;justify-content:center}#wr .wrbot button{background:#fff;color:#14254a;border:0;border-radius:22px;padding:10px 18px;font-weight:700}
 .wrban{display:flex;align-items:center;gap:10px;background:linear-gradient(120deg,#5b2a86,#c0399a);color:#fff}.wrban>span{font-size:30px}.wrban .muted{color:rgba(255,255,255,.85)}.wrban div{flex:1}
 .wrban button{flex:0 0 auto;width:auto;padding:8px 16px}.wrcard .row button{width:auto;flex:1 1 auto}
+.wrst{margin:8px 0;padding:10px 12px;border-radius:12px;font-weight:700;font-size:15px}.wrst.on{background:#e3f6ea;color:#17673a;border:1px solid #9bd8b2}.wrst.off{background:#eef0f5;color:#4a5266;border:1px solid #d3d8e3}
+.wrcard select{min-width:90px;width:auto}.wrcard .row button:not(.p){background:#fff;color:var(--b);border:1.5px solid var(--b);border-radius:10px;padding:10px 14px;font-weight:700}

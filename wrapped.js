@@ -149,15 +149,24 @@ const WR={st:null,
  anni(st){const now=new Date().getFullYear(),max=st.staff?now:+st.anno,out=[];for(let y=max;y>=Math.max(2020,max-5);y--)out.push(y);return out},
  async card(own,mid){const st=await this.stato();if(!st.staff&&!(st.attivo&&own))return null;const m=(await DB.members()).find(x=>x.id===mid);
   const box=document.createElement('div');box.className='card wrcard';box.id='wrcard';
-  box.innerHTML=`<b>🎁 PerGioco Wrapped</b> ${st.attivo?'':'<span class="muted">(visibile solo allo staff)</span>'}
+  box.innerHTML=`<b>🎁 PerGioco Wrapped</b> ${st.attivo?'':'<span class="muted">(anteprima staff: spento per i soci)</span>'}
    <div class="row" style="gap:8px;margin-top:8px;flex-wrap:wrap"><select id="wranno" aria-label="Anno">${this.anni(st).map(y=>`<option ${y===+st.anno?'selected':''}>${y}</option>`).join('')}</select>
    ${mid?`<button class="p" id="wrmio">${own?'Il mio Wrapped':'Wrapped di '+esc(nm(m))}</button>`:''}<button id="wrass">🏛️ Associazione</button></div>
-   ${st.staff?`<details style="margin-top:8px"><summary class="muted">Staff: visibilità ai soci</summary><label class="row" style="gap:8px;margin-top:6px"><input type="checkbox" id="wron" ${st.attivo?'checked':''}> Attivo per i soci, anno <select id="wrsa">${this.anni({staff:true}).map(y=>`<option ${y===+st.anno?'selected':''}>${y}</option>`).join('')}</select></label><button id="wrsave" style="margin-top:6px">Salva</button></details>`:''}`;
+`;
   box.addEventListener('click',async e=>{const id=e.target.id,anno=+box.querySelector('#wranno').value;
    try{if(id==='wrmio'){const st=await this.stato();if(!this.puo(st,anno))return toast('Wrapped non ancora disponibile');const pub=!!(m&&m.statsPub);this.apri(this.storieSocio(await this.socio(mid,anno,pub)),'Wrapped '+anno,pub)}
     if(id==='wrass'){if(!this.puo(await this.stato(),anno))return toast('Wrapped non ancora disponibile');this.apri(this.storieAssoc(await this.assoc(anno)),'Wrapped PerGioco '+anno,true)}
-    if(id==='wrsave'){await this.set(box.querySelector('#wron').checked,box.querySelector('#wrsa').value);toast('Wrapped aggiornato');go('profilo')}}catch(err){toast(err.message||'Errore')}});
+}catch(err){toast(err.message||'Errore')}});
   return box},
+ async gestione(){const st=await this.stato(true);if(!st.staff)return null;const box=document.createElement('div');box.className='card wrcard';box.id='wrgest';
+  const draw=st=>{const on=!!st.attivo;box.innerHTML=`<b>🎁 PerGioco Wrapped</b>
+   <div class="wrst ${on?'on':'off'}" id="wrstato">${on?'🟢 Wrapped ATTIVO per i soci (anno '+esc(st.anno)+')':'⚪ Wrapped SPENTO per i soci'}</div>
+   <label class="row" style="gap:8px;margin:6px 0">Anno <select id="wrsa">${this.anni({staff:true}).map(y=>`<option ${y===+st.anno?'selected':''}>${y}</option>`).join('')}</select></label>
+   <div class="row" style="gap:8px;flex-wrap:wrap"><button class="${on?'':'p'}" id="wrtog">${on?'Spegni per i soci':'Attiva per i soci'}</button>${on?'<button id="wranno2">Cambia anno</button>':''}</div>
+   <div class="muted" style="margin-top:6px">Lo staff può sempre vederlo in anteprima dal Profilo.</div>`;
+   const save=async(att)=>{try{const ns=await this.set(att,box.querySelector('#wrsa').value);toast(ns.attivo?'Wrapped attivato per i soci':'Wrapped spento per i soci');draw(ns)}catch(e){toast(e.message||'Errore')}};
+   box.querySelector('#wrtog').onclick=()=>save(!on);const a2=box.querySelector('#wranno2');if(a2)a2.onclick=()=>save(true)};
+  draw(st);return box},
  async banner(){const st=await this.stato();if(!st.attivo||!st.me)return null;const b=document.createElement('div');b.className='card wrban';b.id='wrban';
   b.innerHTML=`<span>🎁</span><div><b>Il tuo PerGioco Wrapped ${esc(st.anno)} è pronto!</b><div class="muted">Partite, record, nemesi e il tuo titolo dell'anno.</div></div><button class="p">Apri</button>`;
   b.querySelector('button').onclick=async()=>{const m=(await DB.members()).find(x=>x.id===st.me);const pub=!!(m&&m.statsPub);this.apri(this.storieSocio(await this.socio(st.me,st.anno,pub)),'Wrapped '+st.anno,pub)};return b}};
@@ -166,5 +175,6 @@ window.WR=WR;
 // aggancio a Profilo (dopo "Le mie statistiche") e alla home
 {const _p=views.profilo;views.profilo=async(...a)=>{await _p(...a);try{const st=await WR.stato(true);const pv=window._pv||st.me;const own=!!st.me&&pv===st.me;
   if(!own&&!st.staff)return;const c=await WR.card(own,pv);if(!c)return;const h=V.querySelector('#st33h');h?h.parentNode.insertBefore(c,h.nextSibling):V.append(c)}catch(e){console.warn('wrapped',e)}}}
+{const _a=views.altro;views.altro=async(...a)=>{await _a(...a);try{const c=await WR.gestione();if(c&&!V.querySelector('#wrgest'))V.append(c)}catch(e){console.warn('wrapped',e)}}}
 {const _l=views.ludoteca;views.ludoteca=async(...a)=>{await _l(...a);try{const b=await WR.banner();if(b&&!V.querySelector('#wrban'))V.prepend(b)}catch(e){}}}
 })();
