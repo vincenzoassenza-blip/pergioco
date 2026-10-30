@@ -1,6 +1,6 @@
 // v29 — "Sfida equilibrata": propone i giochi più equilibrati per un gruppo di soci.
 // Dati: partite registrate (RLS esistente: lettura per utenti autenticati) + game_meta (fortuna; lettura già consentita agli autenticati).
-// Nessun dato nuovo salvato: le risposte alle domande restano solo in questa sessione (memoria).
+// Le risposte alle domande "pochi dati" sono salvate per socio in member_profile_gioco (migrate-v29.sql), così non si richiedono due volte.
 const EQ={MIN_N:5,FULL_N:10,TIME:{'30':30,'60':60,'120':120,'0':0},PREF:['ind','new','known'],FREQ:['raro','spesso','vet'],GUSTO:['strat','mix','luck'],
  hash(s){let h=2166136261;for(const c of String(s)){h^=c.codePointAt(0);h=Math.imul(h,16777619)}return h>>>0},
  // esperienza/forza di ogni partecipante nel gioco g
@@ -24,7 +24,7 @@ const EQ={MIN_N:5,FULL_N:10,TIME:{'30':30,'60':60,'120':120,'0':0},PREF:['ind','
  needQuiz(S,ids){return ids.filter(id=>S[id].n<EQ.FULL_N)},
  score(g,ctx){const{S,comp,ids,Q,meta,pref}=ctx,M=meta[g.id]||{},luck=M.luck!=null?M.luck:1;
   const per=ids.map(id=>{const s=S[id],wd=EQ.wData(s),q=Q[id]||null,a=s.g[g.id];
-   const eD=a?1-Math.exp(-a.n/3):0,fq=q?EQ.FREQ.indexOf(q.freq):-1,kn=q&&q.known.includes(g.id);
+   const eD=a?1-Math.exp(-a.n/3):0,fq=q?EQ.FREQ.indexOf(q.freq):-1,kn=!!(a&&a.n)||!!(q&&q.known.includes(g.id));
    const eQ=q?(kn?[0.45,0.65,0.85][fq]:[0,0.08,0.2][fq]):eD;
    const E=q?wd*eD+(1-wd)*eQ:eD;
    const sk=a&&a.n>=2?EQ.rel(a):EQ.rel(s.cat[typeof gMain==='function'?gMain(g):'']||s);
@@ -50,10 +50,23 @@ const EQ={MIN_N:5,FULL_N:10,TIME:{'30':30,'60':60,'120':120,'0':0},PREF:['ind','
   if(!out.length)out.push(pk(['Tra i giochi possibili è quello con meno squilibri.','Buon compromesso tra esperienza e talento del gruppo.']));
   return out.slice(0,2).join(' ')}};
 
+// profilo di gioco per socio: validato in lettura e in scrittura (stessi vincoli dei CHECK in migrate-v29.sql)
+const EQP={key:'pergioco-eqprof-v29',ID:/^[A-Za-z0-9_-]{1,40}$/,
+ clean(r){if(!r||typeof r!=='object')return null;const f=r.freq??r.frequenza,g=r.gusto??r.preferenza,k=r.known??r.giochi_conosciuti;
+  if(!EQ.FREQ.includes(f)||!EQ.GUSTO.includes(g))return null;const known=[...new Set((Array.isArray(k)?k:[]).filter(x=>typeof x==='string'&&EQP.ID.test(x)))].slice(0,50);return{freq:f,gusto:g,known}},
+ _cache(){try{const o=JSON.parse(localStorage.getItem(this.key));return o&&typeof o==='object'?o:{}}catch(e){return{}}},
+ _put(m){try{localStorage.setItem(this.key,JSON.stringify(m))}catch(e){}},
+ client(){return DB.remote&&DB.mode==='online'?DB.remote.client:null},
+ async load(){const raw=this._cache(),out={};const c=this.client();
+  if(c){try{const{data,error}=await c.from('member_profile_gioco').select('member_id,frequenza,preferenza,giochi_conosciuti');if(!error&&Array.isArray(data)){const m={};data.forEach(r=>{const v=EQP.clean(r);if(v&&typeof r.member_id==='string'&&r.member_id.length<=60)m[r.member_id]=v});this._put(m);return m}}catch(e){}}
+  for(const k in raw){const v=EQP.clean(raw[k]);if(v)out[k]=v}return out},
+ async save(id,d){const v=EQP.clean(d);if(!v||typeof id!=='string'||!id||id.length>60)throw new Error('dati non validi');const c=this.client();
+  if(c){const{error}=await c.from('member_profile_gioco').upsert({member_id:id,frequenza:v.freq,preferenza:v.gusto,giochi_conosciuti:v.known},{onConflict:'member_id'});if(error)throw error}
+  const m=this._cache();m[id]=v;this._put(m);return v}};
 async function eqOpen(){const all=await DB.members(),ms=all.filter(m=>m.active),gsAll=await DB.games(),ps=await DB.plays(),meta=typeof Meta!=='undefined'?await Meta.load():{};
  const games=gsAll.filter(g=>!g.isExp&&!(typeof isCoop==='function'&&isCoop(g)));
- const st={ids:[],guests:0,time:'0',pref:'ind',Q:{},off:0};let _u=null;try{_u=DB.remote?(await DB.remote.user())?.id:null}catch(e){}
- const me=all.find(m=>_u&&m.userId===_u);if(me&&me.active)st.ids.push(me.id);
+ const st={ids:[],guests:0,time:'0',pref:'ind',Q:await EQP.load(),off:0};let _u=null;try{_u=DB.remote?(await DB.remote.user())?.id:null}catch(e){}
+ const me=all.find(m=>_u&&m.userId===_u)||null;if(me&&me.active)st.ids.push(me.id);
  const nm=id=>{const m=all.find(x=>x.id===id);if(!m)return'?';const t=[m.nome,m.cognome].filter(Boolean).join(' ')||m.name||'Socio';return String(t).slice(0,60)};
  const top=(t,back)=>`<div class="cwz-top"><button class="cwz-back" id="eqb">← ${esc(back)}</button><span class="muted">⚖️ Sfida equilibrata</span></div><h2 id="eqh" tabindex="-1">${esc(t)}</h2>`;
  const N=()=>st.ids.length+st.guests;
@@ -67,29 +80,38 @@ async function eqOpen(){const all=await DB.members(),ms=all.filter(m=>m.active),
   <div class="card"><label>Giocatori al tavolo</label><p><b>${N()}</b> <span class="muted">(calcolato dai partecipanti)</span></p>
    <label>Tempo disponibile</label><div class="seg" id="eqt">${[['30','30 min'],['60','1 ora'],['120','2 ore'],['0','Senza limite']].map(([v,l])=>`<button data-v="${v}" class="${st.time===v?'on':''}">${l}</button>`).join('')}</div>
    <label>Preferenza</label><div class="seg" id="eqf">${[['ind','Indifferente'],['new','Nuovo per tutti'],['known','Che conoscono tutti']].map(([v,l])=>`<button data-v="${v}" class="${st.pref===v?'on':''}">${l}</button>`).join('')}</div></div>
+  ${me&&me.active?`<p class="equpd"><a href="#" id="equ">${st.Q[me.id]?'aggiorna le mie preferenze':'indica le mie preferenze'}</a></p>`:''}
   <button class="p" id="eqgo" ${st.ids.length<2?'disabled':''}>Trova la sfida più equilibrata</button>${st.ids.length<2?'<p class="muted">Servono almeno 2 soci.</p>':''}</div>`;
   $('#eqh').focus();$('#eqb').onclick=()=>go('nuova');
   $('#eqp').onclick=async()=>{const r=await pickMembers(ms,st.ids,'Chi partecipa alla sfida?');if(!r)return;st.ids=r.filter(id=>ms.some(m=>m.id===id)).slice(0,20);s1()};
   $('#eqgm').onclick=()=>{st.guests=Math.max(0,st.guests-1);s1()};$('#eqgp').onclick=()=>{st.guests=Math.min(10,st.guests+1);s1()};
+  if($('#equ'))$('#equ').onclick=e=>{e.preventDefault();const{S}=EQ.stats(ps,[me.id],games);s2(S,[me.id],true)};
   V.querySelectorAll('#eqt [data-v]').forEach(b=>b.onclick=()=>{if(b.dataset.v in EQ.TIME){st.time=b.dataset.v;s1()}});
   V.querySelectorAll('#eqf [data-v]').forEach(b=>b.onclick=()=>{if(EQ.PREF.includes(b.dataset.v)){st.pref=b.dataset.v;s1()}});
   $('#eqgo').onclick=()=>{if(st.ids.length<2)return;st.off=0;const{S}=EQ.stats(ps,st.ids,games);const need=EQ.needQuiz(S,st.ids).filter(id=>!st.Q[id]);need.length?s2(S,need):res()}};
  // 2) pochi dati: domande rapide per chi ha poche partite
- const s2=(S,need)=>{const C=cand().sort((a,b)=>EQ.hash(a.id)%7-EQ.hash(b.id)%7).sort((a,b)=>ps.filter(p=>p.gameId===b.id).length-ps.filter(p=>p.gameId===a.id).length).slice(0,8);
-  const draft={};need.forEach(id=>draft[id]={freq:'',known:[],gusto:'mix'});
-  V.innerHTML=`<div class="cwz eq">${top('Qualche domanda veloce','Chi gioca')}
-  <p class="cwz-note">ℹ️ Abbiamo ancora poche partite registrate per ${need.length===1?esc(nm(need[0])):'alcuni di voi'}: rispondete a due domande e la stima sarà più giusta. ${need.some(id=>S[id].n>=EQ.MIN_N)?'Per chi ha già qualche partita contiamo anche quelle.':''}</p>
+ const s2=(S,need,edit)=>{const C=cand().sort((a,b)=>EQ.hash(a.id)%7-EQ.hash(b.id)%7).sort((a,b)=>ps.filter(p=>p.gameId===b.id).length-ps.filter(p=>p.gameId===a.id).length).slice(0,8);
+  const draft={};need.forEach(id=>{const q=st.Q[id];draft[id]=q?{freq:q.freq,known:q.known.slice(),gusto:q.gusto}:{freq:'',known:[],gusto:'mix'}});
+  const C2=edit?[...new Map([...C,...games.filter(g=>need.some(id=>draft[id].known.includes(g.id)))].map(g=>[g.id,g])).values()].slice(0,20):C;
+  V.innerHTML=`<div class="cwz eq">${top(edit?'Le mie preferenze':'Qualche domanda veloce','Chi gioca')}
+  ${edit?'<p class="muted">Facoltativo: aggiorna come giochi. Le risposte restano salvate per le prossime sfide.</p>':`<p class="cwz-note">ℹ️ Abbiamo ancora poche partite registrate per ${need.length===1?esc(nm(need[0])):'alcuni di voi'}: rispondete a due domande e la stima sarà più giusta. ${need.some(id=>S[id].n>=EQ.MIN_N)?'Per chi ha già qualche partita contiamo anche quelle.':''} Le risposte vengono salvate: non ve le richiederemo.</p>`}
   ${need.map(id=>`<div class="card eqq" data-id="${esc(id)}"><b>${esc(nm(id))}</b>
-   <label>Quanto gioca?</label><div class="seg" data-k="freq">${[['raro','Ogni tanto'],['spesso','Spesso'],['vet','Veterano']].map(([v,l])=>`<button data-v="${v}">${l}</button>`).join('')}</div>
-   ${C.length?`<label>Conosce già qualcuno di questi?</label><div class="eqknown" data-k="known">${C.map(g=>`<button class="chip" data-v="${esc(g.id)}" aria-pressed="false">${esc(g.name)}</button>`).join('')}</div>`:''}
-   <label>Preferisce</label><div class="seg" data-k="gusto">${[['strat','Strategia'],['mix','Un mix'],['luck','Fortuna']].map(([v,l])=>`<button data-v="${v}" class="${v==='mix'?'on':''}">${l}</button>`).join('')}</div></div>`).join('')}
-  <button class="p" id="eqq">Calcola</button><button id="eqskip" class="s" style="margin-top:8px;width:100%">Salta le domande</button></div>`;
+   <label>Quanto gioca?</label><div class="seg" data-k="freq">${[['raro','Ogni tanto'],['spesso','Spesso'],['vet','Veterano']].map(([v,l])=>`<button data-v="${v}" class="${draft[id].freq===v?'on':''}">${l}</button>`).join('')}</div>
+   ${C2.length?`<label>Conosce già qualcuno di questi?</label><div class="eqknown" data-k="known">${C2.map(g=>`<button class="chip${draft[id].known.includes(g.id)?' on':''}" data-v="${esc(g.id)}" aria-pressed="${draft[id].known.includes(g.id)}">${esc(g.name)}</button>`).join('')}</div>`:''}
+   <label>Preferisce</label><div class="seg" data-k="gusto">${[['strat','Strategia'],['mix','Un mix'],['luck','Fortuna']].map(([v,l])=>`<button data-v="${v}" class="${draft[id].gusto===v?'on':''}">${l}</button>`).join('')}</div></div>`).join('')}
+  <button class="p" id="eqq">${edit?'Salva':'Calcola'}</button>${edit?'':'<button id="eqskip" class="s" style="margin-top:8px;width:100%">Salta le domande</button>'}</div>`;
   $('#eqh').focus();$('#eqb').onclick=s1;
   V.querySelectorAll('.eqq').forEach(c=>{const d=draft[c.dataset.id];if(!d)return;
    c.querySelectorAll('[data-k="freq"] button,[data-k="gusto"] button').forEach(b=>b.onclick=()=>{const k=b.parentNode.dataset.k,v=b.dataset.v;if(!(k==='freq'?EQ.FREQ:EQ.GUSTO).includes(v))return;d[k]=v;b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
-   c.querySelectorAll('[data-k="known"] button').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(!C.some(g=>g.id===v))return;const i=d.known.indexOf(v);if(i>=0)d.known.splice(i,1);else d.known.push(v);b.setAttribute('aria-pressed',d.known.includes(v));b.classList.toggle('on',d.known.includes(v))})});
-  $('#eqq').onclick=()=>{const miss=need.filter(id=>!draft[id].freq);if(miss.length)return toast('Indica quanto gioca '+nm(miss[0]));need.forEach(id=>st.Q[id]=draft[id]);res()};
-  $('#eqskip').onclick=res};
+   c.querySelectorAll('[data-k="known"] button').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(!C2.some(g=>g.id===v))return;const i=d.known.indexOf(v);if(i>=0)d.known.splice(i,1);else d.known.push(v);b.setAttribute('aria-pressed',d.known.includes(v));b.classList.toggle('on',d.known.includes(v))})});
+  $('#eqq').onclick=async()=>{const miss=need.filter(id=>!draft[id].freq);if(miss.length)return toast('Indica quanto gioca '+nm(miss[0]));const b=$('#eqq');b.disabled=true;let ko=0;
+   for(const id of need){const prev=st.Q[id],d=draft[id];
+    // i giochi conosciuti già salvati che non erano tra le scelte mostrate restano
+    const kept=prev?prev.known.filter(g=>!C2.some(x=>x.id===g)):[];const v=EQP.clean({...d,known:[...kept,...d.known]});if(!v)continue;st.Q[id]=v;
+    try{await EQP.save(id,v)}catch(e){ko++}}
+   if(ko)toast('⚠️ Risposte usate per questa sfida ma non salvate: riprova più tardi');else toast(edit?'✅ Preferenze aggiornate':'✅ Risposte salvate');
+   edit?s1():res()};
+  if($('#eqskip'))$('#eqskip').onclick=res};
  // 3) risultato
  const res=()=>{const{S,comp}=EQ.stats(ps,st.ids,games),ctx={S,comp,ids:st.ids,Q:st.Q,meta,pref:st.pref};
   const L=cand().map(g=>EQ.score(g,ctx)).sort((a,b)=>b.s-a.s||a.g.name.localeCompare(b.g.name));
