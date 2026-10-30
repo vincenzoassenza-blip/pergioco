@@ -4,10 +4,10 @@
 const MAP={
  games:{t:'games',to:g=>({id:g.id,added_at:g.addedAt||null,name:g.name,min_players:g.min,max_players:g.max,min_time:g.minT,max_time:g.maxT,age:g.age,coop:!!g.coop,bgg_id:g.bggId??null,thumb:g.thumb??null,play_time:g.playTime??null,year:g.year??null,best_players:g.best??null,rec_players:g.rec??null,categories:g.categories??null,mechanics:g.mechanics??null,is_expansion:!!g.isExp}),
   from:r=>({id:r.id,addedAt:r.added_at,name:r.name,min:r.min_players,max:r.max_players,minT:r.min_time,maxT:r.max_time,age:r.age,coop:r.coop,bggId:r.bgg_id,thumb:r.thumb,playTime:r.play_time??null,year:r.year??null,best:r.best_players||[],rec:r.rec_players||[],categories:r.categories||[],mechanics:r.mechanics||[],isExp:!!r.is_expansion})},
- members:{t:'members',cols:'id,nome,cognome,soprannome,active,created_at,user_id,avatar,color,fav_game_id',
+ members:{t:'members',cols:'id,nome,cognome,soprannome,active,created_at,user_id,avatar,color,fav_game_id,stats_pubbliche',
   // tessera e user_id si inviano solo se noti (la tessera non e' leggibile dai non admin)
   to:m=>{const r={id:m.id,nome:m.nome,cognome:m.cognome||null,soprannome:m.soprannome||null,active:m.active!==false};if(m.tessera!==undefined)r.tessera=m.tessera||null;if(m.userId!==undefined)r.user_id=m.userId||null;if(m.avatar!==undefined)r.avatar=m.avatar||null;if(m.color!==undefined)r.color=m.color||null;if(m.favGameId!==undefined)r.fav_game_id=m.favGameId||null;return r},
-  from:r=>({id:r.id,nome:r.nome,cognome:r.cognome||'',soprannome:r.soprannome||'',tessera:r.tessera===undefined?undefined:(r.tessera||''),active:r.active,userId:r.user_id===undefined?undefined:r.user_id,avatar:r.avatar||'',color:r.color||'',favGameId:r.fav_game_id||'',createdAt:r.created_at||undefined})},
+  from:r=>({id:r.id,nome:r.nome,cognome:r.cognome||'',soprannome:r.soprannome||'',tessera:r.tessera===undefined?undefined:(r.tessera||''),active:r.active,userId:r.user_id===undefined?undefined:r.user_id,avatar:r.avatar||'',color:r.color||'',favGameId:r.fav_game_id||'',statsPub:r.stats_pubbliche===true,createdAt:r.created_at||undefined})},
  tables:{t:'tables',to:t=>({id:t.id,date:t.date,evening:t.evening,game_id:t.gameId,host_id:t.hostId,seats:t.seats,start_time:t.time||null,note:t.note||null,players:t.players||[],status:t.status||'open',play_id:t.playId||null,created_at:t.createdAt||new Date().toISOString()}),
   from:r=>({id:r.id,date:r.date,evening:r.evening,gameId:r.game_id,hostId:r.host_id,seats:r.seats,time:r.start_time||'',note:r.note||'',players:r.players||[],status:r.status,playId:r.play_id,createdAt:r.created_at})},
  plays:{t:'plays',to:p=>({id:p.id,game_id:p.gameId,date:p.date,evening:p.evening,coop:!!p.coop,group_win:p.groupWin??null,scenario:p.scenario||null,duration:durOk(p.duration),players:p.players,note:p.note||null,created_at:p.createdAt||new Date().toISOString(),updated_at:p.updatedAt||null,...(p.sfidaId?{sfida_id:p.sfidaId}:{})}),
@@ -56,6 +56,7 @@ const SupabaseAdapter={
  // registrazione: il database rifiuta qualsiasi iscrizione senza un codice valido (nessuna email inviata)
  async signUp(code,email,password){const {data,error}=await this.client.auth.signUp({email,password,options:{data:{code}}});if(error)throw error;if(!data.session){const r=await this.client.auth.signInWithPassword({email,password});if(r.error)throw r.error}await this.refresh();return data},
  async resetWithCode(code,email,password){const {error}=await this.client.rpc('reset_password_with_code',{p_code:code,p_email:email,p_password:password});if(error)throw error},
+ async setStatsPub(v){const {error}=await this.client.rpc('set_stats_pubbliche',{p:!!v});if(error)throw error;await this.refresh()},
  async updateProfile(p){const {error}=await this.client.rpc('update_my_profile',{p_soprannome:p.soprannome,p_avatar:p.avatar,p_color:p.color,p_fav_game_id:p.favGameId});if(error)throw error;await this.refresh()},
  async codes(){const {data,error}=await this.client.rpc('admin_codes');if(error)throw error;return data||[]},
  async newCode(memberId){const {data,error}=await this.client.rpc('admin_new_code',{p_member_id:memberId});if(error)throw error;return data},
