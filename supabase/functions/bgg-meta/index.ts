@@ -33,6 +33,44 @@ async function getJson(url: string) {
   const t = await r.text(); if (t.length > 3_000_000) throw new Error("risposta troppo grande");
   return JSON.parse(t);
 }
+// v36b — ricerca per nome. La ricerca di BGG (sito: Cloudflare; XML API2: token dal 2025) non risponde ai server:
+// 1) XML API2 se c'è il secret BGG_TOKEN, 2) ricerca del sito BGG, 3) Wikidata (proprietà P2339 = ID BGG), 4) giochi già in ludoteca.
+type Hit = { bgg_id: number; nome: string; anno: number | null };
+const okHits = (a: any[]) => a.filter((x) => x.bgg_id && x.nome).slice(0, 10) as Hit[];
+async function cercaBgg(q: string, user: any): Promise<Hit[]> {
+  const tok = Deno.env.get("BGG_TOKEN");
+  if (tok) try {
+    const r = await fetch(`https://boardgamegeek.com/xmlapi2/search?type=boardgame&query=${encodeURIComponent(q)}`, { headers: { Authorization: `Bearer ${tok}`, "User-Agent": "PerGioco/1.0 (APS Ragusa)" }, signal: AbortSignal.timeout(15000) });
+    if (r.ok) { const x = (await r.text()).slice(0, 2_000_000); const out: any[] = [];
+      for (const m of x.matchAll(/<item[^>]*\bid="(\d+)"[^>]*>([\s\S]*?)<\/item>/g)) { const n = m[2].match(/<name[^>]*value="([^"]*)"/), y = m[2].match(/<yearpublished[^>]*value="(\d+)"/);
+        out.push({ bgg_id: int(m[1], 1, 99999999), nome: txt((n?.[1] || "").replace(/&amp;/g, "&").replace(/&quot;/g, "'").replace(/&#0?39;/g, "'")), anno: int(y?.[1], 1800, 2100) }); }
+      if (out.length) return okHits(out); }
+  } catch { /* prossima fonte */ }
+  try {
+    const j = await getJson(`https://boardgamegeek.com/search/boardgame?q=${encodeURIComponent(q)}&nosession=1&showcount=10`);
+    const a = okHits((Array.isArray(j?.items) ? j.items : []).map((x: any) => ({ bgg_id: int(x?.objectid, 1, 99999999), nome: txt(x?.name), anno: int(x?.yearpublished, 1800, 2100) })));
+    if (a.length) return a;
+  } catch { /* prossima fonte */ }
+  let wd: Hit[] = [];
+  try {
+    const wu = `https://www.wikidata.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(q.replace(/[^\p{L}\p{N} :'&.-]/gu, " ") + " haswbstatement:P2339")}&srlimit=10&format=json`;
+    const s = await getJson(wu).catch(() => new Promise((r) => setTimeout(r, 800)).then(() => getJson(wu)));
+    const ids = (s?.query?.search || []).map((x: any) => String(x?.title || "")).filter((t: string) => /^Q\d+$/.test(t)).slice(0, 10);
+    if (ids.length) {
+      const e = await getJson(`https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${ids.join("|")}&props=labels|claims&languages=it|en&format=json`);
+      wd = okHits(ids.map((id: string) => { const it = e?.entities?.[id]; const c = it?.claims;
+        const b = c?.P2339?.[0]?.mainsnak?.datavalue?.value; const y = String(c?.P577?.[0]?.mainsnak?.datavalue?.value?.time || "").match(/^\+(\d{4})/);
+        return { bgg_id: int(b, 1, 99999999), nome: txt(it?.labels?.it?.value || it?.labels?.en?.value), anno: int(y?.[1], 1800, 2100) }; }));
+    }
+  } catch { /* prossima fonte */ }
+  let loc: Hit[] = [];
+  try {
+    const { data } = await user.from("games").select("name,bgg_id,year").not("bgg_id", "is", null).ilike("name", `%${q.replace(/[%_\\,()]/g, " ")}%`).limit(10);
+    loc = okHits((data || []).map((g: any) => ({ bgg_id: int(g.bgg_id, 1, 99999999), nome: txt(g.name), anno: int(g.year, 1800, 2100) })));
+  } catch { /* nessuna */ }
+  const seen = new Set<number>(); const all = [...wd, ...loc].filter((x) => !seen.has(x.bgg_id) && seen.add(x.bgg_id));
+  return all.slice(0, 10);
+}
 async function findId(name: string): Promise<number | null> {
   // ricerca per nome (best effort): il primo risultato esatto, altrimenti il primo
   const q = encodeURIComponent(txt(name));
@@ -98,8 +136,7 @@ Deno.serve(async (req) => {
     try {
       if (body.mode === "cerca") {
         const q = txt(body.q).slice(0, 60); if (q.length < 2) return new Response('{"items":[]}', { headers: h });
-        const j = await getJson(`https://boardgamegeek.com/search/boardgame?q=${encodeURIComponent(q)}&nosession=1&showcount=10`);
-        const items = (Array.isArray(j?.items) ? j.items : []).slice(0, 10).map((x: any) => ({ bgg_id: int(x?.objectid, 1, 99999999), nome: txt(x?.name), anno: int(x?.yearpublished, 1800, 2100) })).filter((x: any) => x.bgg_id && x.nome);
+        const items = await cercaBgg(q, user);
         return new Response(JSON.stringify({ items }), { headers: h });
       }
       const id = int(body.bgg_id, 1, 99999999); if (!id) return new Response('{"error":"bgg_id non valido"}', { status: 400, headers: h });
