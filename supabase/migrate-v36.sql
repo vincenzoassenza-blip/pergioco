@@ -58,7 +58,7 @@ declare me text:=public.cp_me(); st boolean:=public.is_staff(); pa desideri_peri
  select * into pa from desideri_periodi where chiuso_at is null limit 1;
  select * into pc from desideri_periodi where chiuso_at is not null order by chiuso_at desc limit 1;
  pv:=coalesce(pa.id,pc.id);
- return jsonb_build_object('me',me,'staff',st,
+ return jsonb_build_object('me',me,'staff',st,'admin',public.is_admin(),
   'periodo',case when pa.id is null then null else jsonb_build_object('id',pa.id,'inizio',pa.inizio,'fine',pa.fine) end,
   'ultimo',case when pc.id is null then null else jsonb_build_object('id',pc.id,'inizio',pc.inizio,'chiuso',pc.chiuso_at,'vincitore',pc.vincitore,'voti',pc.voti_vincitore,
      'nome',(select nome from desideri where id=pc.vincitore)) end,
@@ -114,7 +114,7 @@ declare me text:=public.cp_me(); begin if me is null then raise exception 'Solo 
  if p_on then insert into desideri_spiego values(p,me) on conflict do nothing; else delete from desideri_spiego where desiderio_id=p and member_id=me; end if; end $$;
 
 create or replace function public.des_stato(p uuid,p_stato text) returns void language plpgsql security definer set search_path=public as $$
-begin if not public.is_staff() then raise exception 'Solo staff'; end if;
+begin if not public.is_staff() then raise exception 'Solo admin e moderatori possono cambiare lo stato'; end if;
  if p_stato is null or p_stato not in ('proposto','valutazione','ordinato','arrivato','archiviato') then raise exception 'Stato non valido'; end if;
  update desideri set stato=p_stato,aggiornato_at=now() where id=p; if not found then raise exception 'Proposta non trovata'; end if; end $$;
 
@@ -123,7 +123,7 @@ begin if not public.is_staff() then raise exception 'Solo staff'; end if; delete
 
 -- collega la proposta arrivata al gioco aggiunto in ludoteca
 create or replace function public.des_collega(p uuid,p_game text) returns void language plpgsql security definer set search_path=public as $$
-begin if not public.is_staff() then raise exception 'Solo staff'; end if;
+begin if not public.is_staff() then raise exception 'Solo admin e moderatori possono cambiare lo stato'; end if;
  if not exists(select 1 from games where id=p_game) then raise exception 'Gioco non trovato'; end if;
  update desideri set game_id=p_game,stato='arrivato',aggiornato_at=now() where id=p; if not found then raise exception 'Proposta non trovata'; end if; end $$;
 
@@ -155,11 +155,27 @@ select member_id,tot,case when n is null then level else public.level_for_xp(tot
   'badge',jsonb_build_array(coalesce((dettaglio->'badge'->>0)::int,0)+1,coalesce((dettaglio->'badge'->>1)::int,0)+100)) end
 from x $$;
 
+-- v36c: "Arrivato" aggiunge direttamente il gioco in ludoteca con i dati BGG della proposta (o collega quello già presente con lo stesso ID BGG)
+create or replace function public.des_arrivato(p uuid) returns text language plpgsql security definer set search_path=public as $$
+declare d desideri; gid text; begin
+ if not public.is_staff() then raise exception 'Solo admin e moderatori possono cambiare lo stato'; end if;
+ select * into d from desideri where id=p for update; if d.id is null then raise exception 'Proposta non trovata'; end if;
+ if d.stato='arrivato' and d.game_id is not null then return d.game_id; end if;
+ select id into gid from games where bgg_id=d.bgg_id order by created_at limit 1;
+ if gid is null then
+  gid:='bgg-'||d.bgg_id;
+  if exists(select 1 from games where id=gid) then gid:='bgg-'||d.bgg_id||'-'||substr(md5(random()::text),1,6); end if;
+  insert into games(id,name,min_players,max_players,min_time,max_time,play_time,bgg_id,thumb,categories,year,added_at)
+  values(gid,left(d.nome,120),d.min_p,d.max_p,d.durata,d.durata,d.durata,d.bgg_id,d.thumb,nullif(d.categorie,'{}'),d.anno,now());
+ end if;
+ update desideri set game_id=gid,stato='arrivato',aggiornato_at=now() where id=p;
+ return gid; end $$;
+
 do $$declare f record; t text; begin
  for f in select p.oid::regprocedure s from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='public'
    and (p.proname like 'des\_%' or p.proname in ('member_xp','member_xp_cp')) loop
   execute format('revoke all on function %s from public,anon,authenticated',f.s); end loop;
- foreach t in array array['des_lista()','des_proponi(jsonb)','des_ritira(uuid)','des_vota(uuid,boolean)','des_spiego(uuid,boolean)','des_stato(uuid,text)','des_elimina(uuid)','des_collega(uuid,text)','des_periodo(text,timestamptz)','member_xp()'] loop
+ foreach t in array array['des_lista()','des_proponi(jsonb)','des_ritira(uuid)','des_vota(uuid,boolean)','des_spiego(uuid,boolean)','des_stato(uuid,text)','des_elimina(uuid)','des_collega(uuid,text)','des_arrivato(uuid)','des_periodo(text,timestamptz)','member_xp()'] loop
   execute 'grant execute on function public.'||t||' to authenticated'; end loop; end$$;
 
 -- v36 fix: le copertine BGG contengono "filters:strip_icc()": ammesse le parentesi
