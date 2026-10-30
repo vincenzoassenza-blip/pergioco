@@ -92,16 +92,54 @@ const BADGES=[
  ['coop','🤝','Cooperativo','Vinci 5 partite cooperative',s=>s.coopWins>=5],
  ['host','🏠','Padrone di casa','Ospita 5 tavoli in serata',s=>s.hosted>=5],
  ['expl','🚀','Esploratore','Gioca un gioco il giorno in cui arriva',s=>s.explorer],
- ['critico','✍️','Critico','Vota 10 giochi',s=>s.rated>=10]];
+ ['critico','✍️','Critico','Vota 10 giochi',s=>s.rated>=10],
+ ['sf1','⚖️',"Bilancia d'esordio",'Gioca la prima sfida equilibrata',s=>s.sfN>=1],
+ ['sf10','🗡️','Sfidante seriale','Gioca 10 sfide equilibrate',s=>s.sfN>=10],
+ ['sfw5','🥇','Pari e patta? No, vinta!','Vinci 5 sfide equilibrate',s=>s.sfW>=5],
+ ['sfund','🐢','Sfavorito di lusso','Vinci una sfida col pronostico più basso del gruppo',s=>s.sfU>=1],
+ ['sfriv','🔁','Rivincita servita','Batti in sfida chi ti aveva battuto nella sfida precedente',s=>s.sfRiv],
+ ['sfrivali','🤜🤛','Rivali storici','5 sfide con lo stesso socio',s=>s.sfRivali>=5],
+ ['sfnuovo','🧪','Terreno neutro','3 sfide su un gioco nuovo per tutti',s=>s.sfNuovi>=3],
+ ['sfbig','🎪','Tavolata alla pari','Una sfida con almeno 5 soci',s=>s.sfBig]];
+// --- Sfide equilibrate (v30): cache + calcolo con le stesse regole anti-abuso di member_xp() ---
+const SF_UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,SF_ID=/^[A-Za-z0-9_-]{1,60}$/;
+const SF={map:{},lkey:'pergioco-sfide',
+ clean(r){if(!r||!SF_UUID.test(r.id||''))return null;const ids=(r.member_ids||[]).filter(x=>SF_ID.test(x)),pr={};
+  for(const m of ids){const v=Number(r.pronostico&&r.pronostico[m]);pr[m]=isFinite(v)?Math.max(0,Math.min(2,v)):1}
+  return{id:r.id,memberIds:ids,proposti:(r.proposti||[]).filter(x=>SF_ID.test(x)),scelto:r.scelto,pron:pr,nuovo:!!r.nuovo_per_tutti,createdAt:r.created_at||''}},
+ local(){try{return JSON.parse(localStorage.getItem(this.lkey)||'[]')}catch(e){return[]}},
+ async load(){let rows=null;const c=DB.remote&&DB.remote.client;
+  if(c){try{const {data,error}=await c.from('sfide').select('id,member_ids,proposti,scelto,pronostico,nuovo_per_tutti,created_at').limit(5000);if(!error)rows=data}catch(e){}}
+  if(!rows)rows=this.local();const m={};rows.forEach(r=>{const x=this.clean(r);if(x)m[x.id]=x});this.map=m;return m},
+ async create(d){const ids=[...new Set(d.memberIds)].filter(x=>SF_ID.test(x)),prop=[...new Set(d.proposti)].filter(x=>SF_ID.test(x)).slice(0,3);
+  if(ids.length<2||ids.length>20)throw new Error('Servono da 2 a 20 soci');if(!prop.includes(d.scelto))throw new Error('Gioco non valido');
+  const pr={};ids.forEach(m=>{const v=Number(d.pron[m]);pr[m]=Math.round(Math.max(0,Math.min(2,isFinite(v)?v:1))*1000)/1000});
+  const row={member_ids:ids,proposti:prop,scelto:d.scelto,pronostico:pr,nuovo_per_tutti:!!d.nuovo};const c=DB.remote&&DB.remote.client;
+  if(c){const {data,error}=await c.from('sfide').insert(row).select('id,member_ids,proposti,scelto,pronostico,nuovo_per_tutti,created_at').single();
+   if(error)throw new Error(/limite|20/.test(error.message||'')?'Limite di sfide giornaliere raggiunto':'Impossibile creare la sfida');const x=this.clean(data);this.map[x.id]=x;return x}
+  const r={...row,id:crypto.randomUUID(),created_at:new Date().toISOString()},l=this.local();l.push(r);localStorage.setItem(this.lkey,JSON.stringify(l.slice(-500)));const x=this.clean(r);this.map[x.id]=x;return x},
+ week(d){const t=new Date(String(d).slice(0,10)+'T12:00Z'),w=(t.getUTCDay()+6)%7;t.setUTCDate(t.getUTCDate()-w);return t.toISOString().slice(0,10)},
+ // righe (socio, sfida) contate: dedup gruppo/giorno, max 2/giorno, max 10/settimana
+ rows(plays){const ord=(a,b)=>(a.date<b.date?-1:a.date>b.date?1:0)||String(a.createdAt||'').localeCompare(String(b.createdAt||''))||String(a.id).localeCompare(String(b.id));
+  const seen=new Set(),sm=[];
+  [...plays].filter(p=>p.sfidaId&&!p.coop&&this.map[p.sfidaId]).sort((a,b)=>String(a.createdAt||'').localeCompare(String(b.createdAt||''))||String(a.id).localeCompare(String(b.id))).forEach(p=>{const s=this.map[p.sfidaId],g=p.date+'|'+[...s.memberIds].sort().join(',');if(seen.has(g))return;seen.add(g);
+   s.memberIds.forEach(mid=>sm.push({p,s,mid,won:p.players.some(x=>x.memberId===mid&&x.winner)}))});
+  const dc={},wc={},out=[];
+  sm.sort((a,b)=>ord(a.p,b.p)).forEach(r=>{const dk=r.mid+'|'+r.p.date;dc[dk]=(dc[dk]||0)+1;if(dc[dk]>2)return;const wk=r.mid+'|'+this.week(r.p.date);wc[wk]=(wc[wk]||0)+1;if(wc[wk]>10)return;
+   const v=r.s.memberIds.map(m=>r.s.pron[m]),me=r.s.pron[r.mid];r.under=r.won&&me===Math.min(...v)&&me<Math.max(...v);out.push(r)});return{all:sm,ok:out}},
+ stats(memberId,plays){const z={sfN:0,sfW:0,sfU:0,sfNuovi:0,sfBig:false,sfRiv:false,sfRivali:0};if(!memberId)return z;const{all,ok}=this.rows(plays),mine=ok.filter(r=>r.mid===memberId);
+  mine.forEach(r=>{z.sfN++;if(r.won)z.sfW++;if(r.under)z.sfU++;if(r.s.nuovo)z.sfNuovi++;if(r.s.memberIds.length>=5)z.sfBig=true});
+  const opp={};mine.forEach(r=>all.filter(o=>o.p===r.p&&o.mid!==memberId).forEach(o=>{(opp[o.mid]=opp[o.mid]||[]).push([r.won,o.won])}));
+  Object.values(opp).forEach(l=>{z.sfRivali=Math.max(z.sfRivali,l.length);for(let i=1;i<l.length;i++)if(l[i][0]&&!l[i][1]&&l[i-1][1]&&!l[i-1][0])z.sfRiv=true});return z}};
 const Badges={
  stats(key,{plays,games,tables,ratings}){const mine=plays.filter(p=>p.players.some(x=>Stats.key(x)===key));const me=p=>p.players.find(x=>Stats.key(x)===key);
   const dates=wd=>new Set(mine.filter(p=>new Date(String(p.date).slice(0,10)+'T12:00').getDay()===wd).map(p=>p.date)).size;
   return{plays:mine.length,wins:mine.filter(p=>me(p).winner).length,distinct:new Set(mine.map(p=>p.gameId)).size,thu:dates(4),sun:dates(0),
    coopWins:mine.filter(p=>p.coop&&me(p).winner).length,records:Stats.records(games,plays).filter(r=>Stats.key(r.best.p)===key).length,
-   hosted:(tables||[]).filter(t=>'m:'+t.hostId===key).length,explorer:mine.some(p=>{const g=games.find(g=>g.id===p.gameId);return g&&g.addedAt&&g.addedAt.slice(0,10)===p.date}),rated:(ratings||[]).filter(x=>'m:'+x.member_id===key).length}},
+   hosted:(tables||[]).filter(t=>'m:'+t.hostId===key).length,explorer:mine.some(p=>{const g=games.find(g=>g.id===p.gameId);return g&&g.addedAt&&g.addedAt.slice(0,10)===p.date}),rated:(ratings||[]).filter(x=>'m:'+x.member_id===key).length,...SF.stats(key.startsWith('m:')?key.slice(2):null,plays)}},
  // progresso verso il badge: [valore attuale, obiettivo]
  prog:{prima:s=>[s.plays,1],vittoria:s=>[s.wins,1],p10:s=>[s.plays,10],p25:s=>[s.plays,25],p50:s=>[s.plays,50],g5:s=>[s.distinct,5],g10:s=>[s.distinct,10],g20:s=>[s.distinct,20],
-  gio:s=>[s.thu,5],dom:s=>[s.sun,5],rec:s=>[s.records,1],coop:s=>[s.coopWins,5],host:s=>[s.hosted,5],critico:s=>[s.rated,10]},
+  gio:s=>[s.thu,5],dom:s=>[s.sun,5],rec:s=>[s.records,1],coop:s=>[s.coopWins,5],host:s=>[s.hosted,5],critico:s=>[s.rated,10],sf1:s=>[s.sfN,1],sf10:s=>[s.sfN,10],sfw5:s=>[s.sfW,5],sfund:s=>[s.sfU,1],sfriv:s=>[+s.sfRiv,1],sfrivali:s=>[s.sfRivali,5],sfnuovo:s=>[s.sfNuovi,3],sfbig:s=>[+s.sfBig,1]},
  list(key,ctx){const s=this.stats(key,ctx);return BADGES.map(([id,icon,name,desc,f])=>{const p=this.prog[id]&&this.prog[id](s);return{id,icon,name,desc,on:!!f(s),cur:p?Math.min(p[0],p[1]):null,goal:p?p[1]:null}})},
  unlocked(key,ctx){return this.list(key,ctx).filter(b=>b.on).map(b=>b.id)}};
 

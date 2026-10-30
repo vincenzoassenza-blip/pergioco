@@ -119,13 +119,18 @@ async function eqOpen(){const all=await DB.members(),ms=all.filter(m=>m.active),
   V.innerHTML=`<div class="cwz eq">${top('Le sfide più equilibrate','Modifica')}
   <p class="muted">${esc(st.ids.map(nm).join(', '))}${st.guests?` + ${st.guests} ospit${st.guests===1?'e':'i'}`:''} · ${N()} al tavolo</p>
   ${show.length?show.map((r,j)=>`<div class="card cwz-r"><div class="row"><b>${['🥇','🥈','🥉'][j]} ${esc(r.g.name)}</b><span class="muted" style="flex:0 0 auto">👥 ${esc(pRange(r.g))} · ⏱ ~${esc(gPt(r.g))} min</span></div><p class="cwz-why">${esc(EQ.why(r,st.off+j))}</p>
-   <div class="cwz-btns"><button data-see="${esc(r.g.id)}">📖 Scheda</button><button class="p" data-book="${esc(r.g.id)}">📅 Prenota un tavolo</button></div></div>`).join('')
+   <div class="cwz-btns"><button data-see="${esc(r.g.id)}">📖 Scheda</button><button class="p" data-book="${esc(r.g.id)}">📅 Prenota un tavolo</button><button class="p" data-play="${esc(r.g.id)}">⚔️ Giochiamo questa</button></div></div>`).join('')
    :'<p class="muted">Nessun gioco della collezione va bene per questo numero di giocatori e questo tempo. Prova ad allargare il tempo.</p>'}
   <div class="cwz-btns">${L.length>3?'<button id="eqn">🔄 Altra proposta</button>':''}<button id="eqm">✏️ Cambia partecipanti</button></div></div>`;
   $('#eqh').focus();$('#eqb').onclick=s1;$('#eqm').onclick=s1;if($('#eqn'))$('#eqn').onclick=()=>{st.off+=3;res()};
   V.querySelectorAll('[data-see]').forEach(b=>b.onclick=()=>{const g=gsAll.find(x=>x.id===b.dataset.see);if(g&&typeof gamePage==='function')gamePage(g,ps)});
-  V.querySelectorAll('[data-book]').forEach(b=>b.onclick=()=>typeof cBook==='function'&&cBook(b.dataset.book))};
+  V.querySelectorAll('[data-book]').forEach(b=>b.onclick=()=>typeof cBook==='function'&&cBook(b.dataset.book));
+  V.querySelectorAll('[data-play]').forEach(b=>b.onclick=async()=>{const r=show.find(x=>x.g.id===b.dataset.play);if(!r||r.g.coop)return;b.disabled=true;
+   const pron={};st.ids.forEach((id,i)=>{const F=r.per[i]&&r.per[i].F;pron[id]=Math.max(0,Math.min(2,isFinite(F)?F:1))});
+   try{const sf=await SF.create({memberIds:st.ids,proposti:show.map(x=>x.g.id),scelto:r.g.id,pron,nuovo:r.allNew});
+    views.nuova({sfidaId:sf.id,gameId:r.g.id,date:new Date().toISOString().slice(0,10),players:st.ids.map(id=>({memberId:id,score:''}))})}
+   catch(e){b.disabled=false;toast(e.message||'Impossibile creare la sfida')}})};
  s1()}
 // pulsante discreto in cima alla scheda Partita (solo per nuova partita, non in modifica)
-(()=>{const _n=views.nuova;views.nuova=async function(ed,...a){await _n.call(this,ed,...a);if(ed&&(ed.id||ed.fromTable))return;const h=V.querySelector('h2');if(!h||V.querySelector('#eqo'))return;
+(()=>{const _n=views.nuova;views.nuova=async function(ed,...a){await _n.call(this,ed,...a);if(ed&&(ed.id||ed.fromTable||ed.sfidaId))return;const h=V.querySelector('h2');if(!h||V.querySelector('#eqo'))return;
  h.insertAdjacentHTML('afterend','<button class="eqo" id="eqo">⚖️ Sfida equilibrata · <span>a cosa giochiamo per stare alla pari?</span></button>');$('#eqo').onclick=()=>eqOpen()}})();

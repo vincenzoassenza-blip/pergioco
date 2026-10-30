@@ -58,7 +58,8 @@ const ask=m=>modal(m),askText=(m,d='',num='')=>modal(m,{input:true,def:d,num});
 function isMod(){return !!(admin&&DB.remote&&DB.remote.modCached)}
 function drawOutBtn(){const b=document.getElementById('outbtn');if(!b)return;b.onclick=confirmLogout;if(!DB.remote){b.hidden=true;return}DB.remote.user().then(u=>{b.hidden=!u;if(u)b.title='Esci ('+u.email+')'}).catch(()=>{b.hidden=true})}
 function drawModeBtn(){drawOutBtn();{const n=document.getElementById('navaltro');if(n)n.textContent=admin?'Gestione':'Altro'}const b=document.getElementById('modebtn');if(!b)return;b.hidden=!admin;b.textContent=uiMode()==='user'?'👤 Modalità utente':isMod()?'🛡 Modalità moderatore':'🔧 Modalità admin';document.body.classList.toggle('adm',adminMode())}
-const playRow=(p,gs,ms)=>`<div class="rec"><span>${esc(gname(gs,p.gameId))}<br><span class="muted">${fmt(p.date)} · ${dayName(p.date)}${p.scenario?' · '+esc(p.scenario):''}${durOk(p.duration)?' · ⏱ '+durOk(p.duration)+' min':''}</span></span><span class="win">${p.coop?(p.groupWin?'Vittoria':'Sconfitta'):p.players.filter(x=>x.winner).map(x=>lbH(x,ms)).join(', ')}</span></div>`;
+const SFID=v=>typeof v==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+const playRow=(p,gs,ms)=>`<div class="rec"><span>${esc(gname(gs,p.gameId))}<br><span class="muted">${fmt(p.date)} · ${dayName(p.date)}${p.scenario?' · '+esc(p.scenario):''}${durOk(p.duration)?' · ⏱ '+durOk(p.duration)+' min':''}${p.sfidaId?' · <span class="sfb-tag">⚖️ Sfida</span>':''}</span></span><span class="win">${p.coop?(p.groupWin?'Vittoria':'Sconfitta'):p.players.filter(x=>x.winner).map(x=>lbH(x,ms)).join(', ')}</span></div>`;
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 // Selettore soci: lista alfabetica con checkbox e ricerca (nome/cognome/soprannome, senza accenti)
 function pickMembers(ms,selected,title,max){return new Promise(res=>{const sel=new Set(selected||[]);
@@ -72,7 +73,7 @@ function pickMembers(ms,selected,title,max){return new Promise(res=>{const sel=n
  w.querySelector('#pkq').oninput=e=>{q=norm(e.target.value.trim());draw()};
  w.querySelector('#pkl').onclick=e=>{const r=e.target.closest('.pki');if(!r)return;e.preventDefault();const id=r.dataset.id;if(sel.has(id))sel.delete(id);else{if(max&&sel.size>=max)return toast('Tavolo pieno');sel.add(id)}draw()};
  const close=v=>{w.remove();res(v)};w.querySelector('#pkx').onclick=()=>close(null);w.querySelector('#pko').onclick=()=>close([...sel]);w.onclick=e=>e.target===w&&close(null);draw()})}
-const badgeCtx=async()=>({plays:await DB.plays(),games:await DB.games(),tables:await DB.allTables(),ratings:(await XP.ensure(),XP.rt)});
+const badgeCtx=async()=>(typeof SF!=='undefined'&&await SF.load(),{plays:await DB.plays(),games:await DB.games(),tables:await DB.allTables(),ratings:(await XP.ensure(),XP.rt)});
 const badgeSnap=async()=>{const c=await badgeCtx(),ms=await DB.members(),o={};ms.forEach(m=>o['m:'+m.id]=Badges.unlocked('m:'+m.id,c));return o};
 const badgeNew=async(before,keys)=>{const c=await badgeCtx(),ms=await DB.members(),out=[];keys.forEach(k=>{const b=Badges.list(k,c).filter(b=>b.on&&!(before[k]||[]).includes(b.id));const m=ms.find(m=>'m:'+m.id===k);b.forEach(x=>out.push(`${x.icon} ${m?memberName(m):''}: ${x.name}`))});
  out.forEach((t,i)=>setTimeout(()=>{const e=document.createElement('div');e.className='toast badge-toast';e.textContent='Nuovo badge! '+t;document.body.append(e);setTimeout(()=>e.remove(),3200)},2300+i*3300))};
@@ -91,7 +92,7 @@ ${adminMode()?` <details class="card"><summary><b>Aggiungi un gioco</b></summary
  $('#q').oninput=e=>{f.q=e.target.value.toLowerCase();draw()};$('#n').onchange=e=>{f.n=+e.target.value;draw()};$('#t').onchange=e=>{f.t=+e.target.value;draw()};$('#so').onchange=e=>{f.s=e.target.value;draw()};
  if($('#ga'))$('#ga').onclick=async()=>{const n=$('#gn').value.trim();if(!n)return toast('Inserisci il nome');const gf=$('#ga').closest('details');['#g1','#g2','#g3','#g4','#g5'].forEach(s=>$(s).required=true);if(!numForm(gf))return;if(+$('#g2').value<+$('#g1').value){$('#g2').classList.add('bad');return modal('⚠️ «Giocatori max» non può essere minore di «Giocatori min».',{cancel:false})}if(+$('#g4').value<+$('#g3').value){$('#g4').classList.add('bad');return modal('⚠️ «Minuti max» non può essere minore di «Minuti min».',{cancel:false})}await DB.addGame({name:n,min:+$('#g1').value,max:+$('#g2').value,minT:+$('#g3').value,maxT:+$('#g4').value,age:+$('#g5').value,coop:$('#gc').checked});toast('Gioco aggiunto');go('ludoteca')};draw()},
 async nuova(ed){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=>m.active||(ed&&ed.players.some(x=>x.memberId===m.id)));const today=new Date().toISOString().slice(0,10);const _u=DB.remote?(await DB.remote.user())?.id:null,meM=all.find(m=>_u&&m.userId===_u),lockId=!adminMode()&&meM&&!(ed&&ed.id)?meM.id:null;
- V.innerHTML=`<h2>${ed&&ed.id?'Modifica partita':'Registra una partita'}</h2><div class="card"><label>Gioco</label><select id="g">${gs.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`)}</select>
+ V.innerHTML=`<h2>${ed&&ed.id?'Modifica partita':'Registra una partita'}</h2>${ed&&SFID(ed.sfidaId)?'<p class="sfb">⚖️ <b>Sfida equilibrata</b> · questa partita conta come sfida (EXP e badge sfide)</p>':''}<div class="card"><label>Gioco</label><select id="g">${gs.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`)}</select>
  <label>Data</label><input id="d" type="date" value="${today}" required><div class="muted" id="dday" style="margin:-4px 0 8px"></div>
  <label>Modalità</label><div class="seg" id="mode"><button data-m="0" class="on">Competitiva</button><button data-m="1">Cooperativa</button></div>
  <div id="coop" hidden><label>Scenario</label><input id="sc" placeholder="es. Scenario 3"><label>Esito del gruppo</label><div class="seg" id="res"><button data-r="1" class="on">Vittoria</button><button data-r="0">Sconfitta</button></div></div>
@@ -117,6 +118,7 @@ async nuova(ed){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m
  $('#save').onclick=async()=>{if(!isoOk($('#d').value))return toast('Data non valida');if(!sel.length)return toast('Seleziona almeno un giocatore');if(!coop&&!numForm($('#pl')))return;if(!numForm($('#du').parentNode))return;sel.forEach(s=>{if(s.score!==''&&s.score!=null)s.score=String(s.score).replace(',','.')});if(lockId&&!sel.some(x=>x.memberId===lockId))return toast('Devi essere tra i giocatori');
   const players=sel.map(s=>s.memberId?{memberId:s.memberId,score:coop?null:s.score}:{guest:!!s.guest,name:s.name,score:coop?null:s.score});
   const p={gameId:$('#g').value,date:$('#d').value,evening:dayName($('#d').value),coop,groupWin:coop?win:null,scenario:coop?$('#sc').value:'',players,note:$('#nt').value,duration:durOk($('#du').value.trim())};
+  if(ed&&SFID(ed.sfidaId))p.sfidaId=ed.sfidaId;
   const keys=players.filter(x=>x.memberId).map(x=>'m:'+x.memberId),before=await badgeSnap();
   if(ed&&ed.id){p.id=ed.id;await DB.updatePlay(p);badgeNew(before,keys);toast('Partita aggiornata');adminTab='partite';return go('altro')}
   const r=await DB.addPlay(p);if(ed&&ed.fromTable)await DB.saveTable({id:ed.fromTable,status:'closed',playId:r.id});badgeNew(before,keys);XP.refresh();ratePrompt(r);const w=r.players.filter(x=>x.winner).map(x=>Stats.label(x,all));toast(coop?(win?'Vittoria del gruppo! 🎉':'Sconfitta… alla prossima!'):`Vince ${w.join(' e ')||'—'} 🏆`);go('record')}},
@@ -162,7 +164,7 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<div id="bkp" hidden><h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati sul server dell'associazione. Qui puoi scaricarne una copia manuale in JSON (non include i Libri sociali).</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div></div>
- <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2></div><div class="card" id="adm"></div><div class="card muted">PerGioco · v29 · Associazione PerGioco, Ragusa</div>`;
+ <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2></div><div class="card" id="adm"></div><div class="card muted">PerGioco · v30 · Associazione PerGioco, Ragusa</div>`;
  
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(f&&f.size>IMP_MAX_MB*1048576)return modal(`⚠️ Il file è troppo grande (massimo ${IMP_MAX_MB} MB).`,{cancel:false});if(!f||!await ask('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
