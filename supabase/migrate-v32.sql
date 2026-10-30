@@ -11,6 +11,12 @@ create table if not exists public.coppe(
  created_by uuid, created_at timestamptz not null default now(), concluso_at timestamptz,
  constraint coppe_turno_max check(turno<=turni),
  constraint coppe_campione_chk check((stato='concluso')=(concluso_at is not null)));
+-- durata: la Coppa può durare giorni o settimane (date opzionali, scadenza opzionale per ogni turno)
+alter table public.coppe add column if not exists data_inizio date, add column if not exists data_fine date, add column if not exists scadenze date[] not null default '{}';
+alter table public.coppe drop constraint if exists coppe_date_chk;
+alter table public.coppe add constraint coppe_date_chk check(
+ (data_inizio is null or data_inizio between date '2024-01-01' and date '2100-12-31') and (data_fine is null or data_fine between date '2024-01-01' and date '2100-12-31')
+ and (data_inizio is null or data_fine is null or (data_fine>=data_inizio and data_fine<=data_inizio+366)) and cardinality(scadenze)<=5);
 create table if not exists public.coppa_iscritti(
  coppa_id uuid not null references public.coppe(id) on delete cascade,
  member_id text not null references public.members(id),
@@ -57,10 +63,10 @@ alter table public.coppa_finale enable row level security;
 revoke all on public.coppe,public.coppa_iscritti,public.coppa_incontri,public.coppa_finale from anon,public;
 revoke insert,update,delete,truncate on public.coppe,public.coppa_iscritti,public.coppa_incontri,public.coppa_finale from authenticated;
 grant select on public.coppe,public.coppa_iscritti,public.coppa_incontri,public.coppa_finale to authenticated;
-drop policy if exists coppe_read on public.coppe; create policy coppe_read on public.coppe for select to authenticated using(true);
-drop policy if exists cpi_read on public.coppa_iscritti; create policy cpi_read on public.coppa_iscritti for select to authenticated using(true);
-drop policy if exists cpm_read on public.coppa_incontri; create policy cpm_read on public.coppa_incontri for select to authenticated using(true);
-drop policy if exists cpf_read on public.coppa_finale; create policy cpf_read on public.coppa_finale for select to authenticated using(true);
+drop policy if exists coppe_read on public.coppe; create policy coppe_read on public.coppe for select to authenticated using(stato<>'bozza' or public.is_staff());
+drop policy if exists cpi_read on public.coppa_iscritti; create policy cpi_read on public.coppa_iscritti for select to authenticated using(exists(select 1 from public.coppe c where c.id=coppa_id and (c.stato<>'bozza' or public.is_staff())));
+drop policy if exists cpm_read on public.coppa_incontri; create policy cpm_read on public.coppa_incontri for select to authenticated using(exists(select 1 from public.coppe c where c.id=coppa_id and (c.stato<>'bozza' or public.is_staff())));
+drop policy if exists cpf_read on public.coppa_finale; create policy cpf_read on public.coppa_finale for select to authenticated using(exists(select 1 from public.coppe c where c.id=coppa_id and (c.stato<>'bozza' or public.is_staff())));
 -- nessuna policy di scrittura: tutte le modifiche passano dalle RPC SECURITY DEFINER sotto
 
 create or replace function public.cp_me() returns text language sql stable security definer set search_path=public as
@@ -320,7 +326,7 @@ begin
 
 -- lettura per i client (nessun dato EXP esposto)
 create or replace function public.coppa_vista(p uuid) returns jsonb language sql stable security definer set search_path=public as $$
- select case when auth.uid() is null then null else jsonb_build_object(
+ select case when auth.uid() is null or not exists(select 1 from coppe x where x.id=p and (x.stato<>'bozza' or public.is_staff())) then null else jsonb_build_object(
   'coppa',(select to_jsonb(c)-'created_by' from coppe c where c.id=p),
   'iscritti',coalesce((select jsonb_agg(member_id order by created_at) from coppa_iscritti where coppa_id=p),'[]'),
   'incontri',coalesce((select jsonb_agg(jsonb_build_object('id',id,'turno',turno,'a',a,'b',b,'game_id',game_id,'vincitore',vincitore,'play_id',play_id) order by turno,a) from coppa_incontri where coppa_id=p),'[]'),
@@ -329,7 +335,7 @@ create or replace function public.coppa_vista(p uuid) returns jsonb language sql
 create or replace function public.coppa_lista() returns jsonb language sql stable security definer set search_path=public as $$
  select case when auth.uid() is null then null else jsonb_build_object(
   'coppe',coalesce((select jsonb_agg(jsonb_build_object('id',c.id,'edizione',c.edizione,'stato',c.stato,'turni',c.turni,'turno',c.turno,'formato',c.formato,'campione',c.campione,'concluso_at',c.concluso_at,
-     'iscritti',(select count(*) from coppa_iscritti i where i.coppa_id=c.id)) order by c.edizione desc) from coppe c),'[]'),
+     'data_inizio',c.data_inizio,'data_fine',c.data_fine,'iscritti',(select count(*) from coppa_iscritti i where i.coppa_id=c.id)) order by c.edizione desc) from coppe c where c.stato<>'bozza' or public.is_staff()),'[]'),
   'finali',coalesce((select jsonb_agg(jsonb_build_object('c',f.coppa_id,'m',f.member_id,'pos',f.pos,'v',f.vinte,'p',f.perse,'r',f.ranking,'b',f.buchholz)) from coppa_finale f),'[]'),
   'incontri',coalesce((select jsonb_agg(jsonb_build_object('c',i.coppa_id,'t',i.turno,'a',i.a,'b',i.b,'w',i.vincitore)) from coppa_incontri i join coppe c on c.id=i.coppa_id and c.stato='concluso'),'[]'),
   'me',public.cp_me(),'staff',public.is_staff()) end $$;
@@ -341,7 +347,7 @@ do $$ declare f text; begin
  foreach f in array array['coppa_crea(integer,text[],text)','coppa_config(uuid,integer,text[],text)','coppa_apri(uuid)','coppa_iscrivi(uuid,text,boolean)','coppa_avvia(uuid)','coppa_risultato(uuid,text)','coppa_avanza(uuid)','coppa_elimina(uuid)','coppa_vista(uuid)','coppa_lista()'] loop
   execute 'grant execute on function public.'||f||' to authenticated'; end loop; end $$;
 -- EXP Coppa: si aggiunge SOLO a chi ha partecipato a una Coppa conclusa (per tutti gli altri member_xp = member_xp_base, invariato)
--- +20 partecipazione, +50 campione, badge Coppa +30 ciascuno (come gli altri badge)
+-- +50 per Coppa giocata, +150 campione, +100 per ogni badge della Coppa
 create or replace function public.member_xp()
  returns table(member_id text, xp integer, level integer, dettaglio jsonb)
  language sql stable security definer set search_path to 'public'
@@ -356,10 +362,29 @@ f as (select f.member_id mid,f.pos,c.turni,
 k as (select mid,count(*)::int n,(count(*) filter(where pos=1))::int camp,
    (1+bool_or(pos<=3)::int+bool_or(pos=1)::int+bool_or(perse=0 and turni>=3)::int+bool_or(giant)::int+bool_or(r1 and pos<=3)::int+(count(*)>=3)::int) bad
   from f group by mid),
-x as (select b.*,k.mid,k.n,k.camp,k.bad,(b.xp+coalesce(20*k.n+50*k.camp+30*k.bad,0))::int tot from b left join k on k.mid=b.member_id)
+x as (select b.*,k.mid,k.n,k.camp,k.bad,(b.xp+coalesce(50*k.n+150*k.camp+100*k.bad,0))::int tot from b left join k on k.mid=b.member_id)
 select member_id,tot,case when mid is null then level else public.level_for_xp(tot) end,
- case when mid is null then dettaglio else dettaglio||jsonb_build_object('coppa',jsonb_build_array(n,20*n),'coppa_campione',jsonb_build_array(camp,50*camp),
-   'badge',jsonb_build_array((dettaglio->'badge'->>0)::int+bad,(dettaglio->'badge'->>1)::int+30*bad)) end
+ case when mid is null then dettaglio else dettaglio||jsonb_build_object('coppa',jsonb_build_array(n,50*n),'coppa_campione',jsonb_build_array(camp,150*camp),
+   'badge',jsonb_build_array((dettaglio->'badge'->>0)::int+bad,(dettaglio->'badge'->>1)::int+100*bad)) end
 from x $function$;
 revoke all on function public.member_xp() from public,anon;
 grant execute on function public.member_xp() to authenticated;
+
+create or replace function public.coppa_date(p uuid,p_inizio date,p_fine date,p_scadenze date[] default '{}') returns void
+language plpgsql security definer set search_path=public as $$
+declare c coppe; d date; k int:=0; prev date;
+begin
+ if auth.uid() is null or not public.is_staff() then raise exception 'Solo staff'; end if;
+ select * into c from coppe where id=p for update; if not found then raise exception 'Coppa inesistente'; end if;
+ if c.stato='concluso' then raise exception 'Coppa conclusa'; end if;
+ if p_inizio is not null and p_fine is not null and p_fine<p_inizio then raise exception 'La data di fine deve essere uguale o successiva all''inizio'; end if;
+ if p_inizio is not null and p_fine is not null and p_fine>p_inizio+366 then raise exception 'Durata massima: un anno'; end if;
+ p_scadenze:=coalesce(p_scadenze,'{}');
+ if cardinality(p_scadenze)>c.turni then raise exception 'Più scadenze che turni'; end if;
+ foreach d in array p_scadenze loop k:=k+1;
+  if d is null then continue; end if;
+  if (p_inizio is not null and d<p_inizio) or (p_fine is not null and d>p_fine) then raise exception 'Scadenza del turno % fuori dalle date della Coppa',k; end if;
+  if prev is not null and d<prev then raise exception 'Le scadenze dei turni devono essere in ordine'; end if; prev:=d; end loop;
+ update coppe set data_inizio=p_inizio,data_fine=p_fine,scadenze=p_scadenze where id=p; end $$;
+revoke all on function public.coppa_date(uuid,date,date,date[]) from public,anon;
+grant execute on function public.coppa_date(uuid,date,date,date[]) to authenticated;

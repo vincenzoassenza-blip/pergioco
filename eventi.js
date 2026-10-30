@@ -52,7 +52,7 @@ async function eventi(){navSerata();
 async function evDetail(e,p,i){const staff=adminMode(),ms=await DB.members(),mn=id=>{const m=ms.find(m=>m.id===id);return m?memberName(m):'Socio'};
  i=i||await EV.info(e.id).catch(()=>null);const aperto=!e.annullato&&new Date(e.chiusura)>new Date(),attiva=p&&ATTIVE.includes(p.stato);
  const nomi=(i&&i.nomi||[]).map(n=>esc(mn(n.member_id))+lv(n.member_id)+(n.ospite?' <span class="muted">+1 ospite</span>':''));
- const o=openPanel(`${safeUrl(e.immagine)?`<img class="evimg big" src="${esc(safeUrl(e.immagine))}" alt="Locandina" referrerpolicy="no-referrer">`:''}<h3>${esc(e.titolo)}</h3>
+ const o=openPanel(`${safeUrl(e.immagine)?`<img class="evimg big" src="${esc(safeUrl(e.immagine))}" alt="" referrerpolicy="no-referrer">`:''}<h3>${esc(e.titolo)}</h3>
  <p>📅 <b>${esc(evData(e.inizio))}</b>${e.luogo?`<br>📍 ${esc(e.luogo)}`:''}<br>⏰ Prenotazioni fino a ${esc(evData(e.chiusura))}</p>
  ${e.descrizione?`<p class="evdesc">${esc(e.descrizione)}</p>`:''}
  <div class="evtags">${e.annullato?'<span class="evb off">Evento annullato</span>':''}${e.torneo?'<span class="evb t">🏆 Torneo</span>':''}${e.solo_soci?'<span class="evb t">Solo soci in regola con la quota</span>':'<span class="evb t">Aperto a tutti</span>'}${e.ospiti?'<span class="evb t">Ospiti ammessi (max 1)</span>':''}${i?`<span class="evb t">${i.occupati}/${e.posti} posti${i.attesa?` · ${i.attesa} in lista d'attesa`:''}</span>`:''}</div>

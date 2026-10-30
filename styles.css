@@ -235,3 +235,6 @@ body.antopen{overflow:hidden}
 .cppool{max-height:240px;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px;margin:6px 0}.cpg{display:flex;gap:6px;align-items:center;font-size:14px}
 table.cpt{width:100%;border-collapse:collapse;font-size:14px}table.cpt th,table.cpt td{padding:5px 4px;text-align:left;border-bottom:1px solid rgba(127,127,127,.15)}table.cpt tr.me{background:rgba(201,162,39,.12)}
 .cptop{margin:6px 0 0 0;padding-left:0;list-style:none}.cptop li{padding:3px 0}
+
+.cpg input{width:auto;flex:none;margin:0}.cpg{line-height:1.2;padding:3px 0}.cpsc{display:grid;grid-template-columns:1fr 1fr;gap:6px}.cpsl{font-size:13px;display:flex;flex-direction:column;gap:2px}
+img.imgko{display:none!important}

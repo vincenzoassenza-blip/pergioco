@@ -19,11 +19,13 @@ BADGES.push(['cpart','🏆','Coppa Antero','Partecipa a una Coppa Antero',s=>s.c
 {const _bs=Badges.stats;Badges.stats=function(k,o){return Object.assign(_bs.call(this,k,o),CP.bstats(k))}}
 {const _xl=XP.load.bind(XP);XP.load=async function(){await _xl();await CP.load()}}
 const cpMsg=e=>String(e&&e.message||e||'Errore').replace(/^.*?ERROR:\s*/,'').slice(0,200);
-async function cpCard(){if(!CP.cl())return'';if(!CP.d)await CP.load();const d=CP.d;if(!d)return'';const c=(d.coppe||[])[0],st=!!d.staff;
+async function cpCard(){if(!CP.cl())return'';if(!CP.d)await CP.load();const d=CP.d;if(!d)return'';const st=!!d.staff,c=(d.coppe||[]).filter(x=>st||x.stato!=='bozza')[0];
  if(!c)return st?`<div class="card cpc"><div class="hrow"><b>🏆 Coppa Antero</b><button class="p" id="cpnew">➕ Crea la prima edizione</button></div><p class="muted">Torneo svizzero 1 contro 1: nessuna rivincita, mai lo stesso gioco due volte.</p></div>`:'';
  return`<div class="card cpc" data-cp="${esc(c.id)}" role="button"><div class="hrow"><b>🏆 Coppa Antero ${esc(CP.rom(c.edizione))}</b><span class="evb t">${esc(CP.STATI[c.stato]||c.stato)}</span></div>
- <p class="muted">${c.stato==='in_corso'?esc(CP.turno(c.turno))+' di '+c.turni:c.turni+' turni'} · ${c.iscritti} iscritt${c.iscritti==1?'o':'i'}${c.stato==='concluso'&&c.campione?' · 👑 '+cpNome(c.campione):''}</p>
+ <p class="muted">${cpDur(c)?'📅 '+esc(cpDur(c))+' · ':''}${c.stato==='in_corso'?esc(CP.turno(c.turno))+' di '+c.turni:c.turni+' turni'} · ${c.iscritti} iscritt${c.iscritti==1?'o':'i'}${c.stato==='concluso'&&c.campione?' · 👑 '+cpNome(c.campione):''}</p>
  ${st&&c.stato==='concluso'?'<button class="s" id="cpnew">➕ Nuova edizione</button>':''}</div>`}
+const cpD=d=>{const x=new Date(d+'T12:00:00');return isNaN(x)?'':x.toLocaleDateString('it-IT',{day:'numeric',month:'short'})};
+const cpDur=c=>c.data_inizio&&c.data_fine?`dal ${cpD(c.data_inizio)} al ${cpD(c.data_fine)}`:c.data_inizio?`dal ${cpD(c.data_inizio)}`:c.data_fine?`fino al ${cpD(c.data_fine)}`:'';
 let _cpMs=[];const cpNome=id=>{const m=_cpMs.find(m=>m.id===id);return m?nmH(m):'<span class="muted">Socio</span>'};
 async function cpBind(){V.querySelectorAll('[data-cp]').forEach(e=>e.onclick=ev=>{if(ev.target.closest('button'))return;window._cpId=e.dataset.cp;go('coppa')});
  const n=$('#cpnew');if(n)n.onclick=async()=>{try{const id=await CP.rpc('coppa_crea',{p_turni:3,p_pool:[],p_formato:'1v1'});await CP.load();window._cpId=id;go('coppa')}catch(e){toast(cpMsg(e))}}}
@@ -40,6 +42,8 @@ views.coppa=async function(){clearInterval(window._cpT);const id=window._cpId||(
   <label>Turni (max 5)</label><select id="cpt">${[1,2,3,4,5].map(n=>`<option value="${n}"${n===c.turni?' selected':''}${n<cur?' disabled':''}>${n} — ${esc(CP.turno(n).replace('Turno ',''))}</option>`).join('')}</select>
   <label>Pool di giochi <span class="muted" id="cpcnt"></span></label><input id="cpq" placeholder="Cerca gioco…">
   <div class="cppool">${gs.filter(okG).sort((a,b)=>a.name.localeCompare(b.name,'it')).map(g=>`<label class="cpg"><input type="checkbox" value="${esc(g.id)}"${pool.includes(g.id)?' checked':''}${c.stato==='in_corso'&&pool.includes(g.id)?' disabled':''}> ${esc(g.name)}</label>`).join('')}</div>
+  <label>Durata <span class="muted">(facoltativa: la Coppa può durare giorni o settimane)</span></label><div class="row"><input type="date" id="cpdi" value="${esc(c.data_inizio||'')}" aria-label="Data inizio"><input type="date" id="cpdf" value="${esc(c.data_fine||'')}" aria-label="Data fine"></div>
+  <label>Scadenza dei turni <span class="muted">(facoltativa)</span></label><div class="cpsc">${Array.from({length:5},(_,k)=>`<label class="cpsl"${k>=c.turni?' hidden':''}>${esc(CP.turno(k+1))}<input type="date" data-sc="${k}" value="${esc((c.scadenze||[])[k]||'')}"></label>`).join('')}</div>
   <p class="warn" id="cpwarn" hidden></p><button class="p" id="cpsave">💾 Salva configurazione</button>${c.stato!=='in_corso'?' <button class="s" id="cpdel">🗑 Elimina</button>':''}</details>`:'';
  const myIn=me&&v.iscritti.includes(me);
  const isc=`<div class="card"><b>✍️ Iscritti (${v.iscritti.length})</b><div class="chips" style="margin-top:6px">${v.iscritti.map(m=>`<span class="chip">${nm(m)}</span>`).join('')||'<span class="muted">Ancora nessuno.</span>'}</div>
@@ -50,14 +54,14 @@ views.coppa=async function(){clearInterval(window._cpT);const id=window._cpId||(
   const can=i.turno===cur&&(st||(!i.vincitore&&me&&(me===i.a||me===i.b)));const w=x=>i.vincitore===x?' cpw':i.vincitore?' cpl':'';
   return`<div class="cpm"><div class="cpv"><span class="cpp${w(i.a)}">${nm(i.a)}</span><span class="muted">vs</span><span class="cpp${w(i.b)}">${nm(i.b)}</span></div><div class="muted">🎲 ${gn(i.game_id)}${i.vincitore?' · 🏆 vince '+nm(i.vincitore):i.turno===cur?' · in attesa del risultato':''}</div>
   ${can?`<div class="row cpbtn"><button class="s" data-res="${esc(i.id)}" data-w="${esc(i.a)}">Vince ${esc(memberName(_cpMs.find(m=>m.id===i.a)||{}))}</button><button class="s" data-res="${esc(i.id)}" data-w="${esc(i.b)}">Vince ${esc(memberName(_cpMs.find(m=>m.id===i.b)||{}))}</button></div>`:''}</div>`};
- const tab=turni.length?`<h3 class="rsec">⚔️ Tabellone${c.stato==='in_corso'?' <span class="evb t">live</span>':''}</h3>${turni.map(t=>`<div class="card"><b>${esc(CP.turno(t))}</b>${t===cur?' <span class="muted">(in corso)</span>':''}${inc.filter(i=>i.turno===t).map(row).join('')}</div>`).join('')}`:'';
+ const tab=turni.length?`<h3 class="rsec">⚔️ Tabellone${c.stato==='in_corso'?' <span class="evb t">live</span>':''}</h3>${turni.map(t=>`<div class="card"><b>${esc(CP.turno(t))}</b>${t===cur?' <span class="muted">(in corso)</span>':''}${(c.scadenze||[])[t-1]?` <span class="muted">· entro il ${esc(cpD(c.scadenze[t-1]))}</span>`:''}${inc.filter(i=>i.turno===t).map(row).join('')}</div>`).join('')}`:'';
  const cla=v.classifica.length&&c.stato!=='bozza'&&c.stato!=='iscrizioni'?`<h3 class="rsec">📊 Classifica${c.stato==='concluso'?' finale':''}</h3><div class="card"><table class="cpt"><tr><th>#</th><th>Socio</th><th title="Vittorie">V</th><th title="Sconfitte">P</th><th title="Ranking (parte da 1000)">Rank</th><th title="Forza avversari (Buchholz)">Avv.</th></tr>
   ${v.classifica.map(r=>`<tr class="${r.member_id===me?'me':''}"><td>${r.pos<=3&&c.stato==='concluso'?['🥇','🥈','🥉'][r.pos-1]:r.pos}</td><td>${nm(r.member_id)}</td><td><b>${r.vinte}</b></td><td>${r.perse}</td><td>${r.ranking}</td><td>${r.buchholz}</td></tr>`).join('')}</table>
   <p class="muted" style="font-size:12px">Ordine: vittorie → scontro diretto → ranking → forza degli avversari.</p></div>`:'';
  const allIn=cur&&!inc.some(i=>i.turno===cur&&!i.vincitore);
  const act=st?(c.stato==='bozza'?`<button class="p" id="cpapri"${pool.length<c.turni?' disabled':''}>✍️ Apri iscrizioni</button>`:c.stato==='iscrizioni'?`<button class="p" id="cpavvia"${v.iscritti.length<2?' disabled':''}>⚔️ Avvia la Coppa (${v.iscritti.length} iscritti)</button>`:c.stato==='in_corso'?`<button class="p" id="cpnext"${allIn?'':' disabled'}>${c.turno<c.turni?'➡️ Genera '+esc(CP.turno(c.turno+1)):'👑 Concludi e incorona'}</button>${allIn?'':'<p class="muted">Servono tutti i risultati del turno.</p>'}`:''):'';
  V.innerHTML=`<div class="hrow"><h2>🏆 Coppa Antero <span class="cpn">${esc(CP.rom(c.edizione))}</span></h2><button class="s" id="cpback">← Eventi</button></div>
- <div class="evtags"><span class="evb t">${esc(CP.STATI[c.stato]||c.stato)}</span><span class="evb t">1 contro 1</span><span class="evb t">${c.turni} turni</span>${c.stato==='in_corso'?`<span class="evb t">${esc(CP.turno(c.turno))}</span>`:''}<span class="evb t">${pool.length} giochi nel pool</span></div>
+ <div class="evtags"><span class="evb t">${esc(CP.STATI[c.stato]||c.stato)}</span><span class="evb t">1 contro 1</span><span class="evb t">${c.turni} turni</span>${c.stato==='in_corso'?`<span class="evb t">${esc(CP.turno(c.turno))}</span>`:''}<span class="evb t">${pool.length} giochi nel pool</span>${cpDur(c)?`<span class="evb t">📅 ${esc(cpDur(c))}</span>`:''}</div>
  ${c.stato==='concluso'&&c.campione?`<div class="card cpking">👑 <b>${nm(c.campione)}</b> incoronato da Sant'Antero<div class="muted">Campione della Coppa Antero ${esc(CP.rom(c.edizione))}</div></div>`:''}
  ${act?`<div class="card">${act}</div>`:''}${cfg}${tab}${cla}${c.stato!=='in_corso'&&c.stato!=='concluso'||!turni.length?isc:''}
  <p class="muted" style="font-size:12px">Regole: niente rivincite, nessun gioco si ripete per lo stesso giocatore, a chi ha meno vittorie toccano giochi più favorevoli. Con giocatori dispari uno riposa (vittoria a tavolino, al massimo una volta).</p>`;
@@ -70,10 +74,13 @@ views.coppa=async function(){clearInterval(window._cpT);const id=window._cpId||(
  if($('#cpavvia'))$('#cpavvia').onclick=()=>confirm('Avviare la Coppa? Le iscrizioni si chiudono e parte il primo turno.')&&run(()=>CP.rpc('coppa_avvia',{p:c.id}),'Si parte! ⚔️');
  if($('#cpnext'))$('#cpnext').onclick=()=>run(()=>CP.rpc('coppa_avanza',{p:c.id}),c.turno<c.turni?'Nuovo turno generato':"👑 Incoronato da Sant'Antero!");
  if($('#cpdel'))$('#cpdel').onclick=()=>confirm('Eliminare questa Coppa?')&&run(async()=>{await CP.rpc('coppa_elimina',{p:c.id});window._cpId=null;go('eventi')},'Coppa eliminata');
- if($('#cpsave')){const sel=()=>[...V.querySelectorAll('.cppool input:checked')].map(i=>i.value),chk=()=>{const n=sel().length,t=+$('#cpt').value,w=$('#cpwarn');$('#cpcnt').textContent=`(${n} selezionati)`;w.hidden=n>=t;w.textContent=`⚠️ Il pool ha ${n} giochi ma i turni sono ${t}: servono almeno ${t} giochi, perché un gioco non si ripete mai per lo stesso giocatore.`};
+ if($('#cpsave')){const sel=()=>[...V.querySelectorAll('.cppool input:checked')].map(i=>i.value),chk=()=>{const n=sel().length,t=+$('#cpt').value,w=$('#cpwarn');$('#cpcnt').textContent=`(${n} selezionati)`;w.hidden=n>=t;V.querySelectorAll('.cpsl').forEach((l,k)=>l.hidden=k>=t);w.textContent=`⚠️ Il pool ha ${n} giochi ma i turni sono ${t}: servono almeno ${t} giochi, perché un gioco non si ripete mai per lo stesso giocatore.`};
   V.querySelectorAll('.cppool input,#cpt').forEach(i=>i.onchange=chk);chk();
   $('#cpq').oninput=e=>{const q=e.target.value.toLowerCase();V.querySelectorAll('.cpg').forEach(l=>l.hidden=q&&!l.textContent.toLowerCase().includes(q))};
-  $('#cpsave').onclick=()=>run(()=>CP.rpc('coppa_config',{p:c.id,p_turni:+$('#cpt').value,p_pool:sel(),p_formato:'1v1'}),'Configurazione salvata')}
+  $('#cpsave').onclick=()=>run(async()=>{const di=$('#cpdi').value||null,df=$('#cpdf').value||null;if(di&&df&&df<di)throw new Error('La data di fine deve essere uguale o successiva all\'inizio');
+   await CP.rpc('coppa_config',{p:c.id,p_turni:+$('#cpt').value,p_pool:sel(),p_formato:'1v1'});
+   const t=+$('#cpt').value,sc=[...V.querySelectorAll('[data-sc]')].slice(0,t).map(i=>i.value||null);while(sc.length&&!sc[sc.length-1])sc.pop();
+   await CP.rpc('coppa_date',{p:c.id,p_inizio:di,p_fine:df,p_scadenze:sc})},'Configurazione salvata')}
  if(c.stato==='in_corso')window._cpT=setInterval(()=>{if(window._cur!=='coppa'){clearInterval(window._cpT);return}if(!document.activeElement||document.activeElement===document.body)re()},20000)};
 // Record: top 5 dell'ultima Coppa (fino alla prossima), più Coppe vinte, albo d'oro
 const _rec=views.record;views.record=async(...a)=>{await _rec(...a);if(!CP.cl())return;if(!CP.d)await CP.load();const d=CP.d;if(!d||window._cur!=='record')return;

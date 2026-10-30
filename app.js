@@ -1,4 +1,6 @@
 const romeToday=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date());
+// immagini non caricabili (cover, locandine, icone): si nascondono invece di mostrare l'icona rotta o il testo alternativo
+document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG')t.classList.add('imgko')},true);
 const START=location.hash;
 const $=s=>document.querySelector(s),V=$('#view');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
