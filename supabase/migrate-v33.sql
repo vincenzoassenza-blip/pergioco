@@ -14,3 +14,6 @@ begin
  if n=0 then raise exception 'Il tuo account non è collegato a un socio'; end if; end $$;
 revoke all on function public.set_stats_pubbliche(boolean) from public,anon;
 grant execute on function public.set_stats_pubbliche(boolean) to authenticated;
+-- v33.1 hotfix: members usa privilegi per colonna → la nuova colonna va resa leggibile (altrimenti la select del client fallisce e l'app va "offline")
+grant select (stats_pubbliche) on public.members to authenticated;
+revoke insert (stats_pubbliche), update (stats_pubbliche) on public.members from authenticated;
