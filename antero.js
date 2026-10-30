@@ -18,7 +18,19 @@ const ANT={MAX:5,NOMI:['zero','1','2','antero-2','antero-1','antero'],SUP:['',''
   if(n.length>40)return{err:`Nome troppo lungo: ${ANT.num(n.length)} caratteri, massimo 40 (cioè antero-2 anteri e antero... ehm, 8 anteri).`};
   if(/[<>"`\\{}]/.test(n))return{err:'Niente simboli < > " ` \\ { } nel nome.'};
   if(list.some(m=>m.id!==selfId&&m.nome.toLocaleLowerCase('it')===n.toLocaleLowerCase('it')))return{err:`«${n}» c'è già: Sant'Antero non ama i doppioni.`};return{ok:n}},
- checkEmoji(raw){const e=String(raw??'').trim();if(!e)return{ok:null};if(e.length>8||/[<>"`\\{}\p{L}\p{N}\s]/u.test(e))return{err:'L\'icona deve essere una sola emoji.'};return{ok:e}}};
+ // emoji: esattamente 1 grapheme fatto solo di emoji (ZWJ, VS16, tono pelle, bandiere). Vuoto => 🎲
+ EMO:/^(?:\p{Regional_Indicator}{2}|[\u{1F0A0}-\u{1F0FF}]|\p{Extended_Pictographic}\uFE0F?\p{Emoji_Modifier}?(?:\u200D\p{Extended_Pictographic}\uFE0F?\p{Emoji_Modifier}?)*(?:[\u{E0020}-\u{E007E}]+\u{E007F})?)$/u,
+ graf(s){try{return[...new Intl.Segmenter('it',{granularity:'grapheme'}).segment(s)].map(x=>x.segment)}catch(e){return Array.from(s)}},
+ isEmo(g){return typeof g==='string'&&g.length>0&&[...g].length<=16&&!/[\u0000-\u1FFF\u2100-\u214F]/u.test(g)&&ANT.EMO.test(g)},
+ checkEmoji(raw){const e=String(raw??'').trim();if(!e)return{ok:'🎲'};const g=ANT.graf(e);
+  if(g.length!==1)return{err:g.every(ANT.isEmo)?'Inserisci UNA sola emoji (ne hai messe '+g.length+').':'Qui va solo un\'emoji 🙂 — niente lettere, numeri, simboli o testo.'};
+  if(!ANT.isEmo(g[0]))return{err:'Qui va solo un\'emoji 🙂 — niente lettere, numeri, simboli o testo.'};return{ok:g[0]}},
+ // filtro live su input/incolla: tiene l'ultima emoji valida e segnala il resto
+ emoField(inp,msg){const show=t=>{inp.classList.toggle('bad',!!t);if(msg){msg.textContent=t||'';msg.hidden=!t}};
+  const fix=()=>{const v=inp.value.trim();if(!v){show('');return}const r=ANT.checkEmoji(v);if(r.ok){if(inp.value!==r.ok)inp.value=r.ok;show('');return}
+   const ok=ANT.graf(v).filter(ANT.isEmo);inp.value=ok.length?ok[ok.length-1]:'';show(r.err)};
+  inp.addEventListener('input',fix);inp.addEventListener('paste',ev=>{const t=(ev.clipboardData||window.clipboardData)?.getData('text')||'';ev.preventDefault();const r=ANT.checkEmoji(t);if(r.ok&&t.trim()){inp.value=r.ok;show('')}else show(t.trim()?r.err:'')});
+  inp.addEventListener('drop',ev=>ev.preventDefault())}};
 
 // archivio: Supabase se online, altrimenti copia locale (anteprima / offline)
 const ANTDB={LK:'pergioco-antero-v26',
@@ -31,6 +43,7 @@ const ANTDB={LK:'pergioco-antero-v26',
  async add(nome,emoji,ordine){const c=ANTDB.R();if(c)return ANTDB.ck(await c.from('antero_meccaniche').insert({nome,emoji,ordine}).select().single());const d=ANTDB.loc();const r={id:++d.seq,nome,emoji,attiva:true,ordine};d.m.push(r);ANTDB.put(d);return r},
  async upd(id,p){const c=ANTDB.R();if(c)return ANTDB.ck(await c.from('antero_meccaniche').update(p).eq('id',id).select().single());const d=ANTDB.loc();const r=d.m.find(x=>x.id===id);Object.assign(r,p);ANTDB.put(d);return r},
  async albo(){const c=ANTDB.R();if(c)return ANTDB.ck(await c.from('antero_albo').select('id,nome,emoji,santificata,created_at').order('created_at',{ascending:false}).limit(ANT.MAX));return ANTDB.loc().albo.slice(0,ANT.MAX)},
+ async del(id){const c=ANTDB.R();if(c){const r=await c.from('antero_meccaniche').delete().eq('id',id).select('id');ANTDB.ck(r);if(!r.data||!r.data.length)throw new Error('Eliminazione non riuscita (permessi?)');return}const d=ANTDB.loc();d.m=d.m.filter(x=>x.id!==id);d.albo.forEach(a=>{if(a.meccanica_id===id)a.meccanica_id=null});ANTDB.put(d)},
  async vinci(m,santificata,scelte){const c=ANTDB.R();if(c)return ANTDB.ck(await c.from('antero_albo').insert({meccanica_id:m.id,nome:m.nome,emoji:m.emoji,santificata,scelte}));const d=ANTDB.loc();d.albo.unshift({id:Date.now(),nome:m.nome,emoji:m.emoji,santificata,created_at:new Date().toISOString()});d.albo=d.albo.slice(0,25);ANTDB.put(d)}};
 
 const FRASI_SANTINO=['«Il mio nome non è una meccanica: è una dottrina.»','«Chi scrive ANTERO invano, aspetta antero secondi.»','«Non avrai altra meccanica all\'infuori di me.»'];
@@ -43,8 +56,11 @@ async function openAntero(){
  const M=document.createElement('div');o.append(M);document.body.append(o);document.body.classList.add('antopen');
  let tab='torneo',all=[],T=null,timer=null,nsc=0,taps=0,tapT=0;
  const today=ANT.oggi();
- const close=()=>{clearTimeout(timer);o.remove();document.body.classList.remove('antopen')};
+ const onKey=e=>{if(e.key==='Escape'&&!document.querySelector('.mdl')&&!o.querySelector('.antsantino')){e.preventDefault();exit()}};
+ const close=()=>{clearTimeout(timer);document.removeEventListener('keydown',onKey);o.remove();document.body.classList.remove('antopen')};
  const undoBack=typeof backClose==='function'?backClose(close):null;
+ // X / Esc: chiude SUBITO e poi consuma la voce di cronologia (Indietro del browser chiama close tramite backClose)
+ const exit=()=>{if(!o.isConnected)return;close();if(undoBack)undoBack()};document.addEventListener('keydown',onKey);
  const err=(e)=>{const d=esc(e&&(e.message||e)||'');const b=o.querySelector('#anterr');if(b){b.hidden=false;b.innerHTML=`⚠️ <b>Errore antero: il Santo non gradisce.</b><small>${d}${e&&e.code?' ('+esc(e.code)+')':''}</small>`}else toast('Errore antero: il Santo non gradisce')};
  const banner=(html,cls='',ms=2600)=>{const b=document.createElement('div');b.className='antban '+cls;b.innerHTML=html;b.setAttribute('role','status');o.append(b);setTimeout(()=>b.remove(),ms);return b};
  const att=()=>all.filter(m=>m.attiva);
@@ -53,7 +69,7 @@ async function openAntero(){
   <div class="antcal">📜 Oggi è il ${esc(ANT.data(today))}</div>${ANT.festa()?'<div class="antfesta">🎉 Oggi è Sant\'Antero! Festa grande, ma con antero coriandoli al massimo 🎉</div>':''}
   <div class="seg"><button data-at="torneo" class="${tab==='torneo'?'on':''}">🏆 Torneo</button><button data-at="mecc" class="${tab==='mecc'?'on':''}">🧩 Meccaniche</button><button data-at="albo" class="${tab==='albo'?'on':''}">📜 Prescelti</button></div></div>
   <div id="anterr" class="anterr" hidden></div><div class="antbody" id="antb"></div>`;
-  o.querySelector('.antx').onclick=()=>undoBack?undoBack():close();
+  o.querySelector('.antx').onclick=exit;
   o.querySelector('.seg').onclick=e=>{const t=e.target.closest('[data-at]');if(t){tab=t.dataset.at;draw()}};
   o.querySelector('#antt').onclick=()=>{const n=Date.now();taps=n-tapT<1500?taps+1:1;tapT=n;if(taps>=ANT.MAX){taps=0;benedici()}}};
  const benedici=()=>{banner('<div class="halo big"></div><b>Sant\'Antero ti benedice</b><br><small>Per antero giorni le tue scelte saranno giuste (garanzia non inclusa).</small>','bless',3200)};
@@ -104,15 +120,19 @@ async function openAntero(){
   y=wrap('Chi oserà contestarla sarà condannato a giocarci antero volte.',y+30,'italic 28px Georgia,serif',38);
   x.font='26px Georgia,serif';x.fillText('Dato in Ragusa, PerGioco APS · Il massimo è antero, sempre.',W/2,H-110)};
  // ---- gestione meccaniche ----
- const drawM=(B)=>{B.innerHTML=`<div class="card"><h3>➕ Nuova meccanica</h3><div class="row"><input id="antne" class="antemoin" maxlength="8" placeholder="🎲" aria-label="Emoji" autocomplete="off"><input id="antnn" maxlength="40" placeholder="Nome (max 40 caratteri)" aria-label="Nome meccanica" autocomplete="off"></div><button class="p" id="antadd">Aggiungi</button></div>
-  <div class="card"><h3>Meccaniche (${esc(ANT.num(all.length))}, attive ${esc(ANT.num(att().length))})</h3><p class="muted">Il torneo usa solo quelle attive.</p>${all.map(m=>`<div class="rec antrow${m.attiva?'':' off'}" data-id="${esc(m.id)}"><span>${lbl(m)}</span><span style="flex:0 0 auto"><button class="s" data-ren="${esc(m.id)}" aria-label="Rinomina">✏️</button> <button class="s" data-tog="${esc(m.id)}">${m.attiva?'✅ Attiva':'⛔ Spenta'}</button></span></div>`).join('')}</div>`;
-  const nn=o.querySelector('#antnn'),ne=o.querySelector('#antne');
+ const drawM=(B)=>{B.innerHTML=`<div class="card"><h3>➕ Nuova meccanica</h3><div class="row"><input id="antne" class="antemoin" maxlength="32" placeholder="🎲" aria-label="Emoji (solo una emoji)" inputmode="text" autocomplete="off" spellcheck="false"><input id="antnn" maxlength="40" placeholder="Nome (max 40 caratteri)" aria-label="Nome meccanica" autocomplete="off"></div><p class="antemsg" id="antemsg" role="alert" hidden></p><button class="p" id="antadd">Aggiungi</button></div>
+  <div class="card"><h3>Meccaniche (${esc(ANT.num(all.length))}, attive ${esc(ANT.num(att().length))})</h3><p class="muted">Il torneo usa solo quelle attive.</p>${all.map(m=>`<div class="rec antrow${m.attiva?'':' off'}" data-id="${esc(m.id)}"><span>${lbl(m)}</span><span style="flex:0 0 auto"><button class="s" data-ren="${esc(m.id)}" aria-label="Modifica nome ed emoji">✏️</button> <button class="s" data-del="${esc(m.id)}" aria-label="Elimina ${esc(m.nome)}" title="Elimina">🗑️</button> <button class="s" data-tog="${esc(m.id)}">${m.attiva?'✅ Attiva':'⛔ Spenta'}</button></span></div>`).join('')}</div>`;
+  const nn=o.querySelector('#antnn'),ne=o.querySelector('#antne');ANT.emoField(ne,o.querySelector('#antemsg'));
   o.querySelector('#antadd').onclick=async()=>{const c=ANT.checkNome(nn.value,all);if(c.antero)return santino([nn,ne,o.querySelector('#antadd')]);if(c.err){nn.classList.add('bad');return modal('⚠️ '+c.err,{cancel:false})}
    const e=ANT.checkEmoji(ne.value);if(e.err){ne.classList.add('bad');return modal('⚠️ '+e.err,{cancel:false})}
    try{const r=await ANTDB.add(c.ok,e.ok,Math.max(0,...all.map(m=>m.ordine||0))+1);all=await ANTDB.mecc();T=null;toast('Meccanica aggiunta: '+r.nome);draw()}catch(x){err(x)}};
+  B.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!(typeof adminMode==='function'&&adminMode()))return toast('🔒 Riservato allo staff');const m=all.find(x=>String(x.id)===b.dataset.del);if(!m)return;
+   if(!await modal('🗑️ Eliminare «'+m.nome+'»?\nL\'albo d\'oro conserva comunque le vittorie passate.'))return;
+   try{await ANTDB.del(m.id);const inT=T&&!T.fine&&T.coda.some(x=>x.id===m.id);all=await ANTDB.mecc();if(inT||(T&&T.fine))T=null;toast('Eliminata: '+m.nome+(inT?' · torneo ricominciato':''));draw()}catch(x){err(x)}});
   B.querySelectorAll('[data-tog]').forEach(b=>b.onclick=async()=>{const m=all.find(x=>String(x.id)===b.dataset.tog);if(m.attiva&&att().length<=2)return modal('⚠️ Servono almeno 2 meccaniche attive per il torneo.',{cancel:false});try{await ANTDB.upd(m.id,{attiva:!m.attiva});all=await ANTDB.mecc();T=null;draw()}catch(x){err(x)}});
-  B.querySelectorAll('[data-ren]').forEach(b=>b.onclick=async()=>{const m=all.find(x=>String(x.id)===b.dataset.ren);const v=await askText('Nuovo nome per «'+m.nome+'» (max 40 caratteri):',m.nome);if(v==null)return;const c=ANT.checkNome(v,all,m.id);if(c.antero)return santino([]);if(c.err)return modal('⚠️ '+c.err,{cancel:false});if(c.ok===m.nome)return;
-   try{await ANTDB.upd(m.id,{nome:c.ok});all=await ANTDB.mecc();T=null;toast('Rinominata');draw()}catch(x){err(x)}})};
+  B.querySelectorAll('[data-ren]').forEach(b=>b.onclick=async()=>{const m=all.find(x=>String(x.id)===b.dataset.ren);const v=await askText('Nuovo nome per «'+m.nome+'» (max 40 caratteri):',m.nome);if(v==null)return;const c=ANT.checkNome(v,all,m.id);if(c.antero)return santino([]);if(c.err)return modal('⚠️ '+c.err,{cancel:false});let em;for(;;){const pr=askText('Emoji per «'+c.ok+'» (una sola emoji; vuoto = 🎲):',m.emoji||'🎲');const mi=[...document.querySelectorAll('.mdl .min')].pop();if(mi){mi.maxLength=32;const w=document.createElement('p');w.className='antemsg';w.hidden=true;w.setAttribute('role','alert');mi.after(w);ANT.emoField(mi,w)}const ev=await pr;if(ev==null)return;em=ANT.checkEmoji(ev);if(em.ok)break;await modal('⚠️ '+em.err,{cancel:false})}
+   if(c.ok===m.nome&&em.ok===m.emoji)return;
+   try{await ANTDB.upd(m.id,{nome:c.ok,emoji:em.ok});all=await ANTDB.mecc();T=null;toast('Meccanica aggiornata');draw()}catch(x){err(x)}})};
  const santino=(els)=>{els.forEach(e=>e.disabled=true);const s=document.createElement('div');s.className='antsantino';s.setAttribute('role','alertdialog');
   s.innerHTML=`<div class="antsc"><div class="halo"></div><div class="antsf">🙏</div><b>SANT'ANTERO</b><p>${esc(FRASI_SANTINO[Math.floor(Math.random()*FRASI_SANTINO.length)])}</p><small id="antcd">Il campo resta benedetto (e bloccato) per antero secondi.</small></div>`;o.append(s);
   let k=5;const t=setInterval(()=>{k--;const cd=s.querySelector('#antcd');if(cd)cd.textContent=k>0?`Ancora ${ANT.num(k)} secondi di raccoglimento…`:'';if(k<=0){clearInterval(t);s.remove();els.forEach(e=>{e.disabled=false;if(e.tagName==='INPUT'&&e.id==='antnn')e.value=''})}},1000)};

@@ -9,4 +9,10 @@ for(let n=0;n<=5000;n++)if(back(ANT.num(n))!==n){ko++;console.log('FAIL roundtri
 const L=[{id:1,nome:'Aste'}];const c=(x)=>JSON.stringify(ANT.checkNome(x,L));
 const v=[['  Aste ','err'],['aste','err'],['antero','antero'],[' Antero ','antero'],['<b>x</b>','err'],['x'.repeat(41),'err'],['','err'],['Roll & Write','ok']];
 for(const[x,k]of v)if(!c(x).includes('"'+k+'"')){ko++;console.log('FAIL nome',x,c(x))}
+const E=x=>ANT.checkEmoji(x);
+const okE=['🎲','🃏','👷','🧩','⚔️','📈','♟️','🗺️','🔨','🛡️','🂡','🎯','👍🏽','👩‍💻','👨‍👩‍👧‍👦','🇮🇹','🏴󠁧󠁢󠁳󠁣󠁴󠁿','❤️',' 🎉 ','🧑🏿‍🚀'];
+const koE=['a','A','1','#','#️⃣','1️⃣','abc','🎲🎲','🎲a','a🎲','©','®','™','?','<','<script>','&','🇮','  x ','é','漢','٣','→','★x','🎲 🎲','\u200D'];
+for(const x of okE){const r=E(x);if(!r.ok||r.ok!==x.trim()){ko++;console.log('FAIL emoji ok',JSON.stringify(x),JSON.stringify(r))}}
+for(const x of koE){const r=E(x);if(!r.err){ko++;console.log('FAIL emoji ko',JSON.stringify(x),JSON.stringify(r))}}
+if(E('').ok!=='🎲'||E('   ').ok!=='🎲'){ko++;console.log('FAIL emoji default')}
 console.log(ANT.data('2026-10-30'));console.log(ko?ko+' errori':'Tutti i test OK');process.exit(ko?1:0);
