@@ -9,7 +9,7 @@ create table if not exists public.desideri(
  id uuid primary key default gen_random_uuid(),
  bgg_id integer not null check(bgg_id between 1 and 99999999),
  nome text not null check(char_length(btrim(nome)) between 1 and 120 and nome !~ '[<>]'),
- thumb text check(thumb is null or (char_length(thumb)<=400 and thumb ~ '^https://cf\.geekdo-images\.com/[A-Za-z0-9_./%=:-]+$')),
+ thumb text check(thumb is null or (char_length(thumb)<=400 and thumb ~ '^https://cf\.geekdo-images\.com/[A-Za-z0-9_./%=:()-]+$')),
  min_p smallint check(min_p between 1 and 20), max_p smallint check(max_p between 1 and 30), durata smallint check(durata between 1 and 1440),
  anno smallint check(anno between 1800 and 2100), peso numeric(3,2) check(peso between 1 and 5),
  categorie text[] not null default '{}' check(cardinality(categorie)<=10 and array_position(categorie,null) is null),
@@ -79,7 +79,7 @@ declare me text:=public.cp_me(); b int; n text; th text; c text[]; i uuid; pr te
  if b is null or b<1 or b>99999999 then raise exception 'Gioco BGG non valido'; end if;
  n:=btrim(regexp_replace(coalesce(p->>'nome',''),'[\u0000-\u001f<>]','','g'));
  if char_length(n) not between 1 and 120 then raise exception 'Nome non valido'; end if;
- th:=nullif(p->>'thumb',''); if th is not null and (char_length(th)>400 or th !~ '^https://cf\.geekdo-images\.com/[A-Za-z0-9_./%=:-]+$') then th:=null; end if;
+ th:=nullif(p->>'thumb',''); if th is not null and (char_length(th)>400 or th !~ '^https://cf\.geekdo-images\.com/[A-Za-z0-9_./%=:()-]+$') then th:=null; end if;
  select coalesce(array_agg(x),'{}') into c from (select left(btrim(regexp_replace(e,'[\u0000-\u001f<>]','','g')),40) x from jsonb_array_elements_text(case when jsonb_typeof(p->'cat')='array' then p->'cat' else '[]' end) e limit 10) s where x<>'';
  pr:=nullif(btrim(regexp_replace(coalesce(p->>'perche',''),'[\u0000-\u0009\u000b-\u001f]','','g')),'');
  if char_length(pr)>200 then raise exception 'Il "perché" può avere al massimo 200 caratteri'; end if;
@@ -161,3 +161,7 @@ do $$declare f record; t text; begin
   execute format('revoke all on function %s from public,anon,authenticated',f.s); end loop;
  foreach t in array array['des_lista()','des_proponi(jsonb)','des_ritira(uuid)','des_vota(uuid,boolean)','des_spiego(uuid,boolean)','des_stato(uuid,text)','des_elimina(uuid)','des_collega(uuid,text)','des_periodo(text,timestamptz)','member_xp()'] loop
   execute 'grant execute on function public.'||t||' to authenticated'; end loop; end$$;
+
+-- v36 fix: le copertine BGG contengono "filters:strip_icc()": ammesse le parentesi
+alter table public.desideri drop constraint if exists desideri_thumb_check;
+alter table public.desideri add constraint desideri_thumb_check check(thumb is null or (char_length(thumb)<=400 and thumb ~ '^https://cf\.geekdo-images\.com/[A-Za-z0-9_./%=:()-]+$'));

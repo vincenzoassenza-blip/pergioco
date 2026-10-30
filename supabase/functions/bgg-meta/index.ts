@@ -108,7 +108,7 @@ Deno.serve(async (req) => {
       if (!it) throw new Error("dati BGG assenti");
       const th = String(it.images?.square200 || it.images?.thumb || it.imageurl || "");
       const durata = int(it.maxplaytime, 1, 1440) ?? int(it.minplaytime, 1, 1440);
-      return new Response(JSON.stringify({ bgg_id: id, nome: txt(it.name), thumb: /^https:\/\/cf\.geekdo-images\.com\/[A-Za-z0-9_./%=:-]+$/.test(th) && th.length <= 400 ? th : null,
+      return new Response(JSON.stringify({ bgg_id: id, nome: txt(it.name), thumb: /^https:\/\/cf\.geekdo-images\.com\/[A-Za-z0-9_./%=:()-]+$/.test(th) && th.length <= 400 ? th : null,
         min: int(it.minplayers, 1, 20), max: int(it.maxplayers, 1, 30), durata, anno: int(it.yearpublished, 1800, 2100),
         peso: num(dy?.polls?.boardgameweight?.averageweight, 1, 5), cat: list(it.links?.boardgamecategory, 10) }), { headers: h });
     } catch { return new Response('{"error":"BGG non raggiungibile, riprova"}', { status: 502, headers: h }); }
