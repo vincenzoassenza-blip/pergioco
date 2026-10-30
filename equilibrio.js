@@ -67,6 +67,9 @@ async function eqOpen(){const all=await DB.members(),ms=all.filter(m=>m.active),
  const games=gsAll.filter(g=>!g.isExp&&!(typeof isCoop==='function'&&isCoop(g)));
  const st={ids:[],guests:0,time:'0',pref:'ind',Q:await EQP.load(),off:0};let _u=null;try{_u=DB.remote?(await DB.remote.user())?.id:null}catch(e){}
  const me=all.find(m=>_u&&m.userId===_u)||null;if(me&&me.active)st.ids.push(me.id);
+ // v31: chi non è staff è sempre tra i partecipanti (bloccato); senza socio collegato non può creare sfide
+ const staff=typeof adminMode==='function'&&adminMode(),lock=!staff&&me&&me.active?me.id:null,noMe=!staff&&!lock;
+ const keep=ids=>lock&&!ids.includes(lock)?[lock,...ids.filter(x=>x!==lock)]:ids;
  const nm=id=>{const m=all.find(x=>x.id===id);if(!m)return'?';const t=[m.nome,m.cognome].filter(Boolean).join(' ')||m.name||'Socio';return String(t).slice(0,60)};
  const top=(t,back)=>`<div class="cwz-top"><button class="cwz-back" id="eqb">← ${esc(back)}</button><span class="muted">⚖️ Sfida equilibrata</span></div><h2 id="eqh" tabindex="-1">${esc(t)}</h2>`;
  const N=()=>st.ids.length+st.guests;
@@ -75,20 +78,20 @@ async function eqOpen(){const all=await DB.members(),ms=all.filter(m=>m.active),
  const s1=()=>{V.innerHTML=`<div class="cwz eq">${top('Chi gioca?','Partita')}
   <p class="muted">Scegli almeno 2 soci: ti proponiamo i giochi in cui la sfida è più equilibrata.</p>
   <div class="card"><button class="s" id="eqp" style="width:100%">👥 Scegli i soci (${st.ids.length})</button>
-   <div class="eqchips">${st.ids.map(id=>`<span class="chip">${esc(nm(id))}</span>`).join('')}</div>
+   <div class="eqchips">${st.ids.map(id=>id===lock?`<span class="chip eqme" title="Sei sempre tra i partecipanti">${esc(nm(id))} · <b>tu</b> 🔒</span>`:`<span class="chip">${esc(nm(id))}</span>`).join('')}</div>${lock?'<p class="muted" style="font-size:13px;margin:4px 0 0">Partecipi sempre alle sfide che crei: puoi aggiungere o togliere gli altri soci.</p>':''}
    <label>Ospiti (non contano nei calcoli)</label><div class="row eqstep"><button class="s" id="eqgm">−</button><b id="eqgn">${st.guests}</b><button class="s" id="eqgp">+</button></div></div>
   <div class="card"><label>Giocatori al tavolo</label><p><b>${N()}</b> <span class="muted">(calcolato dai partecipanti)</span></p>
    <label>Tempo disponibile</label><div class="seg" id="eqt">${[['30','30 min'],['60','1 ora'],['120','2 ore'],['0','Senza limite']].map(([v,l])=>`<button data-v="${v}" class="${st.time===v?'on':''}">${l}</button>`).join('')}</div>
    <label>Preferenza</label><div class="seg" id="eqf">${[['ind','Indifferente'],['new','Nuovo per tutti'],['known','Che conoscono tutti']].map(([v,l])=>`<button data-v="${v}" class="${st.pref===v?'on':''}">${l}</button>`).join('')}</div></div>
   ${me&&me.active?`<p class="equpd"><a href="#" id="equ">${st.Q[me.id]?'aggiorna le mie preferenze':'indica le mie preferenze'}</a></p>`:''}
-  <button class="p" id="eqgo" ${st.ids.length<2?'disabled':''}>Trova la sfida più equilibrata</button>${st.ids.length<2?'<p class="muted">Servono almeno 2 soci.</p>':''}</div>`;
+  ${noMe?'<p class="warn" id="eqnome">Il tuo account non è ancora collegato a un socio, quindi non puoi creare una sfida. Chiedi a un admin di collegarlo (Altro → Pannello admin).</p>':''}<button class="p" id="eqgo" ${st.ids.length<2||noMe?'disabled':''}>Trova la sfida più equilibrata</button>${st.ids.length<2?'<p class="muted">Servono almeno 2 soci.</p>':''}</div>`;
   $('#eqh').focus();$('#eqb').onclick=()=>go('nuova');
-  $('#eqp').onclick=async()=>{const r=await pickMembers(ms,st.ids,'Chi partecipa alla sfida?');if(!r)return;st.ids=r.filter(id=>ms.some(m=>m.id===id)).slice(0,20);s1()};
+  $('#eqp').onclick=async()=>{const r=await pickMembers(ms,st.ids,'Chi partecipa alla sfida?');if(!r)return;st.ids=keep(r.filter(id=>ms.some(m=>m.id===id))).slice(0,20);if(lock&&!r.includes(lock))toast('Non puoi toglierti dalla sfida');s1()};
   $('#eqgm').onclick=()=>{st.guests=Math.max(0,st.guests-1);s1()};$('#eqgp').onclick=()=>{st.guests=Math.min(10,st.guests+1);s1()};
   if($('#equ'))$('#equ').onclick=e=>{e.preventDefault();const{S}=EQ.stats(ps,[me.id],games);s2(S,[me.id],true)};
   V.querySelectorAll('#eqt [data-v]').forEach(b=>b.onclick=()=>{if(b.dataset.v in EQ.TIME){st.time=b.dataset.v;s1()}});
   V.querySelectorAll('#eqf [data-v]').forEach(b=>b.onclick=()=>{if(EQ.PREF.includes(b.dataset.v)){st.pref=b.dataset.v;s1()}});
-  $('#eqgo').onclick=()=>{if(st.ids.length<2)return;st.off=0;const{S}=EQ.stats(ps,st.ids,games);const need=EQ.needQuiz(S,st.ids).filter(id=>!st.Q[id]);need.length?s2(S,need):res()}};
+  $('#eqgo').onclick=()=>{st.ids=keep(st.ids);if(st.ids.length<2||noMe)return;st.off=0;const{S}=EQ.stats(ps,st.ids,games);const need=EQ.needQuiz(S,st.ids).filter(id=>!st.Q[id]);need.length?s2(S,need):res()}};
  // 2) pochi dati: domande rapide per chi ha poche partite
  const s2=(S,need,edit)=>{const C=cand().sort((a,b)=>EQ.hash(a.id)%7-EQ.hash(b.id)%7).sort((a,b)=>ps.filter(p=>p.gameId===b.id).length-ps.filter(p=>p.gameId===a.id).length).slice(0,8);
   const draft={};need.forEach(id=>{const q=st.Q[id];draft[id]=q?{freq:q.freq,known:q.known.slice(),gusto:q.gusto}:{freq:'',known:[],gusto:'mix'}});
@@ -125,7 +128,7 @@ async function eqOpen(){const all=await DB.members(),ms=all.filter(m=>m.active),
   $('#eqh').focus();$('#eqb').onclick=s1;$('#eqm').onclick=s1;if($('#eqn'))$('#eqn').onclick=()=>{st.off+=3;res()};
   V.querySelectorAll('[data-see]').forEach(b=>b.onclick=()=>{const g=gsAll.find(x=>x.id===b.dataset.see);if(g&&typeof gamePage==='function')gamePage(g,ps)});
   V.querySelectorAll('[data-book]').forEach(b=>b.onclick=()=>typeof cBook==='function'&&cBook(b.dataset.book));
-  V.querySelectorAll('[data-play]').forEach(b=>b.onclick=async()=>{const r=show.find(x=>x.g.id===b.dataset.play);if(!r||r.g.coop)return;b.disabled=true;
+  V.querySelectorAll('[data-play]').forEach(b=>b.onclick=async()=>{const r=show.find(x=>x.g.id===b.dataset.play);if(!r||r.g.coop||noMe||(lock&&!st.ids.includes(lock)))return;b.disabled=true;
    const pron={};st.ids.forEach((id,i)=>{const F=r.per[i]&&r.per[i].F;pron[id]=Math.max(0,Math.min(2,isFinite(F)?F:1))});
    try{const sf=await SF.create({memberIds:st.ids,proposti:show.map(x=>x.g.id),scelto:r.g.id,pron,nuovo:r.allNew});
     views.nuova({sfidaId:sf.id,gameId:r.g.id,date:new Date().toISOString().slice(0,10),players:st.ids.map(id=>({memberId:id,score:''}))})}
