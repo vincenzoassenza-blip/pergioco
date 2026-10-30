@@ -1,6 +1,6 @@
-const C='pergioco-v25';
+const C='pergioco-v26';
 const CDN='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
-const A=['./','./index.html','./styles.css?v=25','./config.js?v=25','./data.js?v=25','./sb.js?v=25','./app.js?v=25','./libri.js?v=25','./giochi.js?v=25','./consigliere.js?v=25','./eventi.js?v=25','./xp.js?v=25','./sicurezza.js?v=25','./desktop.js?v=25','./vendor/xlsx.full.min.js','./manifest.json','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png'];
+const A=['./','./index.html','./styles.css?v=26','./config.js?v=26','./data.js?v=26','./sb.js?v=26','./app.js?v=26','./libri.js?v=26','./giochi.js?v=26','./consigliere.js?v=26','./eventi.js?v=26','./xp.js?v=26','./sicurezza.js?v=26','./desktop.js?v=26','./antero.js?v=26','./vendor/xlsx.full.min.js','./manifest.json','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A.map(u=>new Request(u,{cache:'reload'}))).then(()=>c.add(CDN).catch(()=>{}))));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))));self.clients.claim()});
 // solo i file dell'app e la libreria Supabase vanno in cache; le chiamate al database no

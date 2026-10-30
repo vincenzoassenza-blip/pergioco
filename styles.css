@@ -179,3 +179,39 @@ nav button .nico{width:1.25em;height:1.25em;display:block}
 .gclr{min-height:40px;padding:6px 14px;border-radius:20px;font-weight:700;cursor:pointer;background:#fff3d6;border:2px solid #f2a900;color:#5a3d00}
 .gclr:hover{background:#ffe7a8}
 .cwz-miss{margin:.2rem 0 .4rem;font-size:.85rem;color:#8a5a00;background:#fff6e0;border-radius:8px;padding:.3rem .5rem}
+/* v26 — La Sfida di Antero */
+body.antopen{overflow:hidden}
+.ant{position:fixed;inset:0;z-index:50;background:linear-gradient(160deg,#1b1340,#14254a 60%,#3a2a10);color:#fff;overflow:auto;padding:calc(12px + env(safe-area-inset-top)) 14px calc(20px + env(safe-area-inset-bottom))}
+.ant .card{color:var(--t)}.ant h2{color:#ffd76a;margin:4px 40px 4px 0;font-size:22px;cursor:pointer;user-select:none}
+.anthd,.antbody{max-width:640px;margin:auto}.antbody{margin-top:12px}
+.antx{position:absolute;right:14px;top:calc(12px + env(safe-area-inset-top));border:0;background:#fff2;color:#fff;border-radius:50%;width:40px;height:40px;font-size:18px}
+.antcal{font-size:13px;opacity:.85;margin-bottom:10px;font-style:italic}.ant .seg{background:#fff2}.ant .seg button{color:#fff}.ant .seg button.on{background:#ffd76a;color:#2a1a00}
+.antfesta{background:#ffd76a;color:#3a2600;border-radius:10px;padding:8px;margin-bottom:8px;font-weight:700;text-align:center}
+.ant.festa{background:radial-gradient(circle at 20% 10%,#ff6b9b55,transparent 40%),radial-gradient(circle at 80% 30%,#ffd76a55,transparent 40%),linear-gradient(160deg,#4a1a5a,#14254a)}
+.antcnt{text-align:center;font-size:15px;margin-bottom:10px;opacity:.9}
+.antduel{display:flex;gap:10px;align-items:stretch}.antvs{align-self:center;font-weight:900;color:#ffd76a;font-size:20px}
+.antcard{position:relative;flex:1;min-height:220px;border:0;border-radius:18px;background:#fff;color:var(--b);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px;font-size:18px;font-weight:800;box-shadow:0 6px 20px #0006;transition:transform .15s}
+.antcard:active{transform:scale(.96)}.antcard small{font-weight:400;color:var(--m);font-size:12px}
+.antemo{font-size:52px;line-height:1}.antnm{overflow-wrap:anywhere;text-align:center}
+.antrow .antemo{font-size:22px;margin-right:8px}.antrow.off{opacity:.5}.antrow .antnm{text-align:left}
+.antns{width:100%;margin-top:12px;background:#fff2!important;color:#fff!important}.ant .row{margin-top:10px}.ant button:disabled{opacity:.4}
+.anterr{max-width:640px;margin:10px auto 0;background:#b3261e;border-radius:10px;padding:10px;font-size:14px}.anterr small{display:block;opacity:.75;font-size:11px;margin-top:4px;word-break:break-word}
+.antban{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:60;background:#fffbea;color:#3a2600;border-radius:18px;padding:18px 22px;text-align:center;box-shadow:0 10px 40px #000a;min-width:260px;max-width:90vw;animation:antpop .3s}
+.antban.imp{top:auto;bottom:24px;transform:translateX(-50%)}.antban .antemo{font-size:36px;display:block}
+.halo{width:56px;height:16px;border:4px solid #ffd76a;border-radius:50%;margin:0 auto 8px;box-shadow:0 0 14px #ffd76a}.halo.big{width:90px;height:24px}
+.halo.blink{animation:antblink .6s infinite alternate}
+.antcard .halo.hid{position:absolute;top:8px;left:50%;transform:translateX(-50%);opacity:.18;margin:0;width:44px;height:12px;border-width:3px}
+.antwin{position:relative;background:#fffbea;color:var(--b);border-radius:20px;padding:20px;text-align:center;font-size:22px;font-weight:800;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.antwin .antemo{display:block;font-size:72px}.antwin .muted{font-weight:400}.antwt{font-size:15px;color:#b07a00}.antwin.sant{box-shadow:0 0 30px #ffd76a}
+.antpg{width:100%;max-width:360px;display:block;margin:14px auto 0;border-radius:8px;box-shadow:0 6px 20px #0008}
+.antstar{position:fixed;top:-40px;z-index:61;font-size:34px;animation:antfall 3.5s linear forwards}
+.antproc{position:fixed;left:0;right:0;bottom:22%;z-index:61;white-space:nowrap;font-size:40px;animation:antproc 7s linear forwards;pointer-events:none}
+.antproc span{margin-right:18px}.antproc small{display:block;font-size:14px;color:#ffd76a}
+.antsantino{position:fixed;inset:0;z-index:62;background:#000a;display:flex;align-items:center;justify-content:center}
+.antsc{background:linear-gradient(#fff7dc,#f0dca0);color:#3a2600;border:6px double #8a5a1c;border-radius:14px;padding:24px;max-width:300px;text-align:center}.antsf{font-size:64px}
+.antsc p{font-style:italic;font-family:Georgia,serif}
+.antemoin{flex:0 0 64px!important;text-align:center}
+#aant{font-size:13px;padding:7px 10px;margin-bottom:8px}
+@keyframes antpop{from{opacity:0;scale:.8}}@keyframes antblink{to{opacity:.2}}
+@keyframes antfall{to{transform:translateY(110vh) rotate(200deg)}}@keyframes antproc{from{transform:translateX(100vw)}to{transform:translateX(-110%)}}
+@media (prefers-reduced-motion:reduce){.ant *,.antban{animation:none!important;transition:none!important}.antstar{top:20%}.antproc{transform:none;text-align:center;white-space:normal}.halo.blink{opacity:.6}}
