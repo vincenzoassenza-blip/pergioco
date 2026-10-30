@@ -1,4 +1,4 @@
--- v26: "La Sfida di Antero" — torneo tra meccaniche (solo admin).
+-- v26: "La Sfida di Antero" — torneo tra meccaniche (solo staff: admin e moderatori).
 -- Applicare con: SQL editor Supabase (SOLO dopo conferma di Vincenzo). Idempotente.
 create table if not exists public.antero_meccaniche(
  id bigint generated always as identity primary key,
@@ -40,16 +40,16 @@ revoke all on function public.antero_albo_trim() from public, anon, authenticate
 drop trigger if exists antero_albo_trim on public.antero_albo;
 create trigger antero_albo_trim after insert on public.antero_albo for each statement execute function public.antero_albo_trim();
 
--- RLS: lettura e scrittura solo admin
+-- RLS: lettura e scrittura solo staff (admin + moderatori)
 alter table public.antero_meccaniche enable row level security;
 alter table public.antero_albo enable row level security;
 revoke all on public.antero_meccaniche, public.antero_albo from anon, public;
 grant select, insert, update, delete on public.antero_meccaniche to authenticated;
 grant select, insert, delete on public.antero_albo to authenticated;
 drop policy if exists antero_mecc_admin on public.antero_meccaniche;
-create policy antero_mecc_admin on public.antero_meccaniche for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy antero_mecc_admin on public.antero_meccaniche for all to authenticated using (public.is_staff()) with check (public.is_staff());
 drop policy if exists antero_albo_admin on public.antero_albo;
-create policy antero_albo_admin on public.antero_albo for all to authenticated using (public.is_admin()) with check (public.is_admin());
+create policy antero_albo_admin on public.antero_albo for all to authenticated using (public.is_staff()) with check (public.is_staff());
 
 -- seed iniziale
 insert into public.antero_meccaniche(nome,emoji,ordine) values

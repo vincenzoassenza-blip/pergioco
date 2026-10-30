@@ -1,4 +1,4 @@
-// v26 — "La Sfida di Antero": torneo tra meccaniche, solo admin. Tutti i numeri in base antero (5 è il massimo di tutto).
+// v26 — "La Sfida di Antero": torneo tra meccaniche, solo admin e moderatori. Tutti i numeri in base antero (5 è il massimo di tutto).
 const ANT={MAX:5,NOMI:['zero','1','2','antero-2','antero-1','antero'],SUP:['','','²','³','⁴','⁵','⁶','⁷','⁸','⁹'],
  // numero → base antero. 3='antero-2', 10='2 anteri', 21='4 anteri e 1', 2026='antero-2 antero⁴, 1 antero³, 1 antero² e 1'
  num(n){n=Math.floor(Math.abs(+n||0));if(n<=5)return ANT.NOMI[n];const d=[];for(let x=n;x;x=Math.floor(x/5))d.push(x%5);
@@ -37,7 +37,7 @@ const FRASI_SANTINO=['«Il mio nome non è una meccanica: è una dottrina.»','�
 const FRASI_GIUDIZIO=['Sant\'Antero ha visto. Sant\'Antero approva (più o meno).','Antero scelte: il Santo prende appunti.','Il Santo annuisce solennemente.','Giudizio emesso: continuate pure, figlioli.'];
 
 async function openAntero(){
- if(!(typeof adminMode==='function'&&adminMode())||(typeof isMod==='function'&&isMod()))return toast('🔒 Riservato agli admin');
+ if(!(typeof adminMode==='function'&&adminMode()))return toast('🔒 Riservato allo staff');
  document.querySelector('.ant')?.remove();
  const o=document.createElement('div');o.className='ant'+(ANT.festa()?' festa':'');o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','La Sfida di Antero');
  const M=document.createElement('div');o.append(M);document.body.append(o);document.body.classList.add('antopen');
