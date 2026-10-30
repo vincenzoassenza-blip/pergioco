@@ -17,8 +17,10 @@ const PAL=[['#14254a','#2a4785'],['#5b2a86','#c0399a'],['#0f6b5c','#1fb58f'],['#
 const WR={st:null,
  cl(){return window.CP_CLIENT||(DB.remote&&DB.remote.client)||null},
  async stato(force){if(this.st&&!force)return this.st;const c=this.cl();if(!c)return this.st={attivo:false,anno:new Date().getFullYear(),me:null,staff:false};
-  try{const{data,error}=await c.rpc('wrapped_stato',{});if(error)throw error;this.st=data||{}}catch(e){this.st={attivo:false,anno:new Date().getFullYear(),me:null,staff:false}}return this.st},
- async set(on,anno){const c=this.cl();const{data,error}=await c.rpc('wrapped_set',{p_attivo:!!on,p_anno:+anno});if(error)throw error;this.st=data;return data},
+  try{const{data,error}=await c.rpc('wrapped_stato',{});if(error)throw error;this.st=this.ruolo(data||{})}catch(e){this.st={attivo:false,anno:new Date().getFullYear(),me:null,staff:false}}return this.st},
+ async set(on,anno){const c=this.cl();const{data,error}=await c.rpc('wrapped_set',{p_attivo:!!on,p_anno:+anno});if(error)throw error;this.st=this.ruolo(data||{});return this.st},
+ // v37.2: lo staff vale solo se l'app è in modalità admin/moderatore (stesso criterio del pannello: adminMode()); in "modalità utente" si vede come un socio
+ ruolo(st){st.staff=!!st.staff&&typeof adminMode==='function'&&adminMode();return st},
  // chi può vedere quale anno
  puo(st,anno){return !!(st.staff||(st.attivo&&st.me&&+anno<=+st.anno))},
 
@@ -158,7 +160,7 @@ const WR={st:null,
     if(id==='wrass'){if(!this.puo(await this.stato(),anno))return toast('Wrapped non ancora disponibile');this.apri(this.storieAssoc(await this.assoc(anno)),'Wrapped PerGioco '+anno,true)}
 }catch(err){toast(err.message||'Errore')}});
   return box},
- async gestione(){const st=await this.stato(true);if(!st.staff)return null;const box=document.createElement('div');box.className='card wrcard';box.id='wrgest';
+ async gestione(){if(typeof adminMode!=='function'||!adminMode())return null;const st=await this.stato(true);if(!st.staff)return null;const box=document.createElement('div');box.className='card wrcard';box.id='wrgest';
   const draw=st=>{const on=!!st.attivo;box.innerHTML=`<b>🎁 PerGioco Wrapped</b>
    <div class="wrst ${on?'on':'off'}" id="wrstato">${on?'🟢 Wrapped ATTIVO per i soci (anno '+esc(st.anno)+')':'⚪ Wrapped SPENTO per i soci'}</div>
    <label class="row" style="gap:8px;margin:6px 0">Anno <select id="wrsa">${this.anni({staff:true}).map(y=>`<option ${y===+st.anno?'selected':''}>${y}</option>`).join('')}</select></label>
@@ -175,6 +177,6 @@ window.WR=WR;
 // aggancio a Profilo (dopo "Le mie statistiche") e alla home
 {const _p=views.profilo;views.profilo=async(...a)=>{await _p(...a);try{const st=await WR.stato(true);const pv=window._pv||st.me;const own=!!st.me&&pv===st.me;
   if(!own&&!st.staff)return;const c=await WR.card(own,pv);if(!c)return;const h=V.querySelector('#st33h');h?h.parentNode.insertBefore(c,h.nextSibling):V.append(c)}catch(e){console.warn('wrapped',e)}}}
-{const _a=views.altro;views.altro=async(...a)=>{await _a(...a);try{const c=await WR.gestione();if(c&&!V.querySelector('#wrgest'))V.append(c)}catch(e){console.warn('wrapped',e)}}}
+{const _a=views.altro;views.altro=async(...a)=>{await _a(...a);try{if(!WR.cl()||V.querySelector('#adm #lg,#adm #p1,#adm #pi,#adm #tm'))return;/* v37.2: solo se il pannello admin/moderatore è davvero aperto */const c=await WR.gestione();if(c&&!V.querySelector('#wrgest'))V.append(c)}catch(e){console.warn('wrapped',e)}}}
 {const _l=views.ludoteca;views.ludoteca=async(...a)=>{await _l(...a);try{const b=await WR.banner();if(b&&!V.querySelector('#wrban'))V.prepend(b)}catch(e){}}}
 })();
