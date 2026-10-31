@@ -45,6 +45,10 @@ const gname=(gs,id)=>(gs.find(g=>g.id===id)||{}).name||'?';
 let admin=false,adminTab='soci';
 // modalita' admin/utente (solo per chi e' admin), scelta salvata sul telefono
 const uiMode=()=>localStorage.getItem('pergioco-mode')||'admin';
+// v37.8 — email/nome utente incollati: NFKC, via spazi/a capo/tab/NBSP/caratteri invisibili, apostrofi tipografici, minuscolo
+const normEmail=v=>String(v??'').normalize('NFKC').replace(/[\u2018\u2019\u02BC]/g,"'").replace(/[\s\u0000-\u001F\u007F-\u009F\u00AD\u180E\u200B-\u200F\u2028-\u202F\u205F-\u206F\u3000\uFEFF]/g,'').toLowerCase().slice(0,254);
+const okEmail=e=>e.length<=254&&/^[^\s@<>"]{1,64}@[^\s@<>"]+\.[^\s@<>"]{2,}$/.test(e);
+const EMA=' autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="email" maxlength="254"';
 const adminMode=()=>admin&&uiMode()!=='user';
 function setMode(m){localStorage.setItem('pergioco-mode',m);drawModeBtn();toast(m==='user'?'Modalità utente':'Modalità admin');const v=location.hash.slice(1);go(views[v]?v:'ludoteca')}
 function modal(msg,{input=false,def='',cancel=true,num=''}={}){return new Promise(res=>{const o=document.createElement('div');o.className='mdl';
@@ -166,7 +170,7 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<div id="bkp" hidden><h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati sul server dell'associazione. Qui puoi scaricarne una copia manuale in JSON (non include i Libri sociali).</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div></div>
- <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2></div><div class="card" id="adm"></div><div class="card muted">PerGioco · v37.7 · Associazione PerGioco, Ragusa</div>`;
+ <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2></div><div class="card" id="adm"></div><div class="card muted">PerGioco · v37.8 · Associazione PerGioco, Ragusa</div>`;
  
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(f&&f.size>IMP_MAX_MB*1048576)return modal(`⚠️ Il file è troppo grande (massimo ${IMP_MAX_MB} MB).`,{cancel:false});if(!f||!await ask('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toast('Errore: '+err.message)}};
@@ -175,8 +179,8 @@ async altro(){const hp=await DB.hasPin();
  $('#bkp').hidden=!(admin&&adminMode()&&!isMod());
  if(isMod())$('#pt').textContent='🛡 Pannello moderatore';
  if(admin&&uiMode()==='user'){A.innerHTML=`<p class="muted">Sei in <b>modalità utente</b>: vedi l'app come un socio qualsiasi.</p><button class="p" id="tm">${isMod()?'🛡 Passa a modalità moderatore':'🔧 Passa a modalità admin'}</button>`;$('#tm').onclick=()=>setMode('admin');return}
- if(R&&!admin){A.innerHTML=`<p class="muted">Accesso admin con l'account Supabase.</p><label>Email</label><input id="le" type="email" autocomplete="username"><label>Password</label><input id="lp" type="password" autocomplete="current-password"><button class="p" id="lg">Entra</button>`;
-  $('#lg').onclick=async()=>{let ok;try{ok=await DB.remote.signIn($('#le').value.trim(),$('#lp').value)}catch(err){return toast('Accesso non riuscito: '+err.message)}
+ if(R&&!admin){A.innerHTML=`<p class="muted">Accesso admin con l'account Supabase.</p><label>Email</label><input id="le" type="email" autocomplete="username"${EMA}><label>Password</label><input id="lp" type="password" autocomplete="current-password"><button class="p" id="lg">Entra</button>`;
+  $('#lg').onclick=async()=>{let ok;try{ok=await DB.remote.signIn(normEmail($('#le').value),$('#lp').value)}catch(err){return toast('Accesso non riuscito: '+err.message)}
    if(!ok){await DB.remote.signOut();return toast('Questo utente non è tra gli admin')}admin=true;drawModeBtn();go('altro')};return}
  if(!R&&!admin){A.innerHTML='<p class="muted">Il pannello è disponibile solo con la connessione a internet.</p>';return}
  if(!R&&!hp){A.innerHTML=`<p class="muted">Primo accesso: scegliete un PIN admin (almeno 4 cifre).</p><label>Nuovo PIN</label><input id="p1" type="password" inputmode="numeric"><label>Ripeti PIN</label><input id="p2" type="password" inputmode="numeric"><button class="p" id="ps">Imposta PIN</button>`;
@@ -225,7 +229,7 @@ async altro(){const hp=await DB.hasPin();
   A.innerHTML=TB()+`<p class="muted">I moderatori possono: aggiungere nuovi soci, generare/rigenerare i codici, gestire i tavoli dell'Agenda e registrare partite per gli altri. <b>Non</b> possono modificare o eliminare nulla né vedere tessere e stato account.</p>
   <label>Email del nuovo moderatore (quella con cui si registra/accede)</label><input id="me2" type="email" placeholder="nome@email.it" style="width:100%"><button class="p" id="ma" style="width:100%">Nomina moderatore</button>
   <div style="margin-top:12px">${l.map(e=>`<div class="rec"><span>🛡 ${esc(e)}</span><button class="s" data-mr="${esc(e)}" style="flex:0 0 auto">Rimuovi</button></div>`).join('')||'<p class="muted">Nessun moderatore.</p>'}</div>`;bind();
-  $('#ma').onclick=async()=>{const e=$('#me2').value.trim();if(!/^\S+@\S+\.\S+$/.test(e))return toast('Email non valida');try{await DB.remote.setModerator(e,true);toast('Moderatore nominato');drawMods()}catch(x){toast('Errore: '+x.message)}};
+  $('#ma').onclick=async()=>{const e=normEmail($('#me2').value);if(!/^\S+@\S+\.\S+$/.test(e))return toast('Email non valida');try{await DB.remote.setModerator(e,true);toast('Moderatore nominato');drawMods()}catch(x){toast('Errore: '+x.message)}};
   A.querySelectorAll('[data-mr]').forEach(b=>b.onclick=async()=>{if(!await ask('Rimuovere il moderatore '+b.dataset.mr+'?'))return;try{await DB.remote.setModerator(b.dataset.mr,false);toast('Moderatore rimosso');drawMods()}catch(x){toast('Errore: '+x.message)}})};
  if(isMod()&&(adminTab==='partite'||adminTab==='mods'))adminTab='soci';
  const draw=()=>adminTab==='mods'&&R?drawMods():isMod()?(adminTab==='account'&&R?drawAcc():drawSociMod()):adminTab==='partite'?drawPlays():adminTab==='account'&&R?drawAcc():drawSoci();draw()},
@@ -301,14 +305,14 @@ function authForm(){let mode=window._am||'login';const T={login:'Entra',signup:'
  const G=document.body.classList.contains('gate');V.innerHTML=`${G?'<div class="login-hero"><img src="icons/icon-192.png" alt=""><h1>PerGioco</h1><p>Gioca, prenota, condividi<br>Accesso riservato ai soci</p></div>':'<h2>Profilo</h2>'}<div class="card"><p class="muted">${mode==='signup'?'Per registrarti ti serve il <b>codice</b> personale che ti ha dato un admin di PerGioco.':mode==='reset'?'Chiedi a un admin un nuovo codice e usalo qui con la tua email per scegliere una nuova password.':'Accedi con la tua email e password. Nuovo socio? Tocca «Registrati con codice».'}</p>
  <div class="seg" id="am"><button data-m="login" class="${mode==='login'?'on':''}">Accedi</button><button data-m="signup" class="${mode==='signup'?'on':''}">Registrati con codice</button></div>
  ${mode!=='login'?`<label>Codice</label><input id="ac" class="code" placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false">`:''}
- <label>Email ${mode==='signup'?'(sarà il tuo nome utente)':''}</label><input id="ae" type="email" autocomplete="username">
+ <label>Email ${mode==='signup'?'(sarà il tuo nome utente)':''}</label><input id="ae" type="email" autocomplete="username"${EMA}>
  <label>${mode==='login'?'Password':'Nuova password (almeno 8 caratteri)'}</label><input id="ap" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}">
  ${mode!=='login'?`<label>Ripeti password</label><input id="ap2" type="password" autocomplete="new-password">`:''}
  <button class="p" id="ago">${T[mode]}</button>
  ${mode==='login'?'<button class="s" id="afp" style="width:100%;margin-top:6px">Password dimenticata? (con codice)</button>':mode==='reset'?'<button class="s" id="abk" style="width:100%;margin-top:6px">← Torna all\'accesso</button>':''}</div>`;
  const sw=m=>{window._am=m;authForm()};$('#am').onclick=e=>e.target.dataset.m&&sw(e.target.dataset.m);if($('#afp'))$('#afp').onclick=()=>sw('reset');if($('#abk'))$('#abk').onclick=()=>sw('login');
  if($('#ac'))$('#ac').oninput=e=>{const v=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);e.target.value=v.match(/.{1,4}/g)?.join('-')||''};
- $('#ago').onclick=async()=>{const em=$('#ae').value.trim(),pw=$('#ap').value;if(!/^\S+@\S+\.\S+$/.test(em))return toast('Email non valida');
+ $('#ago').onclick=async()=>{const em=normEmail($('#ae').value),pw=$('#ap').value;$('#ae').value=em;if(!okEmail(em))return toast('Email non valida');
   let code='';if(mode!=='login'){code=$('#ac').value.replace(/-/g,'');if(code.length!==12)return toast('Il codice ha 12 caratteri (XXXX-XXXX-XXXX)');if(pw.length<8)return toast('La password deve avere almeno 8 caratteri');if(pw!==$('#ap2').value)return toast('Le password non coincidono')}
   $('#ago').disabled=true;
   try{if(mode==='signup')await DB.remote.signUp(code,em,pw);else if(mode==='reset'){await DB.remote.resetWithCode(code,em,pw);await DB.remote.signIn(em,pw)}else await DB.remote.signIn(em,pw);
