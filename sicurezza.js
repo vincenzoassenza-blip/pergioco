@@ -41,14 +41,14 @@ function safeUrl(u,http){try{const s=String(u??'').trim();if(!s||s.length>500)re
 const csvCell=v=>{let s=String(v??'');if(/^[=+\-@\t\r]/.test(s))s="'"+s;return'"'+s.replace(/"/g,'""')+'"'};
 const IMP_MAX_MB=5,IMP_MAX_ROWS=5000;
 // data layer: pulizia e limiti prima di ogni scrittura
-if(typeof SupabaseAdapter!=='undefined'){const _run=SupabaseAdapter.run.bind(SupabaseAdapter);SupabaseAdapter.run=async o=>{if(o.row)try{rowClean(MAP[o.k].t,o.row)}catch(e){toast('⚠️ '+e.message);return{message:e.message,code:'CLIENT'}}return _run(o)}}
+if(typeof SupabaseAdapter!=='undefined'){const _run=SupabaseAdapter.run.bind(SupabaseAdapter);SupabaseAdapter.run=async o=>{if(o.row)try{rowClean(MAP[o.k].t,o.row)}catch(e){const A={games:'GIOCO',plays:'PARTITA',eventi:'EVENTO',tables:'EVENTO',members:'SOCI',libro_soci:'LIBRI',libro_volontari:'LIBRI'}[MAP[o.k]?MAP[o.k].t:'']||errCtx().area;toastVal(e.message+' Accorcia il testo o correggi il campo e salva di nuovo.','E-'+A+'-V9');return{message:e.message,code:'CLIENT'}}return _run(o)}}
 if(typeof LB!=='undefined'){const _s=LB.save.bind(LB);LB.save=(t,r)=>_s(t,rowClean(t,r))}
 if(typeof EV!=='undefined'){const _s=EV.save;EV.save=e=>_s(rowClean('eventi',e))}
 // immagini rotte (al posto di onerror inline, bloccato dalla CSP)
 document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.classList.contains('evimg'))t.remove()},true);
 document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;if(b.dataset.act==='reload')location.reload();else if(b.dataset.act.startsWith('go:'))go(b.dataset.act.slice(3))});
 // errori globali: messaggio invece della pagina bianca
-let _errAt=0;function appErr(m){if(Date.now()-_errAt<3000)return;_errAt=Date.now();try{const r=(typeof errSpiega==='function')?errSpiega(m,'APP'):{code:'E-APP-99'};toast(/-99/.test(r.code)||!r.msg?`⚠️ Si è verificato un errore imprevisto. Riprova; se continua chiudi e riapri l'app e avvisa lo staff con il codice [${r.code}].`:`⚠️ ${r.msg} [${r.code}]`,true)}catch(_){}
+let _errAt=0;function appErr(m){if(Date.now()-_errAt<3000)return;_errAt=Date.now();try{const r=(typeof errSpiega==='function')?errSpiega(m,'APP'):{code:'E-APP-99'};toast(r.msg?`⚠️ ${r.msg} [${r.code}]`:`⚠️ Qualcosa non ha funzionato. Chiudi e riapri l'app; se succede ancora avvisa lo staff con il codice [${r.code}].`,true)}catch(_){}
  if(V&&!V.children.length)V.innerHTML='<div class="card"><h3>⚠️ Qualcosa è andato storto</h3><p class="muted">La pagina non si è caricata correttamente.</p><button class="p" data-act="reload">Ricarica</button></div>'}
 addEventListener('error',e=>{if(e.target===window||e.error)appErr(e.message)});
 addEventListener('unhandledrejection',e=>appErr(e.reason&&e.reason.message||String(e.reason)));
