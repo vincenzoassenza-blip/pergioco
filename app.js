@@ -179,7 +179,7 @@ async altro(){const hp=await DB.hasPin();
  $('#bkp').hidden=!(admin&&adminMode()&&!isMod());
  if(isMod())$('#pt').textContent='🛡 Pannello moderatore';
  if(admin&&uiMode()==='user'){A.innerHTML=`<p class="muted">Sei in <b>modalità utente</b>: vedi l'app come un socio qualsiasi.</p><button class="p" id="tm">${isMod()?'🛡 Passa a modalità moderatore':'🔧 Passa a modalità admin'}</button>`;$('#tm').onclick=()=>setMode('admin');return}
- if(R&&!admin){A.innerHTML=`<p class="muted">Accesso admin con l'account Supabase.</p><label>Email</label><input id="le" type="email" autocomplete="username"${EMA}><label>Password</label><input id="lp" type="password" autocomplete="current-password"><button class="p" id="lg">Entra</button>`;
+ if(R&&!admin){A.innerHTML=`<p class="muted">Accesso admin con l'account Supabase.</p><label>Email</label><input id="le" type="text" autocomplete="username"${EMA}><label>Password</label><input id="lp" type="password" autocomplete="current-password"><button class="p" id="lg">Entra</button>`;
   $('#lg').onclick=async()=>{let ok;try{ok=await DB.remote.signIn(normEmail($('#le').value),$('#lp').value)}catch(err){return toast('Accesso non riuscito: '+err.message)}
    if(!ok){await DB.remote.signOut();return toast('Questo utente non è tra gli admin')}admin=true;drawModeBtn();go('altro')};return}
  if(!R&&!admin){A.innerHTML='<p class="muted">Il pannello è disponibile solo con la connessione a internet.</p>';return}
@@ -227,7 +227,7 @@ async altro(){const hp=await DB.hasPin();
   $('#msv').onclick=async()=>{const nome=$('#mn').value.trim(),cognome=$('#mc2').value.trim();if(!nome)return toast('Inserisci il nome');try{await DB.saveMember({nome,cognome,soprannome:$('#mso').value.trim()});toast('Socio aggiunto: ora generagli il codice');adminTab='account';go('altro')}catch(e){toast('Errore: '+e.message)}}};
  const drawMods=async()=>{let l=[];try{l=await DB.remote.moderators()}catch(e){A.innerHTML=TB()+'<p class="warn">Moderatori non disponibili (eseguire supabase/migrate-v9.sql). '+esc(e.message)+'</p>';bind();return}
   A.innerHTML=TB()+`<p class="muted">I moderatori possono: aggiungere nuovi soci, generare/rigenerare i codici, gestire i tavoli dell'Agenda e registrare partite per gli altri. <b>Non</b> possono modificare o eliminare nulla né vedere tessere e stato account.</p>
-  <label>Email del nuovo moderatore (quella con cui si registra/accede)</label><input id="me2" type="email" placeholder="nome@email.it" style="width:100%"><button class="p" id="ma" style="width:100%">Nomina moderatore</button>
+  <label>Email del nuovo moderatore (quella con cui si registra/accede)</label><input id="me2" type="text" placeholder="nome@email.it" style="width:100%"><button class="p" id="ma" style="width:100%">Nomina moderatore</button>
   <div style="margin-top:12px">${l.map(e=>`<div class="rec"><span>🛡 ${esc(e)}</span><button class="s" data-mr="${esc(e)}" style="flex:0 0 auto">Rimuovi</button></div>`).join('')||'<p class="muted">Nessun moderatore.</p>'}</div>`;bind();
   $('#ma').onclick=async()=>{const e=normEmail($('#me2').value);if(!/^\S+@\S+\.\S+$/.test(e))return toast('Email non valida');try{await DB.remote.setModerator(e,true);toast('Moderatore nominato');drawMods()}catch(x){toast('Errore: '+x.message)}};
   A.querySelectorAll('[data-mr]').forEach(b=>b.onclick=async()=>{if(!await ask('Rimuovere il moderatore '+b.dataset.mr+'?'))return;try{await DB.remote.setModerator(b.dataset.mr,false);toast('Moderatore rimosso');drawMods()}catch(x){toast('Errore: '+x.message)}})};
@@ -305,7 +305,7 @@ function authForm(){let mode=window._am||'login';const T={login:'Entra',signup:'
  const G=document.body.classList.contains('gate');V.innerHTML=`${G?'<div class="login-hero"><img src="icons/icon-192.png" alt=""><h1>PerGioco</h1><p>Gioca, prenota, condividi<br>Accesso riservato ai soci</p></div>':'<h2>Profilo</h2>'}<div class="card"><p class="muted">${mode==='signup'?'Per registrarti ti serve il <b>codice</b> personale che ti ha dato un admin di PerGioco.':mode==='reset'?'Chiedi a un admin un nuovo codice e usalo qui con la tua email per scegliere una nuova password.':'Accedi con la tua email e password. Nuovo socio? Tocca «Registrati con codice».'}</p>
  <div class="seg" id="am"><button data-m="login" class="${mode==='login'?'on':''}">Accedi</button><button data-m="signup" class="${mode==='signup'?'on':''}">Registrati con codice</button></div>
  ${mode!=='login'?`<label>Codice</label><input id="ac" class="code" placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false">`:''}
- <label>Email ${mode==='signup'?'(sarà il tuo nome utente)':''}</label><input id="ae" type="email" autocomplete="username"${EMA}>
+ <label>Email ${mode==='signup'?'(sarà il tuo nome utente)':''}</label><input id="ae" type="text" autocomplete="username"${EMA}>
  <label>${mode==='login'?'Password':'Nuova password (almeno 8 caratteri)'}</label><input id="ap" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}">
  ${mode!=='login'?`<label>Ripeti password</label><input id="ap2" type="password" autocomplete="new-password">`:''}
  <button class="p" id="ago">${T[mode]}</button>
