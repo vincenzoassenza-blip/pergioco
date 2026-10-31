@@ -147,7 +147,12 @@ Deno.serve(async (req) => {
       const durata = int(it.maxplaytime, 1, 1440) ?? int(it.minplaytime, 1, 1440);
       return new Response(JSON.stringify({ bgg_id: id, nome: txt(it.name), thumb: /^https:\/\/cf\.geekdo-images\.com\/[A-Za-z0-9_./%=:()-]+$/.test(th) && th.length <= 400 ? th : null,
         min: int(it.minplayers, 1, 20), max: int(it.maxplayers, 1, 30), durata, anno: int(it.yearpublished, 1800, 2100),
-        peso: num(dy?.polls?.boardgameweight?.averageweight, 1, 5), cat: list(it.links?.boardgamecategory, 10) }), { headers: h });
+        peso: num(dy?.polls?.boardgameweight?.averageweight, 1, 5), cat: list(it.links?.boardgamecategory, 10),
+        // v37.7 — dati extra per "Aggiungi un gioco" (staff): stessi limiti dei vincoli della tabella games
+        minT: int(it.minplaytime, 1, 1440), maxT: int(it.maxplaytime, 1, 1440), eta: int(it.minage, 0, 99),
+        cats: list(it.links?.boardgamecategory, 20), mec: list(it.links?.boardgamemechanic, 40),
+        best: range(dy?.polls?.userplayers?.best), rec: range(dy?.polls?.userplayers?.recommended),
+        exp: String(it.subtype || "") === "boardgameexpansion" }), { headers: h });
     } catch { return new Response('{"error":"BGG non raggiungibile, riprova"}', { status: 502, headers: h }); }
   }
   const { data: staff } = await user.rpc("is_staff");
