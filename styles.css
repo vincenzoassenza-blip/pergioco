@@ -282,3 +282,13 @@ img.imgko{display:none!important}
 .xppg{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}.xppg .s{flex:0 0 auto;margin:0}.xppg span{white-space:nowrap;text-align:center}.xppg .s:disabled{opacity:.4}
 .xpmy{width:100%;margin-top:8px}.rec.xpme{background:#f9a82526;border-radius:8px;padding-left:6px;padding-right:6px;box-shadow:inset 3px 0 0 #b07a00}
 .roh2{white-space:normal;overflow-wrap:anywhere}
+/* v37.6 Instagram */
+.igl{text-align:center;margin:18px 0 8px;font-size:14px}.igl a{color:var(--b);text-decoration:none}
+.igcard{position:relative;background:linear-gradient(135deg,#fff5f9,#fff8ee);border:1px solid #f3d3e2}.igcard p{margin:6px 0 10px}
+.igcx{position:absolute;top:6px;right:8px;background:none;border:0;font-size:16px;color:#888;cursor:pointer;padding:6px}
+.igbtn{display:inline-block;background:linear-gradient(90deg,#f58529,#dd2a7b,#8134af);color:#fff!important;border-radius:999px;padding:7px 14px;font-weight:700;text-decoration:none}
+.igev{display:block;margin-top:8px;font-size:13px;color:var(--b);text-decoration:none}
+.igpost{position:fixed;left:12px;right:12px;bottom:84px;z-index:60;background:#fff;border-radius:16px;box-shadow:0 6px 24px #0003;padding:14px 14px 12px;display:flex;flex-direction:column;gap:10px;border-left:4px solid #dd2a7b}
+.igpost .igfoto,.s.igfoto,.igfoto{background:linear-gradient(90deg,#f58529,#dd2a7b,#8134af);color:#fff;border:0;font-weight:700}
+.igfoto.sm{padding:4px 10px;font-size:12px;margin-top:6px;width:auto}
+.badge-toast .igb,.wrig{font-size:12px;opacity:.9;margin-top:4px}.wrig{text-align:center;color:#fff;margin:8px 0 0}

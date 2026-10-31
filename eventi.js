@@ -33,7 +33,7 @@ const card=(e,p,i)=>{const fut=new Date(e.inizio)>new Date(),chiuso=new Date(e.c
  return`<div class="card evc${e.annullato?' evx':''}" data-ev="${e.id}">${safeUrl(e.immagine)?`<img class="evimg" src="${esc(safeUrl(e.immagine))}" alt="" loading="lazy" referrerpolicy="no-referrer">`:''}<div class="evt"><b>${esc(e.titolo)}</b>
  <div class="muted">📅 ${esc(evData(e.inizio))}${e.luogo?` · 📍 ${esc(e.luogo)}`:''}</div>
  <div class="evtags">${e.annullato?'<span class="evb off">Evento annullato</span>':''}${e.torneo?'<span class="evb t">🏆 Torneo</span>':''}${e.solo_soci?'<span class="evb t">Solo soci in regola</span>':''}${hasQuota(e)?`<span class="evb t">${e.quota?'Quota '+euro(e.quota):'Caparra '+euro(e.caparra)}</span>`:'<span class="evb t">Gratuito</span>'}${i?`<span class="evb t">${i.occupati}/${e.posti} posti${i.attesa?` · ${i.attesa} in attesa`:''}</span>`:''}${!fut&&!e.annullato?`<span class="evb t">✔ ${i?i.presenti:0} presenti</span>`:chiuso&&!e.annullato?'<span class="evb off">Prenotazioni chiuse</span>':''}</div>
- ${p?stBadge(p.stato):''}</div></div>`};
+ ${p?stBadge(p.stato):''}</div>${typeof IG!=='undefined'?IG.link('📸 Foto e aggiornamenti su Instagram','igev'):''}</div>`};
 async function eventi(){navSerata();
  if(!DB.remote||DB.status!=='online'){V.innerHTML=segHtml('eventi')+'<h2>🎉 Eventi</h2><div class="card"><p class="muted">Gli eventi richiedono la connessione al database. Riprova quando sei online.</p></div>';bindSeg();return}
  const staff=adminMode(),arch=staff&&window._evArch;

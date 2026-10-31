@@ -114,7 +114,7 @@ const WR={st:null,
    <div class="wrs"><div class="wre">${esc(s.emoji)}</div><div class="wrk">${esc(s.k)}</div><div class="wrb">${esc(s.big)}</div>${s.sub?`<div class="wrsub">${esc(s.sub)}</div>`:''}
    ${s.list&&s.list.length?`<div class="wrl">${s.list.map(x=>`<div>${esc(x)}</div>`).join('')}</div>`:''}${s.note?`<div class="wrn">${esc(s.note)}</div>`:''}
    ${s.priv&&!pub?'<div class="wrp">🔒 Solo per te: non compare nelle immagini condivise</div>':''}</div>
-   <div class="wrbot"><button data-wr="sh">📤 Salva / condividi</button>${s.fin?'<button data-wr="x">Fine</button>':''}</div>`};
+   <div class="wrbot"><button data-wr="sh">📤 Salva / condividi</button>${s.fin?'<button data-wr="x">Fine</button>':''}</div>${s.fin?'<div class="wrig">📸 Condividi e taggaci @pergiocoets</div>':''}`};
   const mv=d=>{i=Math.max(0,Math.min(S.length-1,i+d));draw()};
   let x0=null;el.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
   el.addEventListener('touchend',e=>{if(x0==null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>40){e.preventDefault();mv(dx<0?1:-1)}});
