@@ -28,7 +28,7 @@ document.addEventListener('paste',e=>{const t=e.target;if(!isTxt(t))return;const
  let c=txtNorm(raw,t.tagName==='TEXTAREA');if(t.type!=='password')c=t.tagName==='TEXTAREA'?c:c.trim();if(t.type==='password')c=raw.replace(BAD_CH,'');
  const max=txtMax(t),s=t.selectionStart??t.value.length,en=t.selectionEnd??s,room=max-(t.value.length-(en-s));
  if(c.length>room){c=txtCut(c,Math.max(0,room));toast(`✂️ Testo incollato troppo lungo: tenuti ${c.length} caratteri (massimo ${max}).`)}
- t.setRangeText(c,s,en,'end');t.dispatchEvent(new Event('input',{bubbles:true}))},true);
+ try{t.setRangeText(c,s,en,'end')}catch(_){t.value=t.value.slice(0,s)+c+t.value.slice(en)}t.dispatchEvent(new Event('input',{bubbles:true}))},true);
 // controllo al salvataggio di un oggetto da inviare al DB
 function rowClean(table,row){const lim=COL_MAX[table]||{};const multi=['descrizione','note'];for(const k of Object.keys(row)){const v=row[k];if(typeof v!=='string')continue;
   let c=txtNorm(v,multi.includes(k)).trim();row[k]=c===''&&v!==''&&k!=='id'?null:c;
