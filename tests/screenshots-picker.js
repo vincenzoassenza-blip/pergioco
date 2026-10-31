@@ -1,0 +1,17 @@
+const pw=require('playwright-core');const D='/workspace/pergioco-app/screenshots/v38.2-picker/';
+const N=['Catan','Azul','Carcassonne','Città di Carte','Dixit','Ticket to Ride','Codenames','Splendor','Wingspan','Pandemic','7 Wonders','Patchwork','Cascadia','Kingdomino','Root','Cartographers','Café','Carnival of Monsters'];
+(async()=>{const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome'});const errs=[];let r={};
+const mk=async(name,fn)=>{const c=await b.newContext({serviceWorkers:'block',viewport:{width:390,height:844},deviceScaleFactor:2,hasTouch:true});const p=await c.newPage();p.on('pageerror',e=>errs.push(name+': '+e.message));
+ const cols=['e57373','64b5f6','81c784','ffb74d','ba68c8','4db6ac'];await p.route(/cf\.geekdo-images\.com/,ro=>{const i=+(ro.request().url().match(/(\d+)\.png/)||[0,0])[1];ro.fulfill({contentType:'image/svg+xml',body:`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="#${cols[i%6]}"/></svg>`})});
+ await p.goto('http://localhost:8799/',{waitUntil:'networkidle'});await p.waitForTimeout(3000);
+ await p.evaluate(async N=>{document.body.classList.remove('gate');admin=true;const gs=N.map((n,i)=>({id:'g'+i,name:n,min:2,max:4,minT:30,maxT:60,age:10,coop:n==='Pandemic',thumb:i%4==3?null:`https://cf.geekdo-images.com/x/${i}.png`}));
+  const ms=['Vincenzo','Giulia','Marco','Sara'].map((n,i)=>({id:'m'+i,nome:n,cognome:'',active:true}));const d=i=>'2026-10-'+String(30-i).padStart(2,'0');
+  const ps=[[14,0],[1,0],[9,1],[1,1],[1,2],[5,2],[5,3],[1,3],[0,1],[0,2],[2,3],[2,0]].map(([g,m],i)=>({id:'p'+i,gameId:'g'+g,date:d(i),players:[{memberId:'m'+m,score:5}],coop:false}));
+  DB.games=async()=>gs;DB.plays=async()=>ps;DB.members=async()=>ms;window._ps=ps},N);
+ await fn(p);await p.waitForTimeout(500);await p.screenshot({path:D+name+'.png'});await c.close()};
+await mk('1-iniziale-scorciatoie',async p=>{await p.evaluate(()=>go('nuova'));await p.waitForTimeout(2500);r.chips=await p.$$eval('.gpchip',e=>e.map(x=>x.textContent));r.dbg=await p.evaluate(async()=>[(await DB.plays()).length,document.querySelectorAll('.gp').length,document.querySelector('.gp')?.innerHTML.slice(0,200)])});
+await mk('2-ricerca-digitata',async p=>{await p.evaluate(()=>go('nuova'));await p.waitForTimeout(2500);await p.fill('.gpq','CAR');await p.waitForTimeout(300);r.res=await p.$$eval('.gpit',e=>e.map(x=>x.textContent))});
+await mk('3-gioco-selezionato',async p=>{await p.evaluate(()=>go('nuova'));await p.waitForTimeout(2500);await p.fill('.gpq','citta');await p.keyboard.press('Enter');await p.waitForTimeout(300);r.val=await p.$eval('#g',e=>e.value);r.foc=await p.evaluate(()=>document.activeElement.className)});
+await mk('4-modifica-partita',async p=>{await p.evaluate(()=>views.nuova({..._ps[0],id:'p0',players:[{memberId:'m0',score:5}]}));await p.waitForTimeout(2500);r.ed=await p.$eval('#g',e=>e.value);r.edtxt=await p.$eval('.gpon b',e=>e.textContent)});
+await mk('5-salva-senza-gioco',async p=>{await p.evaluate(()=>go('nuova'));await p.waitForTimeout(2500);await p.click('#save');await p.waitForTimeout(400);r.toast=await p.evaluate(()=>[...document.querySelectorAll('.toast')].map(x=>x.textContent).join('|'))});
+console.log(JSON.stringify(r,null,1),'errors',errs);await b.close()})();
