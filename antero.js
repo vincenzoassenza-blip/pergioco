@@ -61,7 +61,7 @@ async function openAntero(){
  const undoBack=typeof backClose==='function'?backClose(close):null;
  // X / Esc: chiude SUBITO e poi consuma la voce di cronologia (Indietro del browser chiama close tramite backClose)
  const exit=()=>{if(!o.isConnected)return;close();if(undoBack)undoBack()};document.addEventListener('keydown',onKey);
- const err=(e)=>{const d=esc(e&&(e.message||e)||'');const b=o.querySelector('#anterr');if(b){b.hidden=false;b.innerHTML=`⚠️ <b>Errore antero: il Santo non gradisce.</b><small>${d}${e&&e.code?' ('+esc(e.code)+')':''}</small>`}else toast('Errore antero: il Santo non gradisce')};
+ const err=(e)=>{const r=errSpiega(e,'SFIDA');const b=o.querySelector('#anterr');if(b){b.hidden=false;b.innerHTML=`⚠️ <b>Il Santo non gradisce: operazione non riuscita.</b><small>${esc(r.msg)} [${esc(r.code)}]</small>`}else toast(`⚠️ ${r.msg} [${r.code}]`,true)};
  const banner=(html,cls='',ms=2600)=>{const b=document.createElement('div');b.className='antban '+cls;b.innerHTML=html;b.setAttribute('role','status');o.append(b);setTimeout(()=>b.remove(),ms);return b};
  const att=()=>all.filter(m=>m.attiva);
  const lbl=m=>`<span class="antemo" aria-hidden="true">${esc(m.emoji||'🎲')}</span><span class="antnm">${esc(m.nome)}</span>`;

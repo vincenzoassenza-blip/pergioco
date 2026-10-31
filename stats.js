@@ -117,6 +117,6 @@ window.StatsV33={gameMount,async mount(host,m,{own,staff}){
  const bind=()=>{const c=host.querySelector('#st33');c.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{if(!['sempre','12m','m'].includes(b.dataset.sp))return;per=b.dataset.sp;const op=[...c.querySelectorAll('details')].map(d=>d.open);draw();host.querySelectorAll('#st33 details').forEach((d,i)=>d.open=op[i])});
   c.querySelectorAll('[data-g]').forEach(b=>b.onclick=async()=>{const g=gs.find(x=>x.id===b.dataset.g);if(!g||typeof gamePage!=='function')return;window._gsCtx={m,own,staff,open:true};try{await gamePage(g,plays)}finally{window._gsCtx=null}});
   const ma=c.querySelector('[data-all]');if(ma)ma.onclick=()=>{c.querySelectorAll('[data-more]').forEach(x=>x.hidden=false);ma.remove()};
-  const cb=c.querySelector('#stpub');if(cb)cb.onchange=async()=>{const v=cb.checked;cb.disabled=true;try{if(DB.remote&&DB.remote.setStatsPub)await DB.remote.setStatsPub(v);m.statsPub=v;toast(v?'Statistiche pubbliche: gli altri vedranno solo i numeri aggregati':'Statistiche private')}catch(e){cb.checked=!v;toast('Errore: '+(e.message||''))}finally{cb.disabled=false}}};
+  const cb=c.querySelector('#stpub');if(cb)cb.onchange=async()=>{const v=cb.checked;cb.disabled=true;try{if(DB.remote&&DB.remote.setStatsPub)await DB.remote.setStatsPub(v);m.statsPub=v;toast(v?'Statistiche pubbliche: gli altri vedranno solo i numeri aggregati':'Statistiche private')}catch(e){cb.checked=!v;toastErr(e,'STAT','Impostazione non salvata')}finally{cb.disabled=false}}};
  draw()}};
 })();

@@ -37,7 +37,7 @@ function rateDialog(g){const cur=Rate.mine(g.id);return new Promise(res=>{const 
  const rel=backClose(()=>{o.remove();res(false)});
  o.querySelector('.mbt').onclick=async e=>{const k=e.target.closest('[data-k]');if(!k)return;const kk=k.dataset.k;if(kk==='0'){rel();o.remove();return res(false)}
   if(kk==='1'&&!v)return toast('Scegli un voto da 1 a 10');
-  try{await Rate.save(g.id,kk==='d'?null:v,ta.value.trim());rel();o.remove();toast(kk==='d'?'Voto rimosso':'Voto salvato ⭐');res(true)}catch(err){toast('Errore: '+err.message)}};
+  try{await Rate.save(g.id,kk==='d'?null:v,ta.value.trim());rel();o.remove();toast(kk==='d'?'Voto rimosso':'Voto salvato ⭐');res(true)}catch(err){toastErr(err,'VOTO','Voto non salvato')}};
  document.body.appendChild(o)})}
 async function rateSection(g,o){await XP.ensure();const box=document.createElement('div');box.className='card rsec';o.querySelector('.gpc').children[1].after(box);
  const draw=async()=>{const v=Rate.avg(g.id),me=Rate.mine(g.id),can=await Rate.canRate(g.id),ms=await DB.members(),st=adminMode(),l=Rate.of(g.id).filter(r=>r.commento).sort((a,b)=>b.updated_at.localeCompare(a.updated_at));
@@ -45,7 +45,7 @@ async function rateSection(g,o){await XP.ensure();const box=document.createEleme
   ${me?`<div class="rec"><span>Il tuo voto: <b>${me.voto}/10</b>${me.commento?`<br><span class="muted">“${esc(me.commento)}”</span>`:''}</span><button class="s rv">Modifica</button></div>`:can?'<button class="p rv" style="width:100%">⭐ Vota questo gioco</button>':`<p class="muted" style="font-size:13px">${XP.me?'Potrai votarlo dopo averci giocato.':'Solo i soci che ci hanno giocato possono votarlo.'}</p>`}
   ${l.length?`<div style="margin-top:6px">${l.map(r=>{const m=ms.find(x=>x.id===r.member_id);return`<div class="rec"><span>${m?nmH(m):'Socio'} · <b>${r.voto}/10</b><br><span class="muted">“${esc(r.commento)}”</span></span>${st?`<button class="s rmc" data-m="${r.member_id}" title="Rimuovi commento">🗑️</button>`:''}</div>`}).join('')}</div>`:''}`;
   const b=box.querySelector('.rv');if(b)b.onclick=async()=>{if(await rateDialog(g))draw()};
-  box.querySelectorAll('.rmc').forEach(b=>b.onclick=async()=>{const del=await modal('Rimuovere il commento inappropriato? (Il voto resta. Scrivi ELIMINA per cancellare anche il voto.)',{input:true});if(del===null||del===false)return;try{await Rate.mod(b.dataset.m,g.id,String(del).trim().toUpperCase()==='ELIMINA');toast('Fatto');draw()}catch(e){toast('Errore: '+e.message)}})};
+  box.querySelectorAll('.rmc').forEach(b=>b.onclick=async()=>{const del=await modal('Rimuovere il commento inappropriato? (Il voto resta. Scrivi ELIMINA per cancellare anche il voto.)',{input:true});if(del===null||del===false)return;try{await Rate.mod(b.dataset.m,g.id,String(del).trim().toUpperCase()==='ELIMINA');toast('Fatto');draw()}catch(e){toastErr(e,'COMM')}})};
  draw()}
 async function ratePrompt(p){try{await XP.p;if(!XP.me||!p.players.some(x=>x.memberId===XP.me)||Rate.mine(p.gameId))return;const g=(await DB.games()).find(x=>x.id===p.gameId);if(!g)return;
  document.querySelectorAll('.rprompt').forEach(x=>x.remove());const e=document.createElement('div');e.className='rprompt';e.innerHTML=`<span>Ti è piaciuto <b>${esc(g.name)}</b>?</span><button class="p">⭐ Vota</button><button class="s" aria-label="Chiudi">✕</button>`;

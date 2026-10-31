@@ -145,7 +145,7 @@ const WR={st:null,
   return new Promise(r=>cv.toBlob(r,'image/png'))},
  async condividi(s,i,pub,titolo){try{const b=await this.png(s,i,pub);const f=new File([b],`pergioco-wrapped-${i+1}.png`,{type:'image/png'});
    if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:titolo});return}catch(e){if(e&&e.name==='AbortError')return}}
-   const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast('Immagine salvata')}catch(e){toast('Impossibile creare l\'immagine')}},
+   const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast('Immagine salvata')}catch(e){toastErr({message:'Non riesco a creare l\'immagine del Wrapped: riprova, oppure fai uno screenshot'},'WRAP')}},
 
  // ---- punti di accesso ----
  anni(st){const now=new Date().getFullYear(),max=st.staff?now:+st.anno,out=[];for(let y=max;y>=Math.max(2020,max-5);y--)out.push(y);return out},
@@ -158,7 +158,7 @@ const WR={st:null,
   box.addEventListener('click',async e=>{const id=e.target.id,anno=+box.querySelector('#wranno').value;
    try{if(id==='wrmio'){const st=await this.stato();if(!this.puo(st,anno))return toast('Wrapped non ancora disponibile');const pub=!!(m&&m.statsPub);this.apri(this.storieSocio(await this.socio(mid,anno,pub)),'Wrapped '+anno,pub)}
     if(id==='wrass'){if(!this.puo(await this.stato(),anno))return toast('Wrapped non ancora disponibile');this.apri(this.storieAssoc(await this.assoc(anno)),'Wrapped PerGioco '+anno,true)}
-}catch(err){toast(err.message||'Errore')}});
+}catch(err){toastErr(err,'WRAP')}});
   return box},
  async gestione(){if(typeof adminMode!=='function'||!adminMode())return null;const st=await this.stato(true);if(!st.staff)return null;const box=document.createElement('div');box.className='card wrcard';box.id='wrgest';
   const draw=st=>{const on=!!st.attivo;box.innerHTML=`<b>🎁 PerGioco Wrapped</b>
@@ -166,7 +166,7 @@ const WR={st:null,
    <label class="row" style="gap:8px;margin:6px 0">Anno <select id="wrsa">${this.anni({staff:true}).map(y=>`<option ${y===+st.anno?'selected':''}>${y}</option>`).join('')}</select></label>
    <div class="row" style="gap:8px;flex-wrap:wrap"><button class="${on?'':'p'}" id="wrtog">${on?'Spegni per i soci':'Attiva per i soci'}</button>${on?'<button id="wranno2">Cambia anno</button>':''}</div>
    <div class="muted" style="margin-top:6px">Lo staff può sempre vederlo in anteprima dal Profilo.</div>`;
-   const save=async(att)=>{try{const ns=await this.set(att,box.querySelector('#wrsa').value);toast(ns.attivo?'Wrapped attivato per i soci':'Wrapped spento per i soci');draw(ns)}catch(e){toast(e.message||'Errore')}};
+   const save=async(att)=>{try{const ns=await this.set(att,box.querySelector('#wrsa').value);toast(ns.attivo?'Wrapped attivato per i soci':'Wrapped spento per i soci');draw(ns)}catch(e){toastErr(e,'WRAP')}};
    box.querySelector('#wrtog').onclick=()=>save(!on);const a2=box.querySelector('#wranno2');if(a2)a2.onclick=()=>save(true)};
   draw(st);return box},
  async banner(){const st=await this.stato();if(!st.attivo||!st.me)return null;const b=document.createElement('div');b.className='card wrban';b.id='wrban';
