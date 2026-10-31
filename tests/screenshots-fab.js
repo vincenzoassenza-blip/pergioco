@@ -1,0 +1,13 @@
+const pw=require('playwright-core');const D='/workspace/pergioco-app/screenshots/v38.1-fab/';
+(async()=>{const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome'});const errs=[];
+const mk=async(name,isAdmin,fn)=>{const c=await b.newContext({serviceWorkers:'block',viewport:{width:390,height:844},deviceScaleFactor:2,hasTouch:true});const p=await c.newPage();p.on('pageerror',e=>errs.push(name+': '+e.message));
+ await p.goto('http://localhost:8799/',{waitUntil:'networkidle'});await p.waitForTimeout(3000);
+ await p.evaluate(async a=>{document.body.classList.remove('gate');admin=a;const fake=[...Array(14)].map((_,i)=>({id:'g'+i,name:['Catan','Azul','Carcassonne','Dixit','Ticket to Ride','Codenames','Splendor','Wingspan','Pandemic','7 Wonders','Patchwork','Cascadia','Kingdomino','Root'][i],min:2,max:4,minT:30,maxT:60,age:10,coop:i==8,categories:[],mechanics:[]}));DB.games=async()=>fake;DB.plays=async()=>[];await go('ludoteca')},isAdmin);
+ await p.waitForTimeout(1500);await p.evaluate(async a=>{admin=a;await go('ludoteca')},isAdmin);await p.waitForTimeout(800);if(fn)await fn(p);
+ const has=await p.$('#gfab');console.log(name,'fab:',!!has);await p.screenshot({path:D+name+'.png'});await c.close()};
+await mk('1-staff-inizio',true);
+await mk('2-staff-scroll',true,async p=>{await p.evaluate(()=>scrollTo(0,900));await p.waitForTimeout(300)});
+await mk('3-staff-dopo-tocco',true,async p=>{await p.evaluate(()=>scrollTo(0,300));await p.tap('#gfab');await p.waitForTimeout(900);console.log(' open:',await p.evaluate(()=>$('#gadd').open),'focus:',await p.evaluate(()=>document.activeElement.id))});
+await mk('4-staff-altro-tab',true,async p=>{await p.evaluate(()=>go(Object.keys(views).find(v=>v!=='ludoteca')));await p.waitForTimeout(600)});
+await mk('5-socio',false,async p=>{await p.evaluate(()=>scrollTo(0,900));await p.waitForTimeout(300)});
+console.log('errors',errs);await b.close()})();
