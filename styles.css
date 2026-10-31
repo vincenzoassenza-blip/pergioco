@@ -275,3 +275,10 @@ img.imgko{display:none!important}
 .wrban button{flex:0 0 auto;width:auto;padding:8px 16px}.wrcard .row button{width:auto;flex:1 1 auto}
 .wrst{margin:8px 0;padding:10px 12px;border-radius:12px;font-weight:700;font-size:15px}.wrst.on{background:#e3f6ea;color:#17673a;border:1px solid #9bd8b2}.wrst.off{background:#eef0f5;color:#4a5266;border:1px solid #d3d8e3}
 .wrcard select{min-width:90px;width:auto}.wrcard .row button:not(.p){background:#fff;color:var(--b);border:1.5px solid var(--b);border-radius:10px;padding:10px 14px;font-weight:700}
+/* v37.4 Ultime partite: gioco e data su una riga (mai spezzati), vincitori sotto allineati a sinistra; a capo solo tra un nome e l'altro */
+.rec.prow{display:block}.prh{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px;row-gap:0}.prh .prg{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.prd{white-space:nowrap}
+.prw{display:block;margin-top:3px;text-align:left;line-height:1.5}.pwn{white-space:nowrap}.pws{white-space:normal}
+/* v37.4 classifica XP paginata */
+.xppg{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}.xppg .s{flex:0 0 auto;margin:0}.xppg span{white-space:nowrap;text-align:center}.xppg .s:disabled{opacity:.4}
+.xpmy{width:100%;margin-top:8px}.rec.xpme{background:#f9a82526;border-radius:8px;padding-left:6px;padding-right:6px;box-shadow:inset 3px 0 0 #b07a00}
+.roh2{white-space:normal;overflow-wrap:anywhere}

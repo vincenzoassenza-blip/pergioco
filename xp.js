@@ -50,7 +50,46 @@ async function rateSection(g,o){await XP.ensure();const box=document.createEleme
 async function ratePrompt(p){try{await XP.p;if(!XP.me||!p.players.some(x=>x.memberId===XP.me)||Rate.mine(p.gameId))return;const g=(await DB.games()).find(x=>x.id===p.gameId);if(!g)return;
  document.querySelectorAll('.rprompt').forEach(x=>x.remove());const e=document.createElement('div');e.className='rprompt';e.innerHTML=`<span>Ti è piaciuto <b>${esc(g.name)}</b>?</span><button class="p">⭐ Vota</button><button class="s" aria-label="Chiudi">✕</button>`;
  const bs=e.querySelectorAll('button');bs[0].onclick=async()=>{e.remove();await rateDialog(g)};bs[1].onclick=()=>e.remove();document.body.appendChild(e);setTimeout(()=>e.remove(),12000)}catch(err){console.warn(err)}}
-function xpTop(){const ms=Object.values(XP.map).sort((a,b)=>b.xp-a.xp).slice(0,10);if(!ms.length)return'';return`<div class="card"><b>⚡ Classifica XP</b>${ms.map((r,k)=>`<div class="rec"><span>${['🥇','🥈','🥉'][k]||(k+1)+'.'} <a class="pv" data-pv="${r.member_id}">${esc(XP._n[r.member_id]||'Socio')}${lv(r.member_id)}</a></span><b>${r.xp} XP</b></div>`).join('')}</div>`}
+// v37.4: classifica XP paginata (10 per pagina), apre sempre a pagina 1; posizione reale; "📍 La mia posizione" porta alla pagina del socio collegato
+const XPPG=10;
+function xpTop(pg,hl){const all=Object.values(XP.map).sort((a,b)=>b.xp-a.xp);if(!all.length)return'';const tot=Math.ceil(all.length/XPPG);pg=Math.min(Math.max(1,+pg||1),tot);const o=(pg-1)*XPPG,ms=all.slice(o,o+XPPG),mine=!!XP.me&&all.some(r=>r.member_id===XP.me);
+ return`<div class="card"><b>⚡ Classifica XP</b>${ms.map((r,k)=>{const n=o+k;return`<div class="rec${hl&&r.member_id===hl?' xpme':''}"><span>${['🥇','🥈','🥉'][n]||(n+1)+'.'} <a class="pv" data-pv="${esc(r.member_id)}">${esc(XP._n[r.member_id]||'Socio')}${lv(r.member_id)}</a></span><b>${+r.xp||0} XP</b></div>`}).join('')}
+ ${tot>1||mine?`<div class="xppg">${tot>1?`<button type="button" class="s" data-xpp="${pg-1}"${pg<=1?' disabled':''}>‹ Precedente</button><span class="muted" aria-live="polite">Pagina ${pg} di ${tot}</span><button type="button" class="s" data-xpp="${pg+1}"${pg>=tot?' disabled':''}>Successiva ›</button>`:''}</div>${mine?'<button type="button" class="s xpmy" data-xpme="1">📍 La mia posizione</button>':''}`:''}</div>`}
+function xpTopBind(d){const draw=(pg,hl)=>{d.innerHTML=xpTop(pg,hl).replace('Classifica XP</b>','Classifica XP</b> <small class="muted">(totale, non filtrata)</small>')};
+ d.addEventListener('click',e=>{const b=e.target.closest('[data-xpp],[data-xpme]');if(!b||b.disabled)return;if(b.dataset.xpme){const all=Object.values(XP.map).sort((a,b)=>b.xp-a.xp),i=all.findIndex(r=>r.member_id===XP.me);if(i<0)return;draw(Math.floor(i/XPPG)+1,XP.me);const r=d.querySelector('.xpme');if(r)r.scrollIntoView({block:'center',behavior:'smooth'})}else{draw(+b.dataset.xpp);d.scrollIntoView({block:'start',behavior:'smooth'})}});draw(1)}
 XP._n={};
 Object.keys(views).forEach(k=>{const f=views[k];views[k]=async(...a)=>{await XP.ensure();const r=await f.apply(views,a);
- if(k==='record'&&typeof V!=='undefined'){const ms=await DB.members();ms.forEach(m=>XP._n[m.id]=memberName(m));const h=V.querySelector('.pfbar')||V.querySelector('h2');if(h&&!V.querySelector('.xptop')){const d=document.createElement('div');d.className='xptop';d.innerHTML=xpTop().replace('Classifica XP</b>','Classifica XP</b> <small class="muted">(totale, non filtrata)</small>');h.after(d)}}return r}});
+ if(k==='record'&&typeof V!=='undefined'){const ms=await DB.members();ms.forEach(m=>XP._n[m.id]=memberName(m));const h=V.querySelector('.pfbar')||V.querySelector('h2');if(h&&!V.querySelector('.xptop')){const d=document.createElement('div');d.className='xptop';xpTopBind(d);h.after(d)}RA.mount()}return r}});
+// v37.4: nuovi record assoluti (pari merito gestiti; nomi sempre con esc; dati server solo aggregati per socio)
+const RA={
+ fd(s){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||'');return m?`${+m[3]}/${+m[2]}/${m[1]}`:''},
+ top(m){let b=null,w=[];for(const[id,v]of m){if(!(v>0))continue;if(b===null||v>b){b=v;w=[id]}else if(v===b)w.push(id)}return b===null?null:{v:b,ids:w}},
+ cnt(arr){const m=new Map();arr.forEach(x=>{if(x!=null&&x!=='')m.set(x,(m.get(x)||0)+1)});return m},
+ async server(){try{if(!DB.remote||!DB.remote.client)return[];const{data,error}=await DB.remote.client.rpc('record_assoluti');if(error)throw error;return data||[]}catch(e){console.warn('record_assoluti',e);return[]}},
+ async html(){const ps0=await DB.plays(),ps=typeof pf==='function'?pf(ps0):ps0,gs=await DB.games(),ms=await DB.members(),act=new Set(ms.filter(m=>m.active!==false).map(m=>m.id)),gn=id=>{const g=gs.find(x=>x.id===id);return g?g.name:'Gioco'};
+  const nm=id=>{const m=ms.find(x=>x.id===id);return m?memberName(m):'Socio'},P=[];ps.forEach(p=>(p.players||[]).forEach(x=>{if(x.memberId&&act.has(x.memberId))P.push({p,id:x.memberId,w:!!x.winner})}));
+  const comp=P.filter(x=>!x.p.coop),out=[],who=t=>{const s=t.ids.slice(0,3).map(id=>`<a class="pv" data-pv="${esc(id)}">${esc(nm(id))}${lv(id)}</a>`).join(', ');return s+(t.ids.length>3?` <span class="muted">+${t.ids.length-3}</span>`:'')},
+   txt=t=>t.ids.slice(0,2).map(esc).join(', ')+(t.ids.length>2?` <span class="muted">+${t.ids.length-2}</span>`:''),
+   add=(ic,t,top,f,lab)=>{if(top)out.push([ic,t,lab?txt(top):who(top),f(top.v)]),0},pl=(v,a,b)=>v+' '+(v==1?a:b);
+  // EXP
+  add('⚡','Re degli EXP',RA.top(new Map(Object.values(XP.map).filter(r=>act.has(r.member_id)).map(r=>[r.member_id,+r.xp||0]))),v=>v+' XP');
+  // % vittorie (min 10 competitive)
+  {const n=RA.cnt(comp.map(x=>x.id)),w=RA.cnt(comp.filter(x=>x.w).map(x=>x.id)),m=new Map();n.forEach((c,id)=>{if(c>=10)m.set(id,Math.round(1000*(w.get(id)||0)/c))});const t=RA.top(m);add('🎯','Miglior % di vittorie',t,v=>String(Math.round(v)/10).replace('.',',')+'% (min. 10 partite)')}
+  {const m=new Map();comp.filter(x=>x.w).forEach(x=>{if(!m.has(x.id))m.set(x.id,new Set());m.get(x.id).add(x.p.gameId)});add('🏅','Vincitore eclettico',RA.top(new Map([...m].map(([k,s])=>[k,s.size]))),v=>pl(v,'gioco diverso vinto','giochi diversi vinti'))}
+  {const first=new Map();[...ps].sort((a,b)=>String(a.date).localeCompare(String(b.date))).forEach(p=>{if(first.has(p.gameId))return;const d=p.date;first.set(p.gameId,ps.filter(q=>q.gameId===p.gameId&&q.date===d).flatMap(q=>(q.players||[]).map(x=>x.memberId)).filter(id=>id&&act.has(id)))});
+   const m=new Map();first.forEach(ids=>new Set(ids).forEach(id=>m.set(id,(m.get(id)||0)+1)));add('🧪','Pioniere: primo a giocare più giochi dell\'associazione',RA.top(m),v=>pl(v,'gioco','giochi'))}
+  add('📝','Critico più attivo',RA.top(RA.cnt(XP.rt.filter(r=>act.has(r.member_id)).map(r=>r.member_id))),v=>pl(v,'voto','voti'));
+  {const t=RA.top(RA.cnt(ps.map(p=>p.gameId)));if(t)t.ids=t.ids.map(gn);add('🎲','Gioco più giocato',t,v=>pl(v,'partita','partite'),1)}
+  {const t=RA.top(new Map(ps.map(p=>[p.id,(p.players||[]).length])));if(t)t.ids=t.ids.map(id=>{const p=ps.find(x=>x.id===id);return gn(p.gameId)+' · '+RA.fd(p.date)});add('👥','Partita più affollata',t,v=>pl(v,'giocatore','giocatori'),1)}
+  {const t=RA.top(new Map(ps.filter(p=>+p.duration>0).map(p=>[p.id,+p.duration])));if(t)t.ids=t.ids.map(id=>{const p=ps.find(x=>x.id===id);return gn(p.gameId)+' · '+RA.fd(p.date)});add('⏱️','Partita più lunga',t,v=>v+' min',1)}
+  {let tb=[];try{tb=await DB.allTables()}catch(e){}add('🪑','Padrone di casa',RA.top(RA.cnt((tb||[]).map(t=>t.hostId).filter(id=>act.has(id)))),v=>pl(v,'tavolo organizzato','tavoli organizzati'))}
+  {const sf=P.filter(x=>x.p.sfidaId);add('⚔️','Più Sfide giocate',RA.top(RA.cnt(sf.map(x=>x.id))),v=>pl(v,'sfida','sfide'));add('🗡️','Più Sfide vinte',RA.top(RA.cnt(sf.filter(x=>x.w).map(x=>x.id))),v=>pl(v,'sfida vinta','sfide vinte'))}
+  const sv=await RA.server(),S=k=>RA.top(new Map(sv.filter(r=>r.k===k&&act.has(r.member_id)).map(r=>[r.member_id,+r.v])));
+  add('🎪','Più presenze agli eventi',S('presenze'),v=>pl(v,'presenza','presenze'));
+  add('💡','Più desideri proposti',S('desideri'),v=>pl(v,'desiderio','desideri'));
+  add('🗳️','Più voti ai desideri',S('voti'),v=>pl(v,'voto','voti'));
+  add('🎓','Più giochi da spiegare',S('spiego'),v=>pl(v,'gioco','giochi'));
+  add('👑','Più Coppe Antero vinte',S('coppe'),v=>pl(v,'coppa','coppe'));
+  add('🥊','Più incontri vinti in Coppa',S('coppa_vinti'),v=>pl(v,'incontro','incontri'));
+  return out.map(([ic,t,h,v])=>`<div class="roc"><span class="roi">${ic}</span><span class="rot">${esc(t)}</span><span class="roh roh2">${h}</span><span class="rov2">${esc(v)}</span></div>`).join('')},
+ async mount(){const g=typeof V!=='undefined'&&V.querySelector('.rov');if(!g||g.dataset.ra)return;g.dataset.ra='1';try{g.insertAdjacentHTML('beforeend',await RA.html())}catch(e){console.warn('RA',e)}}};
