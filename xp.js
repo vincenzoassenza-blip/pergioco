@@ -86,7 +86,7 @@ const RA={
   {const sf=P.filter(x=>x.p.sfidaId);add('⚔️','Più Sfide giocate',RA.top(RA.cnt(sf.map(x=>x.id))),v=>pl(v,'sfida','sfide'));add('🗡️','Più Sfide vinte',RA.top(RA.cnt(sf.filter(x=>x.w).map(x=>x.id))),v=>pl(v,'sfida vinta','sfide vinte'))}
   const sv=await RA.server(),S=k=>RA.top(new Map(sv.filter(r=>r.k===k&&act.has(r.member_id)).map(r=>[r.member_id,+r.v])));
   add('🎪','Più presenze agli eventi',S('presenze'),v=>pl(v,'presenza','presenze'));
-  add('💡','Più desideri proposti',S('desideri'),v=>pl(v,'desiderio','desideri'));
+  add('🧞','Genio della lampada – Più desideri avverati',S('avverati'),v=>pl(v,'desiderio avverato','desideri avverati'));
   add('🗳️','Più voti ai desideri',S('voti'),v=>pl(v,'voto','voti'));
   add('🎓','Più giochi da spiegare',S('spiego'),v=>pl(v,'gioco','giochi'));
   add('👑','Più Coppe Antero vinte',S('coppe'),v=>pl(v,'coppa','coppe'));
