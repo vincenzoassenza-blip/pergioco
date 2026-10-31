@@ -11,7 +11,7 @@ BADGES.push(['scout','🔭','Talent scout','Proponi un gioco che poi arriva in l
 XP_SRC.splice(XP_SRC.length-1,0,['scout','🔭 Talent scout',40]);
 {const _bs=Badges.stats;Badges.stats=function(k,o){return Object.assign(_bs.call(this,k,o),{dsScout:String(k).startsWith('m:')?DS.scout(String(k).slice(2)):0})}}
 {const _xl=XP.load.bind(XP);XP.load=async function(){await _xl();await DS.load()}}
-const dsMsg=e=>String(e&&e.message||e||'Errore').replace(/^.*?ERROR:\s*/,'').slice(0,200);
+const dsMsg=e=>{const r=errSpiega(e,'DES');return `⚠️ ${r.msg} [${r.code}]`};
 const dsData=t=>{try{return new Date(t).toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'})}catch(_){return''}};
 const dsThumb=u=>/^https:\/\/cf\.geekdo-images\.com\/[A-Za-z0-9_./%=:()-]+$/.test(String(u||''))?`<img class="dsimg" src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:'<div class="dsimg dsph">🎲</div>';
 const dsInfo=g=>[g.min&&(g.max&&g.max!==g.min?`👥 ${+g.min}–${+g.max}`:`👥 ${+g.min}`),g.durata&&`⏱ ${+g.durata}′`,g.peso&&`⚖️ ${String(g.peso).replace('.',',')}`,g.anno&&`📅 ${+g.anno}`].filter(Boolean).map(x=>`<span class="chip">${esc(x)}</span>`).join('');

@@ -48,7 +48,7 @@ if(typeof EV!=='undefined'){const _s=EV.save;EV.save=e=>_s(rowClean('eventi',e))
 document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.classList.contains('evimg'))t.remove()},true);
 document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;if(b.dataset.act==='reload')location.reload();else if(b.dataset.act.startsWith('go:'))go(b.dataset.act.slice(3))});
 // errori globali: messaggio invece della pagina bianca
-let _errAt=0;function appErr(m){console.error(m);if(Date.now()-_errAt<3000)return;_errAt=Date.now();try{toast('⚠️ Si è verificato un errore imprevisto. Riprova; se continua, ricarica l\'app.')}catch(_){}
+let _errAt=0;function appErr(m){if(Date.now()-_errAt<3000)return;_errAt=Date.now();try{const r=(typeof errSpiega==='function')?errSpiega(m,'APP'):{code:'E-APP-99'};toast(/-99/.test(r.code)||!r.msg?`⚠️ Si è verificato un errore imprevisto. Riprova; se continua chiudi e riapri l'app e avvisa lo staff con il codice [${r.code}].`:`⚠️ ${r.msg} [${r.code}]`,true)}catch(_){}
  if(V&&!V.children.length)V.innerHTML='<div class="card"><h3>⚠️ Qualcosa è andato storto</h3><p class="muted">La pagina non si è caricata correttamente.</p><button class="p" data-act="reload">Ricarica</button></div>'}
 addEventListener('error',e=>{if(e.target===window||e.error)appErr(e.message)});
 addEventListener('unhandledrejection',e=>appErr(e.reason&&e.reason.message||String(e.reason)));

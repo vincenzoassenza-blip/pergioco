@@ -132,7 +132,7 @@ async function eqOpen(){const all=await DB.members(),ms=all.filter(m=>m.active),
    const pron={};st.ids.forEach((id,i)=>{const F=r.per[i]&&r.per[i].F;pron[id]=Math.max(0,Math.min(2,isFinite(F)?F:1))});
    try{const sf=await SF.create({memberIds:st.ids,proposti:show.map(x=>x.g.id),scelto:r.g.id,pron,nuovo:r.allNew});
     views.nuova({sfidaId:sf.id,gameId:r.g.id,date:new Date().toISOString().slice(0,10),players:st.ids.map(id=>({memberId:id,score:''}))})}
-   catch(e){b.disabled=false;toast(e.message||'Impossibile creare la sfida')}})};
+   catch(e){b.disabled=false;toastErr(e,'SFIDA','Sfida non creata')}})};
  s1()}
 // pulsante discreto in cima alla scheda Partita (solo per nuova partita, non in modifica)
 (()=>{const _n=views.nuova;views.nuova=async function(ed,...a){await _n.call(this,ed,...a);if(ed&&(ed.id||ed.fromTable||ed.sfidaId))return;const h=V.querySelector('h2');if(!h||V.querySelector('#eqo'))return;

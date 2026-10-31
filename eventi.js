@@ -22,7 +22,7 @@ const hasQuota=e=>(+e.quota||0)>0||(+e.caparra||0)>0;
 const ST={confermata:['ok','✅ Confermata'],in_attesa_conferma:['pend','⏳ In attesa di conferma caparra'],attesa:['wait','🕒 Lista d\'attesa'],annullata:['off','Annullata'],rifiutata:['off','Annullata dallo staff']};
 const stBadge=s=>ST[s]?`<span class="evb ${ST[s][0]}">${ST[s][1]}</span>`:'';
 const ATTIVE=['confermata','in_attesa_conferma','attesa'];
-const evMsg=e=>{const m=(e&&e.message)||String(e);return /fetch|network/i.test(m)?'Connessione assente: riprova quando sei online.':m};
+const evMsg=e=>{const r=errSpiega(e,'PREN');return `⚠️ ${r.msg} [${r.code}]`};
 const segHtml=a=>`<div class="seg evseg"><button data-sv="serata" class="${a==='serata'?'on':''}">🪑 Tavoli</button><button data-sv="eventi" class="${a==='eventi'?'on':''}">🎉 Eventi</button></div>`;
 const bindSeg=()=>V.querySelectorAll('[data-sv]').forEach(b=>b.onclick=()=>{if(!b.classList.contains('on'))go(b.dataset.sv)});
 const navSerata=()=>document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v==='serata'));

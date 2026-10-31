@@ -26,7 +26,7 @@ BADGES.push(['cpart','🏆','Coppa Antero','Partecipa a una Coppa Antero',s=>s.c
  ['cvet','🎖️','Veterano della Coppa','Partecipa a 3 edizioni della Coppa',s=>s.cpN>=3]);
 {const _bs=Badges.stats;Badges.stats=function(k,o){return Object.assign(_bs.call(this,k,o),CP.bstats(k))}}
 {const _xl=XP.load.bind(XP);XP.load=async function(){await _xl();await CP.load()}}
-const cpMsg=e=>String(e&&e.message||e||'Errore').replace(/^.*?ERROR:\s*/,'').slice(0,200);
+const cpMsg=e=>{const r=errSpiega(e,'COPPA');return `⚠️ ${r.msg} [${r.code}]`};
 async function cpCard(){if(!CP.cl())return'';if(!CP.d)await CP.load();const d=CP.d;if(!d)return'';const st=!!d.staff,c=(d.coppe||[]).filter(x=>st||x.stato!=='bozza')[0];
  if(!c)return st?`<div class="card cpc"><div class="hrow"><b>🏆 Coppa Antero</b><button class="p" id="cpnew">➕ Crea la prima edizione</button></div><p class="muted">Torneo svizzero 1 contro 1 o a tavoli da 3–4: nessun tavolo ripetuto, mai lo stesso gioco due volte.</p></div>`:'';
  return`<div class="card cpc" data-cp="${esc(c.id)}" role="button"><div class="hrow"><b>🏆 Coppa Antero ${esc(CP.rom(c.edizione))}</b><span class="evb t">${esc(CP.STATI[c.stato]||c.stato)}</span></div>
