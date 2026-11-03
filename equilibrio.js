@@ -131,7 +131,7 @@ async function eqOpen(){const all=await DB.members(),ms=all.filter(m=>m.active),
   V.querySelectorAll('[data-play]').forEach(b=>b.onclick=async()=>{const r=show.find(x=>x.g.id===b.dataset.play);if(!r||r.g.coop||noMe||(lock&&!st.ids.includes(lock)))return;b.disabled=true;
    const pron={};st.ids.forEach((id,i)=>{const F=r.per[i]&&r.per[i].F;pron[id]=Math.max(0,Math.min(2,isFinite(F)?F:1))});
    try{const sf=await SF.create({memberIds:st.ids,proposti:show.map(x=>x.g.id),scelto:r.g.id,pron,nuovo:r.allNew});
-    views.nuova({sfidaId:sf.id,gameId:r.g.id,date:new Date().toISOString().slice(0,10),players:st.ids.map(id=>({memberId:id,score:''}))})}
+    views.nuova({sfidaId:sf.id,gameId:r.g.id,date:romeToday(),players:st.ids.map(id=>({memberId:id,score:''}))})}
    catch(e){b.disabled=false;toastErr(e,'SFIDA','Sfida non creata')}})};
  s1()}
 // pulsante discreto in cima alla scheda Partita (solo per nuova partita, non in modifica)
