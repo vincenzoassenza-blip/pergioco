@@ -31,9 +31,9 @@ function ics(e){const z=d=>new Date(d).toISOString().replace(/[-:]/g,'').replace
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/calendar'}));a.download=(e.titolo||'evento').replace(/[^\w-]+/g,'_')+'.ics';document.body.append(a);a.click();a.remove()}
 const card=(e,p,i)=>{const fut=new Date(e.inizio)>new Date(),chiuso=new Date(e.chiusura)<new Date();
  return`<div class="card evc${e.annullato?' evx':''}" data-ev="${e.id}">${safeUrl(e.immagine)?`<img class="evimg" src="${esc(safeUrl(e.immagine))}" alt="" loading="lazy" referrerpolicy="no-referrer">`:''}<div class="evt"><b>${esc(e.titolo)}</b>
- <div class="muted">📅 ${esc(evData(e.inizio))}${e.luogo?` · 📍 ${esc(e.luogo)}`:''}</div>
- <div class="evtags">${e.annullato?'<span class="evb off">Evento annullato</span>':''}${e.torneo?'<span class="evb t">🏆 Torneo</span>':''}${e.solo_soci?'<span class="evb t">Solo soci in regola</span>':''}${hasQuota(e)?`<span class="evb t">${e.quota?'Quota '+euro(e.quota):'Caparra '+euro(e.caparra)}</span>`:'<span class="evb t">Gratuito</span>'}${i?`<span class="evb t">${i.occupati}/${e.posti} posti${i.attesa?` · ${i.attesa} in attesa`:''}</span>`:''}${!fut&&!e.annullato?`<span class="evb t">✔ ${i?i.presenti:0} presenti</span>`:chiuso&&!e.annullato?'<span class="evb off">Prenotazioni chiuse</span>':''}</div>
- ${p?stBadge(p.stato):''}</div>${typeof IG!=='undefined'?IG.link('📸 Foto e aggiornamenti su Instagram','igev'):''}</div>`};
+ <div class="muted">📅 ${esc(evData(e.inizio))}</div>
+ <div class="evtags">${e.annullato?'<span class="evb off">Evento annullato</span>':''}${e.torneo?'<span class="evb t">🏆 Torneo</span>':''}${hasQuota(e)?'':'<span class="evb t">Gratuito</span>'}${i?`<span class="evb st">${i.occupati}/${e.posti} posti${i.attesa?` · ${i.attesa} in attesa`:''}</span>`:''}${!fut&&!e.annullato?`<span class="evb st">✔ ${i?i.presenti:0} presenti</span>`:chiuso&&!e.annullato?'<span class="evb off">Prenotazioni chiuse</span>':''}</div>
+ ${p?stBadge(p.stato):''}</div></div>`};
 async function eventi(){navSerata();
  if(!DB.remote||DB.status!=='online'){V.innerHTML=segHtml('eventi')+'<h2>🎉 Eventi</h2><div class="card"><p class="muted">Gli eventi richiedono la connessione al database. Riprova quando sei online.</p></div>';bindSeg();return}
  const staff=adminMode(),arch=staff&&window._evArch;
@@ -55,7 +55,8 @@ async function evDetail(e,p,i){const staff=adminMode(),ms=await DB.members(),mn=
  const o=openPanel(`${safeUrl(e.immagine)?`<img class="evimg big" src="${esc(safeUrl(e.immagine))}" alt="" referrerpolicy="no-referrer">`:''}<h3>${esc(e.titolo)}</h3>
  <p>📅 <b>${esc(evData(e.inizio))}</b>${e.luogo?`<br>📍 ${esc(e.luogo)}`:''}<br>⏰ Prenotazioni fino a ${esc(evData(e.chiusura))}</p>
  ${e.descrizione?`<p class="evdesc">${esc(e.descrizione)}</p>`:''}
- <div class="evtags">${e.annullato?'<span class="evb off">Evento annullato</span>':''}${e.torneo?'<span class="evb t">🏆 Torneo</span>':''}${e.solo_soci?'<span class="evb t">Solo soci in regola con la quota</span>':'<span class="evb t">Aperto a tutti</span>'}${e.ospiti?'<span class="evb t">Ospiti ammessi (max 1)</span>':''}${i?`<span class="evb t">${i.occupati}/${e.posti} posti${i.attesa?` · ${i.attesa} in lista d'attesa`:''}</span>`:''}</div>
+ <div class="evtags">${e.annullato?'<span class="evb off">Evento annullato</span>':''}${e.torneo?'<span class="evb t">🏆 Torneo</span>':''}${e.solo_soci?'<span class="evb t">Solo soci in regola con la quota</span>':'<span class="evb t">Aperto a tutti</span>'}${e.ospiti?'<span class="evb t">Ospiti ammessi (max 1)</span>':''}${i?`<span class="evb st">${i.occupati}/${e.posti} posti${i.attesa?` · ${i.attesa} in lista d'attesa`:''}</span>`:''}</div>
+ ${typeof IG!=='undefined'?IG.link('📸 Foto e aggiornamenti su Instagram','igev'):''}
  ${hasQuota(e)?`<div class="lwarn">💶 ${e.quota?`Quota di partecipazione: <b>${euro(e.quota)}</b>. `:''}${e.caparra?`Caparra: <b>${euro(e.caparra)}</b>. `:''}La prenotazione diventa <b>confermata</b> solo dopo che hai versato la caparra di persona a un admin o moderatore. Nessun pagamento nell'app.</div>`:''}
  ${p?`<p>La tua prenotazione: ${stBadge(p.stato)}${p.ospite?` <span class="muted">· con ${esc(p.ospite)}</span>`:''}</p>`:''}
  <div class="mbt evact">${aperto&&!attiva?`${e.ospiti?'<label class="lchk"><input type="checkbox" id="evg"> Porto un ospite</label><input id="evgn" maxlength="80" placeholder="Nome dell\'ospite" hidden>':''}<button class="p" id="evbook">🎟 Prenota</button>`:''}
