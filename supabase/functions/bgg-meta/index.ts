@@ -5,7 +5,7 @@
 // Segreti richiesti (supabase secrets set): CRON_SECRET. SUPABASE_URL / SUPABASE_ANON_KEY / SUPABASE_SERVICE_ROLE_KEY sono forniti da Supabase.
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
-const ORIGINS = ["https://vincenzoassenza-blip.github.io", "http://localhost:8765"];
+const ORIGINS = ["https://app.pergioco.org", "https://vincenzoassenza-blip.github.io", "http://localhost:8765"];
 const cors = (o: string | null) => ({
   "Access-Control-Allow-Origin": o && ORIGINS.includes(o) ? o : ORIGINS[0],
   "Access-Control-Allow-Headers": "authorization, content-type, apikey, x-client-info",
