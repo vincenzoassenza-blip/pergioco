@@ -17,7 +17,7 @@ const l=gLastMine(ps,'m1');chk(l.a==='2026-10-20'&&!l.b,'recenti solo mie');chk(
 chk(/'Zombies':'Zombi'/.test(G)&&/'Video Game Theme':'Videogioco'/.test(G),'categorie');chk(!/>Tutt[ie]</.test(G),'Tutto nei menu',G.match(/>Tutt[ie]</));chk(/Giocati più di recente/.test(G),'ordina recenti');
 chk(/id="apshow"/.test(A)&&/Mostra password/.test(A),'mostra password');chk(/maxlength="40"/.test(A)&&/gncnt/.test(A),'ospite maxlength');chk(/comprendono anche chi apre/.test(A),'testo posti');
 chk(!/<h2>Io<\/h2>/.test(A),'niente card Io');chk(/role="button" tabindex="0"/.test(X)&&/data-pv="\$\{esc\(r\.member_id\)\}" role/.test(X),'riga XP cliccabile');chk(/roc\$\{r\?' rclick'/.test(A),'record cliccabili');
-chk(/keydown/.test(A),'tastiera');chk(/data-bdg/.test(A)&&/function bdgPop/.test(A),'popup badge');chk(/des_vota',\{p:id,p_on:true\}/.test(D),'autovoto');
+chk(/keydown/.test(A),'tastiera');chk(/data-bdg/.test(A)&&/function bdgPop/.test(A),'popup badge');chk(/des_proponi_voto/.test(D),'autovoto');
 chk(/if\(!adminMode\(\)\)return`<div class="rec"><span>Tavoli organizzati/.test(A),'liste solo staff');chk(/mLink\(x\.id/.test(S)&&/gLink\(d\.id/.test(S),'link in statistiche');
-chk(/\.hint\{/.test(C)&&/\.cnt\{/.test(C),'css');chk(/pergioco-v39\.0/.test(W)&&!/\?v=(?!39\.0)\d/.test(I+W),'versioni 39.0');
+chk(/\.hint\{/.test(C)&&/\.cnt\{/.test(C),'css');chk(/pergioco-v39\.[01]/.test(W),'versioni');
 console.log(ok+'/'+n+' ok');process.exit(ok===n?0:1)

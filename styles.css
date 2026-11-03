@@ -308,3 +308,10 @@ a.gl{color:inherit;text-decoration:underline dotted;text-underline-offset:2px}
 .bdn{background:none;border:0;padding:0;font:inherit;font-weight:700;color:inherit;cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px}
 .bdgdlg{border:0;border-radius:14px;max-width:320px;text-align:center;padding:18px}.bdgdlg .bi{font-size:40px}.bdgdlg::backdrop{background:rgba(0,0,0,.4)}
 details.adl summary{display:flex;justify-content:space-between;padding:6px 0;cursor:pointer}
+/* v39.1: evidenziazione leggera dei dati chiave + icona orologio */
+.kw{border-radius:5px;padding:0 4px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.kwg{background:rgba(42,71,133,.08);font-weight:600}.kwd{background:rgba(255,183,77,.18);color:inherit}
+.kww{background:rgba(129,199,132,.22);color:inherit}.kws{background:rgba(100,181,246,.18);color:inherit;font-weight:600}
+.kwfree{background:rgba(129,199,132,.22);color:#1b5e20;font-weight:600}.kwst{background:rgba(42,71,133,.08)}
+.ico-clk{display:inline-block;font-size:1.2em;line-height:1;vertical-align:-.1em}
+.mtx{white-space:pre-line}.gpclr{margin-left:6px;background:none;border:1px solid rgba(0,0,0,.15);border-radius:8px;padding:2px 8px;cursor:pointer}

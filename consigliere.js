@@ -13,7 +13,7 @@ const Meta={key:'pergioco-meta-v25',map:null,
 // Domande. Ogni risposta è un valore di un elenco chiuso: qualsiasi altro valore viene scartato.
 const CQ={
  n:{t:'👥 Quanti siete?',o:[1,2,3,4,5,6,7,8].map(i=>[String(i),i===8?'8 o più':String(i)])},
- t:{t:'⏱ Quanto tempo avete?',o:[['30','Meno di 30 minuti'],['60','Fino a un\'ora'],['120','1–2 ore'],['999','Una serata intera']]},
+ t:{t:'🕒 Quanto tempo avete?',o:[['30','Meno di 30 minuti'],['60','Fino a un\'ora'],['120','1–2 ore'],['999','Una serata intera']]},
  k:{t:'🤝 Come volete giocare?',o:[['co','Insieme contro il gioco'],['cp','Uno contro l\'altro'],['','Indifferente']]},
  a:{t:'🎭 Che atmosfera cercate?',o:[['party','Risate e party'],['strat','Strategia'],['bluff','Bluff e deduzione'],['adv','Avventura'],['','Sorprendimi']]},
  e:{t:'🎲 Quanto giocate di solito?',o:[['1','Ogni tanto, meglio regole semplici'],['2','Abbastanza, regole medie vanno bene'],['3','Spesso, anche giochi impegnativi']]},
@@ -187,7 +187,7 @@ async function cWizard(mode){if(!CFLOW[mode])return;const gs=await DB.games(),ps
   if($('#cwn'))$('#cwn').onclick=()=>{i++;step()}};
  const result=()=>{const R=cRecommend(gs,meta,ps,cValid(A),me);
   V.innerHTML=`<div class="cwz">${head()}<h2>🎯 Ecco cosa vi consiglio</h2>${R.notes.map(x=>`<p class="cwz-note">ℹ️ ${esc(x)}</p>`).join('')}
-  ${R.list.length?R.list.map((r,j)=>`<div class="card cwz-r"><div class="row"><b>${['🥇','🥈','🥉'][j]} ${esc(r.g.name)}</b><span class="muted" style="flex:0 0 auto">👥 ${pRange(r.g)} · ⏱ ~${gPt(r.g)} min</span></div>
+  ${R.list.length?R.list.map((r,j)=>`<div class="card cwz-r"><div class="row"><b>${['🥇','🥈','🥉'][j]} ${esc(r.g.name)}</b><span class="muted" style="flex:0 0 auto">👥 ${pRange(r.g)} · ${CLK} ~${gPt(r.g)} min</span></div>
    <p class="cwz-why">${esc(r.txt)}</p>${r.warn?`<p class="cwz-miss">⚠️ ${esc(r.warn)}</p>`:''}
    <div class="cwz-btns"><button data-see="${esc(r.g.id)}">📖 Vedi scheda</button><button class="p" data-book="${esc(r.g.id)}">📅 Prenota un tavolo con questo</button></div></div>`).join('')
    :'<p class="muted">Non ho trovato giochi adatti nemmeno allargando i criteri. Provate a cambiare qualche risposta.</p>'}
