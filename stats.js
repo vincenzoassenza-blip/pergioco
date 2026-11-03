@@ -20,7 +20,7 @@ function calc(mid,plays,gs,per){
  const games=[...G.values()].sort((a,b)=>b.n-a.n||a.name.localeCompare(b.name));
  let h=0;games.map(g=>g.n).sort((a,b)=>b-a).forEach((n,i)=>{if(n>=i+1)h=i+1});
  const lastAll=new Map();for(const p of allMine)if(!lastAll.has(p.gameId)||lastAll.get(p.gameId)<p.date)lastAll.set(p.gameId,p.date);
- const dusty=[...lastAll].filter(([,d])=>days(d,today)>60).map(([id,d])=>({name:(gs.find(x=>x.id===id)||{}).name||'Gioco rimosso',d,ago:days(d,today)})).sort((a,b)=>b.ago-a.ago);
+ const dusty=[...lastAll].filter(([,d])=>days(d,today)>60).map(([id,d])=>({id:gs.some(x=>x.id===id)?id:null,name:(gs.find(x=>x.id===id)||{}).name||'Gioco rimosso',d,ago:days(d,today)})).sort((a,b)=>b.ago-a.ago);
  // avversari
  const O=new Map();let guest=0;
  for(const p of mine){const iw=!!me(p).winner;for(const x of p.players){if(x.memberId===mid)continue;if(!x.memberId){guest++;continue}
@@ -49,8 +49,8 @@ function html(m,s,full,per,ms,own){
  const mx=s.games[0]?s.games[0].n:1;
  o+=`<details class="std" open><summary>🎲 Giochi (${s.games.length})</summary><div class="stl">${s.games.map((g,i)=>{const sc=g.sc,av=sc.length?sc.reduce((a,b)=>a+b,0)/sc.length:null,f=v=>String(Math.round(v*10)/10).replace('.',',');
   return `<div class="str"${i>=8?' hidden data-more':''}><div class="strh"><button type="button" class="stlink" data-g="${esc(g.id)}"><b>${esc(g.name)}</b> ›</button><span>${g.n}×</span></div>${bar(g.n,mx)}<div class="muted sm">Vinte ${g.w} · ${pct(g.w,g.n)} · prima ${df(g.first)} · ultima ${df(g.last)}${sc.length?` · punti: max ${f(Math.max(...sc))}, media ${f(av)}, min ${f(Math.min(...sc))}`:''}</div></div>`}).join('')}</div>${s.games.length>8?`<button type="button" class="s sm" data-all>Mostra tutti (${s.games.length})</button>`:''}
- ${s.dusty.length?`<p class="sm"><b>🧹 Da rispolverare</b> (non giocati da oltre 60 giorni): ${s.dusty.slice(0,8).map(d=>`${esc(d.name)} <span class="muted">(${d.ago} gg)</span>`).join(', ')}</p>`:''}</details>`;
- if(full){const so=[...s.opp].sort((a,b)=>b.n-a.n),nm=id=>{const x=ms.find(y=>y.id===id);return x?esc(memberName(x)):'Ospite'},omx=so[0]?so[0].n:1;
+ ${s.dusty.length?`<p class="sm"><b>🧹 Da rispolverare</b> (non giocati da oltre 60 giorni): ${s.dusty.slice(0,8).map(d=>`${d.id?gLink(d.id,d.name):esc(d.name)} <span class="muted">(${d.ago} gg)</span>`).join(', ')}</p>`:''}</details>`;
+ if(full){const so=[...s.opp].sort((a,b)=>b.n-a.n),nm=id=>{const x=ms.find(y=>y.id===id);return x?mLink(x.id,esc(memberName(x))):'Ospite'},omx=so[0]?so[0].n:1;
   o+=`<details class="std"><summary>⚔️ Avversari</summary>
   <div class="stg2"><div class="stn"><b>${s.nem?nm(s.nem.id):'—'}</b><span>😈 nemesi${s.nem?` · ti ha battuto ${s.nem.beatMe}×`:''}</span></div><div class="stn"><b>${s.vit?nm(s.vit.id):'—'}</b><span>🎯 vittima${s.vit?` · battuto ${s.vit.beat}×`:''}</span></div></div>
   <div class="stl">${so.slice(0,15).map(x=>`<div class="str"><div class="strh"><b>${nm(x.id)}</b><span>${x.n} insieme</span></div>${bar(x.n,omx)}<div class="muted sm">${x.comp?`Competitive: ${x.beat} vinte / ${x.beatMe} perse contro (${x.comp})`:''}${x.comp&&x.coop?' · ':''}${x.coop?`Coop insieme: ${x.coop}, vinte ${pct(x.coopW,x.coop)}`:''}</div></div>`).join('')}</div>
