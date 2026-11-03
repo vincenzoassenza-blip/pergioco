@@ -1,0 +1,27 @@
+// node tests/v40.1b.test.js — Record: tutte le sezioni richiudibili con freccia, Classifica XP compresa
+const fs=require('fs');const css=fs.readFileSync(__dirname+'/../styles.css','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8');
+let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};
+chk(/pergioco-v40\.1'/.test(sw)&&/ux40\.js\?v=40\.1/.test(sw),'versione 40.1');
+chk(/content:'▸'/.test(css)&&/\[open\]>summary::after\{content:'▾'\}/.test(css)&&/list-style:none/.test(css),'freccia ▸/▾ nei css');
+(async()=>{const pw=require('playwright-core');const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome'});const errs=[];
+ const c=await b.newContext({serviceWorkers:'block',viewport:{width:390,height:844}});const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));
+ await p.route(/supabase|jsdelivr/,r=>r.abort());await p.goto('http://localhost:8799/',{waitUntil:'load'});await p.waitForTimeout(2500);
+ await p.evaluate(()=>{document.body.classList.remove('gate');localStorage.removeItem('pergioco-acc');
+  const gs=Array.from({length:8},(_,i)=>({id:'g'+i,name:['Catan','Azul','Carcassonne','Ticket to Ride','Wingspan','Dixit','7 Wonders','Splendor'][i],min:2,max:4,minT:30,maxT:60,age:10}));
+  const N=['Vincenzo','Giulia','Marco','Sara','Luca','Anna','Paolo','Elena','Davide','Chiara','Simone','Laura','Andrea','Marta'];const ms=N.map((x,i)=>({id:'m'+i,nome:x,cognome:'',active:true}));
+  const ps=Array.from({length:30},(_,i)=>({id:'p'+i,gameId:'g'+(i%8),date:'2026-10-'+String(1+i%28).padStart(2,'0'),players:[{memberId:'m'+(i%14),score:10+i%7},{memberId:'m'+((i+3)%14),score:8}],coop:false}));
+  DB.games=async()=>gs;DB.plays=async()=>ps;DB.members=async()=>ms;XP.map={};ms.forEach((m,i)=>XP.map[m.id]={member_id:m.id,xp:900-i*55,level:5});XP.ensure=async()=>{}});
+ await p.evaluate(()=>go('record'));await p.waitForTimeout(1500);
+ const st=()=>p.evaluate(()=>{const ds=[...document.querySelectorAll('#view details.acc')];const x=document.querySelector('#view .xptop');
+  return{n:ds.length,x:!!(x&&x.closest('details.acc')),xo:!!(x&&x.closest('details.acc').open),loose:document.querySelectorAll('#view h3.rsec').length,arr:ds.every(d=>{const a=getComputedStyle(d.querySelector('summary'),'::after').content;return a.includes(d.open?'▾':'▸')}),pg:!!document.querySelector('#view .accx [data-xpp]')}});
+ let s=await st();chk(s.x&&s.xo,'Classifica XP è un blocco richiudibile, aperto');chk(s.loose===0&&s.n>=2,'tutte le sezioni sono blocchi ('+s.n+')');chk(s.arr,'freccia ▸/▾ visibile e coerente');
+ await p.screenshot({path:process.env.SHOT||'/tmp/v401.png'});
+ chk(s.pg,'paginazione presente');await p.evaluate(()=>document.querySelector('#view .accx [data-xpp]:not([disabled])').click());await p.waitForTimeout(400);
+ s=await st();chk(s.xo&&s.x,'paginazione non rompe il blocco');
+ await p.evaluate(()=>{const d=document.querySelector('#view .accx');d.querySelector('summary').click()});await p.waitForTimeout(300);
+ chk(await p.evaluate(()=>!document.querySelector('#view .accx').open&&getComputedStyle(document.querySelector('#view .accx summary'),'::after').content.includes('▸')),'Classifica si chiude con freccia ▸');
+ await p.evaluate(()=>go('nuova'));await p.waitForTimeout(800);await p.evaluate(()=>go('record'));await p.waitForTimeout(1500);
+ chk(await p.evaluate(()=>{const d=document.querySelector('#view .accx');return d&&!d.open}),'stato chiuso ricordato');
+ await p.evaluate(()=>go('nuova'));await p.waitForTimeout(800);chk(await p.evaluate(()=>getComputedStyle(document.querySelector('#uxaltro>summary'),'::after').content.includes('▸')),'freccia su «Altro»');
+ await p.evaluate(()=>go('ludoteca'));await p.waitForTimeout(800);chk(await p.evaluate(()=>{const s=document.querySelector('#uxfil>summary');return s&&getComputedStyle(s,'::after').content.includes('▸')}),'freccia su «Filtri»');
+ chk(!errs.length,'nessun errore JS '+errs.join('|'));await b.close();console.log(ok+'/'+n+' ok');process.exit(ok===n?0:1)})();

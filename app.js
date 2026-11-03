@@ -408,7 +408,7 @@ async function gamePage(g,ps){const ms=await DB.members(),mine=ps.filter(p=>p.ga
  document.addEventListener('focusin',e=>{if(e.target.closest&&e.target.closest('.mbox,.sheet')&&/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))setTimeout(()=>e.target.scrollIntoView({block:'center'}),300)});
 })();
 // v33: statistiche personali (stats.js caricato solo quando serve)
-function loadStats33(){return window.StatsV33?Promise.resolve():new Promise((r,j)=>{const s=document.createElement('script');s.src='stats.js?v=40';s.onload=r;s.onerror=()=>j(new Error('stats.js non caricato'));document.head.append(s)})}
+function loadStats33(){return window.StatsV33?Promise.resolve():new Promise((r,j)=>{const s=document.createElement('script');s.src='stats.js?v=40.1';s.onload=r;s.onerror=()=>j(new Error('stats.js non caricato'));document.head.append(s)})}
 {const _pf=views.profilo;views.profilo=async(...a)=>{await _pf(...a);try{const ms=await DB.members(),u=DB.remote&&DB.status==='online'?await DB.remote.user():null,myId=u&&u.id;let m,own=false;
  if(window._pv){m=ms.find(x=>x.id===window._pv);own=!!(m&&myId&&m.userId===myId)}else{m=myId?ms.find(x=>x.userId===myId):null;own=!!m}
  const staff=adminMode();if(!m||!(own||staff||m.statsPub)||!V.querySelector('.card.prof'))return;
