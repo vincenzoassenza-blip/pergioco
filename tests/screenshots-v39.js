@@ -1,0 +1,18 @@
+const pw=require('playwright-core');const D='/workspace/pergioco-app/screenshots/v39.0/';
+const N=['Catan','Azul','Carcassonne','Città di Carte','Dixit','Ticket to Ride','Codenames','Splendor','Wingspan','Pandemic','7 Wonders','Patchwork','Cascadia','Kingdomino','Root','Cartographers','Café','Carnival of Monsters'];
+(async()=>{const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome'});const errs=[];let r={};
+const mk=async(name,fn)=>{if(process.env.ONLY&&!name.startsWith(process.env.ONLY))return;const c=await b.newContext({serviceWorkers:'block',viewport:{width:390,height:844},deviceScaleFactor:2,hasTouch:true});const p=await c.newPage();p.on('pageerror',e=>errs.push(name+': '+e.message));
+ const cols=['e57373','64b5f6','81c784','ffb74d','ba68c8','4db6ac'];await p.route(/cf\.geekdo-images\.com/,ro=>{const i=+(ro.request().url().match(/(\d+)\.png/)||[0,0])[1];ro.fulfill({contentType:'image/svg+xml',body:`<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="#${cols[i%6]}"/></svg>`})});
+ await p.goto('http://localhost:8799/',{waitUntil:'networkidle'});await p.waitForTimeout(3000);
+ await p.evaluate(async N=>{document.body.classList.remove('gate');admin=true;const gs=N.map((n,i)=>({id:'g'+i,name:n,min:2,max:4,minT:30,maxT:60,age:10,coop:n==='Pandemic',thumb:i%4==3?null:`https://cf.geekdo-images.com/x/${i}.png`}));
+  const ms=['Vincenzo','Giulia','Marco','Sara'].map((n,i)=>({id:'m'+i,nome:n,cognome:'',active:true}));const d=i=>'2026-10-'+String(30-i).padStart(2,'0');
+  const ps=[[14,0],[1,0],[9,1],[1,1],[1,2],[5,2],[5,3],[1,3],[0,1],[0,2],[2,3],[2,0]].map(([g,m],i)=>({id:'p'+i,gameId:'g'+g,date:d(i),players:[{memberId:'m'+m,score:5}],coop:false}));
+  DB.games=async()=>gs;DB.plays=async()=>ps;DB.members=async()=>ms;window._ps=ps},N);
+ await fn(p);await p.waitForTimeout(500);await p.screenshot({path:D+name+'.png'});await c.close()};
+const ONLY=process.env.ONLY;const mk0=mk;
+await mk('1-login-mostra-password',async p=>{await p.evaluate(()=>{document.body.classList.add('gate');window._am='login';authForm()});await p.waitForTimeout(800);await p.fill('#ap','segreta123');await p.check('#apshow');r.type=await p.$eval('#ap',e=>e.type)});
+await mk('2-partita-ospite-modalita',async p=>{await p.evaluate(()=>go('nuova'));await p.waitForTimeout(2500);r.hint=await p.$$eval('.hint',e=>e.map(x=>x.textContent));await p.evaluate(()=>{const m=document.getElementById('mode');m&&m.scrollIntoView({block:'start'})});await p.evaluate(()=>{const g=document.getElementById('gn');if(g){g.value='Ospite Rossi';g.dispatchEvent(new Event('input'))}});r.cnt=await p.evaluate(()=>document.getElementById('gncnt')?.textContent);
+ p.once('dialog',async d=>{r.confirm=d.message();await d.dismiss()});await p.evaluate(()=>{const s=document.querySelector('#g');s.value='g1';s.dispatchEvent(new Event('change'));document.querySelector('#d').value='2026-12-25'});});
+await mk('3-record-righe-cliccabili',async p=>{await p.evaluate(()=>go('record'));await p.waitForTimeout(2500);r.roc=await p.$$eval('.roc.rclick',e=>e.length);await p.focus('.roc.rclick');});
+await mk('4-badge-popup',async p=>{await p.evaluate(()=>openProfile('m0'));await p.waitForTimeout(3000);const b=await p.$('.bdn');r.bdn=!!b;if(b){await b.click();await p.waitForTimeout(300);r.pop=await p.evaluate(()=>document.getElementById('bdgdlg')?.textContent)}});
+console.log(JSON.stringify(r,null,1),'errors',errs);await b.close()})();

@@ -1,6 +1,6 @@
-const C='pergioco-v38.2';
+const C='pergioco-v39.0';
 const CDN='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
-const A=['./','./index.html','./styles.css?v=38.2','./config.js?v=37.1','./data.js?v=37.1','./sb.js?v=37.1','./app.js?v=38.2','./picker.js?v=38.2','./errori.js?v=38.0','./libri.js?v=38.0','./giochi.js?v=38.2','./consigliere.js?v=37.1','./equilibrio.js?v=38.0','./eventi.js?v=38.0','./xp.js?v=38.0','./sicurezza.js?v=38.0','./desktop.js?v=37.1','./stats.js?v=38.0','./antero.js?v=38.0','./coppa.js?v=38.0','./desideri.js?v=38.0','./wrapped.js?v=38.0','./ig.js?v=37.6','./vendor/xlsx.full.min.js','./manifest.json','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png'];
+const A=['./','./index.html','./styles.css?v=39.0','./config.js?v=39.0','./data.js?v=39.0','./sb.js?v=39.0','./app.js?v=39.0','./picker.js?v=39.0','./errori.js?v=39.0','./libri.js?v=39.0','./giochi.js?v=39.0','./consigliere.js?v=39.0','./equilibrio.js?v=39.0','./eventi.js?v=39.0','./xp.js?v=39.0','./sicurezza.js?v=39.0','./desktop.js?v=39.0','./stats.js?v=39.0','./antero.js?v=39.0','./coppa.js?v=39.0','./desideri.js?v=39.0','./wrapped.js?v=39.0','./ig.js?v=39.0','./vendor/xlsx.full.min.js','./manifest.json','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A.map(u=>new Request(u,{cache:'reload'}))).then(()=>c.add(CDN).catch(()=>{}))));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))));self.clients.claim()});
 // solo i file dell'app e la libreria Supabase vanno in cache; le chiamate al database no
