@@ -121,7 +121,7 @@ async function eqOpen(){const all=await DB.members(),ms=all.filter(m=>m.active),
   if(st.off>=L.length)st.off=0;const show=L.slice(st.off,st.off+3);
   V.innerHTML=`<div class="cwz eq">${top('Le sfide più equilibrate','Modifica')}
   <p class="muted">${esc(st.ids.map(nm).join(', '))}${st.guests?` + ${st.guests} ospit${st.guests===1?'e':'i'}`:''} · ${N()} al tavolo</p>
-  ${show.length?show.map((r,j)=>`<div class="card cwz-r"><div class="row"><b>${['🥇','🥈','🥉'][j]} ${esc(r.g.name)}</b><span class="muted" style="flex:0 0 auto">👥 ${esc(pRange(r.g))} · ⏱ ~${esc(gPt(r.g))} min</span></div><p class="cwz-why">${esc(EQ.why(r,st.off+j))}</p>
+  ${show.length?show.map((r,j)=>`<div class="card cwz-r"><div class="row"><b>${['🥇','🥈','🥉'][j]} ${esc(r.g.name)}</b><span class="muted" style="flex:0 0 auto">👥 ${esc(pRange(r.g))} · ${CLK} ~${esc(gPt(r.g))} min</span></div><p class="cwz-why">${esc(EQ.why(r,st.off+j))}</p>
    <div class="cwz-btns"><button data-see="${esc(r.g.id)}">📖 Scheda</button><button class="p" data-book="${esc(r.g.id)}">📅 Prenota un tavolo</button><button class="p" data-play="${esc(r.g.id)}">⚔️ Giochiamo questa</button></div></div>`).join('')
    :'<p class="muted">Nessun gioco della collezione va bene per questo numero di giocatori e questo tempo. Prova ad allargare il tempo.</p>'}
   <div class="cwz-btns">${L.length>3?'<button id="eqn">🔄 Altra proposta</button>':''}<button id="eqm">✏️ Cambia partecipanti</button></div></div>`;
