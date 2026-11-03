@@ -36,11 +36,15 @@ const SupabaseAdapter={
   for(const k of Object.keys(MAP)){let {data,error}=await this.client.from(MAP[k].t).select(MAP[k].cols||'*');
    if(error&&MAP[k].cols&&(error.code==='42703'||/column/i.test(error.message||''))){DB.v6Missing=true;({data,error}=await this.client.from(MAP[k].t).select('*'))}else if(MAP[k].cols)DB.v6Missing=false;if(error&&k==='tables'&&isMissing(error)){DB.tablesMissing=true;d.tables=[];continue}if(error)throw error;d[k]=data.map(MAP[k].from)}
   if(DB.v6Missing===false&&this.adminCached){const {data}=await this.client.rpc('admin_member_tessere');if(data){const t=new Map(data.map(x=>[x.id,x.tessera||'']));d.members.forEach(m=>{if(t.has(m.id))m.tessera=t.get(m.id)})}}
-  if(this.queue().length)return;await this.cache.replaceAll(d)},
+  if(this.queue().length)return;await this.cache.replaceAll(d);try{const u=await this.user();if(u)localStorage.setItem('pergioco-cache-uid',u.id)}catch(e){}},
  async init(){const c=window.PERGIOCO_CONFIG||{};if(!c.supabaseUrl||!c.supabaseAnonKey)return 'local';
   if(!window.supabase)return 'nolib';
   this.client=window.supabase.createClient(c.supabaseUrl,c.supabaseAnonKey);
   const {data:ss}=await this.client.auth.getSession();if(!ss.session)return 'auth';
+  // v40: avvio immediato dalla copia locale (solo se è dello stesso account) e aggiornamento in sottofondo
+  const uid=ss.session.user&&ss.session.user.id,UK='pergioco-cache-uid';
+  if(uid&&this.cache._load()&&localStorage.getItem(UK)===uid){this.bg=this.refresh().then(()=>{DB.setStatus&&DB.setStatus('online');document.dispatchEvent(new Event('pergioco-refreshed'))}).catch(e=>{if(isNet(e)&&DB.setStatus)DB.setStatus('offline')});return 'online'}
+  {const o=localStorage.getItem(UK);if(o&&o!==uid&&!this.queue().length)localStorage.removeItem(this.cache.key)}
   try{await Promise.race([this.refresh(),new Promise((_,r)=>setTimeout(()=>r({message:'Failed: timeout'}),6000))]);return 'online'}
   catch(e){if(isMissing(e))return 'missing';return this.cache._load()?'offline':'nolib'}},
  // --- autenticazione admin (Supabase Auth, email + password) ---
@@ -69,7 +73,7 @@ const SupabaseAdapter={
 // Avvio: sceglie l'adapter. Senza configurazione o con tabelle mancanti resta tutto locale come prima.
 DB.mode='local';DB.status='local';DB.onStatus=()=>{};
 DB.setStatus=s=>{DB.status=s;DB.onStatus()};
-DB.logout=async()=>{try{await SupabaseAdapter.flush()}catch(e){}try{await SupabaseAdapter.client.auth.signOut()}catch(e){}if(!SupabaseAdapter.queue().length)localStorage.removeItem(SupabaseAdapter.cache.key);localStorage.removeItem('pergioco-mode');location.replace(location.pathname+'#ludoteca');location.reload()};
+DB.logout=async()=>{try{await SupabaseAdapter.flush()}catch(e){}try{await SupabaseAdapter.client.auth.signOut()}catch(e){}if(!SupabaseAdapter.queue().length)localStorage.removeItem(SupabaseAdapter.cache.key);localStorage.removeItem('pergioco-cache-uid');localStorage.removeItem('pergioco-acc');localStorage.removeItem('pergioco-mode');location.replace(location.pathname+'#ludoteca');location.reload()};
 DB.init=async()=>{const m=await SupabaseAdapter.init();DB.mode=m;
  if(m==='online'||m==='offline'||m==='auth'){DB.adapter=SupabaseAdapter;DB.remote=SupabaseAdapter;addEventListener('online',()=>SupabaseAdapter.flush())}
  DB.setStatus(m);return m};
