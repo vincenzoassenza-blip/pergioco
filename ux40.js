@@ -9,6 +9,8 @@ const UX={
  accSave(d){if(!d.dataset.accok)return;const s=this.accGet();s[this.accKey(d)]=d.open;const ks=Object.keys(s);if(ks.length>200)delete s[ks[0]];try{localStorage.setItem(this.AK,JSON.stringify(s))}catch(e){}},
  // converte titolo h3.rsec + contenuto in un blocco richiudibile
  wrapSections(root){root.querySelectorAll('h3.rsec').forEach((h,i)=>{const d=document.createElement('details');d.className='card acc';d.open=i===0;const sm=document.createElement('summary');sm.innerHTML=`<b>${h.innerHTML}</b>`;d.append(sm);let n=h.nextElementSibling;while(n&&!n.matches('h3.rsec,details,h2')){const x=n.nextElementSibling;d.append(n);n=x}h.replaceWith(d)})},
+ // v40.1 — Record: anche Classifica XP (e sezioni aggiunte dopo) diventano blocchi richiudibili
+ recFix(V){const x=V.querySelector('.xptop');if(x&&!x.closest('details')){const d=document.createElement('details');d.className='card acc accx';d.dataset.acc='Classifica XP';d.open=true;const sm=document.createElement('summary');sm.innerHTML='<b>⚡ Classifica XP</b>';x.replaceWith(d);d.append(sm,x)}if(V.querySelector('h3.rsec'))this.wrapSections(V);this.accApply(V)},
  // 8 — liste lunghe: mostra un pezzo alla volta mentre scorri
  chunk(box,size=40){if(!box)return;const it=[...box.children].filter(x=>!x.classList.contains('uxmore'));if(it.length<=size)return;let shown=size;it.forEach((x,i)=>{if(i>=size)x.hidden=true});
   const s=document.createElement('div');s.className='uxmore muted';s.textContent='Carico altri…';box.append(s);
@@ -37,7 +39,7 @@ _uxWrap('nuova',async ed=>{const card=V.querySelector('.card');const save=$('#sa
  const lO=lab('Ospite'),lG=lab('Giocatori');if(lO&&lG)take(lO,lG);
  const lDu=lab('Durata');if(lDu)take(lDu,save);
  save.before(d);
- const today=$('#d')?$('#d').defaultValue:'';const upd=()=>{const v=$('#d')&&$('#d').value;sm.innerHTML=`Altro: data${v&&v!==today?' <b>('+esc(UX.dLbl(v))+')</b>':''}, modalità, ospite, durata, nota ▾`};upd();if($('#d'))$('#d').addEventListener('change',upd);
+ const today=$('#d')?$('#d').defaultValue:'';const upd=()=>{const v=$('#d')&&$('#d').value;sm.innerHTML=`Altro: data${v&&v!==today?' <b>('+esc(UX.dLbl(v))+')</b>':''}, modalità, ospite, durata, nota`};upd();if($('#d'))$('#d').addEventListener('change',upd);
  if(ed&&(ed.id||(ed.date&&ed.date!==today)))d.open=true;else UX.accApply(V);
  save.addEventListener('click',()=>{if(!isoOk($('#d').value)||($('#du')&&$('#du').classList.contains('bad')))d.open=true},true);
  // sotto: i tavoli in Agenda di oggi
@@ -59,13 +61,13 @@ _uxWrap('ludoteca',()=>{const n=$('#n');if(!n||V.querySelector('#uxfil'))return;
  const gl=$('#gl');const ch=()=>UX.chunk(gl);ch();new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(y=>y.classList&&!y.classList.contains('uxmore'))))ch()}).observe(gl,{childList:true})});
 
 // 4 — Record: sezioni a blocchi richiudibili
-_uxWrap('record',()=>{UX.wrapSections(V);UX.accApply(V)});
+_uxWrap('record',()=>UX.recFix(V));
 _uxWrap('stats',()=>UX.accApply(V));
 _uxWrap('profilo',()=>{UX.accApply(V);UX.hdr()});
 
 // 8 — Altro > Partite (staff): lista a pezzi
 new MutationObserver(()=>{const a=document.getElementById('aplays');if(a&&!a.dataset.uxc){a.dataset.uxc='1';UX.chunk(a)}
- const v=document.getElementById('view');if(v)UX.accApply(v)}).observe(document.getElementById('view'),{childList:true,subtree:true});
+ const v=document.getElementById('view');if(v){if(window._cur==='record'&&v.querySelector('.xptop:not(details .xptop),h3.rsec'))UX.recFix(v);UX.accApply(v)}}).observe(document.getElementById('view'),{childList:true,subtree:true});
 addEventListener('hashchange',()=>setTimeout(()=>UX.hdr(),0));
 document.getElementById('tabs').addEventListener('click',()=>setTimeout(()=>UX.hdr(),0));
 
