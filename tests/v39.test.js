@@ -19,5 +19,5 @@ chk(/id="apshow"/.test(A)&&/Mostra password/.test(A),'mostra password');chk(/max
 chk(!/<h2>Io<\/h2>/.test(A),'niente card Io');chk(/role="button" tabindex="0"/.test(X)&&/data-pv="\$\{esc\(r\.member_id\)\}" role/.test(X),'riga XP cliccabile');chk(/roc\$\{r\?' rclick'/.test(A),'record cliccabili');
 chk(/keydown/.test(A),'tastiera');chk(/data-bdg/.test(A)&&/function bdgPop/.test(A),'popup badge');chk(/des_proponi_voto/.test(D),'autovoto');
 chk(/if\(!adminMode\(\)\)return`<div class="rec"><span>Tavoli organizzati/.test(A),'liste solo staff');chk(/mLink\(x\.id/.test(S)&&/gLink\(d\.id/.test(S),'link in statistiche');
-chk(/\.hint\{/.test(C)&&/\.cnt\{/.test(C),'css');chk(/pergioco-v39\.[01]/.test(W),'versioni');
+chk(/\.hint\{/.test(C)&&/\.cnt\{/.test(C),'css');chk(/pergioco-v39\.\d+/.test(W),'versioni');
 console.log(ok+'/'+n+' ok');process.exit(ok===n?0:1)
