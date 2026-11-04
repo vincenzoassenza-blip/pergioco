@@ -367,3 +367,21 @@ details[open]>summary::after{content:'▾'}
 .gcov{flex:none;width:48px;height:48px;border-radius:8px;background:#eef3fb;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden}.gcov img{width:48px;height:48px;object-fit:cover}
 .uxcons{margin:0 0 10px}
 .gfoot[hidden]{display:none!important}
+/* v40.6 anteprima — Agenda per giorno */
+.agdays{display:flex;gap:6px;overflow-x:auto;margin:0 0 6px;padding-bottom:2px;position:relative}.agdays .chip{white-space:nowrap;flex:0 0 auto;font-size:14px}
+.agdi{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;border:0;padding:0;min-height:0!important}
+.agday{margin:16px 2px 8px;font-size:16px;color:var(--b)}.agday .muted{font-weight:400;font-size:14px}.agnone{margin:0 2px 8px}
+.card.agt,.card.evc.agt{padding:12px 14px}.agrow{display:flex;gap:12px;align-items:flex-start}.agtx{flex:1;min-width:0}
+.agl1{display:flex;justify-content:space-between;gap:8px;align-items:baseline}.agl1>b{font-size:16px;min-width:0;overflow-wrap:anywhere}.agl1 a.gl{color:inherit}
+.agl2,.agl3{font-size:14px;margin-top:3px;line-height:1.35}.agl2{color:#6b7489}.agl3{color:#1d2433}.agsep{margin:0 6px}
+.agi{display:inline-block;width:1.15em;font-size:14px;text-align:center}
+.agst{flex:none;font-size:13px;font-weight:600;color:#6b7489;white-space:nowrap}.agst.free{color:#1d7a3a}
+.agact{margin-top:10px}.agbtn{width:100%}.agx{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px}
+.lnk{background:none;border:0;padding:6px 0;color:var(--b);font-size:14px;font-weight:600;min-height:40px}.lnk:disabled{opacity:.4}
+.agov{position:fixed;inset:0;background:rgba(10,20,40,.45);z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.agsheet{background:#fff;width:100%;max-width:560px;max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .22s ease-out}
+.agov.on .agsheet{transform:none}.aghd{display:flex;justify-content:space-between;align-items:center}.aghd h3{margin:4px 0}
+.agclose{background:none;border:0;font-size:20px;min-width:44px}.agme{background:#eef3fb;border-radius:10px;padding:10px 12px;margin:6px 0 4px;font-size:14px}
+.agdb{width:100%;text-align:left}.agsheet .p#tsv{width:100%;margin-top:12px}
+@media (prefers-reduced-motion:reduce){.agsheet{transition:none}}
+.agact .agbtn{margin-top:0}.agact{margin-top:8px}

@@ -148,29 +148,45 @@ async giocatori(){const gs=await DB.games(),ms=await DB.members(),bc=await badge
   setTimeout(async()=>{if(k!==tk)return;let ids;try{if(DB.remote&&DB.status==='online')ids=await DB.remote.searchMembers(q)}catch(err){}
    if(!ids){const n=norm(q);ids=ms.filter(m=>norm([m.nome,m.cognome,m.soprannome,m.nome].join(' ')).includes(n)).slice(0,20).map(m=>m.id)}
    if(k!==tk)return;const l=ids.map(id=>ms.find(m=>m.id===id)).filter(Boolean);R.innerHTML=l.map(mini).join('')+(l.length===20?'<p class="muted">Mostrati i primi 20: affina la ricerca.</p>':'')||'<p class="muted">Nessun socio trovato.</p>'},250)}},
-async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=>m.active),ts=await DB.allTables();const _uid=DB.remote?(await DB.remote.user())?.id:null,meM=all.find(m=>_uid&&m.userId===_uid),pickH=adminMode();const ne=nextEvening();window._ser=window._ser||ne;const S=window._ser;
- const mn=id=>{const m=all.find(m=>m.id===id);return m?memberName(m):'?'};
- if(!isoOk(S.date))S.date=ne.date;const open=ts.filter(t=>t.date===S.date);const pres=new Set();open.forEach(t=>(t.players||[]).forEach(p=>pres.add(p.memberId?'m:'+p.memberId:'g:'+p.name)));
- V.innerHTML=`<h2>Agenda</h2>${DB.tablesMissing?'<p class="warn">Tabella «tables» non ancora creata su Supabase: eseguire di nuovo supabase/schema.sql.</p>':''}<div class="card"><label>Data</label><input id="sd" type="date" min="${romeToday()}" value="${S.date}" required><div class="dday"><b>📅 ${dayLbl(S.date)}</b></div>
- <div class="chips"><span class="chip">🪑 ${open.filter(t=>t.status==='open').length} tavoli aperti</span><span class="chip">🙋 ${pres.size} presenti</span></div></div>
- <div id="tl">${open.map(t=>{const n=(t.players||[]).length,full=n>=t.seats,g=gs.find(g=>g.id===t.gameId)||{};return`<div class="card tavolo${t.status!=='open'?' closed':''}"><div class="row"><b class="kw kwg">${g.id?gLink(g.id,g.name):esc(g.name||'?')}</b><span class="muted" style="text-align:right">${t.time?'<span class="kw kwd">'+CLK+' '+esc(t.time)+'</span> · ':''}${t.status==='open'?(full?'<b class="kw kwst">Pieno</b>':'<span class="kw kwfree">'+(t.seats-n)+' posti liberi</span>'):'<span class="kw kwst">✅ Chiuso</span>'}</span></div>
-  <div class="muted">🏠 <a class="pv" data-pv="${t.hostId}">${esc(mn(t.hostId))}${lv(t.hostId)}</a>${t.note?' · '+esc(t.note):''}</div><div class="chips">${(t.players||[]).map(p=>`<span class="chip">${p.memberId?mLink(p.memberId,esc(mn(p.memberId))+lv(p.memberId)):esc(p.name+' (ospite)')}</span>`).join('')}<span class="chip">${n}/${t.seats}</span></div>
-  ${t.status==='open'?`<div class="row" style="margin-top:8px"><button class="s" data-j="${t.id}">👥 Unisciti / lascia</button><button class="s" data-o="${t.id}"${full?' disabled':''}>+ Ospite</button></div><button class="p" data-c="${t.id}">🏁 Chiudi e registra</button>`:''}${adminMode()&&!isMod()?`<button class="s" data-x="${t.id}" style="width:100%;margin-top:6px">🗑 Elimina tavolo</button>`:''}</div>`}).join('')||'<p class="muted">Nessun tavolo per questa serata. Aprine uno!</p>'}</div>
- <details class="card" id="nt"${open.length?'':' open'}><summary><b>➕ Apri un tavolo</b></summary>${(pickH?ms.length:meM)?`${pickH?`<label>Chi ospita</label><select id="th">${ms.slice().sort((a,b)=>memberName(a).localeCompare(memberName(b),'it')).map(m=>`<option value="${m.id}"${meM&&m.id===meM.id?' selected':''}>${esc(memberName(m))}</option>`)}</select>`:`<label>Chi ospita</label><div class="rec"><b>🏠 ${nmH(meM)} (tu)</b></div><input type="hidden" id="th" value="${meM.id}">`}
-  <label>Gioco</label><select id="tg">${gs.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`)}</select><div class="row"><div><label>Posti</label><input id="tp"${nA('int',1,100,'Posti',' required')} value="${gs[0]?.max||4}"></div><div><label>Inizio (facolt.)</label><input id="tt" type="time"></div></div><p class="muted hint">ⓘ I posti comprendono anche chi apre il tavolo: con 4 posti, oltre a te ci stanno altre 3 persone.</p>
-  <label>Nota (facoltativa)</label><input id="tn" placeholder="es. spiego io le regole"><button class="p" id="tsv">Apri il tavolo</button>`:pickH?'<p class="warn">Nessun socio in elenco: un admin deve aggiungerli.</p>':'<p class="warn">Il tuo account non è collegato a un socio: non puoi aprire tavoli. Chiedi a un admin.</p>'}</details>${tFab((pickH?ms.length:meM))}`;
- $('#sd').onchange=e=>{const v=e.target.value;if(!isoOk(v)){toast('Data non valida');e.target.value=S.date;return}S.date=v;go('serata')};
-if($('#tfab'))$('#tfab').onclick=tFabGo;
-if($('#tg'))gpMount($('#tg'),gs,[],null);
- if($('#tg'))$('#tg').onchange=()=>$('#tp').value=(gs.find(g=>g.id===$('#tg').value)||{}).max||4;
- if($('#tsv'))$('#tsv').onclick=async()=>{if(!numForm($('#tp').parentNode))return;if(S.date<romeToday())return toast('Non puoi aprire tavoli in una data passata');const h=$('#th').value;if(!isoOk(S.date))return toast('Data non valida');await DB.saveTable({date:S.date,evening:dayName(S.date),gameId:$('#tg').value,hostId:h,seats:Math.max(1,+$('#tp').value||1),time:$('#tt').value,note:$('#tn').value.trim(),players:[{memberId:h}]});toast('Tavolo aperto');go('serata')};
- const T=id=>ts.find(t=>t.id===id);
- V.querySelectorAll('[data-j]').forEach(b=>b.onclick=async()=>{const t=T(b.dataset.j),guests=t.players.filter(p=>!p.memberId);const ids=await pickMembers(ms,t.players.filter(p=>p.memberId).map(p=>p.memberId),'Giocatori al tavolo',t.seats-guests.length);if(!ids)return;
+// v40.6 anteprima — Agenda «elenco per giorno»: giorni in alto, tavoli raggruppati, «+» con foglio dal basso, «Siediti/Lascia il posto»
+async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=>m.active),ts=await DB.allTables();const _uid=DB.remote?(await DB.remote.user())?.id:null,meM=all.find(m=>_uid&&m.userId===_uid),staff=adminMode(),oggi=romeToday();
+ window._ser=window._ser||{date:oggi};const S=window._ser;if(!isoOk(S.date)||S.date<oggi)S.date=oggi;
+ const mn=id=>{const m=all.find(m=>m.id===id);return m?memberName(m):'Socio'};
+ const vis=ts.filter(t=>isoOk(t.date)&&t.date>=oggi).sort((a,b)=>a.date.localeCompare(b.date)||String(a.time||'99').localeCompare(String(b.time||'99')));
+ const days=[...new Set([oggi,...vis.map(t=>t.date),S.date])].sort();const by=d=>vis.filter(t=>t.date===d);
+ const nOpen=d=>by(d).filter(t=>t.status==='open').length;
+ const card=t=>{const pl=t.players||[],n=pl.length,full=n>=t.seats,g=gs.find(g=>g.id===t.gameId)||{name:'Gioco'},op=t.status==='open',seduto=!!meM&&pl.some(p=>p.memberId===meM.id),host=!!meM&&meM.id===t.hostId;
+  const altri=pl.filter(p=>p.memberId!==t.hostId).map(p=>p.memberId?mLink(p.memberId,esc(mn(p.memberId))):esc(p.name)+' <span class="muted">(ospite)</span>');
+  const st=op?(full?'<span class="agst">Pieno</span>':`<span class="agst free">${t.seats-n} ${t.seats-n===1?'posto libero':'posti liberi'}</span>`):'<span class="agst">✅ Chiuso</span>';
+  let act='';if(op){if(seduto)act+=`<button type="button" class="s agbtn" data-lv="${esc(t.id)}">Lascia il posto</button>`;else if(meM&&!full)act+=`<button type="button" class="p agbtn" data-sd="${esc(t.id)}">Siediti</button>`;
+   if(host||staff)act+=`<div class="agx"><button type="button" class="lnk" data-o="${esc(t.id)}"${full?' disabled':''}>+ Ospite</button><button type="button" class="lnk" data-c="${esc(t.id)}">🏁 Chiudi e registra</button>${staff?`<button type="button" class="lnk" data-j="${esc(t.id)}">👥 Giocatori</button>`:''}${staff&&!isMod()?`<button type="button" class="lnk" data-x="${esc(t.id)}">🗑 Elimina</button>`:''}</div>`}
+  return`<div class="card tavolo agt${op?'':' closed'}" data-t="${esc(t.id)}"><div class="agrow">${typeof gCov==='function'?gCov(g):'<div class="gcov">🎲</div>'}<div class="agtx">
+  <div class="agl1"><b>${g.id?gLink(g.id,g.name):esc(g.name)}</b>${st}</div>
+  <div class="agl2"><span class="agi">🕒</span> ${t.time?esc(t.time):'<span class="muted">ora libera</span>'}<span class="agsep">·</span><span class="agi">🏠</span> ${mLink(t.hostId,esc(mn(t.hostId)))}</div>
+  ${altri.length?`<div class="agl3">Con ${altri.join(', ')}</div>`:''}${t.note?`<div class="agl3 muted">${esc(t.note)}</div>`:''}</div></div>${act?`<div class="agact">${act}</div>`:''}</div>`};
+ const head=d=>{const x=by(d),pers=new Set();x.filter(t=>t.status==='open').forEach(t=>(t.players||[]).forEach(p=>pers.add(p.memberId?'m:'+p.memberId:'g:'+t.id+p.name)));const k=nOpen(d);
+  return`<h3 class="agday" id="agd-${d}">${d===oggi?'Oggi, ':''}${esc(agLbl(d))}<span class="muted"> · ${k} ${k===1?'tavolo':'tavoli'}${pers.size?` · ${pers.size} ${pers.size===1?'persona':'persone'} (ospiti inclusi)`:''}</span></h3>`};
+ const can=staff?ms.length:meM;
+ V.innerHTML=`<h2>📅 Agenda</h2>${DB.tablesMissing?'<p class="warn">Tabella «tables» non ancora creata su Supabase.</p>':''}
+ <div class="agdays" role="tablist" aria-label="Giorni">${days.map(d=>`<button type="button" class="chip pick${d===S.date?' on':''}" data-d="${d}">${d===oggi?'Oggi':esc(UX_d(d))}${nOpen(d)?` · ${nOpen(d)}`:''}</button>`).join('')}<button type="button" class="chip pick agcal" id="agcal" aria-label="Scegli un'altra data">📅</button><input type="date" id="sd" lang="it" min="${oggi}" value="${S.date}" class="agdi" tabindex="-1" aria-hidden="true"></div>
+ <div id="tl">${days.map(d=>head(d)+(by(d).map(card).join('')||`<p class="muted agnone">Nessun tavolo${can?': tocca + per aprirne uno.':'.'}</p>`)).join('')}</div>${tFab(can)}`;
+ const go2=d=>{S.date=d;V.querySelectorAll('.agdays [data-d]').forEach(b=>b.classList.toggle('on',b.dataset.d===d));const h=document.getElementById('agd-'+d);if(h&&d!==oggi)h.scrollIntoView({behavior:'smooth',block:'start'})};
+ V.querySelectorAll('.agdays [data-d]').forEach(b=>b.onclick=()=>go2(b.dataset.d));
+ $('#agcal').onclick=()=>{const i=$('#sd');try{i.showPicker()}catch(e){i.click()}};
+ $('#sd').onchange=e=>{const v=e.target.value;if(!isoOk(v)||v<oggi){toast('Data non valida');return}S.date=v;go('serata')};
+ if(S.date!==oggi)setTimeout(()=>{const h=document.getElementById('agd-'+S.date);if(h)h.scrollIntoView({block:'start'})},0);
+ window._agNew=()=>agSheet({gs,ms,meM,staff,S,oggi});if($('#tfab'))$('#tfab').onclick=tFabGo;
+ const T=async id=>(await DB.allTables()).find(t=>t.id===id);
+ V.querySelectorAll('[data-sd]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.sd);if(!t||!meM||t.status!=='open')return;const pl=t.players||[];if(pl.some(p=>p.memberId===meM.id))return go('serata');if(pl.length>=t.seats)return toast('Tavolo pieno');
+  try{await DB.seat(t.id,'join',meM.id);toast('Ti sei seduto al tavolo')}catch(e){toast('⚠️ '+(e.message||'Non è stato possibile sederti'))}go('serata')});
+ V.querySelectorAll('[data-lv]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.lv);if(!t||!meM)return;if(t.hostId===meM.id&&!await ask('Hai aperto tu questo tavolo: vuoi davvero lasciarlo?'))return;
+  try{await DB.seat(t.id,'leave',meM.id);toast('Hai lasciato il posto')}catch(e){toast('⚠️ '+(e.message||'Non è stato possibile lasciare il posto'))}go('serata')});
+ V.querySelectorAll('[data-j]').forEach(b=>b.onclick=async()=>{if(!adminMode())return;const t=await T(b.dataset.j);if(!t)return;const guests=(t.players||[]).filter(p=>!p.memberId);const ids=await pickMembers(ms,t.players.filter(p=>p.memberId).map(p=>p.memberId),'Giocatori al tavolo',t.seats-guests.length);if(!ids)return;
   if(!ids.includes(t.hostId)&&!await ask('Il padrone di casa lascia il tavolo?'))return;await DB.saveTable({id:t.id,players:[...ids.map(memberId=>({memberId})),...guests]});go('serata')});
- V.querySelectorAll('[data-o]').forEach(b=>b.onclick=async()=>{const t=T(b.dataset.o);if(t.players.length>=t.seats)return toast('Tavolo pieno');const n=(await askText('Nome dell\'ospite')||'').trim();if(!n)return;await DB.saveTable({id:t.id,players:[...t.players,{guest:true,name:n}]});go('serata')});
- V.querySelectorAll('[data-c]').forEach(b=>b.onclick=async()=>{const t=T(b.dataset.c);if(!adminMode()&&!await ask('Sei '+mn(t.hostId)+' (padrone di casa)? Chiudi il tavolo e registra la partita.'))return;
+ V.querySelectorAll('[data-o]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.o);if(!t)return;if(!(adminMode()||meM&&meM.id===t.hostId))return;if(t.players.length>=t.seats)return toast('Tavolo pieno');const n=(await askText('Nome dell\'ospite')||'').trim().slice(0,40);if(!n)return;await DB.saveTable({id:t.id,players:[...t.players,{guest:true,name:n}]});go('serata')});
+ V.querySelectorAll('[data-c]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.c);if(!t)return;if(!(adminMode()||meM&&meM.id===t.hostId))return;
   views.nuova({fromTable:t.id,gameId:t.gameId,date:t.date,players:t.players.map(p=>p.memberId?{memberId:p.memberId}:{guest:true,name:p.name})})});
- V.querySelectorAll('[data-x]').forEach(b=>b.onclick=async()=>{if(!await ask('Eliminare il tavolo?'))return;await DB.deleteTable(b.dataset.x);toast('Tavolo eliminato');go('serata')})},
+ V.querySelectorAll('[data-x]').forEach(b=>b.onclick=async()=>{if(!adminMode()||isMod())return;if(!await ask('Eliminare il tavolo?'))return;await DB.deleteTable(b.dataset.x);toast('Tavolo eliminato');go('serata')})},
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<div id="bkp" hidden><h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati sul server dell'associazione. Qui puoi scaricarne una copia manuale in JSON (non include i Libri sociali).</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div></div>
@@ -424,4 +440,23 @@ function loadStats33(){return window.StatsV33?Promise.resolve():new Promise((r,j
  d.querySelectorAll('[data-rg]').forEach(b=>b.onclick=async()=>{const g=gs.find(x=>x.id===b.dataset.rg);if(g)await gamePage(g,await DB.plays())})}catch(e){console.warn('record giochi',e)}}}
 // v39.2 — «+» flottante Agenda > Tavoli, visibile a tutti i soci che possono aprire un tavolo
 function tFab(can){return can?'<button type="button" id="tfab" class="gfab" aria-label="Apri un tavolo" title="Apri un tavolo">+</button>':''}
-function tFabGo(){const d=$('#nt');if(!d)return;d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'});const g=d.querySelector('input:not([type=hidden]),select');if(g)setTimeout(()=>g.focus({preventScroll:true}),350)}
+function tFabGo(){if(typeof window._agNew==='function')window._agNew()}
+const MESIL=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+function agLbl(d){if(!isoOk(d))return'';const x=new Date(d+'T12:00');return GIORNI[x.getDay()]+' '+x.getDate()+' '+MESIL[x.getMonth()]+(x.getFullYear()!==new Date().getFullYear()?' '+x.getFullYear():'')}
+function UX_d(d){if(!isoOk(d))return'';const x=new Date(d+'T12:00');return GIORNI[x.getDay()].slice(0,3).toLowerCase()+' '+x.getDate()+' '+MESIL[x.getMonth()].slice(0,3)}
+// Foglio dal basso «Apri un tavolo»: chi lo apre è già seduto (lo staff può scegliere chi ospita)
+function agSheet({gs,ms,meM,staff,S,oggi}){if(document.querySelector('.agov'))return;let D=isoOk(S.date)&&S.date>=oggi?S.date:oggi;
+ const o=document.createElement('div');o.className='agov';o.innerHTML=`<div class="agsheet" role="dialog" aria-modal="true" aria-labelledby="agst"><div class="aghd"><h3 id="agst">Apri un tavolo</h3><button type="button" class="agclose" aria-label="Chiudi">✕</button></div>
+ ${staff?`<label for="th">Chi ospita</label><select id="th">${ms.slice().sort((a,b)=>memberName(a).localeCompare(memberName(b),'it')).map(m=>`<option value="${esc(m.id)}"${meM&&m.id===meM.id?' selected':''}>${esc(memberName(m))}</option>`).join('')}</select>`:`<div class="agme">🏠 Ospiti tu, ${esc(memberName(meM))}: il tuo posto è già incluso.</div><input type="hidden" id="th" value="${esc(meM.id)}">`}
+ <label>Giorno</label><button type="button" class="s agdb" id="agdb"></button><input type="date" id="agdt" lang="it" min="${oggi}" value="${D}" class="agdi" tabindex="-1" aria-hidden="true">
+ <label>Gioco</label><select id="tg">${gs.map(g=>`<option value="${esc(g.id)}">${esc(g.name)}</option>`).join('')}</select>
+ <div class="row"><div><label for="tp">Posti (te compreso)</label><input id="tp"${nA('int',1,100,'Posti',' required')} value="${gs[0]?.max||4}"></div><div><label for="tt">Ora (facoltativa)</label><input id="tt" type="time"></div></div>
+ <label for="tn">Nota (facoltativa)</label><input id="tn" maxlength="120" placeholder="es. spiego io le regole"><button type="button" class="p" id="tsv">Apri il tavolo</button></div>`;
+ document.body.append(o);requestAnimationFrame(()=>o.classList.add('on'));const rel=backClose(()=>o.remove());const close=()=>{rel();o.remove()};
+ o.onclick=e=>{if(e.target===o||e.target.closest('.agclose'))close()};
+ const sd=()=>{$('#agdb').textContent='📅 '+(D===oggi?'Oggi, ':'')+agLbl(D)};sd();
+ $('#agdb').onclick=()=>{const i=$('#agdt');try{i.showPicker()}catch(e){i.click()}};$('#agdt').onchange=e=>{const v=e.target.value;if(isoOk(v)&&v>=oggi){D=v;sd()}else{toast('Data non valida');e.target.value=D}};
+ gpMount($('#tg'),gs,[],null);$('#tg').onchange=()=>$('#tp').value=(gs.find(g=>g.id===$('#tg').value)||{}).max||4;
+ $('#tsv').onclick=async()=>{if(!numForm(o))return;if(!isoOk(D)||D<romeToday())return toast('Data non valida');const h=$('#th').value;if(!h||!ms.some(m=>m.id===h))return toast('Scegli chi ospita');if(!staff&&(!meM||h!==meM.id))return;
+  await DB.saveTable({date:D,evening:dayName(D),gameId:$('#tg').value,hostId:h,seats:Math.max(1,Math.min(100,+$('#tp').value||1)),time:$('#tt').value,note:$('#tn').value.trim().slice(0,120),players:[{memberId:h}]});close();S.date=D;toast('Tavolo aperto');go('serata')};
+ setTimeout(()=>{const f=o.querySelector('.agclose');if(f)f.focus({preventScroll:true})},50);return o}

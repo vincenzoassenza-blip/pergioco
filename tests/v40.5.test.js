@@ -1,7 +1,7 @@
 // node tests/v40.5.test.js — pagina Giochi «Proposta A»: ricerca + Filtri unico, titolo collezione, copertine, consigliere in lista
 const fs=require('fs');const sw=fs.readFileSync(__dirname+'/../sw.js','utf8'),idx=fs.readFileSync(__dirname+'/../index.html','utf8');
 let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};
-chk(/pergioco-v40\.5[.0-9]*'/.test(sw)&&/ux40\.js\?v=40\.5/.test(sw)&&/ux40\.js\?v=40\.5/.test(idx)&&/styles\.css\?v=40\.5/.test(idx),'versione 40.5');
+chk(/pergioco-v40\.([5-9]|\d\d)[.0-9]*'/.test(sw)&&/ux40\.js\?v=40\.([5-9]|\d\d)/.test(sw)&&/ux40\.js\?v=40\.([5-9]|\d\d)/.test(idx)&&/styles\.css\?v=40\.([5-9]|\d\d)/.test(idx),'versione 40.5');
 (async()=>{const pw=require('playwright-core');const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome'});const errs=[];
  const c=await b.newContext({serviceWorkers:'block',viewport:{width:460,height:1000}});const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));
  const req=[];await p.route(/supabase|jsdelivr/,r=>r.abort());

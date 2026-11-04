@@ -15,7 +15,7 @@ chk(/data-pv="m&lt;1"/.test(mLink('m<1','N')),'mLink escape');
 const ps=[{gameId:'a',date:'2026-10-01',players:[{memberId:'m1'}]},{gameId:'a',date:'2026-10-20',players:[{memberId:'m1'}]},{gameId:'b',date:'2026-10-25',players:[{memberId:'m2'}]}];
 const l=gLastMine(ps,'m1');chk(l.a==='2026-10-20'&&!l.b,'recenti solo mie');chk(Object.keys(gLastMine(ps,null)).length===0,'senza socio');
 chk(/'Zombies':'Zombi'/.test(G)&&/'Video Game Theme':'Videogioco'/.test(G),'categorie');chk(!/>Tutt[ie]</.test(G),'Tutto nei menu',G.match(/>Tutt[ie]</));chk(/Giocati più di recente/.test(G),'ordina recenti');
-chk(/id="apshow"/.test(A)&&/Mostra password/.test(A),'mostra password');chk(/maxlength="40"/.test(A)&&/gncnt/.test(A),'ospite maxlength');chk(/comprendono anche chi apre/.test(A),'testo posti');
+chk(/id="apshow"/.test(A)&&/Mostra password/.test(A),'mostra password');chk(/maxlength="40"/.test(A)&&/gncnt/.test(A),'ospite maxlength');chk(/comprendono anche chi apre|Posti \(te compreso\)/.test(A),'testo posti');
 chk(!/<h2>Io<\/h2>/.test(A),'niente card Io');chk(/role="button" tabindex="0"/.test(X)&&/data-pv="\$\{esc\(r\.member_id\)\}" role/.test(X),'riga XP cliccabile');chk(/roc\$\{r\?' rclick'/.test(A),'record cliccabili');
 chk(/keydown/.test(A),'tastiera');chk(/data-bdg/.test(A)&&/function bdgPop/.test(A),'popup badge');chk(/des_proponi_voto/.test(D),'autovoto');
 chk(/if\(!adminMode\(\)\)return`<div class="rec"><span>Tavoli organizzati/.test(A),'liste solo staff');chk(/mLink\(x\.id/.test(S)&&/gLink\(d\.id/.test(S),'link in statistiche');

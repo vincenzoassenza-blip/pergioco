@@ -51,12 +51,7 @@ _uxWrap('nuova',async ed=>{const card=V.querySelector('.card');const save=$('#sa
  const box=document.createElement('div');box.className='card uxtoday';box.innerHTML=`<b>📅 In Agenda oggi</b>${ts.slice(0,5).map(t=>{const g=gs.find(x=>x.id===t.gameId)||{},n=(t.players||[]).length,lib=Math.max(0,(+t.seats||0)-n);return`<div class="rec"><span>${g.id?gLink(g.id,g.name):esc(g.name||'?')}${t.time?' <span class="muted">· '+esc(t.time)+'</span>':''}</span>${lib?`<span class="evb st">${lib} post${lib==1?'o':'i'} liber${lib==1?'o':'i'}</span>`:'<span class="evb off">Pieno</span>'}</div>`}).join('')}<button type="button" class="s" id="uxag" style="width:100%;margin-top:6px">Vai all'Agenda</button>`;
  card.after(box);$('#uxag').onclick=()=>{window._ser={...(window._ser||{}),date:romeToday()};go('serata')}});
 
-// 1 — Agenda: in alto i tavoli di oggi e dei prossimi giorni
-_uxWrap('serata',async()=>{if(!$('#sd')||V.querySelector('.uxdays'))return;const ts=(await DB.allTables()).filter(t=>t.status==='open'&&t.date>=romeToday());const S=window._ser||{};
- const c={};ts.forEach(t=>c[t.date]=(c[t.date]||0)+1);const ds=Object.keys(c).sort().slice(0,6);if(!ds.length)return;
- const w=document.createElement('div');w.className='uxdays';w.setAttribute('aria-label','Prossimi giorni con tavoli');
- w.innerHTML=ds.map(d=>`<button type="button" class="chip pick${d===S.date?' on':''}" data-uxd="${esc(d)}">${d===romeToday()?'Oggi':esc(UX.dLbl(d))} · ${c[d]} tavol${c[d]==1?'o':'i'}</button>`).join('');
- const card=$('#sd').closest('.card');card.after(w);w.onclick=e=>{const b=e.target.closest('[data-uxd]');if(!b||!isoOk(b.dataset.uxd))return;window._ser.date=b.dataset.uxd;go('serata')}});
+// 1 — Agenda: la riga dei giorni ora è nella vista stessa (v40.6)
 
 // 2 + 8 — Giochi: filtri chiusi in un solo pulsante «Filtri (n)» e lista caricata a pezzi
 UX.gA1=()=>{const n=$('#n');if(!n||V.querySelector('#uxfil'))return;const so=$('#so'),soRow=so&&so.closest('.row'),adv=$('#adv'),r1=n.closest('.row'),r2=$('#c')&&$('#c').closest('.row');

@@ -44,7 +44,7 @@ chk(/min-height:44px/.test(css),'target tattili 44px');
  await p.evaluate(async()=>{const gs=await DB.games();await gamePage(gs[3],await DB.plays())});await p.waitForTimeout(800);
  chk(await p.evaluate(()=>document.querySelector('.gpg .gpb').textContent==='← Gioco <b>3'),'scheda gioco: «← nome» (testo, non HTML)');
  await p.evaluate(()=>document.querySelector('.gpg .gpb').click());await t(()=>{window._ser={date:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date())};go('serata')});
- chk(await p.evaluate(()=>/Oggi · 1 tavolo/.test(document.querySelector('.uxdays')?.textContent||'')),'Agenda: giorni con tavoli in alto');
+ chk(await p.evaluate(()=>/Oggi · 1/.test(document.querySelector('.agdays')?.textContent||'')),'Agenda: giorni con tavoli in alto');
  chk(errs.length===0,'nessun errore JS: '+errs.join(' | '));
  if(process.env.SHOT){await t(()=>{localStorage.removeItem('pergioco-acc');go('nuova')});await p.screenshot({path:process.env.SHOT})}
  await b.close();fin()})();

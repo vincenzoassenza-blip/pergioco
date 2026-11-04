@@ -28,6 +28,9 @@ const DB={adapter:LocalAdapter,
  // --- Tavoli della modalita' serata ---
  async allTables(){return (await this.adapter.getAll()).tables||[]},
  async saveTable(t){const d=await this.adapter.getAll();d.tables=d.tables||[];if(t.id){const i=d.tables.findIndex(x=>x.id===t.id);d.tables[i]={...d.tables[i],...t}}else{t.id=uid();t.status='open';t.createdAt=new Date().toISOString();d.tables.push(t)}await this.adapter.replaceAll(d);return t},
+ // v40.6 — Siediti/Lascia il posto: online via RPC (solo se stessi), in locale sul file
+ async seat(id,action,me){if(typeof SupabaseAdapter!=='undefined'&&this.adapter===SupabaseAdapter&&this.adapter.client){const {data,error}=await this.adapter.client.rpc('table_seat',{p_table:id,p_action:action});if(error)throw error;const c=await this.adapter.cache.getAll();const t=(c.tables||[]).find(x=>x.id===id);if(t&&Array.isArray(data)){t.players=data;await this.adapter.cache.replaceAll(c)}return data}
+  const d=await this.adapter.getAll();const t=(d.tables||[]).find(x=>x.id===id);if(!t||!me)return null;const pl=t.players||[];if(action==='join'){if(!pl.some(p=>p.memberId===me)){if(pl.length>=t.seats)throw new Error('Tavolo pieno');t.players=[...pl,{memberId:me}]}}else t.players=pl.filter(p=>p.memberId!==me);await this.adapter.replaceAll(d);return t.players},
  async deleteTable(id){const d=await this.adapter.getAll();d.tables=(d.tables||[]).filter(t=>t.id!==id);await this.adapter.replaceAll(d)},
  async deletePlay(id){const d=await this.adapter.getAll();d.plays=d.plays.filter(p=>p.id!==id);await this.adapter.replaceAll(d)},
  // --- Soci (modificabili solo dal pannello admin) ---
