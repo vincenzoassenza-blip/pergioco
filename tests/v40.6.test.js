@@ -14,7 +14,7 @@ const mk=async role=>{const errs=[];const p=await (await b.newContext({serviceWo
    {id:'t2',date:d(1),gameId:'g3',hostId:'m3',seats:4,time:'21:30',status:'open',players:[{memberId:'m3'},{memberId:'m4'},{memberId:'m5'},{guest:true,name:'Chiara'}]},
    {id:'t3',date:d(3),gameId:'g4',hostId:'m0',seats:6,status:'open',note:SHN?'Si gioca alle 21 circa':'<b>x</b>',players:[{memberId:'m0'},{memberId:'m1'}]},
    {id:'t4',date:d(3),gameId:'g5',hostId:'m2',seats:4,time:'21:00',status:'open',players:[{memberId:'m2'}]}];
-  window.SAVED=[];DB.games=async()=>G;DB.members=async()=>M;DB.allTables=async()=>JSON.parse(JSON.stringify(T));DB.plays=async()=>[];DB.saveTable=async t=>{SAVED.push(t)};DB.status='online';
+  window.SAVED=[];DB.games=async()=>G;DB.members=async()=>M;DB.allTables=async()=>JSON.parse(JSON.stringify(T));DB.plays=async()=>[];DB.saveTable=async t=>{SAVED.push(t)};DB.seat=async(id,a,me)=>{SAVED.push({seat:id,a,me})};DB.status='online';
   DB.remote=Object.assign(DB.remote||{},{user:async()=>({id:'u1'})});
   const iso=(k,h)=>{const x=new Date();x.setDate(x.getDate()+k);x.setHours(h,0,0,0);return x.toISOString()};
   EV.list=async()=>[{id:'e2',titolo:'Torneo di Carcassonne',inizio:iso(10,16),chiusura:iso(8,20),posti:16,torneo:true,luogo:'Sede PerGioco'},{id:'e1',titolo:'Serata Giochi di Natale',inizio:iso(20,20),chiusura:iso(18,20),posti:40,quota:5,caparra:5,luogo:'Sala parrocchiale, Ragusa'}];
@@ -34,7 +34,8 @@ chk(r.lv===0&&!r.nm,'niente livelli né N/M');chk(r.hostOnce===1,'host una sola 
 chk(!r.o1&&r.o3,'+ Ospite / Chiudi e registra solo all’host');chk(r.lvBtn,'Lascia il posto se seduto');chk(!r.nt&&r.fab,'il + è l’unico modo');chk(r.seg,'tab Tavoli/Eventi');chk(r.cov===5,'copertine');chk(!r.xss&&(SH||r.noteEsc),'XSS escape');
 if(SH)await p.screenshot({path:OUT+'agenda-a-socio.png'});
 await p.click('[data-sd="t1"]');await p.waitForTimeout(500);r=await p.evaluate(()=>SAVED[0]);
-chk(r&&r.id==='t1'&&r.players.length===3&&r.players[2].memberId==='m0'&&r.players.slice(0,2).map(x=>x.memberId).join()==='m1,m2','Siediti aggiunge solo me');
+chk(r&&r.seat==='t1'&&r.a==='join'&&r.me==='m0','Siediti usa la RPC solo per me');
+const SRC=require('fs').readFileSync('app.js','utf8'),DSRC=require('fs').readFileSync('data.js','utf8');chk(/DB\.seat\(t\.id,'join'/.test(SRC)&&/DB\.seat\(t\.id,'leave'/.test(SRC)&&!/players:\[\.\.\.pl,\{memberId:meM\.id\}\]/.test(SRC),'Siediti/Lascia usano DB.seat');chk(/rpc\('table_seat'/.test(DSRC),'DB.seat chiama la RPC table_seat');
 await p.evaluate(()=>{T[1].players=[{memberId:'m1'},{memberId:'m2'},{memberId:'m4'},{memberId:'m5'}];SAVED.length=0;go('serata')});await p.waitForTimeout(800);
 await p.evaluate(()=>{T[1].players=[{memberId:'m1'},{memberId:'m2'},{memberId:'m4'},{memberId:'m5'}]});
 await p.click('#tfab');await p.waitForTimeout(500);

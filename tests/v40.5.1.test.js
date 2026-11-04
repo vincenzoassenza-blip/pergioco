@@ -1,7 +1,7 @@
 // node tests/v40.5.1.test.js — Giochi: nessun frame con la vecchia schermata (prima del paint la pagina è già Proposta A)
 const fs=require('fs');const sw=fs.readFileSync(__dirname+'/../sw.js','utf8'),gj=fs.readFileSync(__dirname+'/../giochi.js','utf8');
 let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};
-chk(/pergioco-v40\.5\.1'/.test(sw)&&/ux40\.js\?v=40\.5\.1/.test(sw),'versione 40.5.1');chk(/function gCov/.test(gj)&&!/onerror=/.test(gj),'copertine nel render di giochi.js, senza handler inline');
+chk(/pergioco-v40\.(5\.1|[6-9]|\d\d)[.0-9]*'/.test(sw)&&/ux40\.js\?v=40\.(5\.1|[6-9]|\d\d)/.test(sw),'versione 40.5.1');chk(/function gCov/.test(gj)&&!/onerror=/.test(gj),'copertine nel render di giochi.js, senza handler inline');
 // sonda: a ogni frame (rAF = subito prima del paint) annota se si vede qualcosa della vecchia schermata
 const PROBE=()=>{window.__bad=[];window.__frames=0;const vis=e=>e&&e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden'&&!e.closest('.sr,[hidden]')&&e.getBoundingClientRect().width>2;
  const tick=()=>{const V=document.getElementById('view');if(V&&V.querySelector('.gflt')){window.__frames++;const b=[];

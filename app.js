@@ -178,9 +178,9 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
  window._agNew=()=>agSheet({gs,ms,meM,staff,S,oggi});if($('#tfab'))$('#tfab').onclick=tFabGo;
  const T=async id=>(await DB.allTables()).find(t=>t.id===id);
  V.querySelectorAll('[data-sd]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.sd);if(!t||!meM||t.status!=='open')return;const pl=t.players||[];if(pl.some(p=>p.memberId===meM.id))return go('serata');if(pl.length>=t.seats)return toast('Tavolo pieno');
-  await DB.saveTable({id:t.id,players:[...pl,{memberId:meM.id}]});toast('Ti sei seduto al tavolo');go('serata')});
+  try{await DB.seat(t.id,'join',meM.id);toast('Ti sei seduto al tavolo')}catch(e){toast('⚠️ '+(e.message||'Non è stato possibile sederti'))}go('serata')});
  V.querySelectorAll('[data-lv]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.lv);if(!t||!meM)return;if(t.hostId===meM.id&&!await ask('Hai aperto tu questo tavolo: vuoi davvero lasciarlo?'))return;
-  await DB.saveTable({id:t.id,players:(t.players||[]).filter(p=>p.memberId!==meM.id)});toast('Hai lasciato il posto');go('serata')});
+  try{await DB.seat(t.id,'leave',meM.id);toast('Hai lasciato il posto')}catch(e){toast('⚠️ '+(e.message||'Non è stato possibile lasciare il posto'))}go('serata')});
  V.querySelectorAll('[data-j]').forEach(b=>b.onclick=async()=>{if(!adminMode())return;const t=await T(b.dataset.j);if(!t)return;const guests=(t.players||[]).filter(p=>!p.memberId);const ids=await pickMembers(ms,t.players.filter(p=>p.memberId).map(p=>p.memberId),'Giocatori al tavolo',t.seats-guests.length);if(!ids)return;
   if(!ids.includes(t.hostId)&&!await ask('Il padrone di casa lascia il tavolo?'))return;await DB.saveTable({id:t.id,players:[...ids.map(memberId=>({memberId})),...guests]});go('serata')});
  V.querySelectorAll('[data-o]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.o);if(!t)return;if(!(adminMode()||meM&&meM.id===t.hostId))return;if(t.players.length>=t.seats)return toast('Tavolo pieno');const n=(await askText('Nome dell\'ospite')||'').trim().slice(0,40);if(!n)return;await DB.saveTable({id:t.id,players:[...t.players,{guest:true,name:n}]});go('serata')});
