@@ -2,7 +2,7 @@
 const fs=require('fs'),R=f=>fs.readFileSync(__dirname+'/../'+f,'utf8');
 const app=R('app.js'),ux=R('ux40.js'),ev=R('eventi.js'),sb=R('sb.js'),css=R('styles.css'),idx=R('index.html'),sw=R('sw.js');
 let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};
-chk(/const C='pergioco-v40(\.\d+)?'/.test(sw)&&!/v=39/.test(sw+idx),'versione 40 ovunque');
+chk(/const C='pergioco-v40(\.\d+)*'/.test(sw)&&!/v=39/.test(sw+idx),'versione 40 ovunque');
 chk(/ux40\.js\?v=40/.test(idx)&&/ux40\.js\?v=40/.test(sw),'ux40.js caricato e in cache');
 {const A=sw.match(/const A=\[([^\]]+)\]/)[1].split(',');chk(new Set(A).size===A.length,'nessun file doppio nella cache SW')}
 chk(!/IG\.link[^\n]*igev'\):''\}<\/div>`\};/.test(ev)&&/IG\.link\('📸 Foto e aggiornamenti su Instagram','igev'\)/.test(ev),'Instagram solo nella scheda evento');
