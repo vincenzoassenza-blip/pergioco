@@ -1,7 +1,7 @@
 // node tests/v40.4.test.js — riquadro Sfida equilibrata in Partita
 const fs=require('fs');const eq=fs.readFileSync(__dirname+'/../equilibrio.js','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8');
 let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};
-chk(/pergioco-v40\.[4-9]'/.test(sw)&&/ux40\.js\?v=40\.[4-9]/.test(sw),'versione 40.4');
+chk(/pergioco-v40\.[4-9](\.\d+)?'/.test(sw)&&/ux40\.js\?v=40\.[4-9]/.test(sw),'versione 40.4');
 chk(/class="eqc" id="eqo" role="button" tabindex="0" aria-label=/.test(eq)&&!/insertAdjacentHTML\('afterend','[^']*\$\{/.test(eq),'card accessibile, nessun testo interpolato');
 (async()=>{const pw=require('playwright-core');const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome'});const errs=[];
  const c=await b.newContext({serviceWorkers:'block',viewport:{width:390,height:844}});const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));
