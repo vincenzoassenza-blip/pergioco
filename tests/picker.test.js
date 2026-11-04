@@ -7,7 +7,11 @@ chk(gpNorm('CITTÀ  di  Càrte')==='citta di carte','norm');
 chk(gpFilter(gs,'citta').map(g=>g.id).join()==='a','accenti');chk(gpFilter(gs,'CAR').map(g=>g.id).join()==='b,a','parte del nome, prima chi inizia così',gpFilter(gs,'CAR').map(g=>g.id));
 chk(gpFilter(gs,'ride tick').length===1,'più parole');chk(gpFilter(gs,'').length===0&&gpFilter(gs,'zzz').length===0,'vuoto/nessuno');chk(gpFilter(gs,'a'.repeat(5000)).length===0,'input lunghissimo');
 const ps=[{gameId:'h',date:'2026-10-30',players:[{memberId:'m1'}]},{gameId:'f',date:'2026-10-01',players:[{memberId:'m1'}]},...['e','e','e','c','c','b','g','zz'].map((x,i)=>({gameId:x,date:'2026-09-0'+i,players:[{memberId:'m2'}]}))];
-const sc=gpShort(gs,ps,'m1');chk(sc[0].id==='h'&&sc[1].id==='f'&&sc[2].id==='e'&&sc.length===6,'recenti miei poi più giocati, max 6',sc.map(g=>g.id));
+const sc=gpShort(gs,ps,'m1');chk(sc[0].id==='h'&&sc[1].id==='f'&&sc[2].id==='e'&&sc.length===3,'2 recenti miei + 1 più giocato in associazione, max 3',sc.map(g=>g.id));
+{const p3=[...ps,{gameId:'c',date:'2026-10-31',players:[{memberId:'m1'}]}];const s=gpShort(gs,p3,'m1');chk(s.map(g=>g.id).join()==='c,h,e','solo 2 miei anche se ne ho di più',s.map(g=>g.id))}
+{const s=gpShort(gs,ps,'m9');chk(s.map(g=>g.id).join()==='e,c,b'||s.map(g=>g.id).join()==='e,c,h','nessuna mia partita: 3 più giocati',s.map(g=>g.id));chk(s.length===3,'riempie fino a 3')}
+{const p1=[{gameId:'h',date:'2026-10-30',players:[{memberId:'m1'}]},...ps.slice(2)];const s=gpShort(gs,p1,'m1');chk(s[0].id==='h'&&s.length===3&&s[1].id==='e','1 mio + 2 associazione',s.map(g=>g.id))}
+{const pd=[{gameId:'h',date:'2026-10-30',players:[{memberId:'m1'}]},{gameId:'h',date:'2026-10-29',players:[{memberId:'m1'}]},{gameId:'f',date:'2026-10-01',players:[{memberId:'m1'}]},...ps.slice(2)];chk(gpShort(gs,pd,'m1').map(g=>g.id).join()==='h,f,e','recenti senza doppioni')}
 chk(!gpShort(gs,ps,null).some(g=>!g),'id inesistenti ignorati');
 // DOM minimale
 const mkEl=()=>{const e={hidden:false,attrs:{},children:[],_h:'',setAttribute(k,v){this.attrs[k]=v},after(b){this.next=b},dispatchEvent(ev){this.fired=(this.fired||0)+1;this.onchange&&this.onchange(ev)},value:''};return e};

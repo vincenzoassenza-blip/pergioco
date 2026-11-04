@@ -3,8 +3,8 @@ const gpNorm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').to
 const gpFilter=(gs,q,max=30)=>{const n=gpNorm(q).slice(0,60);if(!n)return[];const w=n.split(' ');const r=gs.filter(g=>{const x=gpNorm(g.name);return w.every(t=>x.includes(t))});
  r.sort((a,b)=>{const x=gpNorm(a.name),y=gpNorm(b.name);return (y.startsWith(n)-x.startsWith(n))||x.localeCompare(y)});return r.slice(0,max)};
 // scorciatoie: prima i giochi giocati di recente da me, poi i più giocati in assoluto
-const gpShort=(gs,ps,meId,max=6)=>{const ok=new Set(gs.map(g=>g.id)),out=[];const add=id=>{if(ok.has(id)&&!out.includes(id)&&out.length<max)out.push(id)};
- if(meId)[...ps].filter(p=>(p.players||[]).some(x=>x.memberId===meId)).sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,30).forEach(p=>out.length<3&&add(p.gameId));
+const gpShort=(gs,ps,meId,max=3)=>{const ok=new Set(gs.map(g=>g.id)),out=[];const add=id=>{if(ok.has(id)&&!out.includes(id)&&out.length<max)out.push(id)};
+ if(meId)[...ps].filter(p=>(p.players||[]).some(x=>x.memberId===meId)).sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,30).forEach(p=>out.length<2&&add(p.gameId));
  const c={};ps.forEach(p=>c[p.gameId]=(c[p.gameId]||0)+1);Object.keys(c).sort((a,b)=>c[b]-c[a]).forEach(add);return out.map(id=>gs.find(g=>g.id===id))};
 const gpImg=g=>typeof dsThumb==='function'?dsThumb(g&&g.thumb).replace('class="dsimg','class="gpimg dsimg'):'<div class="gpimg">🎲</div>';
 // sel: <select> nascosto; ps: partite; meId: socio corrente (facoltativo)
