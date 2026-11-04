@@ -59,9 +59,15 @@ _uxWrap('serata',async()=>{if(!$('#sd')||V.querySelector('.uxdays'))return;const
  const card=$('#sd').closest('.card');card.after(w);w.onclick=e=>{const b=e.target.closest('[data-uxd]');if(!b||!isoOk(b.dataset.uxd))return;window._ser.date=b.dataset.uxd;go('serata')}});
 
 // 2 + 8 — Giochi: filtri chiusi in un solo pulsante «Filtri (n)» e lista caricata a pezzi
-_uxWrap('ludoteca',()=>{const n=$('#n');if(!n||V.querySelector('#uxfil'))return;const row=n.closest('.row');const d=document.createElement('details');d.id='uxfil';d.className='uxfil';const sm=document.createElement('summary');d.append(sm);row.before(d);d.append(row);
- const cnt=()=>{const k=[$('#n').value,$('#t').value].filter(Boolean).length;sm.innerHTML=`⚙️ Filtri${k?` <span class="uxbadge">${k}</span>`:''}`};cnt();
- ['#n','#t','#so'].forEach(s=>$(s)&&$(s).addEventListener('change',cnt));
+_uxWrap('ludoteca',()=>{const n=$('#n');if(!n||V.querySelector('#uxfil'))return;const so=$('#so'),soRow=so&&so.closest('.row'),adv=$('#adv'),r1=n.closest('.row'),r2=$('#c')&&$('#c').closest('.row');
+ const d=document.createElement('details');d.id='uxfil';d.className='uxfil';const sm=document.createElement('summary');d.append(sm);r1.before(d);d.append(r1);if(r2)d.append(r2);
+ // v40.5 — un solo pannello: i secondari sotto un sottotitolo «Altro» non richiudibile
+ if(adv){const sub=document.createElement('div');sub.id='adv';sub.className='uxsub';sub.innerHTML='<div class="uxsubt">Altro</div>';[...adv.childNodes].filter(x=>x.nodeName!=='SUMMARY').forEach(x=>sub.append(x));adv.replaceWith(sub);d.append(sub)}
+ // Ordina esce dai filtri: piccolo selettore accanto al conteggio
+ if(so){const f=$('#gcnt').parentNode,w=document.createElement('label');w.className='uxsort';w.htmlFor='so';w.append('Ordina: ');f.insertBefore(w,$('#gcnt').nextSibling);w.append(so);soRow.remove();$('#gcnt').after(document.createTextNode(''))}
+ const clr=$('#gclr');if(clr){clr.classList.add('uxclr');d.append(clr)}
+ const ids=['#n','#t','#c','#k','#m','#a'];const cnt=()=>{const k=ids.filter(x=>$(x)&&$(x).value).length+($('#x')&&$('#x').checked?1:0);sm.innerHTML=`⚙️ Filtri${k?` <span class="uxbadge" aria-label="${k} attivi">${k}</span>`:''}`;ids.forEach(x=>$(x)&&$(x).classList.toggle('uxon',!!$(x).value))};cnt();
+ [...ids,'#x'].forEach(s=>$(s)&&$(s).addEventListener('change',cnt));if(clr)clr.addEventListener('click',()=>setTimeout(cnt,0));
  const gl=$('#gl');const ch=()=>UX.chunk(gl);ch();new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(y=>y.classList&&!y.classList.contains('uxmore'))))ch()}).observe(gl,{childList:true})});
 
 // 4 — Record: sezioni a blocchi richiudibili

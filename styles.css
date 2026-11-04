@@ -348,3 +348,10 @@ details[open]>summary::after{content:'▾'}
 .eqc:hover{background:#ffefcc}.eqc:focus-visible{outline:3px solid var(--b,#13254a);outline-offset:2px}
 .eqc .eqi{font-size:28px;line-height:1;flex:none}.eqc .eqt{min-width:0}.eqc b{font-size:16px}.eqc small{display:block;color:#6b7489;font-size:12px;margin-top:2px}
 .eqc .eqgo{margin-left:auto;background:var(--b,#13254a);color:#fff;border-radius:10px;padding:10px 12px;font-weight:700;white-space:nowrap;font-size:14px;flex:none}
+
+/* v40.5 anteprima — Filtri unici */
+.uxfil .row select{background:#eef3fb}.uxfil select.uxon{background:#fff4dc;border-color:#f0b43c}
+.uxsub{margin-top:12px;padding-top:8px;border-top:1px solid #eef1f6}.uxsubt{font-size:12px;font-weight:700;color:#6b7489;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.gfoot:has(.uxsort){justify-content:flex-start}.uxsort{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:#6b7489;margin:0}.uxsort select{width:auto;min-height:36px;padding:4px 8px;font-size:13px;border:0;background:#eef3fb;border-radius:8px;color:var(--b);font-weight:600}
+.gfoot #gcnt::after{content:' ·';}
+.gclr.uxclr{display:block;background:none;border:0;color:#b04a00;text-decoration:underline;font-weight:600;padding:8px 0;min-height:44px;border-radius:0}.gclr.uxclr[hidden]{display:none}
