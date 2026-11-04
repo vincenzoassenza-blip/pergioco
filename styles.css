@@ -348,3 +348,22 @@ details[open]>summary::after{content:'▾'}
 .eqc:hover{background:#ffefcc}.eqc:focus-visible{outline:3px solid var(--b,#13254a);outline-offset:2px}
 .eqc .eqi{font-size:28px;line-height:1;flex:none}.eqc .eqt{min-width:0}.eqc b{font-size:16px}.eqc small{display:block;color:#6b7489;font-size:12px;margin-top:2px}
 .eqc .eqgo{margin-left:auto;background:var(--b,#13254a);color:#fff;border-radius:10px;padding:10px 12px;font-weight:700;white-space:nowrap;font-size:14px;flex:none}
+
+/* v40.5 anteprima — Filtri unici */
+.uxfil .row select{background:#eef3fb}.uxfil select.uxon{background:#fff4dc;border-color:#f0b43c}
+.uxsub{margin-top:12px;padding-top:8px;border-top:1px solid #eef1f6}.uxsubt{font-size:12px;font-weight:700;color:#6b7489;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.gfoot:has(.uxsort){justify-content:flex-start}.uxsort{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:#6b7489;margin:0}.uxsort select{width:auto;min-height:36px;padding:4px 8px;font-size:13px;border:0;background:#eef3fb;border-radius:8px;color:var(--b);font-weight:600}
+.gfoot #gcnt::after{content:' ·';}
+.gclr.uxclr{display:block;background:none;border:0;color:#b04a00;text-decoration:underline;font-weight:600;padding:8px 0;min-height:44px;border-radius:0}.gclr.uxclr[hidden]{display:none}
+
+/* Anteprima Proposta A — Giochi */
+.uxtop{display:flex;gap:8px;align-items:center}.uxtop #q{flex:1;margin:0}
+.uxfb{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:8px 12px;border-radius:10px;background:#e7ecf7;color:var(--b);font-weight:600;border:0;width:auto}
+.uxfb::after{content:'▸';font-size:18px;line-height:1;width:1em;text-align:center;font-weight:400}.uxfb.on::after{content:'▾'}
+#uxfil>summary{display:none}#uxfil{margin-top:0}#uxfil[open]{margin-top:10px}
+.gflt:has(#uxfil:not([open])){padding-bottom:12px}
+.uxcolh{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 10px;margin:16px 2px 8px}.uxcolh h3{margin:0;font-size:18px;color:var(--b)}.uxcolh h3 .muted{font-weight:400}
+.gitem.uxth{display:flex;gap:12px;align-items:center}.gitem.uxth .gtx{flex:1;min-width:0}
+.gcov{flex:none;width:48px;height:48px;border-radius:8px;background:#eef3fb;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden}.gcov img{width:48px;height:48px;object-fit:cover}
+.uxcons{margin:0 0 10px}
+.gfoot[hidden]{display:none!important}

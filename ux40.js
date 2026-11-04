@@ -16,7 +16,7 @@ const UX={
   const d=document.createElement('details');d.id='uxnums';d.className='card acc';d.dataset.acc=bt?'Statistiche associazione admin':'Numeri associazione';d.open=false;const sm=document.createElement('summary');
   sm.innerHTML=bt&&adminMode()?'<b>📊 Statistiche associazione (admin)</b>':'<b>📊 Numeri dell\'associazione</b>';d.append(sm);if(r)d.append(r);if(bt){if(adminMode()){bt.textContent='Apri statistiche associazione';d.append(bt)}else bt.remove()}V.append(d)},
  // 8 — liste lunghe: mostra un pezzo alla volta mentre scorri
- chunk(box,size=40){if(!box)return;const it=[...box.children].filter(x=>!x.classList.contains('uxmore'));if(it.length<=size)return;let shown=size;it.forEach((x,i)=>{if(i>=size)x.hidden=true});
+ chunk(box,size=40){if(!box)return;const it=[...box.children].filter(x=>!x.classList.contains('uxmore')&&!x.classList.contains('uxcons'));if(it.length<=size)return;let shown=size;it.forEach((x,i)=>{if(i>=size)x.hidden=true});
   const s=document.createElement('div');s.className='uxmore muted';s.textContent='Carico altri…';box.append(s);
   const more=()=>{it.slice(shown,shown+size).forEach(x=>x.hidden=false);shown+=size;if(shown>=it.length){s.remove();io&&io.disconnect()}};
   const io='IntersectionObserver'in window?new IntersectionObserver(e=>{if(e.some(x=>x.isIntersecting))more()},{rootMargin:'400px'}):null;if(io)io.observe(s);else{s.textContent='Mostra altri';s.onclick=more}},
@@ -59,10 +59,39 @@ _uxWrap('serata',async()=>{if(!$('#sd')||V.querySelector('.uxdays'))return;const
  const card=$('#sd').closest('.card');card.after(w);w.onclick=e=>{const b=e.target.closest('[data-uxd]');if(!b||!isoOk(b.dataset.uxd))return;window._ser.date=b.dataset.uxd;go('serata')}});
 
 // 2 + 8 — Giochi: filtri chiusi in un solo pulsante «Filtri (n)» e lista caricata a pezzi
-_uxWrap('ludoteca',()=>{const n=$('#n');if(!n||V.querySelector('#uxfil'))return;const row=n.closest('.row');const d=document.createElement('details');d.id='uxfil';d.className='uxfil';const sm=document.createElement('summary');d.append(sm);row.before(d);d.append(row);
- const cnt=()=>{const k=[$('#n').value,$('#t').value].filter(Boolean).length;sm.innerHTML=`⚙️ Filtri${k?` <span class="uxbadge">${k}</span>`:''}`};cnt();
- ['#n','#t','#so'].forEach(s=>$(s)&&$(s).addEventListener('change',cnt));
- const gl=$('#gl');const ch=()=>UX.chunk(gl);ch();new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(y=>y.classList&&!y.classList.contains('uxmore'))))ch()}).observe(gl,{childList:true})});
+_uxWrap('ludoteca',()=>{const n=$('#n');if(!n||V.querySelector('#uxfil'))return;const so=$('#so'),soRow=so&&so.closest('.row'),adv=$('#adv'),r1=n.closest('.row'),r2=$('#c')&&$('#c').closest('.row');
+ const d=document.createElement('details');d.id='uxfil';d.className='uxfil';const sm=document.createElement('summary');d.append(sm);r1.before(d);d.append(r1);if(r2)d.append(r2);
+ // v40.5 — un solo pannello: i secondari sotto un sottotitolo «Altro» non richiudibile
+ if(adv){const sub=document.createElement('div');sub.id='adv';sub.className='uxsub';sub.innerHTML='<div class="uxsubt">Altro</div>';[...adv.childNodes].filter(x=>x.nodeName!=='SUMMARY').forEach(x=>sub.append(x));adv.replaceWith(sub);d.append(sub)}
+ // Ordina esce dai filtri: piccolo selettore accanto al conteggio
+ if(so){const f=$('#gcnt').parentNode,w=document.createElement('label');w.className='uxsort';w.htmlFor='so';w.append('Ordina: ');f.insertBefore(w,$('#gcnt').nextSibling);w.append(so);soRow.remove();$('#gcnt').after(document.createTextNode(''))}
+ const clr=$('#gclr');if(clr){clr.classList.add('uxclr');d.append(clr)}
+ const ids=['#n','#t','#c','#k','#m','#a'];const cnt=()=>{const k=ids.filter(x=>$(x)&&$(x).value).length+($('#x')&&$('#x').checked?1:0);sm.innerHTML=`⚙️ Filtri${k?` <span class="uxbadge" aria-label="${k} attivi">${k}</span>`:''}`;ids.forEach(x=>$(x)&&$(x).classList.toggle('uxon',!!$(x).value))};cnt();
+ [...ids,'#x'].forEach(s=>$(s)&&$(s).addEventListener('change',cnt));if(clr)clr.addEventListener('click',()=>setTimeout(cnt,0));
+ const gl=$('#gl');const ch=()=>UX.chunk(gl);ch();new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(y=>y.classList&&!y.classList.contains('uxmore')&&!y.classList.contains('uxcons'))))ch()}).observe(gl,{childList:true})});
+
+// Anteprima Proposta A — pagina Giochi: ricerca + Filtri in cima, titolo collezione, copertine, consigliere dentro la lista
+_uxWrap('ludoteca',async()=>{const d=$('#uxfil'),q=$('#q'),gl=$('#gl');if(!d||!q||!gl||V.querySelector('#uxtop'))return;
+ const h2=V.querySelector('h2');if(h2)h2.classList.add('sr');
+ // barra: ricerca + pulsante Filtri (il pannello resta il <details>, chiuso all'apertura)
+ d.open=false;const top=document.createElement('div');top.id='uxtop';top.className='uxtop';q.before(top);top.append(q);
+ const fb=document.createElement('button');fb.type='button';fb.id='uxfb';fb.className='uxfb';fb.setAttribute('aria-controls','uxfil');top.append(fb);
+ const sm=d.querySelector('summary');const syncB=()=>{fb.innerHTML=sm.innerHTML;fb.setAttribute('aria-expanded',d.open?'true':'false');fb.classList.toggle('on',d.open)};syncB();
+ new MutationObserver(syncB).observe(sm,{childList:true,subtree:true});d.addEventListener('toggle',syncB);fb.onclick=()=>{d.open=!d.open;syncB()};
+ // titolo collezione + Ordina, fuori dalla card, subito sopra la lista
+ const cnt=$('#gcnt'),srt=V.querySelector('.uxsort'),foot=cnt&&cnt.parentNode;const hd=document.createElement('div');hd.className='uxcolh';
+ hd.innerHTML='<h3>📚 La nostra collezione <span class="muted">·</span> <span id="uxn"></span></h3>';if(srt)hd.append(srt);gl.before(hd);
+ const num=()=>{$('#uxn').textContent=cnt?cnt.textContent:''};if(cnt){num();new MutationObserver(num).observe(cnt,{childList:true,characterData:true,subtree:true})}const gf=cnt&&cnt.closest('.gfoot');if(gf)gf.hidden=true;else if(cnt)cnt.hidden=true;
+ // altri blocchi che stavano sopra la ricerca
+ const cta=V.querySelector('.cwz-cta');if(cta)cta.remove();const ig=V.querySelector('.igcard');if(ig)gl.after(ig);
+ // copertine + consigliere dopo i primi 4 giochi
+ const gs=await DB.games(),th={};gs.forEach(g=>th[g.id]=typeof safeUrl==='function'?safeUrl(g.thumb,true):null);
+ const deco=()=>{gl.querySelectorAll('.gitem[data-gp]:not(.uxth)').forEach(it=>{it.classList.add('uxth');const u=th[it.dataset.gp];const w=document.createElement('div');w.className='gtx';while(it.firstChild)w.append(it.firstChild);
+   const c=document.createElement('div');c.className='gcov';c.setAttribute('aria-hidden','true');if(u){const im=document.createElement('img');im.src=u;im.alt='';im.loading='lazy';im.decoding='async';im.width=48;im.height=48;im.referrerPolicy='no-referrer';im.onerror=()=>{im.remove();c.textContent='🎲'};c.append(im)}else c.textContent='🎲';it.append(c,w)});
+  if(!gl.querySelector('#uxcons')){const its=gl.querySelectorAll('.gitem');if(its.length){const k=document.createElement('div');k.id='uxcons';k.className='eqc uxcons';k.setAttribute('role','button');k.tabIndex=0;k.setAttribute('aria-label','Non sai cosa scegliere? Consigliami un gioco');
+   k.innerHTML='<span class="eqi" aria-hidden="true">✨</span><span class="eqt"><b>Non sai cosa scegliere?</b><small>Poche domande e ti proponiamo 3 giochi</small></span><span class="eqgo" aria-hidden="true">Consigliami ›</span>';
+   k.onclick=()=>cChoose();k.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();cChoose()}};(its[3]||its[its.length-1]).after(k)}}};
+ deco();new MutationObserver(()=>deco()).observe(gl,{childList:true})});
 
 // 4 — Record: sezioni a blocchi richiudibili
 _uxWrap('record',()=>UX.recFix(V));
