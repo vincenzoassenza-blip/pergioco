@@ -1,0 +1,20 @@
+// node tests/v40.4.test.js — riquadro Sfida equilibrata in Partita
+const fs=require('fs');const eq=fs.readFileSync(__dirname+'/../equilibrio.js','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8');
+let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};
+chk(/pergioco-v40\.4'/.test(sw)&&/ux40\.js\?v=40\.4/.test(sw),'versione 40.4');
+chk(/class="eqc" id="eqo" role="button" tabindex="0" aria-label=/.test(eq)&&!/insertAdjacentHTML\('afterend','[^']*\$\{/.test(eq),'card accessibile, nessun testo interpolato');
+(async()=>{const pw=require('playwright-core');const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome'});const errs=[];
+ const c=await b.newContext({serviceWorkers:'block',viewport:{width:390,height:844}});const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));
+ await p.route(/supabase|jsdelivr/,r=>r.abort());await p.goto('http://localhost:8799/',{waitUntil:'load'});await p.waitForTimeout(2500);
+ await p.evaluate(()=>{document.body.classList.remove('gate');localStorage.removeItem('pergioco-acc');const gs=['Catan','Azul','Wingspan','Carcassonne'].map((x,i)=>({id:'g'+i,name:x,min:2,max:4,minT:30,maxT:60,age:10}));
+  const ms=['Vincenzo','Giulia'].map((x,i)=>({id:'m'+i,nome:x,cognome:'',active:true}));DB.games=async()=>gs;DB.members=async()=>ms;DB.plays=async()=>[{id:'p',gameId:'g0',date:'2026-10-01',players:[{memberId:'m0',score:1}]}];DB.allTables=async()=>[]});
+ await p.evaluate(()=>go('nuova'));await p.waitForTimeout(1200);
+ const r=await p.evaluate(()=>{const e=document.getElementById('eqo'),h=document.querySelector('#view h2'),cs=e&&getComputedStyle(e),i=e&&getComputedStyle(e.querySelector('.eqi'));
+  return{e:!!e,after:h&&h.nextElementSibling===e,form:!!(e&&e.compareDocumentPosition(document.getElementById('g')||document.body)&4),bg:cs&&cs.backgroundColor,bd:cs&&cs.borderTopColor,h:e&&e.getBoundingClientRect().height,isz:i&&i.fontSize,txt:e&&e.textContent,role:e&&e.getAttribute('role')}});
+ chk(r.e&&r.after&&r.form,'card sotto il titolo, sopra il form');chk(r.bg==='rgb(255, 244, 220)'&&r.bd==='rgb(240, 180, 60)','crema con bordo arancione');
+ chk(/Sfida equilibrata/.test(r.txt)&&/Trova il gioco giusto per giocare alla pari/.test(r.txt)&&/Inizia ›/.test(r.txt),'testi');chk(r.role==='button'&&r.h>=44,'accessibile, tap alto ('+r.h+')');chk(r.isz==='28px','icona 28px');
+ await p.screenshot({path:process.env.SHOT||'/tmp/v404.png'});
+ await p.evaluate(()=>{window._eq=0;const o=eqOpen;window.eqOpen=(...a)=>{window._eq++;};document.querySelector('#eqo .eqt small').click();document.getElementById('eqo').dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}))});
+ chk(await p.evaluate(()=>window._eq)===2,'tap ovunque sulla card e Invio aprono eqOpen');
+ await p.evaluate(()=>go('serata'));await p.waitForTimeout(800);chk(await p.evaluate(()=>!document.querySelector('#view .eqc')),'Agenda non toccata');
+ chk(!errs.length,'nessun errore JS '+errs.join('|'));await b.close();console.log(ok+'/'+n+' ok');process.exit(ok===n?0:1)})();

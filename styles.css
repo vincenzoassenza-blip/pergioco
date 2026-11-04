@@ -342,3 +342,9 @@ details>summary::after{content:'▸';margin-left:auto;font-size:18px;line-height
 details[open]>summary::after{content:'▾'}
 .uxfil>summary::after{margin-left:4px}
 .accx .xptop>.card{box-shadow:none;padding:0;margin:0;background:none}.accx .xptop>.card>b:first-child{display:none}
+
+/* v40.4 — riquadro Sfida equilibrata in Partita */
+.eqc{display:flex;align-items:center;gap:12px;background:#fff4dc;border:2px solid #f0b43c;border-radius:14px;padding:12px;margin:0 0 12px;min-height:64px;cursor:pointer;color:var(--b,#13254a)}
+.eqc:hover{background:#ffefcc}.eqc:focus-visible{outline:3px solid var(--b,#13254a);outline-offset:2px}
+.eqc .eqi{font-size:28px;line-height:1;flex:none}.eqc .eqt{min-width:0}.eqc b{font-size:16px}.eqc small{display:block;color:#6b7489;font-size:12px;margin-top:2px}
+.eqc .eqgo{margin-left:auto;background:var(--b,#13254a);color:#fff;border-radius:10px;padding:10px 12px;font-weight:700;white-space:nowrap;font-size:14px;flex:none}

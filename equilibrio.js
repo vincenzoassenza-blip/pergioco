@@ -136,4 +136,4 @@ async function eqOpen(){const all=await DB.members(),ms=all.filter(m=>m.active),
  s1()}
 // pulsante discreto in cima alla scheda Partita (solo per nuova partita, non in modifica)
 (()=>{const _n=views.nuova;views.nuova=async function(ed,...a){await _n.call(this,ed,...a);if(ed&&(ed.id||ed.fromTable||ed.sfidaId))return;const h=V.querySelector('h2');if(!h||V.querySelector('#eqo'))return;
- h.insertAdjacentHTML('afterend','<button class="eqo" id="eqo">⚖️ Sfida equilibrata · <span>a cosa giochiamo per stare alla pari?</span></button>');$('#eqo').onclick=()=>eqOpen()}})();
+ h.insertAdjacentHTML('afterend','<div class="eqc" id="eqo" role="button" tabindex="0" aria-label="Sfida equilibrata: trova il gioco giusto per giocare alla pari"><span class="eqi" aria-hidden="true">⚖️</span><span class="eqt"><b>Sfida equilibrata</b><small>Trova il gioco giusto per giocare alla pari</small></span><span class="eqgo" aria-hidden="true">Inizia ›</span></div>');const e=$('#eqo');e.onclick=()=>eqOpen();e.onkeydown=k=>{if(k.key==='Enter'||k.key===' '){k.preventDefault();eqOpen()}}}})();
