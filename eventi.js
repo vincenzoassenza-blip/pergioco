@@ -29,11 +29,15 @@ const navSerata=()=>document.querySelectorAll('nav button').forEach(b=>b.classLi
 function ics(e){const z=d=>new Date(d).toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');const x=s=>String(s||'').replace(/([,;\\])/g,'\\$1').replace(/\n/g,'\\n');
  const t=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//PerGioco//IT','BEGIN:VEVENT','UID:'+e.id+'@pergioco','DTSTAMP:'+z(Date.now()),'DTSTART:'+z(e.inizio),'DTEND:'+z(new Date(e.inizio).getTime()+3*36e5),'SUMMARY:'+x(e.titolo),e.luogo?'LOCATION:'+x(e.luogo):'',e.descrizione?'DESCRIPTION:'+x(e.descrizione):'','END:VEVENT','END:VCALENDAR'].filter(Boolean).join('\r\n');
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/calendar'}));a.download=(e.titolo||'evento').replace(/[^\w-]+/g,'_')+'.ics';document.body.append(a);a.click();a.remove()}
-const card=(e,p,i)=>{const fut=new Date(e.inizio)>new Date(),chiuso=new Date(e.chiusura)<new Date();
- return`<div class="card evc${e.annullato?' evx':''}" data-ev="${e.id}">${safeUrl(e.immagine)?`<img class="evimg" src="${esc(safeUrl(e.immagine))}" alt="" loading="lazy" referrerpolicy="no-referrer">`:''}<div class="evt"><b>${esc(e.titolo)}</b>
- <div class="muted">📅 ${esc(evData(e.inizio))}</div>
- <div class="evtags">${e.annullato?'<span class="evb off">Evento annullato</span>':''}${e.torneo?'<span class="evb t">🏆 Torneo</span>':''}${hasQuota(e)?'':'<span class="evb t">Gratuito</span>'}${i?`<span class="evb st">${i.occupati}/${e.posti} posti${i.attesa?` · ${i.attesa} in attesa`:''}</span>`:''}${!fut&&!e.annullato?`<span class="evb st">✔ ${i?i.presenti:0} presenti</span>`:chiuso&&!e.annullato?'<span class="evb off">Prenotazioni chiuse</span>':''}</div>
- ${p?stBadge(p.stato):''}</div></div>`};
+const evCosto=e=>hasQuota(e)?'💶 '+[e.quota?euro(e.quota):'',e.caparra?'caparra '+euro(e.caparra):''].filter(Boolean).join(' · '):'Gratuito';
+const card=(e,p,i)=>{const fut=new Date(e.inizio)>new Date(),chiuso=new Date(e.chiusura)<new Date(),lib=i?Math.max(0,e.posti-i.occupati):null;const u=safeUrl(e.immagine);
+ const st=e.annullato?'<span class="agst">Annullato</span>':!fut?`<span class="agst">✔ ${i?i.presenti:0} presenti</span>`:chiuso?'<span class="agst">Prenotazioni chiuse</span>':lib===null?'':lib>0?`<span class="agst free">${lib} ${lib===1?'posto libero':'posti liberi'}</span>`:`<span class="agst">Pieno${i&&i.attesa?' · '+i.attesa+' in attesa':''}</span>`;
+ return`<div class="card evc agt${e.annullato?' evx':''}" data-ev="${esc(e.id)}" role="button" tabindex="0"><div class="agrow"><div class="gcov">${u?`<img src="${esc(u)}" alt="" loading="lazy" width="48" height="48" referrerpolicy="no-referrer">`:(e.torneo?'🏆':'🎉')}</div><div class="agtx">
+ <div class="agl1"><b>${esc(e.titolo)}</b>${st}</div>
+ <div class="agl2"><span class="agi">📅</span> ${esc(evData(e.inizio))}</div>
+ ${e.luogo?`<div class="agl2"><span class="agi">📍</span> ${esc(e.luogo)}</div>`:''}
+ <div class="agl3">${esc(evCosto(e))}${e.torneo?' · 🏆 Torneo':''}</div>
+ ${p?stBadge(p.stato):''}</div></div></div>`};
 async function eventi(){navSerata();
  if(!DB.remote||DB.status!=='online'){V.innerHTML=segHtml('eventi')+'<h2>🎉 Eventi</h2><div class="card"><p class="muted">Gli eventi richiedono la connessione al database. Riprova quando sei online.</p></div>';bindSeg();return}
  const staff=adminMode(),arch=staff&&window._evArch;
@@ -126,7 +130,7 @@ async function mieiEventiHtml(){try{const [mine,es]=await Promise.all([EV.mine()
  return`<div class="card" id="mieiev"><h3>🎉 I miei eventi</h3>${rows.map(({p,e})=>`<div class="evrow" data-mev="${e.id}"><div><b>${esc(e.titolo)}</b><br><small class="muted">${esc(evData(e.inizio))}</small></div>${stBadge(p.stato)}</div>`).join('')||'<p class="muted">Nessuna prenotazione attiva.</p>'}
  <div class="evtags"><span class="evb ${pz.eventi>=5?'ok':'off'}">🎟 Presente a 5 eventi ${pz.eventi>=5?'✔':`(${pz.eventi}/5)`}</span><span class="evb ${pz.tornei>=1?'ok':'off'}">🏆 Torneista ${pz.tornei>=1?'✔':'(0/1)'}</span></div>
  <button class="s" id="goev">Vedi tutti gli eventi</button></div>`}catch(e){return''}}
-const _serata=views.serata;views.serata=async(...a)=>{await _serata(...a);if(DB.remote){V.insertAdjacentHTML('afterbegin',segHtml('serata'));bindSeg()}};
+const _serata=views.serata;views.serata=async(...a)=>{await _serata(...a);{V.insertAdjacentHTML('afterbegin',segHtml('serata'));bindSeg()}};
 const _profilo=views.profilo;views.profilo=async(...a)=>{await _profilo(...a);if(window._pv||!DB.remote||DB.status!=='online'||!(await DB.remote.user()))return;const h=await mieiEventiHtml();if(!h||location.hash!=='#profilo')return;V.insertAdjacentHTML('beforeend',h);
  $('#goev').onclick=()=>go('eventi');V.querySelectorAll('[data-mev]').forEach(r=>r.onclick=()=>go('eventi'))};
 views.eventi=eventi;

@@ -197,7 +197,7 @@ async function cWizard(mode){if(!CFLOW[mode])return;const gs=await DB.games(),ps
   V.querySelectorAll('[data-book]').forEach(b=>b.onclick=()=>cBook(b.dataset.book))};
  step()}
 // apre l'Agenda con il gioco già scelto nel modulo "nuovo tavolo"
-function cBook(id){if(typeof id!=='string'||id.length>40)return;go('serata');let n=0;const t=setInterval(()=>{const s=$('#tg');if(s||++n>40){clearInterval(t);if(!s)return;if([...s.options].some(o=>o.value===id)){s.value=id;s.dispatchEvent(new Event('change'))}
+function cBook(id){if(typeof id!=='string'||id.length>40)return;go('serata');let n=0,op=0;const t=setInterval(()=>{if(!op&&!$('#tg')&&$('#tfab')){op=1;tFabGo()}const s=$('#tg');if(s||++n>40){clearInterval(t);if(!s)return;if([...s.options].some(o=>o.value===id)){s.value=id;s.dispatchEvent(new Event('change'))}
  const d=s.closest('details');if(d)d.open=true;s.scrollIntoView({block:'center'});toast('Scegli la data e apri il tavolo')}},50)}
 // pulsanti in cima al tab Giochi
 (()=>{const _l=views.ludoteca;views.ludoteca=async function(...a){await _l.apply(this,a);const h=V.querySelector('h2');if(!h)return;
