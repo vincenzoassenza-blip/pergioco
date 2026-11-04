@@ -70,6 +70,29 @@ _uxWrap('ludoteca',()=>{const n=$('#n');if(!n||V.querySelector('#uxfil'))return;
  [...ids,'#x'].forEach(s=>$(s)&&$(s).addEventListener('change',cnt));if(clr)clr.addEventListener('click',()=>setTimeout(cnt,0));
  const gl=$('#gl');const ch=()=>UX.chunk(gl);ch();new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(y=>y.classList&&!y.classList.contains('uxmore'))))ch()}).observe(gl,{childList:true})});
 
+// Anteprima Proposta A — pagina Giochi: ricerca + Filtri in cima, titolo collezione, copertine, consigliere dentro la lista
+_uxWrap('ludoteca',async()=>{const d=$('#uxfil'),q=$('#q'),gl=$('#gl');if(!d||!q||!gl||V.querySelector('#uxtop'))return;
+ const h2=V.querySelector('h2');if(h2)h2.classList.add('sr');
+ // barra: ricerca + pulsante Filtri (il pannello resta il <details>, chiuso all'apertura)
+ d.open=false;const top=document.createElement('div');top.id='uxtop';top.className='uxtop';q.before(top);top.append(q);
+ const fb=document.createElement('button');fb.type='button';fb.id='uxfb';fb.className='uxfb';fb.setAttribute('aria-controls','uxfil');top.append(fb);
+ const sm=d.querySelector('summary');const syncB=()=>{fb.innerHTML=sm.innerHTML;fb.setAttribute('aria-expanded',d.open?'true':'false');fb.classList.toggle('on',d.open)};syncB();
+ new MutationObserver(syncB).observe(sm,{childList:true,subtree:true});d.addEventListener('toggle',syncB);fb.onclick=()=>{d.open=!d.open;syncB()};
+ // titolo collezione + Ordina, fuori dalla card, subito sopra la lista
+ const cnt=$('#gcnt'),srt=V.querySelector('.uxsort'),foot=cnt&&cnt.parentNode;const hd=document.createElement('div');hd.className='uxcolh';
+ hd.innerHTML='<h3>📚 La nostra collezione <span class="muted">·</span> <span id="uxn"></span></h3>';if(srt)hd.append(srt);gl.before(hd);
+ const num=()=>{$('#uxn').textContent=cnt?cnt.textContent:''};if(cnt){num();new MutationObserver(num).observe(cnt,{childList:true,characterData:true,subtree:true})}const gf=cnt&&cnt.closest('.gfoot');if(gf)gf.hidden=true;else if(cnt)cnt.hidden=true;
+ // altri blocchi che stavano sopra la ricerca
+ const cta=V.querySelector('.cwz-cta');if(cta)cta.remove();const ig=V.querySelector('.igcard');if(ig)gl.after(ig);
+ // copertine + consigliere dopo i primi 4 giochi
+ const gs=await DB.games(),th={};gs.forEach(g=>th[g.id]=typeof safeUrl==='function'?safeUrl(g.thumb,true):null);
+ const deco=()=>{gl.querySelectorAll('.gitem[data-gp]:not(.uxth)').forEach(it=>{it.classList.add('uxth');const u=th[it.dataset.gp];const w=document.createElement('div');w.className='gtx';while(it.firstChild)w.append(it.firstChild);
+   const c=document.createElement('div');c.className='gcov';c.setAttribute('aria-hidden','true');if(u){const im=document.createElement('img');im.src=u;im.alt='';im.loading='lazy';im.decoding='async';im.width=48;im.height=48;im.referrerPolicy='no-referrer';im.onerror=()=>{im.remove();c.textContent='🎲'};c.append(im)}else c.textContent='🎲';it.append(c,w)});
+  if(!gl.querySelector('#uxcons')){const its=gl.querySelectorAll('.gitem');if(its.length){const k=document.createElement('div');k.id='uxcons';k.className='eqc uxcons';k.setAttribute('role','button');k.tabIndex=0;k.setAttribute('aria-label','Non sai cosa scegliere? Consigliami un gioco');
+   k.innerHTML='<span class="eqi" aria-hidden="true">✨</span><span class="eqt"><b>Non sai cosa scegliere?</b><small>Poche domande e ti proponiamo 3 giochi</small></span><span class="eqgo" aria-hidden="true">Consigliami ›</span>';
+   k.onclick=()=>cChoose();k.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();cChoose()}};(its[3]||its[its.length-1]).after(k)}}};
+ deco();new MutationObserver(()=>deco()).observe(gl,{childList:true})});
+
 // 4 — Record: sezioni a blocchi richiudibili
 _uxWrap('record',()=>UX.recFix(V));
 _uxWrap('stats',()=>UX.accApply(V));
