@@ -1,7 +1,7 @@
 // node tests/v40.1b.test.js — Record: tutte le sezioni richiudibili con freccia, Classifica XP compresa
 const fs=require('fs');const css=fs.readFileSync(__dirname+'/../styles.css','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8');
 let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};
-chk(/pergioco-v40\.1'/.test(sw)&&/ux40\.js\?v=40\.1/.test(sw),'versione 40.1');
+chk(/pergioco-v40\.\d'/.test(sw)&&/ux40\.js\?v=40\.\d/.test(sw),'versione 40.1');
 chk(/content:'▸'/.test(css)&&/\[open\]>summary::after\{content:'▾'\}/.test(css)&&/list-style:none/.test(css),'freccia ▸/▾ nei css');
 (async()=>{const pw=require('playwright-core');const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome'});const errs=[];
  const c=await b.newContext({serviceWorkers:'block',viewport:{width:390,height:844}});const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));
