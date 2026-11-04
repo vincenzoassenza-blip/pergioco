@@ -16,7 +16,7 @@ const UX={
   const d=document.createElement('details');d.id='uxnums';d.className='card acc';d.dataset.acc=bt?'Statistiche associazione admin':'Numeri associazione';d.open=false;const sm=document.createElement('summary');
   sm.innerHTML=bt&&adminMode()?'<b>📊 Statistiche associazione (admin)</b>':'<b>📊 Numeri dell\'associazione</b>';d.append(sm);if(r)d.append(r);if(bt){if(adminMode()){bt.textContent='Apri statistiche associazione';d.append(bt)}else bt.remove()}V.append(d)},
  // 8 — liste lunghe: mostra un pezzo alla volta mentre scorri
- chunk(box,size=40){if(!box)return;const it=[...box.children].filter(x=>!x.classList.contains('uxmore'));if(it.length<=size)return;let shown=size;it.forEach((x,i)=>{if(i>=size)x.hidden=true});
+ chunk(box,size=40){if(!box)return;const it=[...box.children].filter(x=>!x.classList.contains('uxmore')&&!x.classList.contains('uxcons'));if(it.length<=size)return;let shown=size;it.forEach((x,i)=>{if(i>=size)x.hidden=true});
   const s=document.createElement('div');s.className='uxmore muted';s.textContent='Carico altri…';box.append(s);
   const more=()=>{it.slice(shown,shown+size).forEach(x=>x.hidden=false);shown+=size;if(shown>=it.length){s.remove();io&&io.disconnect()}};
   const io='IntersectionObserver'in window?new IntersectionObserver(e=>{if(e.some(x=>x.isIntersecting))more()},{rootMargin:'400px'}):null;if(io)io.observe(s);else{s.textContent='Mostra altri';s.onclick=more}},
@@ -68,7 +68,7 @@ _uxWrap('ludoteca',()=>{const n=$('#n');if(!n||V.querySelector('#uxfil'))return;
  const clr=$('#gclr');if(clr){clr.classList.add('uxclr');d.append(clr)}
  const ids=['#n','#t','#c','#k','#m','#a'];const cnt=()=>{const k=ids.filter(x=>$(x)&&$(x).value).length+($('#x')&&$('#x').checked?1:0);sm.innerHTML=`⚙️ Filtri${k?` <span class="uxbadge" aria-label="${k} attivi">${k}</span>`:''}`;ids.forEach(x=>$(x)&&$(x).classList.toggle('uxon',!!$(x).value))};cnt();
  [...ids,'#x'].forEach(s=>$(s)&&$(s).addEventListener('change',cnt));if(clr)clr.addEventListener('click',()=>setTimeout(cnt,0));
- const gl=$('#gl');const ch=()=>UX.chunk(gl);ch();new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(y=>y.classList&&!y.classList.contains('uxmore'))))ch()}).observe(gl,{childList:true})});
+ const gl=$('#gl');const ch=()=>UX.chunk(gl);ch();new MutationObserver(m=>{if(m.some(x=>[...x.addedNodes].some(y=>y.classList&&!y.classList.contains('uxmore')&&!y.classList.contains('uxcons'))))ch()}).observe(gl,{childList:true})});
 
 // Anteprima Proposta A — pagina Giochi: ricerca + Filtri in cima, titolo collezione, copertine, consigliere dentro la lista
 _uxWrap('ludoteca',async()=>{const d=$('#uxfil'),q=$('#q'),gl=$('#gl');if(!d||!q||!gl||V.querySelector('#uxtop'))return;
