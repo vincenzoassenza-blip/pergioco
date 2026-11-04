@@ -335,10 +335,10 @@ button,select,input:not([type=checkbox]):not([type=radio]),summary,.chip.pick,.s
 .evb.t,.chip.coop{background:#fff3e0;color:#8a4b00}
 .tavolo .kwst{background:#eee;color:#555;border-radius:999px;padding:2px 9px;font-weight:600}
 
-/* v40.1 — freccia visibile su tutti i blocchi richiudibili */
-details.acc>summary,.uxaltro>summary,.uxfil>summary,details.std>summary,details.stg1>summary{list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer}
-details.acc>summary::-webkit-details-marker,.uxaltro>summary::-webkit-details-marker,.uxfil>summary::-webkit-details-marker,details.std>summary::-webkit-details-marker,details.stg1>summary::-webkit-details-marker{display:none}
-details.acc>summary::after,.uxaltro>summary::after,.uxfil>summary::after,details.std>summary::after,details.stg1>summary::after{content:'▸';margin-left:auto;font-size:18px;line-height:1;width:1em;text-align:center;color:var(--b);flex:none}
-details.acc[open]>summary::after,.uxaltro[open]>summary::after,.uxfil[open]>summary::after,details.std[open]>summary::after,details.stg1[open]>summary::after{content:'▾'}
+/* v40.3 — una sola freccia ▸/▾ a destra per TUTTI i blocchi richiudibili dell'app */
+details>summary{list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer}
+details>summary::-webkit-details-marker{display:none}details>summary::marker{content:''}
+details>summary::after{content:'▸';margin-left:auto;font-size:18px;line-height:1;width:1em;text-align:center;color:var(--b);flex:none;font-weight:400}
+details[open]>summary::after{content:'▾'}
 .uxfil>summary::after{margin-left:4px}
 .accx .xptop>.card{box-shadow:none;padding:0;margin:0;background:none}.accx .xptop>.card>b:first-child{display:none}

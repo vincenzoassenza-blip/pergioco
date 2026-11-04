@@ -10,7 +10,11 @@ const UX={
  // converte titolo h3.rsec + contenuto in un blocco richiudibile
  wrapSections(root){root.querySelectorAll('h3.rsec').forEach((h,i)=>{const d=document.createElement('details');d.className='card acc';d.open=i===0;const sm=document.createElement('summary');sm.innerHTML=`<b>${h.innerHTML}</b>`;d.append(sm);let n=h.nextElementSibling;while(n&&!n.matches('h3.rsec,details,h2')){const x=n.nextElementSibling;d.append(n);n=x}h.replaceWith(d)})},
  // v40.1 — Record: anche Classifica XP (e sezioni aggiunte dopo) diventano blocchi richiudibili
- recFix(V){const x=V.querySelector('.xptop');if(x&&!x.closest('details')){const d=document.createElement('details');d.className='card acc accx';d.dataset.acc='Classifica XP';d.open=true;const sm=document.createElement('summary');sm.innerHTML='<b>⚡ Classifica XP</b>';x.replaceWith(d);d.append(sm,x)}if(V.querySelector('h3.rsec'))this.wrapSections(V);this.accApply(V)},
+ recFix(V){const x=V.querySelector('.xptop');if(x&&!x.closest('details')){const d=document.createElement('details');d.className='card acc accx';d.dataset.acc='Classifica XP';d.open=true;const sm=document.createElement('summary');sm.innerHTML='<b>⚡ Classifica XP</b>';x.replaceWith(d);d.append(sm,x)}if(V.querySelector('h3.rsec'))this.wrapSections(V);this.recNums(V);this.accApply(V)},
+ // v40.3 — numeri (Partite/Soci/Ospiti) e accesso alle statistiche staff in un blocco chiuso in fondo
+ recNums(V){const o=V.querySelector('#uxnums');if(o){if(V.lastElementChild!==o)V.append(o);return}const r=[...V.children].find(e=>e.matches('.row')&&/Partite/.test(e.textContent));const bt=V.querySelector('[data-act="go:stats"]');if(!r&&!bt)return;
+  const d=document.createElement('details');d.id='uxnums';d.className='card acc';d.dataset.acc=bt?'Statistiche associazione admin':'Numeri associazione';d.open=false;const sm=document.createElement('summary');
+  sm.innerHTML=bt&&adminMode()?'<b>📊 Statistiche associazione (admin)</b>':'<b>📊 Numeri dell\'associazione</b>';d.append(sm);if(r)d.append(r);if(bt){if(adminMode()){bt.textContent='Apri statistiche associazione';d.append(bt)}else bt.remove()}V.append(d)},
  // 8 — liste lunghe: mostra un pezzo alla volta mentre scorri
  chunk(box,size=40){if(!box)return;const it=[...box.children].filter(x=>!x.classList.contains('uxmore'));if(it.length<=size)return;let shown=size;it.forEach((x,i)=>{if(i>=size)x.hidden=true});
   const s=document.createElement('div');s.className='uxmore muted';s.textContent='Carico altri…';box.append(s);
@@ -67,7 +71,7 @@ _uxWrap('profilo',()=>{UX.accApply(V);UX.hdr()});
 
 // 8 — Altro > Partite (staff): lista a pezzi
 new MutationObserver(()=>{const a=document.getElementById('aplays');if(a&&!a.dataset.uxc){a.dataset.uxc='1';UX.chunk(a)}
- const v=document.getElementById('view');if(v){if(window._cur==='record'&&v.querySelector('.xptop:not(details .xptop),h3.rsec'))UX.recFix(v);UX.accApply(v)}}).observe(document.getElementById('view'),{childList:true,subtree:true});
+ const v=document.getElementById('view');if(v){if(window._cur==='record'&&v.querySelector('.xptop:not(details .xptop),h3.rsec')||(v.querySelector('#uxnums')||{}).nextElementSibling||!v.querySelector('#uxnums'))UX.recFix(v);UX.accApply(v)}}).observe(document.getElementById('view'),{childList:true,subtree:true});
 addEventListener('hashchange',()=>setTimeout(()=>UX.hdr(),0));
 document.getElementById('tabs').addEventListener('click',()=>setTimeout(()=>UX.hdr(),0));
 
