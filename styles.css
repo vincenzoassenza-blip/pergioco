@@ -500,3 +500,32 @@ details[open]>summary::after{content:'▾'}
 .cmva button.on{background:var(--b);color:var(--c);border-color:var(--b)}.cmva button:disabled{opacity:.5}
 .cmarr .lr b{color:var(--b)}.cmarrl{margin-top:8px}.cmarrl .card{box-shadow:none;border:1px solid var(--bg)}
 .cmc .dsact{display:flex;flex-wrap:nowrap}.cmc .dsact select{flex:2;min-width:0;margin:0}.cmc .dsact button{flex:1}
+/* v41.5 — Classifica (tab Record): podio XP, menu Periodo, record a righe ▸/▾ */
+.clhd{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.clhd h2{margin:0}
+.cldd select{font-size:13px;padding:6px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--m) 22%,transparent);background:var(--c);color:var(--t);max-width:100%}
+.clpf{padding:8px 10px}
+.clpod{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:8px 0 4px}
+.clp{flex:1;max-width:120px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:1px solid color-mix(in srgb,var(--m) 22%,transparent);border-radius:12px;background:var(--bg);cursor:pointer;text-align:center;font-size:13px}
+.clp.p1{padding-top:16px;border-color:var(--a)}
+.clp .md{font-size:24px}.clp .xp{font-size:12px;color:var(--m)}
+.clp.me{outline:2px solid var(--a);background:color-mix(in srgb,var(--a) 15%,var(--c))}
+.clnota{font-size:12px;color:var(--m);margin:4px 0;text-align:center}
+.clln{display:flex;align-items:center;gap:10px;padding:10px 4px;border-top:1px solid color-mix(in srgb,var(--m) 22%,transparent);cursor:pointer;text-decoration:none;color:var(--t)}
+.clln:focus-visible{outline:2px solid var(--b2)}
+.clln .ic{font-size:20px;width:26px;text-align:center;flex:none}
+.clln .t{flex:1;min-width:0;display:flex;flex-direction:column}
+.clln .t small{color:var(--m);font-size:12px}
+.clln .nm{display:flex;gap:6px;align-items:baseline;min-width:0}
+.clln .who{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clln .tie{font-size:12px;color:var(--m);flex:none}
+.clln .pill{flex:none;font-size:12px;padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--a) 22%,var(--c));color:var(--t);white-space:nowrap}
+.clln .ar{color:var(--m);flex:none}
+.clme{background:color-mix(in srgb,var(--a) 15%,var(--c));border-radius:10px;border-top:0}
+.clme .t{flex-direction:row;align-items:center;gap:6px}
+.clrec{margin-top:4px}
+.clrec .clrw:first-child .clln{border-top:0}
+.cldet{padding:0 4px 10px 40px;font-size:13px}
+.cldet a,.clln a,.clp{text-decoration:none}
+.clsub{padding-left:8px}
+.cllink{color:var(--b2);font-weight:600;cursor:pointer}
