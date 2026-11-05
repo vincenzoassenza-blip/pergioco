@@ -385,3 +385,10 @@ details[open]>summary::after{content:'▾'}
 .agdb{width:100%;text-align:left}.agsheet .p#tsv{width:100%;margin-top:12px}
 @media (prefers-reduced-motion:reduce){.agsheet{transition:none}}
 .agact .agbtn{margin-top:0}.agact{margin-top:8px}
+/* v41 Configurazione associazione */
+.cflogo{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}.cflogo input[type=file]{flex:1;min-width:160px}
+.cfimg{width:52px;height:52px;border-radius:10px;border:1px solid #dfe3ee;display:grid;place-items:center;background:#fff;color:var(--m);overflow:hidden}.cfimg.dk{background:var(--b)}.cfimg img{max-width:44px;max-height:44px}
+.cfcol{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #eef0f5}.cfcol input[type=color]{width:44px;height:36px;padding:0;border:1px solid #dfe3ee;border-radius:8px;background:#fff;flex:none}.cfcol label{flex:1;margin:0}.cfcol code{font-size:13px;color:var(--m)}
+.cfprev{margin:12px 0;border-radius:12px;overflow:hidden;border:1px solid #dfe3ee;background:var(--bg)}.cfbar{background:var(--b);color:#fff;padding:10px 12px}.cfbar b{display:block;font-size:18px}.cfbar small{opacity:.75}
+.cfbody{padding:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.cfbody .p{background:var(--b)}.cfbody .kw{background:color-mix(in srgb,var(--a) 35%,#fff)}.cfbody a{color:var(--b2);text-decoration:none;font-weight:600}
+.cfbody button.p{width:auto;margin-top:0}
