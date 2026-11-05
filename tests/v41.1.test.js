@@ -46,7 +46,7 @@ chk(!/Coppa Antero|Coppe Antero|Sfida di Antero|Prescelti di Antero/.test(visUI)
 const lud=[...vis.matchAll(/[^\n]{0,30}ludoteca[^\n]{0,10}/gi)].map(m=>m[0]).filter(s=>!/views\.ludoteca|'ludoteca'|ludoteca\(\)|#ludoteca|ludoteca:\[|ludoteca#|"ludoteca"/.test(s));chk(!lud.length,'niente «ludoteca» nei testi: '+lud.join(' | '));
 chk(!/\bclub\b/i.test(vis+rd('index.html')),'mai «club»');
 chk(!/#14254a/i.test(rd('app.js')+rd('stats.js')+rd('wrapped.js')),'niente #14254a fisso');
-const sw=rd('sw.js'),idx=rd('index.html');chk(/const C='pergioco-v41\.[1234]'/.test(sw)&&!/v=41\.0/.test(sw+idx)&&/APP_VERSION='41\.[1234]'/.test(rd('brand.js')),'versione 41.1');
+const sw=rd('sw.js'),idx=rd('index.html');chk(/const C='pergioco-v41\.[12345]'/.test(sw)&&!/v=41\.0/.test(sw+idx)&&/APP_VERSION='41\.[12345]'/.test(rd('brand.js')),'versione 41.1');
 const sql=rd('supabase/migrate-v41.1.sql');chk(/moduli_valid/.test(sql)&&/revoke all on function public\.mod_nome/i.test(sql)&&!/drop table|delete from/i.test(sql),'SQL additiva');
 chk(!allErrs.length,'nessun errore JS '+allErrs.join('|'));
 console.log(`v41.1: ${ok}/${n}`);await b.close();process.exit(ok===n?0:1)})();
