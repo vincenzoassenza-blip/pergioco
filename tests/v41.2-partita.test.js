@@ -37,7 +37,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};
  chk(await p.evaluate(()=>{document.documentElement.style.setProperty('--a','rgb(1, 2, 3)');document.documentElement.style.setProperty('--b','rgb(4, 5, 6)');return getComputedStyle(document.querySelector('#pl .ps')).borderTopColor==='rgb(1, 2, 3)'&&getComputedStyle(document.querySelector('.pth .n')).backgroundColor==='rgb(4, 5, 6)'}),'colori dalle variabili della config');
  await p.evaluate(()=>go('ludoteca'));await p.waitForTimeout(500);chk(!(await p.$('#eqo')),'Sfida equilibrata solo in Partita');
  await p.context().close();
- const src=fs.readFileSync('partita.js','utf8'),css=fs.readFileSync('styles.css','utf8').split('/* v41.2 — Partita')[1]||'';
+ const src=fs.readFileSync('partita.js','utf8'),css=fs.readFileSync('styles.css','utf8').split('/* v41.2 — Partita')[1].split('/* v41.3')[0]||'';
  chk(!/#[0-9a-f]{3,6}\b/i.test(src.replace(/^\/\/.*$/gm,''))&&!/#[0-9a-f]{6}\b/i.test(css.replace(/#c0392b/g,'')),'niente colori fissi (solo variabili; rosso errore come nel resto dell\'app)');
  chk(!/PerGioco|Antero/.test(src),'nessun nome dell\'associazione fisso');
  chk(!errs.length,'nessun errore JS '+errs.join('|'));

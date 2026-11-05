@@ -2,7 +2,7 @@
 // Fonte: public.app_settings chiave 'brand' (lettura solo utenti autenticati; scrittura solo admin + CHECK lato server).
 // Prima del login (o se il DB non risponde) si usano l'ultima copia salvata sul telefono o i valori PerGioco.
 // Tutti i valori sono testo dell'utente: mostrarli SEMPRE con esc()/textContent; i loghi solo in <img src> validati.
-const APP_VERSION='41.2';
+const APP_VERSION='41.3';
 const BRAND_DEF=Object.freeze({nome:'PerGioco',motto:'Gioca, prenota, condividi',citta:'Ragusa',instagram:'pergiocoets',email:'info@pergioco.org',logo:'',logo_barra:'',
  colori:Object.freeze({primario:'#14254a',secondario:'#2a4785',accento:'#f2b134',sfondo:'#f4f6fb'})});
 const BRAND={
