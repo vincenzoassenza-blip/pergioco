@@ -34,6 +34,10 @@ function privacy(V){const lb=V.querySelector('label.stpub');const ed=V.querySele
  const w=el('div','pftg');const l=el('label','tg');l.append(el('span','ic','👁'),el('b',null,T.vis),cb);cb.classList.add('sw');cb.setAttribute('role','switch');
  w.append(l,el('div','hl','ⓘ '+T.visH));if(old)old.replaceWith(w);else if(ed&&ed.querySelector('#esv'))ed.querySelector('#esv').before(w);else lb.after(w);lb.remove()}
 
+// tavoli / organizzati nel periodo scelto (stesse regole di Profile.stats e degli intervalli di stats.js)
+function perFrom(per){const t=romeToday();if(per==='12m'){const d=new Date(t+'T12:00:00Z');d.setUTCFullYear(d.getUTCFullYear()-1);return d.toISOString().slice(0,10)}if(per==='m')return t.slice(0,8)+'01';return '0000'}
+function tavPer(st,ctx){if(!ctx.mid||!Array.isArray(ctx.ts))return null;const on=st.querySelector('.stf [data-sp].on'),per=on?on.dataset.sp:'sempre',f=perFrom(per),today=romeToday(),id=ctx.mid;
+ const tb=ctx.ts.filter(t=>((t.players||[]).some(x=>x.memberId===id)||t.hostId===id)&&/^\d{4}-\d{2}-\d{2}$/.test(t.date||'')&&t.date>=f&&t.date<=today);return{tav:tb.length,org:tb.filter(t=>t.hostId===id).length}}
 function stats(V,ctx){const st=V.querySelector('#st33');if(!st||st.dataset.p413)return;st.dataset.p413='1';
  const h3=st.querySelector('h3');const note=[...st.querySelectorAll(':scope>p.muted.sm')][0];
  if(h3){h3.classList.add('pfsec');if(note){const i=el('button','pfi','ⓘ');i.type='button';i.setAttribute('aria-label',T.info);i.setAttribute('aria-expanded','false');note.hidden=true;note.classList.add('pfnote');
@@ -41,7 +45,7 @@ function stats(V,ctx){const st=V.querySelector('#st33');if(!st||st.dataset.p413)
  const g=st.querySelector(':scope>.stg');const ab=[...st.querySelectorAll('details.std')].find(d=>/Abitudini/.test(d.querySelector('summary').textContent));
  if(g){const bx=[...g.children];const val=i=>bx[i]?bx[i].querySelector('b').textContent.split(' · ')[0]:'—';
   const ng=el('div','stg pftiles');const tile=(v,l)=>{const t=el('div','stn');t.append(el('b',null,v),el('span',null,l));return t};
-  T.tiles.forEach(([l,i])=>ng.append(tile(val(i),l)));if(ctx.tav!=null)ng.append(tile(ctx.tav,T.tavoli));if(ctx.org!=null)ng.append(tile(ctx.org,T.org));
+  T.tiles.forEach(([l,i])=>ng.append(tile(val(i),l)));const tv=tavPer(st,ctx);if(tv){ng.append(tile(String(tv.tav),T.tavoli),tile(String(tv.org),T.org))}else{if(ctx.tav!=null)ng.append(tile(ctx.tav,T.tavoli));if(ctx.org!=null)ng.append(tile(ctx.org,T.org))}
   // h-index e ore stimate restano, spostati in «Abitudini»
   const rest=bx.slice(4);const ag=ab&&ab.querySelector('.stg');if(rest.length&&ag)ag.prepend(...rest);g.replaceWith(ng)}
  // 3 · I miei giochi
@@ -88,6 +92,7 @@ const _pf=views.profilo;views.profilo=async(...a)=>{await _pf(...a);try{const V=
  // tavoli / organizzati: dalla riga di riquadri sotto le statistiche (poi tolta, i numeri stanno nelle tessere)
  const ctx={};const rw=[...V.querySelectorAll(':scope>.row')].find(r=>/Tavoli organizzati/.test(r.textContent)&&V.querySelector('#st33'));
  if(rw){rw.querySelectorAll('.card').forEach(c=>{const l=(c.querySelector('.muted')||{}).textContent,v=(c.querySelector('.big')||{}).textContent;if(l==='Tavoli')ctx.tav=v;if(l==='Tavoli organizzati')ctx.org=v});rw.remove()}
+ try{const ms=await DB.members(),u=DB.remote&&DB.status==='online'?await DB.remote.user():null;const m=window._pv?ms.find(x=>x.id===window._pv):(u?ms.find(x=>x.userId===u.id):null);if(m){ctx.mid=m.id;ctx.ts=await DB.allTables()}}catch(e){}
  apply(V,ctx);const h=V.querySelector('#st33h');if(h&&!h._pfo){h._pfo=new MutationObserver(()=>{if(h.querySelector('#st33:not([data-p413])'))stats(V,ctx)});h._pfo.observe(h,{childList:true,subtree:true})}}catch(e){console.warn('profilo v41.3',e)}};
 window.PF413={apply,T};
 })();
