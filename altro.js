@@ -26,12 +26,14 @@ function infoCard(){const d=el('details','card alcard alinfo');const b=BRAND.v||
 function foot(staff){const f=el('div','alfoot',`${(BRAND.v||BRAND_DEF).nome} · v${APP_VERSION}`);if(staff&&typeof IG!=='undefined'&&IG.url){f.append(' · ');const a=el('a','igx allink','📸 '+IG.tag);a.href=IG.url;a.target='_blank';a.rel='noopener noreferrer';f.append(a)}return f}
 function clean(V){V.querySelectorAll(':scope>.card.muted,:scope>.igl').forEach(x=>x.remove());const h=V.querySelector(':scope>.hrow');if(h)h.hidden=true}
 function title(V,t){let h=V.querySelector(':scope>h2.altit');if(!h){h=el('h2','altit');V.prepend(h)}h.textContent=t}
+// 1 · «Il mio account» (con «Esci dall'account»: dalla v41.7 l'unico punto per uscire, anche per lo staff)
+async function accRow(){let u=null;try{u=DB.remote&&DB.status==='online'?await DB.remote.user():null}catch(e){}
+ if(u&&u.email){const d=el('details','alacc');const k=kw(String(u.email).split('@')[0].slice(0,18)+'@…');sumRow(d,'👤',T.account,(()=>{const s=document.createDocumentFragment();s.append(T.accCon+' ',k);return s})());
+  const r=row('⎋',T.esci,null,false,'alsub');act(r,()=>confirmLogout());d.append(r);return d}
+ const r=row('👤',T.account,T.accNo+' · '+T.accVai,false);act(r,()=>go('profilo'));return r}
 // 1 · socio
 async function socio(V){const A=V.querySelector('#adm');if(!A)return;clean(V);const bk=V.querySelector('#bkp');if(bk&&bk.hidden)bk.remove();title(V,T.titSocio);
- const m=el('div','card alcard almenu');let u=null;try{u=DB.remote&&DB.status==='online'?await DB.remote.user():null}catch(e){}
- if(u&&u.email){const d=el('details','alacc');const k=kw(String(u.email).split('@')[0].slice(0,18)+'@…');sumRow(d,'👤',T.account,(()=>{const s=document.createDocumentFragment();s.append(T.accCon+' ',k);return s})());
-  const r=row('⎋',T.esci,null,false,'alsub');act(r,()=>confirmLogout());d.append(r);m.append(d)}
- else{const r=row('👤',T.account,T.accNo+' · '+T.accVai,false);act(r,()=>go('profilo'));m.append(r)}
+ const m=el('div','card alcard almenu');m.append(await accRow());
  const inf=infoCard();inf.classList.remove('card','alcard');m.append(inf);
  if(typeof IG!=='undefined'&&IG.url){const a=el('a','alr igx');a.href=IG.url;a.target='_blank';a.rel='noopener noreferrer';a.append(el('span','ic','📸'));const t=el('span','t');t.append(el('b',null,T.ig));const s=el('span','sub');s.append(kw(IG.tag));t.append(s);a.append(t,arrow(false));m.append(a)}
  const st=el('details','card alcard alstaff');const s=sumRow(st,'🔒',T.staff);const i=el('span','ali','ⓘ');i.title=T.staffH;i.setAttribute('aria-label',T.staffH);s.querySelector('b').append(' ',i);
@@ -42,7 +44,7 @@ function staff(V){const A=V.querySelector('#adm');if(!A)return;clean(V);title(V,
  const L=el('div','card alcard allist');L.id='allist';V.querySelector('.altit').after(L);A.classList.remove('card');A.classList.add('alpanel');
  const bk=V.querySelector('#bkp');const str=el('details','card alpink');str.id='alstr';sumRow(str,'🧰',T.strumenti,T.strSub);const sb=el('div','albox');sb.id='alstrb';str.append(sb);
  if(bk&&!bk.hidden){const c=bk.querySelector('.card');if(c)sb.append(...c.childNodes)}if(bk)bk.remove();
- const wr=V.querySelector('#wrgest');const tail=[str,infoCard(),foot(true)];(wr||L).after(...tail);str.hidden=!sb.children.length;
+ const wr=V.querySelector('#wrgest');const ac=el('div','card alcard alaccs');const tail=[str,ac,infoCard(),foot(true)];(wr||L).after(...tail);accRow().then(x=>{ac.append(x);ac.hidden=!x.matches('details')});str.hidden=!sb.children.length;
  const mo=new MutationObserver(()=>proc(V));mo.observe(A,{childList:true});proc(V)}
 function proc(V){const A=V.querySelector('#adm'),L=V.querySelector('#allist');if(!A||!L||A.querySelector(':scope>.almk'))return;A.prepend(Object.assign(el('span','almk'),{hidden:true}));
  if(!(typeof adminMode==='function'&&adminMode()))return;
