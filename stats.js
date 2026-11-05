@@ -57,8 +57,8 @@ function html(m,s,full,per,ms,own){
   ${s.guest?`<p class="muted sm">+ ${s.guest} partecipazioni di Ospite.</p>`:''}</details>`}
  const wmx=Math.max(1,...s.wd),ks=months12(),mmx=Math.max(1,...ks.map(k=>s.mo.get(k)||0));
  o+=`<details class="std"><summary>📅 Abitudini</summary>
- <div class="sthm" aria-label="Partite per giorno della settimana">${s.wd.map((v,i)=>`<div class="sth" style="--a:${(v/wmx).toFixed(2)};color:${v/wmx>.45?'#fff':'#14254a'}" title="${DN[i]}: ${v}"><b>${v}</b><span>${DN[i]}</span></div>`).join('')}</div>
- <div class="sthm sthm12" aria-label="Partite per mese">${ks.map(k=>{const v=s.mo.get(k)||0;return `<div class="sth" style="--a:${(v/mmx).toFixed(2)};color:${v/mmx>.45?'#fff':'#14254a'}" title="${k}: ${v}"><b>${v}</b><span>${MN[+k.slice(5)-1]}</span></div>`}).join('')}</div>
+ <div class="sthm" aria-label="Partite per giorno della settimana">${s.wd.map((v,i)=>`<div class="sth" style="--a:${(v/wmx).toFixed(2)};color:${v/wmx>.45?'#fff':'var(--b)'}" title="${DN[i]}: ${v}"><b>${v}</b><span>${DN[i]}</span></div>`).join('')}</div>
+ <div class="sthm sthm12" aria-label="Partite per mese">${ks.map(k=>{const v=s.mo.get(k)||0;return `<div class="sth" style="--a:${(v/mmx).toFixed(2)};color:${v/mmx>.45?'#fff':'var(--b)'}" title="${k}: ${v}"><b>${v}</b><span>${MN[+k.slice(5)-1]}</span></div>`}).join('')}</div>
  ${spark(s.mo)}
  <div class="stg">${box(s.bw,'serie vittorie max')}${box(s.cw,'serie vittorie attuale')}${box(s.bs,'serate di fila max')}${box(s.topM?`${MN[+s.topM[0].slice(5)-1]} ${s.topM[0].slice(0,4)}`:'—','mese più attivo'+(s.topM?` (${s.topM[1]})`:''))}${box(s.dates?String(Math.round(10*s.n/s.dates)/10).replace('.',','):'—','partite per serata')}</div></details>`;
  if(own)o+=`<label class="stpub"><input type="checkbox" id="stpub"${m.statsPub?' checked':''}><span><b>Rendi pubbliche le mie statistiche</b><br><span class="muted sm">(gli altri soci vedranno solo i numeri aggregati, mai nemesi, vittima o bilanci con le persone)</span></span></label>`;

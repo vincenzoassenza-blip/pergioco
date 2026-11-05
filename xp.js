@@ -10,8 +10,8 @@ const XP={map:{},rt:[],me:null,p:null,
    if(!a.error){const m={};(a.data||[]).forEach(r=>m[r.member_id]=r);this.map=m}
    if(!b.error)this.rt=b.data||[];
    if(u){const ms=await DB.members();const me=ms.find(m=>m.userId===u.id);this.me=me?me.id:null}}catch(e){console.warn('XP',e)}}};
-const cpCamp=id=>!!id&&typeof CP!=='undefined'&&CP.camp===id;
-const lv=id=>{const k=cpCamp(id)?' <span class="lv lvchamp" title="Campione in carica della Coppa Antero">👑</span>':'';const r=id&&XP.map[id];if(!r)return k;const i=lvInfo(r.level);return` <span class="lv" style="background:${i.color}" title="${i.title} · ${r.xp} XP">Lv ${r.level}</span>`+k};
+const cpCamp=id=>!!id&&typeof CP!=='undefined'&&MOD.on('coppa')&&CP.camp===id;
+const lv=id=>{const k=cpCamp(id)?' <span class="lv lvchamp" title="Campione in carica · '+esc(MOD.nome('coppa'))+'">👑</span>':'';const r=id&&XP.map[id];if(!r)return k;const i=lvInfo(r.level);return` <span class="lv" style="background:${i.color}" title="${i.title} · ${r.xp} XP">Lv ${r.level}</span>`+k};
 const champH=(id,h)=>cpCamp(id)?`<span class="champ">${h}</span>`:h;
 const nmH=m=>champH(m&&m.id,esc(memberName(m)))+(m?lv(m.id):'');
 const lbH=(x,ms)=>champH(x&&x.memberId,esc(Stats.label(x,ms)))+(x&&x.memberId?lv(x.memberId):'');
@@ -19,7 +19,7 @@ const XP_SRC=[['partite','🎲 Partite',10],['vittorie','🏆 Vittorie',5],['ser
 function xpCard(id){const r=XP.map[id];if(!r)return'';const i=lvInfo(r.level),a=xpFor(r.level),b=xpFor(r.level+1),pc=Math.round((r.xp-a)/(b-a)*100),d=r.dettaglio||{};
  return`<div class="card xpc"><div class="row" style="align-items:center;justify-content:space-between"><div><span class="lv lvb" style="background:${i.color}">Lv ${r.level}</span> <b style="color:${i.color}">${i.title}</b></div><b>${r.xp} XP</b></div>
  <div class="xpbar"><i style="width:${pc}%;background:${i.color}"></i></div><div class="muted" style="font-size:12px">${b-r.xp} XP al livello ${r.level+1}</div>
- <details><summary class="muted" style="font-size:13px">Da dove arrivano i punti</summary>${XP_SRC.map(([k,l,p])=>{const v=d[k]||[0,0];return`<div class="rec"><span>${l} <span class="muted">${v[0]} × ${p}</span></span><b>+${v[1]}</b></div>`}).join('')}</details></div>`}
+ <details><summary class="muted" style="font-size:13px">Da dove arrivano i punti</summary>${XP_SRC.map(([k,l,p])=>{const v=d[k]||[0,0];if(/^coppa/.test(k)&&!MOD.on('coppa')&&!v[1])return'';return`<div class="rec"><span>${l} <span class="muted">${v[0]} × ${p}</span></span><b>+${v[1]}</b></div>`}).join('')}</details></div>`}
 const Rate={
  of(g){return XP.rt.filter(r=>r.game_id===g)},
  avg(g){const l=this.of(g);return{n:l.length,a:l.length?l.reduce((s,r)=>s+r.voto,0)/l.length:null}},
@@ -89,7 +89,7 @@ const RA={
   add('🧞','Genio della lampada – Più desideri avverati',S('avverati'),v=>pl(v,'desiderio avverato','desideri avverati'));
   add('🗳️','Più voti ai desideri',S('voti'),v=>pl(v,'voto','voti'));
   add('🎓','Più giochi da spiegare',S('spiego'),v=>pl(v,'gioco','giochi'));
-  add('👑','Più Coppe Antero vinte',S('coppe'),v=>pl(v,'coppa','coppe'));
-  add('🥊','Più incontri vinti in Coppa',S('coppa_vinti'),v=>pl(v,'incontro','incontri'));
+  if(MOD.on('coppa')){add('👑','Più vittorie · '+MOD.nome('coppa'),S('coppe'),v=>pl(v,'vittoria','vittorie'));
+  add('🥊','Più incontri vinti · '+MOD.nome('coppa'),S('coppa_vinti'),v=>pl(v,'incontro','incontri'))}
   return out.map(([ic,t,h,v])=>`<div class="roc"><span class="roi">${ic}</span><span class="rot">${esc(t)}</span><span class="roh roh2">${h}</span><span class="rov2">${esc(v)}</span></div>`).join('')},
  async mount(){const g=typeof V!=='undefined'&&V.querySelector('.rov');if(!g||g.dataset.ra)return;g.dataset.ra='1';try{g.insertAdjacentHTML('beforeend',await RA.html())}catch(e){console.warn('RA',e)}}};

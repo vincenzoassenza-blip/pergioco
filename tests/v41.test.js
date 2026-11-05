@@ -11,14 +11,14 @@ const mk=async(role,row)=>{const errs=[];const p=await (await b.newContext({serv
 // 1) fallback: nessuna riga → valori PerGioco
 let {p,errs}=await mk('socio',null);await p.evaluate(()=>BRAND.load(true));
 let r=await p.evaluate(()=>({b:document.querySelector('header .brand').textContent,t:document.title,v:APP_VERSION,n:BRAND.v.nome,c:getComputedStyle(document.documentElement).getPropertyValue('--b').trim()}));
-chk(r.b==='PerGioco'&&/^PerGioco/.test(r.t)&&r.n==='PerGioco'&&r.c==='#14254a','fallback PerGioco '+JSON.stringify(r));chk(r.v==='41.0','APP_VERSION 41.0');
+chk(r.b==='PerGioco'&&/^PerGioco/.test(r.t)&&r.n==='PerGioco'&&r.c==='#14254a','fallback PerGioco '+JSON.stringify(r));chk(/^41\.\d/.test(r.v),'APP_VERSION 41.x');
 // 2) config applicata + XSS
 ({p,errs}=await mk('socio',{nome:XN,motto:'<b>m</b>',citta:'Modica',instagram:'prova_ig',colori:{primario:'#112233',secondario:'#223344',accento:'#ff0000',sfondo:'#eeeeee'}}));
 await p.evaluate(()=>BRAND.load(true));await p.evaluate(()=>go('altro'));await p.waitForTimeout(800);
 r=await p.evaluate(()=>({b:document.querySelector('header .brand').textContent,bh:document.querySelector('header .brand').innerHTML,t:document.title,c:getComputedStyle(document.documentElement).getPropertyValue('--b').trim(),
  a:getComputedStyle(document.documentElement).getPropertyValue('--a').trim(),foot:V.innerText,fh:V.innerHTML,xss:window.XSS,ig:IG.url,cache:localStorage.getItem('pergioco-brand')}));
 chk(r.b===XN&&!/<img/.test(r.bh),'nome nella barra come testo');chk(r.t.startsWith(XN),'titolo pagina dal config');chk(r.c==='#112233'&&r.a==='#ff0000','colori come variabili CSS');
-chk(/v41\.0/.test(r.foot)&&/Modica/.test(r.foot)&&!/<img src=x/.test(r.fh.replace(/&lt;img src=x/g,'')),'piè di pagina Altro dal config, escapato');chk(!r.xss,'nessun XSS');
+chk(/v41\.\d/.test(r.foot)&&/Modica/.test(r.foot)&&!/<img src=x/.test(r.fh.replace(/&lt;img src=x/g,'')),'piè di pagina Altro dal config, escapato');chk(!r.xss,'nessun XSS');
 chk(r.ig==='https://www.instagram.com/prova_ig/','Instagram dal config');chk(r.cache&&JSON.parse(r.cache).citta==='Modica','cache locale salvata');
 chk(!await p.evaluate(()=>!!document.getElementById('acfg')),'socio: niente pulsante Configurazione');
 await p.evaluate(()=>go('config'));await p.waitForTimeout(500);chk(!await p.evaluate(()=>!!document.getElementById('cfsave')),'socio: vista config bloccata');
@@ -42,7 +42,7 @@ r=await p.evaluate(()=>({u:UPS[0],b:document.querySelector('header .brand').text
 chk(r.u&&r.u.t==='app_settings'&&r.u.x.key==='brand'&&r.u.x.value.nome==='Associazione Prova'&&r.u.x.value.instagram==='prova.ig'&&r.u.x.value.colori.accento==='#00aa9e','upsert brand');chk(r.b==='Associazione Prova','barra aggiornata dopo il salvataggio');
 // sorgenti
 const idx=fs.readFileSync('index.html','utf8'),sw=fs.readFileSync('sw.js','utf8'),sql=fs.readFileSync('supabase/migrate-v41.sql','utf8');
-chk(/const C='pergioco-v41\.0'/.test(sw)&&/brand\.js\?v=41\.0/.test(sw)&&/brand\.js\?v=41\.0[^]*app\.js\?v=41\.0/.test(idx)&&!/v=40\./.test(idx+sw),'versione 41.0 ovunque, brand.js prima di app.js');
+chk(/const C='pergioco-v41\.\d'/.test(sw)&&/brand\.js\?v=41\.\d/.test(sw)&&/brand\.js\?v=41\.\d[^]*app\.js\?v=41\.\d/.test(idx)&&!/v=40\./.test(idx+sw),'versione 41.0 ovunque, brand.js prima di app.js');
 chk(!/· v37\.8|@pergiocoets'|Statistiche PerGioco/.test(fs.readFileSync('app.js','utf8')+fs.readFileSync('ig.js','utf8')+fs.readFileSync('stats.js','utf8')),'niente branding fisso residuo');
 chk(/revoke all on public\.app_settings from anon/i.test(sql)&&/brand_valid/.test(sql),'SQL: anon revocato e vincolo');
 chk(!errs.length,'nessun errore JS '+errs.join('|'));
