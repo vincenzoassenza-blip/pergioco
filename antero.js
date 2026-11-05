@@ -50,9 +50,10 @@ const FRASI_SANTINO=['«Il mio nome non è una meccanica: è una dottrina.»','�
 const FRASI_GIUDIZIO=['Sant\'Antero ha visto. Sant\'Antero approva (più o meno).','Antero scelte: il Santo prende appunti.','Il Santo annuisce solennemente.','Giudizio emesso: continuate pure, figlioli.'];
 
 async function openAntero(){
+ if(!MOD.on('sfida'))return;
  if(!(typeof adminMode==='function'&&adminMode()))return toast('🔒 Riservato allo staff');
  document.querySelector('.ant')?.remove();
- const o=document.createElement('div');o.className='ant'+(ANT.festa()?' festa':'');o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','La Sfida di Antero');
+ const o=document.createElement('div');o.className='ant'+(ANT.festa()?' festa':'');o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label',MOD.nome('sfida'));
  const M=document.createElement('div');o.append(M);document.body.append(o);document.body.classList.add('antopen');
  let tab='torneo',all=[],T=null,timer=null,nsc=0,taps=0,tapT=0;
  const today=ANT.oggi();
@@ -65,7 +66,7 @@ async function openAntero(){
  const banner=(html,cls='',ms=2600)=>{const b=document.createElement('div');b.className='antban '+cls;b.innerHTML=html;b.setAttribute('role','status');o.append(b);setTimeout(()=>b.remove(),ms);return b};
  const att=()=>all.filter(m=>m.attiva);
  const lbl=m=>`<span class="antemo" aria-hidden="true">${esc(m.emoji||'🎲')}</span><span class="antnm">${esc(m.nome)}</span>`;
- const shell=()=>{M.innerHTML=`<div class="anthd"><button class="antx" aria-label="Chiudi">✕</button><h2 id="antt" tabindex="0">⚖️ La Sfida di Antero</h2>
+ const shell=()=>{M.innerHTML=`<div class="anthd"><button class="antx" aria-label="Chiudi">✕</button><h2 id="antt" tabindex="0">⚖️ ${esc(MOD.nome('sfida'))}</h2>
   <div class="antcal">📜 Oggi è il ${esc(ANT.data(today))}</div>${ANT.festa()?'<div class="antfesta">🎉 Oggi è Sant\'Antero! Festa grande, ma con antero coriandoli al massimo 🎉</div>':''}
   <div class="seg"><button data-at="torneo" class="${tab==='torneo'?'on':''}">🏆 Torneo</button><button data-at="mecc" class="${tab==='mecc'?'on':''}">🧩 Meccaniche</button><button data-at="albo" class="${tab==='albo'?'on':''}">📜 Prescelti</button></div></div>
   <div id="anterr" class="anterr" hidden></div><div class="antbody" id="antb"></div>`;
@@ -138,5 +139,5 @@ async function openAntero(){
   let k=5;const t=setInterval(()=>{k--;const cd=s.querySelector('#antcd');if(cd)cd.textContent=k>0?`Ancora ${ANT.num(k)} secondi di raccoglimento…`:'';if(k<=0){clearInterval(t);s.remove();els.forEach(e=>{e.disabled=false;if(e.tagName==='INPUT'&&e.id==='antnn')e.value=''})}},1000)};
  // ---- albo d'oro ----
  const drawA=async(B)=>{const l=(await ANTDB.albo()).slice(0,ANT.MAX);
-  B.innerHTML=`<div class="card"><h3>📜 I Prescelti di Antero</h3><p class="muted">Le ultime antero vincitrici (di più non si può, ovviamente).</p>${l.length?l.map((r,i)=>`<div class="rec"><span><b>${esc(ANT.num(i+1))}.</b> ${lbl(r)}${r.santificata?' <span title="Vittoria santificata">😇</span>':''}</span><span class="muted">${esc(ANT.data(String(r.created_at).slice(0,10)).replace(/, anno.*/,''))}</span></div>`).join(''):'<p class="muted">Nessun prescelto ancora. Il Santo attende.</p>'}</div>`};
+  B.innerHTML=`<div class="card"><h3>📜 Albo d'oro · ${esc(MOD.nome('sfida'))}</h3><p class="muted">Le ultime antero vincitrici (di più non si può, ovviamente).</p>${l.length?l.map((r,i)=>`<div class="rec"><span><b>${esc(ANT.num(i+1))}.</b> ${lbl(r)}${r.santificata?' <span title="Vittoria santificata">😇</span>':''}</span><span class="muted">${esc(ANT.data(String(r.created_at).slice(0,10)).replace(/, anno.*/,''))}</span></div>`).join(''):'<p class="muted">Nessun prescelto ancora. Il Santo attende.</p>'}</div>`};
  try{all=await ANTDB.mecc();await draw()}catch(e){shell();err(e)}}

@@ -24,12 +24,13 @@ BADGES.push(['cpart','🏆','Coppa Antero','Partecipa a una Coppa Antero',s=>s.c
  ['ccamp','👑','Campione della Coppa','Vinci una Coppa Antero',s=>s.cpCamp>=1],['cimb','🛡️','Imbattibile','Vinci tutti gli incontri di una Coppa (almeno 3 turni)',s=>!!s.cpImb],
  ['cgig','🪓','Ammazzagiganti','Batti chi poi vince la Coppa',s=>!!s.cpGiant],['crim','📈','Rimonta','Perdi il primo turno e chiudi sul podio',s=>!!s.cpRim],
  ['cvet','🎖️','Veterano della Coppa','Partecipa a 3 edizioni della Coppa',s=>s.cpN>=3]);
+{const _bl=Badges.list,CPB=['cpart','cpod','ccamp','cimb','cgig','crim','cvet'];Badges.list=function(...a){const l=_bl.apply(this,a);return MOD.on('coppa')?l:l.filter(b=>!CPB.includes(b.id))}}
 {const _bs=Badges.stats;Badges.stats=function(k,o){return Object.assign(_bs.call(this,k,o),CP.bstats(k))}}
 {const _xl=XP.load.bind(XP);XP.load=async function(){await _xl();await CP.load()}}
 const cpMsg=e=>{const r=errSpiega(e,'COPPA');return `⚠️ ${r.msg} [${r.code}]`};
 async function cpCard(){if(!CP.cl())return'';if(!CP.d)await CP.load();const d=CP.d;if(!d)return'';const st=!!d.staff,c=(d.coppe||[]).filter(x=>st||x.stato!=='bozza')[0];
- if(!c)return st?`<div class="card cpc"><div class="hrow"><b>🏆 Coppa Antero</b><button class="p" id="cpnew">➕ Crea la prima edizione</button></div><p class="muted">Torneo svizzero 1 contro 1 o a tavoli da 3–4: nessun tavolo ripetuto, mai lo stesso gioco due volte.</p></div>`:'';
- return`<div class="card cpc" data-cp="${esc(c.id)}" role="button"><div class="hrow"><b>🏆 Coppa Antero ${esc(CP.rom(c.edizione))}</b><span class="evb st">${esc(CP.STATI[c.stato]||c.stato)}</span></div>
+ if(!c)return st?`<div class="card cpc"><div class="hrow"><b>🏆 ${esc(MOD.nome('coppa'))}</b><button class="p" id="cpnew">➕ Crea la prima edizione</button></div><p class="muted">Torneo svizzero 1 contro 1 o a tavoli da 3–4: nessun tavolo ripetuto, mai lo stesso gioco due volte.</p></div>`:'';
+ return`<div class="card cpc" data-cp="${esc(c.id)}" role="button"><div class="hrow"><b>🏆 ${esc(MOD.nome('coppa'))} ${esc(CP.rom(c.edizione))}</b><span class="evb st">${esc(CP.STATI[c.stato]||c.stato)}</span></div>
  <p class="muted">${cpDur(c)?'📅 '+esc(cpDur(c))+' · ':''}${c.stato==='in_corso'?esc(CP.turno(c.turno))+' di '+c.turni:c.turni+' turni'} · ${esc(CP.FMT[c.formato]||'1 contro 1')} · ${c.iscritti} iscritt${c.iscritti==1?'o':'i'}${c.stato==='concluso'&&c.campione?' · 👑 '+cpNome(c.campione):''}</p>
  ${st&&c.stato==='concluso'?'<button class="s" id="cpnew">➕ Nuova edizione</button>':''}</div>`}
 const cpD=d=>{const x=new Date(d+'T12:00:00');return isNaN(x)?'':x.toLocaleDateString('it-IT',{day:'numeric',month:'short'})};
@@ -37,12 +38,12 @@ const cpDur=c=>c.data_inizio&&c.data_fine?`dal ${cpD(c.data_inizio)} al ${cpD(c.
 let _cpMs=[];const cpNome=id=>{const m=_cpMs.find(m=>m.id===id);return m?nmH(m):'<span class="muted">Socio</span>'};
 async function cpBind(){V.querySelectorAll('[data-cp]').forEach(e=>e.onclick=ev=>{if(ev.target.closest('button'))return;window._cpId=e.dataset.cp;go('coppa')});
  const n=$('#cpnew');if(n)n.onclick=async()=>{try{const id=await CP.rpc('coppa_crea',{p_turni:3,p_pool:[],p_formato:'1v1'});await CP.load();window._cpId=id;go('coppa')}catch(e){toast(cpMsg(e))}}}
-const _evv=views.eventi;views.eventi=async(...a)=>{await _evv(...a);if(window._cur!=='eventi')return;_cpMs=await DB.members();const h=await cpCard();if(!h||window._cur!=='eventi'||$('.cpc'))return;
+const _evv=views.eventi;views.eventi=async(...a)=>{await _evv(...a);if(window._cur!=='eventi'||!MOD.on('coppa'))return;_cpMs=await DB.members();const h=await cpCard();if(!h||window._cur!=='eventi'||$('.cpc'))return;
  const at=V.querySelector('.hrow')||V.querySelector('h2');at.insertAdjacentHTML('afterend',h);cpBind()};
-views.coppa=async function(){clearInterval(window._cpT);const id=window._cpId||(CP.d&&CP.d.coppe[0]||{}).id;if(!id){go('eventi');return}
- V.innerHTML='<h2>🏆 Coppa Antero</h2><p class="muted">Caricamento…</p>';
- let v,gs;try{[v,gs,_cpMs]=await Promise.all([CP.rpc('coppa_vista',{p:id}),DB.games(),DB.members()])}catch(e){V.innerHTML=`<h2>🏆 Coppa Antero</h2><p class="warn">${esc(cpMsg(e))}</p>`;return}
- if(!v||!v.coppa){V.innerHTML='<h2>🏆 Coppa Antero</h2><p class="muted">Coppa non trovata.</p>';return}
+views.coppa=async function(){clearInterval(window._cpT);if(!MOD.on('coppa')){go('eventi');return}const id=window._cpId||(CP.d&&CP.d.coppe[0]||{}).id;if(!id){go('eventi');return}
+ V.innerHTML='<h2>🏆 '+esc(MOD.nome('coppa'))+'</h2><p class="muted">Caricamento…</p>';
+ let v,gs;try{[v,gs,_cpMs]=await Promise.all([CP.rpc('coppa_vista',{p:id}),DB.games(),DB.members()])}catch(e){V.innerHTML=`<h2>🏆 ${esc(MOD.nome('coppa'))}</h2><p class="warn">${esc(cpMsg(e))}</p>`;return}
+ if(!v||!v.coppa){V.innerHTML='<h2>🏆 '+esc(MOD.nome('coppa'))+'</h2><p class="muted">Torneo non trovato.</p>';return}
  const c=v.coppa,st=!!v.staff,me=v.me,gn=g=>esc((gs.find(x=>x.id===g)||{}).name||'Gioco'),nm=cpNome,inc=v.incontri||[],cur=c.stato==='in_corso'?c.turno:0,F=c.formato||'1v1',T1=F==='1v1',tav=v.tavoli||[];
  const lo=f=>f==='tavoli'?3:2,hi=f=>f==='1v1'?2:4,fit=(g,f)=>(+g.min||1)<=hi(f)&&(+g.max||99)>=lo(f),okG=g=>!g.coop&&!g.isExp&&fit(g,'misto'),pool=c.pool||[];
  const cfg=st&&c.stato!=='concluso'?`<details class="card" ${c.stato==='bozza'?'open':''}><summary><b>⚙️ Configurazione (staff)</b></summary>
@@ -77,9 +78,9 @@ views.coppa=async function(){clearInterval(window._cpT);const id=window._cpId||(
   <p class="muted" style="font-size:12px">Ordine: vittorie → scontro diretto → ranking → forza degli avversari.</p></div>`:'';
  const allIn=cur&&(T1?!inc.some(i=>i.turno===cur&&!i.vincitore):!tav.some(t=>t.turno===cur&&(t.membri||[]).length>1&&!Object.keys(t.posizioni||{}).length));
  const act=st?(c.stato==='bozza'?`<button class="p" id="cpapri"${pool.length<c.turni?' disabled':''}>✍️ Apri iscrizioni</button>`:c.stato==='iscrizioni'?`<button class="p" id="cpavvia"${v.iscritti.length<(F==='tavoli'?3:2)?' disabled':''}>⚔️ Avvia la Coppa (${v.iscritti.length} iscritti)</button>`:c.stato==='in_corso'?`<button class="p" id="cpnext"${allIn?'':' disabled'}>${c.turno<c.turni?'➡️ Genera '+esc(CP.turno(c.turno+1)):'👑 Concludi e incorona'}</button>${allIn?'':'<p class="muted">Servono tutti i risultati del turno.</p>'}`:''):'';
- V.innerHTML=`<div class="hrow"><h2>🏆 Coppa Antero <span class="cpn">${esc(CP.rom(c.edizione))}</span></h2><button class="s" id="cpback">← Eventi</button></div>
+ V.innerHTML=`<div class="hrow"><h2>🏆 ${esc(MOD.nome('coppa'))} <span class="cpn">${esc(CP.rom(c.edizione))}</span></h2><button class="s" id="cpback">← Eventi</button></div>
  <div class="evtags"><span class="evb st">${esc(CP.STATI[c.stato]||c.stato)}</span><span class="evb t">${esc(CP.FMT[F]||F)}</span><span class="evb t">${c.turni} turni</span>${c.stato==='in_corso'?`<span class="evb t">${esc(CP.turno(c.turno))}</span>`:''}<span class="evb t">${pool.length} giochi nel pool</span>${cpDur(c)?`<span class="evb t">📅 ${esc(cpDur(c))}</span>`:''}</div>
- ${c.stato==='concluso'&&c.campione?`<div class="card cpking">👑 <b>${nm(c.campione)}</b> incoronato da Sant'Antero<div class="muted">Campione della Coppa Antero ${esc(CP.rom(c.edizione))}</div></div>`:''}
+ ${c.stato==='concluso'&&c.campione?`<div class="card cpking">👑 <b>${nm(c.campione)}</b> incoronato da Sant'Antero<div class="muted">Campione · ${esc(MOD.nome('coppa'))} ${esc(CP.rom(c.edizione))}</div></div>`:''}
  ${act?`<div class="card">${act}</div>`:''}${cfg}${tab}${cla}${c.stato!=='in_corso'&&c.stato!=='concluso'||!turni.length?isc:''}
  <p class="muted" style="font-size:12px">${T1?'':'Regole: mai due volte lo stesso tavolo, si cerca di non ritrovare gli stessi avversari; i tavoli sono equilibrati per punti e ranking; ogni tavolo gioca un gioco adatto al numero di giocatori, mai già giocato da nessuno di loro, scelto per favorire chi ha meno vittorie. '+(F==='tavoli'?'Con 5 iscritti uno riposa (1,5 punti, al massimo una volta).':'I tavoli da 2 si usano solo se inevitabili.')}</p><p class="muted" style="font-size:12px"${T1?'':' hidden'}>Regole: niente rivincite, nessun gioco si ripete per lo stesso giocatore, a chi ha meno vittorie toccano giochi più favorevoli. Con giocatori dispari uno riposa (vittoria a tavolino, al massimo una volta).</p>`;
  const re=()=>views.coppa(),run=async(f,ok)=>{try{await f();if(ok)toast(ok);await CP.load();re()}catch(e){toast(cpMsg(e))}};
@@ -105,11 +106,11 @@ views.coppa=async function(){clearInterval(window._cpT);const id=window._cpId||(
    await CP.rpc('coppa_date',{p:c.id,p_inizio:di,p_fine:df,p_scadenze:sc})},'Configurazione salvata')}
  if(c.stato==='in_corso')window._cpT=setInterval(()=>{if(window._cur!=='coppa'){clearInterval(window._cpT);return}if(!document.activeElement||document.activeElement===document.body)re()},20000)};
 // Record: top 5 dell'ultima Coppa (fino alla prossima), più Coppe vinte, albo d'oro
-const _rec=views.record;views.record=async(...a)=>{await _rec(...a);if(!CP.cl())return;if(!CP.d)await CP.load();const d=CP.d;if(!d||window._cur!=='record')return;
+const _rec=views.record;views.record=async(...a)=>{await _rec(...a);if(!CP.cl()||!MOD.on('coppa'))return;if(!CP.d)await CP.load();const d=CP.d;if(!d||window._cur!=='record')return;
  const cs=(d.coppe||[]).filter(c=>c.stato==='concluso');if(!cs.length)return;_cpMs=await DB.members();const u=cs[0];
  const top=(d.finali||[]).filter(f=>f.c===u.id).sort((a,b)=>a.pos-b.pos).slice(0,5),cnt={};cs.forEach(c=>c.campione&&(cnt[c.campione]=(cnt[c.campione]||0)+1));
  const best=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);const max=best.length?best[0][1]:0;
- V.insertAdjacentHTML('beforeend',`<h3 class="rsec">🏆 Coppa Antero</h3><div class="card cpc" data-cp="${esc(u.id)}" role="button"><b>Top 5 · Edizione ${esc(CP.rom(u.edizione))}</b>
+ V.insertAdjacentHTML('beforeend',`<h3 class="rsec">🏆 ${esc(MOD.nome('coppa'))}</h3><div class="card cpc" data-cp="${esc(u.id)}" role="button"><b>Top 5 · Edizione ${esc(CP.rom(u.edizione))}</b>
  <ol class="cptop">${top.map(f=>`<li>${['🥇','🥈','🥉','4°','5°'][f.pos-1]||f.pos} ${cpNome(f.m)} <span class="muted">${u.formato&&u.formato!=='1v1'?esc(String(+f.pt).replace('.',','))+' punti':f.v+' vittorie'}</span></li>`).join('')}</ol></div>
- <div class="rov"><div class="roc"><span class="roi">👑</span><span class="rot">Più Coppe Antero vinte</span><span class="roh">${best.filter(b=>b[1]===max).map(b=>cpNome(b[0])).join(', ')}</span><span class="rov2">${max} ${max==1?'Coppa':'Coppe'}</span></div></div>
+ <div class="rov"><div class="roc"><span class="roi">👑</span><span class="rot">Più vittorie · ${esc(MOD.nome('coppa'))}</span><span class="roh">${best.filter(b=>b[1]===max).map(b=>cpNome(b[0])).join(', ')}</span><span class="rov2">${max} ${max==1?'Coppa':'Coppe'}</span></div></div>
  <div class="card"><b>📜 Albo d'oro</b>${cs.map(c=>`<div class="row" style="margin-top:4px"><span>Edizione ${esc(CP.rom(c.edizione))}</span><span>${c.campione?cpNome(c.campione):'—'}</span></div>`).join('')}</div>`);cpBind()};

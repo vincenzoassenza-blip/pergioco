@@ -392,3 +392,5 @@ details[open]>summary::after{content:'▾'}
 .cfprev{margin:12px 0;border-radius:12px;overflow:hidden;border:1px solid #dfe3ee;background:var(--bg)}.cfbar{background:var(--b);color:#fff;padding:10px 12px}.cfbar b{display:block;font-size:18px}.cfbar small{opacity:.75}
 .cfbody{padding:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.cfbody .p{background:var(--b)}.cfbody .kw{background:color-mix(in srgb,var(--a) 35%,#fff)}.cfbody a{color:var(--b2);text-decoration:none;font-weight:600}
 .cfbody button.p{width:auto;margin-top:0}
+/* v41.1 moduli */
+.cfmod{padding:8px 0;border-bottom:1px solid #eef0f5}.cfmod:last-child{border-bottom:0}.cfsw{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0;cursor:pointer}.cfsw input{width:20px;height:20px;margin:0;flex:none;accent-color:var(--b)}.cfmf{margin:6px 0 0 28px}

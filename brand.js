@@ -2,7 +2,7 @@
 // Fonte: public.app_settings chiave 'brand' (lettura solo utenti autenticati; scrittura solo admin + CHECK lato server).
 // Prima del login (o se il DB non risponde) si usano l'ultima copia salvata sul telefono o i valori PerGioco.
 // Tutti i valori sono testo dell'utente: mostrarli SEMPRE con esc()/textContent; i loghi solo in <img src> validati.
-const APP_VERSION='41.0';
+const APP_VERSION='41.1';
 const BRAND_DEF=Object.freeze({nome:'PerGioco',motto:'Gioca, prenota, condividi',citta:'Ragusa',instagram:'pergiocoets',email:'info@pergioco.org',logo:'',logo_barra:'',
  colori:Object.freeze({primario:'#14254a',secondario:'#2a4785',accento:'#f2b134',sfondo:'#f4f6fb'})});
 const BRAND={
@@ -39,3 +39,26 @@ const BRAND={
 };
 BRAND.v=BRAND.norm(BRAND.cached());
 if(document.readyState==='loading')addEventListener('DOMContentLoaded',()=>BRAND.apply(),{once:true});else BRAND.apply();
+// v41.1 (A2) — moduli configurabili: Coppa, Sfida (staff), Libri sociali. Riga app_settings key='moduli' (vincolo DB moduli_valid, scrittura solo admin).
+const MOD_DEF=Object.freeze({coppa:{attivo:true,nome:'Coppa Antero',desc:"Torneo svizzero dell'associazione"},sfida:{attivo:true,nome:'Sfida di Antero',desc:'Torneo tra meccaniche (staff)'},libri:{attivo:true}});
+const MOD={KEY:'pergioco-moduli',v:null,loaded:false,NOMI:['coppa','sfida'],BAD:/[<>]/,
+ norm(x){const o={};x=x&&typeof x==='object'?x:{};for(const k of Object.keys(MOD_DEF)){const d=MOD_DEF[k],m=x[k]&&typeof x[k]==='object'?x[k]:{};o[k]={attivo:typeof m.attivo==='boolean'?m.attivo:d.attivo};
+  if('nome' in d){const n=typeof m.nome==='string'?m.nome.trim():'';o[k].nome=n.length>=2&&n.length<=40&&!this.BAD.test(n)?n:d.nome;const s=typeof m.desc==='string'?m.desc.trim():'';o[k].desc=s.length<=120&&!this.BAD.test(s)?s:d.desc}}return o},
+ errors(x){const e=[],L={coppa:'Torneo a coppa',sfida:'Sfida tra meccaniche'};for(const k of this.NOMI){const m=x[k]||{},n=String(m.nome||'').trim(),s=String(m.desc||'');
+  if(n.length<2||n.length>40)e.push(L[k]+': il nome deve avere da 2 a 40 caratteri');else if(this.BAD.test(n))e.push(L[k]+': il nome non può contenere < o >');
+  if(s.length>120)e.push(L[k]+': descrizione troppo lunga (max 120)');else if(this.BAD.test(s))e.push(L[k]+': la descrizione non può contenere < o >')}return e},
+ on(k){return !!(this.v[k]&&this.v[k].attivo)},nome(k){return(this.v[k]&&this.v[k].nome)||MOD_DEF[k].nome},desc(k){return(this.v[k]&&this.v[k].desc)||''},
+ cached(){try{return JSON.parse(localStorage.getItem(this.KEY)||'null')}catch(e){return null}},
+ async load(force){if(this.loaded&&!force)return this.v;const c=BRAND.cl();if(!c)return this.v;
+  try{const{data,error}=await c.from('app_settings').select('value').eq('key','moduli').maybeSingle();if(error)throw error;this.loaded=true;
+   if(data&&data.value){this.v=this.norm(data.value);try{localStorage.setItem(this.KEY,JSON.stringify(this.v))}catch(e){}this.apply()}}catch(e){console.warn('moduli',e)}return this.v},
+ async save(x){const c=BRAND.cl();if(!c)throw new Error('Serve la connessione al database');const err=this.errors(x);if(err.length)throw Object.assign(new Error(err.join(' · ')),{val:true});const v=this.norm(x);
+  const{error}=await c.from('app_settings').upsert({key:'moduli',value:v});if(error)throw error;this.v=v;try{localStorage.setItem(this.KEY,JSON.stringify(v))}catch(e){}this.apply();return v},
+ // testi statici (badge, fonti XP, nomi schermate errori) col nome configurato
+ apply(){const n=this.nome('coppa'),R=s=>typeof s==='string'?s.replace(/Coppa Antero/g,n):s;
+  if(typeof BADGES!=='undefined')BADGES.forEach(b=>{if(!b._o)b._o=[b[2],b[3]];b[2]=R(b._o[0]);b[3]=R(b._o[1])});
+  if(typeof XP_SRC!=='undefined')XP_SRC.forEach(x=>{if(!x._o)x._o=x[1];x[1]=R(x._o)});
+  if(typeof ERR_AREE!=='undefined'){if(!ERR_AREE._oc)ERR_AREE._oc=ERR_AREE.COPPA;ERR_AREE.COPPA=R(ERR_AREE._oc)}
+  if(typeof ERR_SCHERMI!=='undefined'&&ERR_SCHERMI.coppa)ERR_SCHERMI.coppa[0]=n}};
+MOD.v=MOD.norm(MOD.cached());
+document.addEventListener('DOMContentLoaded',()=>MOD.apply());

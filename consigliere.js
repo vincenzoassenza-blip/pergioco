@@ -100,7 +100,7 @@ const CT={
  cp:[(d,G)=>'Ognuno per sé, e alla fine uno solo esulta.',(d,G)=>'Sfida vera: preparatevi a contendervi la vittoria.',(d,G)=>'Un bel testa a testa, dove ogni punto conta.',
   (d,G)=>`${G.name} vi mette uno contro l'altro, con stile.`,(d,G)=>'Per chi ama la competizione sana.',(d,G)=>'Qui si gioca per vincere, e si vede.'],
  atm:[(d,G)=>`Ha proprio il sapore che cercate: ${CATN[d.a][0]}.`,(d,G)=>`Se volete ${CATN[d.a][1]}, qui ne trovate a volontà.`,(d,G)=>`È fatto apposta per ${CATN[d.a][2]}.`,
-  (d,G)=>`Atmosfera giusta: ${CATN[d.a][0]} dall'inizio alla fine.`,(d,G)=>`Uno dei titoli più adatti a ${CATN[d.a][1]} della nostra ludoteca.`,(d,G)=>`Punta tutto su ${CATN[d.a][2]}, proprio come chiedete.`],
+  (d,G)=>`Atmosfera giusta: ${CATN[d.a][0]} dall'inizio alla fine.`,(d,G)=>`Uno dei titoli più adatti a ${CATN[d.a][1]} della collezione dell'associazione.`,(d,G)=>`Punta tutto su ${CATN[d.a][2]}, proprio come chiedete.`],
  wt:[(d,G)=>d.w<2.7?`È ${cWt(d.w)}: regole che si spiegano senza fatica.`:`È ${cWt(d.w)}, ma ripaga ogni minuto di ragionamento.`,
   (d,G)=>`Complessità ${d.w.toFixed(1).replace('.',',')} su 5, giusta per il vostro livello.`,
   (d,G)=>d.w<2.2?'Si impara in cinque minuti e diverte subito.':d.w<3?'Ha regole di media complessità, senza mal di testa.':'Ha profondità da vendere per chi gioca spesso.',

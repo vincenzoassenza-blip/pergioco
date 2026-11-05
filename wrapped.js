@@ -12,7 +12,7 @@ const top=o=>Object.entries(o).sort((a,b)=>b[1]-a[1]||String(a[0]).localeCompare
 const nm=m=>m?String(m.soprannome||m.nome||'?'):'?';
 const ore=min=>min<90?Math.round(min)+' min':(Math.round(min/6)/10).toLocaleString('it-IT')+' ore';
 const fmtD=d=>{const[y,m,g]=d.split('-');return +g+' '+MESI[+m-1]+' '+y};
-const PAL=[['#14254a','#2a4785'],['#5b2a86','#c0399a'],['#0f6b5c','#1fb58f'],['#a33b20','#f2b134'],['#1d3c78','#3fa7d6'],['#6a1b3a','#e0556a'],['#2d2d6b','#7b5cd6'],['#21543a','#9ccc3c']];
+const PAL=[[BRAND.v.colori.primario,BRAND.v.colori.secondario],['#5b2a86','#c0399a'],['#0f6b5c','#1fb58f'],['#a33b20','#f2b134'],['#1d3c78','#3fa7d6'],['#6a1b3a','#e0556a'],['#2d2d6b','#7b5cd6'],['#21543a','#9ccc3c']];
 
 const WR={st:null,
  cl(){return window.CP_CLIENT||(DB.remote&&DB.remote.client)||null},
@@ -65,7 +65,7 @@ const WR={st:null,
 
  titolo(d){const share=d.topG[0]?d.topG[0].n/d.n:0;
   if(d.pct!=null&&d.pct>=55&&d.n>=8)return['👑','Il Campione di Sant\'Antero','Vinci così tanto che il Santo ti chiede consigli prima della processione.'];
-  if(d.nuovi>=8||d.diversi/d.n>0.7)return['🧭','L\'Esploratore della Ludoteca','Ogni scatola chiusa è una porta: Sant\'Antero ti ha visto aprirle tutte.'];
+  if(d.nuovi>=8||d.diversi/d.n>0.7)return['🧭','L\'Esploratore della Collezione','Ogni scatola chiusa è una porta: Sant\'Antero ti ha visto aprirle tutte.'];
   if(share>=0.4)return['💍','Il Fedelissimo','Un gioco, un amore. Nemmeno la festa di Sant\'Antero ti separa da '+d.topG[0].nome+'.'];
   if(d.coop>d.n/2)return['🤝','Lo Spirito di Squadra','Si vince insieme o si perde insieme: benedizione cooperativa di Sant\'Antero.'];
   if(d.sera.n>=5)return['🌙','L\'Animale da Serata','Quando gli altri sbadigliano tu chiedi "un\'altra?". Sant\'Antero chiude a chiave per ultimo.'];
@@ -103,7 +103,7 @@ const WR={st:null,
    {emoji:'🎲',k:'Insieme abbiamo giocato',big:d.n+' partite',sub:'circa '+ore(d.min)+' in '+d.serate+' serate',note:'Durate stimate dove non registrate'},
    {emoji:'👥',k:'Soci al tavolo',big:String(d.soci),sub:'soci attivi su '+d.giochi+' giochi diversi'},
    {emoji:'🏆',k:'I giochi dell\'anno',big:d.topG[0]?d.topG[0].nome:'—',sub:d.topG[0]?d.topG[0].n+' partite':'',list:d.topG.slice(1).map((g,i)=>(i+2)+'. '+g.nome+' · '+g.n)},
-   {emoji:'🌙',k:'Record',big:fmtD(d.sera.data),sub:'la serata più intensa: '+d.sera.n+' partite',list:['📅 Mese top: '+MESI[d.mese.m-1]+' ('+d.mese.n+')','🪑 Tavolo più grande: '+d.maxTav+' giocatori'].concat(d.nuoviLud?['📦 '+d.nuoviLud+' giochi nuovi in ludoteca']:[])},
+   {emoji:'🌙',k:'Record',big:fmtD(d.sera.data),sub:'la serata più intensa: '+d.sera.n+' partite',list:['📅 Mese top: '+MESI[d.mese.m-1]+' ('+d.mese.n+')','🪑 Tavolo più grande: '+d.maxTav+' giocatori'].concat(d.nuoviLud?['📦 '+d.nuoviLud+' giochi nuovi nella collezione']:[])},
    {emoji:'🙏',k:'Grazie!',big:'Viva PerGioco',sub:'E che Sant\'Antero benedica i dadi anche nel '+(d.anno+1)+'.',fin:true}]},
 
  // ---- visualizzatore a storie ----
