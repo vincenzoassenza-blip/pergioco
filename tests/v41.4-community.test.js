@@ -1,0 +1,45 @@
+// node tests/v41.4-community.test.js — v41.4: pagina Community secondo il mockup approvato
+const pw=require('playwright-core'),fs=require('fs');const {setup}=require('./screenshots-community.js');
+let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W=ms=>new Promise(r=>setTimeout(r,ms));
+(async()=>{const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome'});
+ for(const role of ['socio','staff']){const errs=[];let alerted=false;const R=s=>`[${role}] ${s}`;
+  const p=await setup(b,role,1600);p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{alerted=true;d.dismiss()});
+  const q=f=>p.evaluate(f);
+  // titolo + selettore
+  chk(await q(()=>document.querySelector('.cmtop h2').textContent==='👥 Community'&&[...document.querySelectorAll('[data-cmt]')].map(b=>b.textContent+(b.classList.contains('on')?'*':'')).join('|')==='Soci|🎁 Lista desideri*'&&document.getElementById('cmsoci').hidden&&!document.getElementById('dsw').hidden),R('titolo con selettore, Lista desideri attiva'));
+  chk(await q(async()=>{document.querySelector('[data-cmt="soci"]').click();await new Promise(r=>setTimeout(r,50));const a=!document.getElementById('cmsoci').hidden&&document.getElementById('dsw').hidden&&localStorage.getItem('pergioco-community-tab')==='soci';document.querySelector('[data-cmt="desideri"]').click();return a&&!document.getElementById('dsw').hidden}),R('selettore Soci/Lista desideri commuta e ricorda la scelta'));
+  // striscia unica
+  chk(await q(()=>document.querySelectorAll('.cmstrip').length===1&&document.querySelectorAll('.dsban').length===0&&/Voti aperti fino al 1 dic · 💡 tua proposta: Heat/.test(document.querySelector('.cmstrip').textContent)),R('striscia unica di stato'));
+  chk(await q(async()=>{const w=document.querySelector('.cmwin');const a=/Ultima vinta: Cascadia \(9 👍\)/.test(w.textContent)&&w.querySelector('.ar').textContent==='▸';w.click();await new Promise(r=>setTimeout(r,150));const w2=document.querySelector('.cmwin');return a&&w2.querySelector('.ar').textContent==='▾'&&/chiusa il 15 ottobre 2026/.test(w2.textContent)}),R('ultima vinta ▸/▾'));
+  // ⓘ
+  chk(await q(async()=>{const a=!document.getElementById('cminfot');document.getElementById('cminfo').click();await new Promise(r=>setTimeout(r,150));const t=document.getElementById('cminfot');return a&&!!t&&/associazione/.test(t.textContent)&&!/ludoteca|club/i.test(document.getElementById('view').textContent)}),R('ⓘ apre aiuto, nessuna «ludoteca»/«club»'));
+  // proposte compatte cliccabili
+  chk(await q(async()=>{const r=document.querySelector('[data-cmx="d1"]');const a=r.getAttribute('role')==='button'&&r.querySelector('.ar').textContent==='▸'&&!document.querySelector('[data-ds="d1"] .dsper')&&!r.closest('.card').querySelector('a');r.querySelector('.dsb').click();await new Promise(r=>setTimeout(r,150));const c=document.querySelector('[data-ds="d1"]');const o=c.querySelector('.ar').textContent==='▾'&&/Profondo ma scorrevole/.test(c.textContent)&&!!c.querySelector('a.cmbgg[rel~="noopener"]');c.querySelector('[data-cmx]').click();await new Promise(r=>setTimeout(r,150));return a&&o&&!document.querySelector('[data-ds="d1"] .dsper')}),R('proposta compatta, tutta la riga apre/chiude ▸/▾'));
+  chk(await q(()=>[...document.querySelectorAll('.cm .lr, .cm a')].every(e=>getComputedStyle(e).textDecorationLine==='none')),R('righe e link senza sottolineatura'));
+  // Proposto da solo staff
+  const by=await q(()=>document.querySelectorAll('.cmby').length);chk(role==='staff'?by===4:by===0,R('«Proposto da» solo allo staff ('+by+')'));
+  chk(await q(()=>/Proposta tua/.test(document.querySelector('[data-ds="d2"]').textContent)),R('chip «Proposta tua» sulla propria'));
+  // voto pieno/chiaro
+  chk(await q(()=>{const v=id=>document.querySelector(`[data-dsv="${id}"]`);return v('d1').textContent==='👍 Vota · 7'&&!v('d1').classList.contains('on')&&v('d2').textContent==='👍 Votato · 5'&&v('d2').classList.contains('on')&&getComputedStyle(v('d2')).backgroundColor!==getComputedStyle(v('d1')).backgroundColor}),R('voto pieno/chiaro'));
+  chk(await q(async()=>{document.querySelector('[data-dsv="d1"]').click();await new Promise(r=>setTimeout(r,300));const v=document.querySelector('[data-dsv="d1"]');return v.textContent==='👍 Votato · 8'&&v.classList.contains('on')&&window._rpc.some(([n,a])=>n==='des_vota'&&a.p==='d1'&&a.p_on===true)}),R('votare usa la stessa RPC e diventa pieno'));
+  // ordina a tendina + Tutto
+  chk(await q(async()=>{const s=document.getElementById('cmord');const a=s.tagName==='SELECT'&&s.options.length===4&&!document.querySelector('[data-dso]');s.value='durata';s.dispatchEvent(new Event('change',{bubbles:true}));await new Promise(r=>setTimeout(r,300));const ids=[...document.querySelectorAll('#dsl > [data-ds]')].map(x=>x.dataset.ds).join(',');const s2=document.getElementById('cmord');s2.value='voti';s2.dispatchEvent(new Event('change',{bubbles:true}));await new Promise(r=>setTimeout(r,300));return a&&ids==='d3,d2,d1,d5'}),R('Ordina a tendina (durata)'));
+  chk(await q(async()=>{const f=document.getElementById('cmfil');const a=f.options[0].textContent==='Mostra: Tutto'&&f.value==='tutto';f.value='valutazione';f.dispatchEvent(new Event('change',{bubbles:true}));await new Promise(r=>setTimeout(r,300));const ids=[...document.querySelectorAll('#dsl > [data-ds]')].map(x=>x.dataset.ds).join(',');const f2=document.getElementById('cmfil');f2.value='tutto';f2.dispatchEvent(new Event('change',{bubbles:true}));await new Promise(r=>setTimeout(r,300));return a&&ids==='d2'&&document.querySelectorAll('#dsl > [data-ds]').length===4}),R('filtro con «Tutto»'));
+  // Arrivati chiuso
+  chk(await q(async()=>{const a=document.querySelector('.cmarr');const c=/Arrivati \(1\)/.test(a.textContent)&&!a.querySelector('[data-ds]')&&!document.querySelector('#dsl [data-ds="d4"]');a.querySelector('[data-cmx="arr"]').click();await new Promise(r=>setTimeout(r,150));const a2=document.querySelector('.cmarr');return c&&!!a2.querySelector('[data-ds="d4"]')&&a2.querySelector('.ar').textContent==='▾'}),R('Arrivati chiuso, si apre ▾'));
+  // Proponi grigio con ⓘ
+  chk(await q(async()=>{const b=document.getElementById('cmprop');const th=b.closest('.cmth')&&b.closest('.cmth').contains(document.getElementById('cmord'));const a=b.getAttribute('aria-disabled')==='true'&&b.classList.contains('off')&&/ⓘ/.test(b.textContent);b.click();await new Promise(r=>setTimeout(r,150));const h=document.getElementById('cmproph');return th&&a&&!!h&&/Heat/.test(h.textContent)&&!document.getElementById('dsq')}),R('➕ Proponi grigio con ⓘ se già attiva'));
+  // XSS
+  chk(!alerted&&await q(()=>!document.querySelector('#view img[src="x"],#view script')&&/<img src=x/.test(document.querySelector('[data-ds="d3"] .cmh b').textContent)),R('XSS: nomi/perche escapati'));
+  chk(errs.length===0,R('nessun errore JS '+errs.join(';')));await p.context().close()}
+ // Proponi attivo
+ {const p=await setup(b,'socio',1600,{libero:true});const errs=[];p.on('pageerror',e=>errs.push(e.message));
+  chk(await p.evaluate(async()=>{const b=document.getElementById('cmprop');const a=b.getAttribute('aria-disabled')!=='true'&&!/ⓘ/.test(b.textContent);b.click();await new Promise(r=>setTimeout(r,200));const q=document.getElementById('dsq');return a&&!!q&&q.maxLength===60&&!/tua proposta/.test(document.querySelector('.cmstrip').textContent)}),'[libero] ➕ Proponi apre la ricerca BGG');
+  await p.fill('#dsq','azul');await p.waitForTimeout(800);
+  chk(await p.evaluate(()=>{const a=document.querySelector('#dsr [data-dsb]');return !!a&&!document.querySelector('#dsr i')&&/<i>x<\/i>/.test(a.textContent)}),'[libero] risultati BGG escapati, bind originale attivo');
+  chk(errs.length===0,'[libero] nessun errore JS');await p.context().close()}
+ // sorgente
+ const src=fs.readFileSync('community.js','utf8'),code=src.replace(/\/\/.*$/gm,''),css=fs.readFileSync('styles.css','utf8').split('/* v41.4 — Community')[1]||'';
+ chk(!/ludoteca|club/i.test(code),'nessun «ludoteca/club» nel codice');chk(!/#[0-9a-f]{3,6}\b/i.test(css.replace(/#cfd8ea|#0000000f|--ok:#1e7a43/gi,'')),'CSS solo variabili (salvo bordi neutri)');
+ chk(/community\.js\?v=41\.4/.test(fs.readFileSync('index.html','utf8'))&&/pergioco-v41\.4/.test(fs.readFileSync('sw.js','utf8'))&&/community\.js/.test(fs.readFileSync('sw.js','utf8')),'versione 41.4 e cache');
+ await b.close();console.log(`v41.4-community: ${ok}/${n}`);process.exit(ok===n?0:1)})();
