@@ -7,7 +7,7 @@ const T={titolo:'👥 Community',soci:'Soci',lista:'🎁 Lista desideri',propost
  info:'Proponi un gioco che vorresti nella collezione dell\'associazione e vota 👍 quelli degli altri. Una proposta attiva a testa; si vede solo il numero dei voti.',
  infoL:'Come funziona la lista desideri',aperti:'Voti aperti',fino:'fino al',sempre:'senza scadenza',tua:'tua proposta',vinta:'Ultima vinta',chiusa:'Votazione chiusa il',
  proponi:'➕ Proponi',proponiH:n=>`Hai già una proposta attiva (${n}): potrai proporne un'altra quando arriva o viene archiviata.`,noAcc:'Collega il tuo account a una scheda socio per proporre e votare.',
- vota:'Vota',votato:'Votato',spiego:'Lo spiego io',spiegoT:'Conosco le regole e posso spiegarlo',daStaff:'Proposto da',tuaChip:'Proposta tua',arrivati:'🎉 Arrivati',vuoto:'Ancora nessuna proposta: inizia tu!',
+ vota:'Vota',votato:'Votato',spiego:'Lo spiego io',spiegoT:'Conosco le regole e posso spiegarlo',daStaff:'Proposto da',tuaChip:'Proposta tua',arrivati:'🎉 Arrivati',archiviati:'🗄️ Archiviati',vuoto:'Ancora nessuna proposta: inizia tu!',
  nessuno:'Nessuna proposta con questo filtro.',ritira:'↩️ Ritira',
  ord:[['voti','👍 Voti'],['nuovi','🆕 Nuovi'],['giocatori','👥 Giocatori'],['durata','🕒 Durata']]};
 const TAB='pergioco-community-tab',ATT=['proposto','valutazione','ordinato'];
@@ -22,7 +22,7 @@ dsHtml=async function(){if(!DS.cl())return'';await DS.load();const d=DS.d;if(!d)
  const p=d.periodo,u=d.ultimo,all=(d.desideri||[]).slice(),mia=all.find(x=>x.da===me&&ATT.includes(x.stato));
  const O={voti:(a,b)=>b.voti-a.voti||String(a.creato).localeCompare(String(b.creato)),nuovi:(a,b)=>String(b.creato).localeCompare(String(a.creato)),giocatori:(a,b)=>(b.max||0)-(a.max||0)||(a.min||0)-(b.min||0),durata:(a,b)=>(a.durata||9999)-(b.durata||9999)};
  const srt=(a,b)=>(a.stato==='archiviato')-(b.stato==='archiviato')||(O[DS.ord]||O.voti)(a,b);
- const arrv=all.filter(x=>x.stato==='arrivato').sort(srt),act=all.filter(x=>x.stato!=='arrivato').sort(srt);
+ const arrv=all.filter(x=>x.stato==='arrivato').sort(srt),act=all.filter(x=>x.stato!=='arrivato'&&x.stato!=='archiviato').sort(srt),arch=all.filter(x=>x.stato==='archiviato').sort(srt);
  const stati=[...new Set(act.map(x=>x.stato))].filter(k=>DS.STATI[k]);if(!stati.includes(DS.fil))DS.fil='tutto';
  const L=DS.fil==='tutto'?act:act.filter(x=>x.stato===DS.fil);
  const strip=`<div class="cmstrip">🗳️ <b>${T.aperti}${p&&p.fine?` ${T.fino} ${esc(dShort(p.fine))}`:''}</b>${p&&p.fine?'':` <span>· ${T.sempre}</span>`}${mia?` · 💡 ${T.tua}: <b>${esc(mia.nome)}</b>`:''}</div>`;
@@ -39,13 +39,13 @@ dsHtml=async function(){if(!DS.cl())return'';await DS.load();const d=DS.d;if(!d)
   ${o?`<div class="cmdet">${more(g)?`<div class="chips">${more(g)}</div>`:''}${(g.cat||[]).length?`<div class="muted" style="font-size:12px">🏷 ${(g.cat||[]).slice(0,4).map(esc).join(' · ')}</div>`:''}${g.perche?`<p class="dsper">“${esc(g.perche)}”</p>`:''}<div class="muted" style="font-size:12px"><a class="cmbgg" href="https://boardgamegeek.com/boardgame/${+g.bgg_id}" target="_blank" rel="noopener noreferrer">BoardGameGeek ▸</a></div></div>`:''}
   ${g.stato==='arrivato'?'':`<div class="cmva"><button class="${g.mio?'on':''}" data-dsv="${esc(g.id)}" ${cv?'':'disabled'} aria-pressed="${g.mio?'true':'false'}">👍 ${g.mio?T.votato:T.vota} · ${+g.voti}</button><button class="${g.mio_sp?'on':''}" data-dss="${esc(g.id)}" ${arch?'disabled':''} aria-pressed="${g.mio_sp?'true':'false'}" title="${T.spiegoT}">🙋 ${T.spiego} · ${+g.spiego}</button></div>`}
   ${mio&&g.stato==='proposto'?`<div class="row dsact"><button class="s" data-dsr="${esc(g.id)}">${T.ritira}</button></div>`:''}
-  ${st?`<div class="row dsact"><select data-dst="${esc(g.id)}">${Object.keys(DS.STATI).filter(k=>k!=='arrivato').map(k=>`<option value="${k}"${k===g.stato?' selected':''}>${DS.STATI[k]}</option>`).join('')}${g.stato==='arrivato'?'<option selected>🎉 Arrivato</option>':''}</select>${g.stato!=='arrivato'?`<button class="s" data-dsa="${esc(g.id)}">🎉 Arrivato</button>`:''}<button class="s" data-dsx="${esc(g.id)}">🗑️</button></div>`:''}</div>`};
- const ao=DS.open.has('arr');
+  ${st&&o?`<div class="row dsact"><select data-dst="${esc(g.id)}">${Object.keys(DS.STATI).filter(k=>k!=='arrivato').map(k=>`<option value="${k}"${k===g.stato?' selected':''}>${DS.STATI[k]}</option>`).join('')}${g.stato==='arrivato'?'<option selected>🎉 Arrivato</option>':''}</select>${g.stato!=='arrivato'?`<button class="s" data-dsa="${esc(g.id)}">🎉 Arrivato</button>`:''}<button class="s" data-dsx="${esc(g.id)}">🗑️</button></div>`:''}</div>`};
+ const ao=DS.open.has('arr'),sec=(k,lab,l)=>{const op=DS.open.has(k);return l.length?`<div class="card cmarr" data-cms="${k}"><div class="lr" data-cmx="${k}" role="button" tabindex="0" aria-expanded="${op}"><span class="t"><b>${lab} (${l.length})</b></span>${arr(op)}</div>${op?`<div class="cmarrl">${l.map(card).join('')}</div>`:''}</div>`:''};
  return`<section id="desideri" class="cm">${strip}${win}${stf}
  <div class="cmth"><h3>${T.proposte} <button type="button" class="cmi" id="cminfo" aria-label="${T.infoL}" aria-expanded="${!!DS.info}">ⓘ</button></h3>${sel}${pbtn}</div>
  ${DS.info?`<div class="cmhelp" id="cminfot">${T.info}</div>`:''}${pH}${fil}${form}
- <div id="dsl">${L.length?L.map(card).join(''):`<div class="card muted">${act.length?T.nessuno:T.vuoto}</div>`}</div>
- ${arrv.length?`<div class="card cmarr"><div class="lr" data-cmx="arr" role="button" tabindex="0" aria-expanded="${ao}"><span class="t"><b>${T.arrivati} (${arrv.length})</b></span>${arr(ao)}</div>${ao?`<div class="cmarrl">${arrv.map(card).join('')}</div>`:''}</div>`:''}</section>`};
+ <div id="dsl">${L.length?L.map(card).join(''):`<div class="card muted">${act.length?T.nessuno:(arrv.length||arch.length?T.nessuno:T.vuoto)}</div>`}</div>
+ ${sec('arr',T.arrivati,arrv)}${sec('arch',T.archiviati,arch)}</section>`};
 // interazioni aggiuntive (una sola volta per contenitore; dsBind continua a gestire voti, proposte e staff)
 function bindCm(w){if(w._cm)return;w._cm=1;
  const tog=k=>{DS.open.has(k)?DS.open.delete(k):DS.open.add(k);dsDraw()};
