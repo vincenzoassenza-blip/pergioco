@@ -95,7 +95,7 @@ function gameMine(g,m,plays,gs,ms,full,open){
 function gameAssoc(g,plays,rate){
  const L=plays.filter(p=>p.gameId===g.id&&/^\d{4}-\d{2}-\d{2}$/.test(p.date||'')).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
  const box=(v,l)=>`<div class="stn"><b>${v}</b><span>${l}</span></div>`;
- let o=`<details class="card st stg1" id="stg-assoc"><summary><b>🏛️ Statistiche PerGioco</b> <span class="muted sm">dati aggregati, senza nomi</span></summary>`;
+ let o=`<details class="card st stg1" id="stg-assoc"><summary><b>🏛️ Statistiche ${esc(BRAND.v.nome)}</b> <span class="muted sm">dati aggregati, senza nomi</span></summary>`;
  if(!L.length)return o+`<p class="muted">Non ancora giocato in associazione.</p></details>`;
  const dates=new Set(L.map(p=>p.date)),who=new Set(),win=new Set(),cnt=new Map(),mo=new Map();let tot=0;
  for(const p of L){for(const x of p.players)who.add(Stats.key(x));tot+=p.players.length;cnt.set(p.players.length,(cnt.get(p.players.length)||0)+1);mo.set(p.date.slice(0,7),(mo.get(p.date.slice(0,7))||0)+1);if(!p.coop)for(const x of p.players)if(x.winner)win.add(Stats.key(x))}
