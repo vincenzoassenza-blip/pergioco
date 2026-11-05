@@ -399,3 +399,36 @@ details[open]>summary::after{content:'▾'}
 .cftx>summary::-webkit-details-marker{display:none}
 .cftx>summary h3{display:inline;margin:0}.cftx>summary h3::after{content:' ▸';color:var(--b2)}.cftx[open]>summary h3::after{content:' ▾'}
 .cftx textarea{width:100%;box-sizing:border-box;font:inherit}.cftg{margin:12px 0 2px}
+
+/* v41.2 — Partita (mockup approvato): solo variabili colore della configurazione */
+.pt .pth{display:flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--b2) 12%,#fff);color:var(--b);font-weight:800;font-size:15px;padding:7px 10px;border-radius:10px;margin:6px 0 10px}
+.pt .pth .n{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--b);color:#fff;font-size:13px;align-items:center;justify-content:center;flex:none}
+.pt #pth2{margin-top:16px}
+.pt .gpnone{display:none}
+.pt .gpchips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}
+.pt .gpchip{border:1px solid color-mix(in srgb,var(--b2) 25%,#fff);background:var(--c);border-radius:999px;padding:6px 12px 6px 6px;font-weight:600;color:var(--t)}
+.pt .gpq{border-radius:10px}
+.pt .gpon{background:color-mix(in srgb,var(--b2) 6%,#fff);border:2px solid var(--b);border-radius:12px}
+.pt .gpchg{background:none;border:0;color:var(--b2);font-weight:700;width:auto;padding:8px 4px;margin:0 0 0 auto;min-height:44px}
+.pt .gpchg::after{content:' ▸'}
+.pt .seg{margin-bottom:6px}.pt .hint{font-size:12px;margin:0 0 8px}
+.pt #pl>p.muted{display:none}
+.pt .prow.ptr{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid color-mix(in srgb,var(--b2) 10%,#fff);cursor:pointer;margin:0}
+.pt .pttr{width:20px;flex:none;text-align:center;font-size:16px}
+.pt .ptn{flex:1;min-width:0;display:flex;align-items:center;gap:6px;font-weight:800;color:var(--b);text-decoration:none;min-height:44px}
+.pt .ptnm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pt .ptnm small{font-weight:400;color:var(--m)}
+.pt .ptgo{margin-left:auto;color:var(--b2);font-size:16px;font-weight:400;padding-right:2px}
+.pt .ptcoop .ptgo{display:none}
+.pt .prow .ps{flex:0 0 78px;width:78px;text-align:center;font-weight:800;font-size:16px;background:var(--c);border:2px dashed var(--a);border-radius:10px;padding:8px 4px;margin:0}
+.pt .prow .ps.ptv{background:color-mix(in srgb,var(--a) 15%,#fff);border-style:solid}
+.pt .prow .ps.bad{border-color:#c0392b}
+.pt .prow button{flex:0 0 34px;width:34px;min-height:34px;padding:0;margin:0;border-radius:8px}
+.pt .ptbtns{display:flex;gap:8px;margin-top:10px}.pt .ptbtns button{flex:1;width:auto;margin:0}
+.pt .ptosp{margin-top:8px}
+.pt .uxaltro>summary{font-weight:800;color:var(--b)}
+.pt .ptdate{display:inline-block;width:auto;background:color-mix(in srgb,var(--b2) 12%,#fff);color:var(--b);border:0;border-radius:999px;padding:6px 12px;font-weight:700;font-size:14px;margin:4px 0 10px;min-height:36px}
+.pt .ptw{background:color-mix(in srgb,var(--a) 18%,#fff);border:1px solid var(--a);color:var(--t);border-radius:10px;padding:9px 12px;font-size:14px;margin-bottom:10px}
+.pt .ptw[hidden]{display:none}
+/* Sfida equilibrata ben visibile (solo in Partita) */
+#eqo.eqc{background:color-mix(in srgb,var(--a) 18%,#fff);border-color:var(--a);box-shadow:0 2px 8px color-mix(in srgb,var(--a) 30%,transparent)}
+#eqo .eqgo{background:var(--b)}

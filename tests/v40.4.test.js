@@ -11,7 +11,7 @@ chk(/class="eqc" id="eqo" role="button" tabindex="0" aria-label=/.test(eq)&&!/in
  await p.evaluate(()=>go('nuova'));await p.waitForTimeout(1200);
  const r=await p.evaluate(()=>{const e=document.getElementById('eqo'),h=document.querySelector('#view h2'),cs=e&&getComputedStyle(e),i=e&&getComputedStyle(e.querySelector('.eqi'));
   return{e:!!e,after:h&&h.nextElementSibling===e,form:!!(e&&e.compareDocumentPosition(document.getElementById('g')||document.body)&4),bg:cs&&cs.backgroundColor,bd:cs&&cs.borderTopColor,h:e&&e.getBoundingClientRect().height,isz:i&&i.fontSize,txt:e&&e.textContent,role:e&&e.getAttribute('role')}});
- chk(r.e&&r.after&&r.form,'card sotto il titolo, sopra il form');chk(r.bg==='rgb(255, 244, 220)'&&r.bd==='rgb(240, 180, 60)','crema con bordo arancione');
+ chk(r.e&&r.after&&r.form,'card sotto il titolo, sopra il form');chk(r.bg!=='rgb(255, 255, 255)'&&/^(rgb\(242, 177, 52\)|color\()/.test(r.bd),'crema con bordo arancione (v41.2: dal colore accento della config)');
  chk(/Sfida equilibrata/.test(r.txt)&&/Trova il gioco giusto per giocare alla pari/.test(r.txt)&&/Inizia ›/.test(r.txt),'testi');chk(r.role==='button'&&r.h>=44,'accessibile, tap alto ('+r.h+')');chk(r.isz==='28px','icona 28px');
  await p.screenshot({path:process.env.SHOT||'/tmp/v404.png'});
  await p.evaluate(()=>{window._eq=0;const o=eqOpen;window.eqOpen=(...a)=>{window._eq++;};document.querySelector('#eqo .eqt small').click();document.getElementById('eqo').dispatchEvent(new KeyboardEvent('keydown',{key:'Enter'}))});
