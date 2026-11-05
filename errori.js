@@ -6,7 +6,7 @@ const ERR_AREE={LOGIN:'accesso',REG:'registrazione',PWD:'recupero password',SOCI
 // tipi di errore tecnico -> numero del codice + spiegazione
 const ERR_TIPI=[
  [/timeout|timed out|aborterror|signal is aborted/i,'16','Il server ci sta mettendo troppo a rispondere.','Riprova tra poco; se la connessione è lenta avvicinati al wifi o passa ai dati mobili.'],
- [/quotaexceeded|quota|storage.*full|exceeded the quota/i,'12','La memoria del browser per questo sito è piena.','Chiudi le altre schede, libera spazio sul telefono o nelle impostazioni del browser cancella i dati dei siti vecchi (non di PerGioco), poi riapri l\'app.'],
+ [/quotaexceeded|quota|storage.*full|exceeded the quota/i,'12','La memoria del browser per questo sito è piena.','Chiudi le altre schede, libera spazio sul telefono o nelle impostazioni del browser cancella i dati dei siti vecchi (non di '+(typeof BRAND!=='undefined'?BRAND.v.nome:'PerGioco')+'), poi riapri l\'app.'],
  [/notallowederror|permission (denied|dismissed)|not allowed by the user agent|clipboard|securityerror/i,'13','Il browser ha bloccato un permesso (appunti, fotocamera o condivisione).','Consenti il permesso per questo sito nelle impostazioni del browser e riprova, oppure fai l\'operazione a mano.'],
  [/cannot read prop|of null|of undefined|null is not an object|undefined is not an object|reading '|has no properties|notfounderror/i,'15','Una parte della schermata non era pronta o mancava un dato.','Torna indietro, riapri la schermata e riprova: i dati già salvati non sono stati toccati.'],
  [/is not a function|is not defined|can't find variable|not supported|unsupported|notsupportederror|syntaxerror|unexpected identifier/i,'14','Il tuo browser non supporta una funzione usata qui.','Aggiorna il browser (Chrome, Safari, Firefox o Edge recenti) oppure usa l\'app installata sul telefono.'],
@@ -73,6 +73,6 @@ function errSpiega(e,area){const C=errCtx();if(!area||area==='APP')area=C.area||
  const dove=C.schermo?`nella schermata ${C.schermo}`:`(${ERR_AREE[area]||'app'})`;
  return{code:c,msg:`Qualcosa non ha funzionato ${dove}. Riprova; se succede ancora chiudi e riapri l'app e avvisa lo staff con il codice.`}}
 // mostra l'errore all'utente; prefisso opzionale (es. "Salvataggio non riuscito")
-function toastErr(e,area,prefisso){const {code,msg}=errSpiega(e,area);toast(`⚠️ ${prefisso&&!/^Non sono riuscito/.test(msg)?prefisso+': ':''}${msg} [${code}]`,true);return code}
+function toastErr(e,area,prefisso){let {code,msg}=errSpiega(e,area);if(area==='COPPA'&&typeof TXT!=='undefined')msg=TXT.cp(msg);toast(`⚠️ ${prefisso&&!/^Non sono riuscito/.test(msg)?prefisso+': ':''}${msg} [${code}]`,true);return code}
 // messaggio di validazione con codice fisso (non viene loggato: è un errore di compilazione)
 function toastVal(msg,code){toast(`✋ ${msg}${code?' ['+code+']':''}`)}

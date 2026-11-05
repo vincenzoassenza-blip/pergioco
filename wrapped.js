@@ -64,17 +64,17 @@ const WR={st:null,
    comp:c1?{nome:nm(M[c1[0]]),n:c1[1]}:null,nem:n1?{nome:nm(M[n1[0]]),n:n1[1]}:null,topPct,attivi,badge,exp,pub:!!pub}},
 
  titolo(d){const share=d.topG[0]?d.topG[0].n/d.n:0;
-  if(d.pct!=null&&d.pct>=55&&d.n>=8)return['👑','Il Campione di Sant\'Antero','Vinci così tanto che il Santo ti chiede consigli prima della processione.'];
-  if(d.nuovi>=8||d.diversi/d.n>0.7)return['🧭','L\'Esploratore della Collezione','Ogni scatola chiusa è una porta: Sant\'Antero ti ha visto aprirle tutte.'];
-  if(share>=0.4)return['💍','Il Fedelissimo','Un gioco, un amore. Nemmeno la festa di Sant\'Antero ti separa da '+d.topG[0].nome+'.'];
-  if(d.coop>d.n/2)return['🤝','Lo Spirito di Squadra','Si vince insieme o si perde insieme: benedizione cooperativa di Sant\'Antero.'];
-  if(d.sera.n>=5)return['🌙','L\'Animale da Serata','Quando gli altri sbadigliano tu chiedi "un\'altra?". Sant\'Antero chiude a chiave per ultimo.'];
-  return['🎲','Il Giocatore di Sant\'Antero','Costante, curioso, sempre al tavolo: il cuore che fa girare PerGioco.']},
+  if(d.pct!=null&&d.pct>=55&&d.n>=8)return['👑','Il Campione di '+TXT.g('santo')+'','Vinci così tanto che il Santo ti chiede consigli prima della processione.'];
+  if(d.nuovi>=8||d.diversi/d.n>0.7)return['🧭','L\'Esploratore della Collezione','Ogni scatola chiusa è una porta: '+TXT.g('santo')+' ti ha visto aprirle tutte.'];
+  if(share>=0.4)return['💍','Il Fedelissimo','Un gioco, un amore. Nemmeno la festa di '+TXT.g('santo')+' ti separa da '+d.topG[0].nome+'.'];
+  if(d.coop>d.n/2)return['🤝','Lo Spirito di Squadra','Si vince insieme o si perde insieme: benedizione cooperativa di '+TXT.g('santo')+'.'];
+  if(d.sera.n>=5)return['🌙','L\'Animale da Serata','Quando gli altri sbadigliano tu chiedi "un\'altra?". '+TXT.g('santo')+' chiude a chiave per ultimo.'];
+  return['🎲','Il Giocatore di '+TXT.g('santo')+'','Costante, curioso, sempre al tavolo: il cuore che fa girare '+BRAND.v.nome+'.']},
 
  // storie: {k (kicker), big, sub, list, emoji, priv}
  storieSocio(d){const S=[],nome=nm(d.me);
   if(d.vuoto)return[{emoji:'🎲',k:'Wrapped '+d.anno,big:'Nessuna partita',sub:'Nel '+d.anno+' non risultano partite registrate. Il tavolo ti aspetta!'}];
-  S.push({emoji:'🎁',k:'PerGioco Wrapped',big:String(d.anno),sub:'Ciao '+nome+'! Ecco il tuo anno al tavolo. Tocca per scorrere →'});
+  S.push({emoji:'🎁',k:BRAND.v.nome+' Wrapped',big:String(d.anno),sub:'Ciao '+nome+'! Ecco il tuo anno al tavolo. Tocca per scorrere →'});
   S.push({emoji:'🎲',k:'Hai giocato',big:d.n+' partite',sub:'circa '+ore(d.min)+' di gioco in '+d.serate+(d.serate===1?' serata':' serate'),note:'Durate stimate dove non registrate'});
   if(d.topG[0])S.push({emoji:'🏆',k:'Il tuo gioco dell\'anno',big:d.topG[0].nome,sub:d.topG[0].n+(d.topG[0].n===1?' partita':' partite'),list:d.topG.slice(1).map((g,i)=>(i+2)+'. '+g.nome+' · '+g.n)});
   S.push({emoji:'🧭',k:'Hai esplorato',big:d.diversi+' giochi diversi',sub:d.nuovi?d.nuovi+(d.nuovi===1?' mai provato prima':' mai provati prima'):'tutti già conosciuti: fedeltà assoluta!'});
@@ -99,22 +99,22 @@ const WR={st:null,
   return{anno:+anno,n:py.length,min,serate:Object.keys(perD).length,soci:soci.size,giochi:Object.keys(perG).length,
    topG:top(perG).slice(0,5).map(([g,n])=>({nome:(G[g]&&G[g].name)||'?',n})),sera:{data:dTop[0],n:dTop[1]},mese:{m:+moTop[0],n:moTop[1]},nuoviLud,maxTav}},
  storieAssoc(d){if(d.vuoto)return[{emoji:'🎲',k:'Wrapped '+d.anno,big:'Nessuna partita',sub:'Nessuna partita registrata nel '+d.anno+'.'}];
-  return[{emoji:'🏛️',k:'PerGioco Wrapped',big:String(d.anno),sub:'L\'anno dell\'associazione, tutto insieme'},
+  return[{emoji:'🏛️',k:BRAND.v.nome+' Wrapped',big:String(d.anno),sub:'L\'anno dell\'associazione, tutto insieme'},
    {emoji:'🎲',k:'Insieme abbiamo giocato',big:d.n+' partite',sub:'circa '+ore(d.min)+' in '+d.serate+' serate',note:'Durate stimate dove non registrate'},
    {emoji:'👥',k:'Soci al tavolo',big:String(d.soci),sub:'soci attivi su '+d.giochi+' giochi diversi'},
    {emoji:'🏆',k:'I giochi dell\'anno',big:d.topG[0]?d.topG[0].nome:'—',sub:d.topG[0]?d.topG[0].n+' partite':'',list:d.topG.slice(1).map((g,i)=>(i+2)+'. '+g.nome+' · '+g.n)},
    {emoji:'🌙',k:'Record',big:fmtD(d.sera.data),sub:'la serata più intensa: '+d.sera.n+' partite',list:['📅 Mese top: '+MESI[d.mese.m-1]+' ('+d.mese.n+')','🪑 Tavolo più grande: '+d.maxTav+' giocatori'].concat(d.nuoviLud?['📦 '+d.nuoviLud+' giochi nuovi nella collezione']:[])},
-   {emoji:'🙏',k:'Grazie!',big:'Viva PerGioco',sub:'E che Sant\'Antero benedica i dadi anche nel '+(d.anno+1)+'.',fin:true}]},
+   {emoji:'🙏',k:'Grazie!',big:'Viva '+BRAND.v.nome,sub:'E che '+TXT.g('santo')+' benedica i dadi anche nel '+(d.anno+1)+'.',fin:true}]},
 
  // ---- visualizzatore a storie ----
  apri(S,titolo,pub){document.getElementById('wr')?.remove();let i=0;const el=document.createElement('div');el.id='wr';el.setAttribute('role','dialog');el.setAttribute('aria-label',titolo);document.body.append(el);
   const draw=()=>{const s=S[i],c=PAL[i%PAL.length];el.style.background=`linear-gradient(160deg,${c[0]},${c[1]})`;
    el.innerHTML=`<div class="wrbar">${S.map((_,k)=>`<i class="${k<i?'on':k===i?'cur':''}"></i>`).join('')}</div>
-   <div class="wrtop"><img src="icons/icon-192.png" alt=""><b>PerGioco Wrapped</b><button class="wrx" data-wr="x" aria-label="Chiudi">✕</button></div>
+   <div class="wrtop"><img src="icons/icon-192.png" alt=""><b>${esc(BRAND.v.nome)} Wrapped</b><button class="wrx" data-wr="x" aria-label="Chiudi">✕</button></div>
    <div class="wrs"><div class="wre">${esc(s.emoji)}</div><div class="wrk">${esc(s.k)}</div><div class="wrb">${esc(s.big)}</div>${s.sub?`<div class="wrsub">${esc(s.sub)}</div>`:''}
    ${s.list&&s.list.length?`<div class="wrl">${s.list.map(x=>`<div>${esc(x)}</div>`).join('')}</div>`:''}${s.note?`<div class="wrn">${esc(s.note)}</div>`:''}
    ${s.priv&&!pub?'<div class="wrp">🔒 Solo per te: non compare nelle immagini condivise</div>':''}</div>
-   <div class="wrbot"><button data-wr="sh">📤 Salva / condividi</button>${s.fin?'<button data-wr="x">Fine</button>':''}</div>${s.fin?'<div class="wrig">📸 Condividi e taggaci @pergiocoets</div>':''}`};
+   <div class="wrbot"><button data-wr="sh">📤 Salva / condividi</button>${s.fin?'<button data-wr="x">Fine</button>':''}</div>${s.fin&&BRAND.v.instagram?'<div class="wrig">📸 Condividi e taggaci @'+esc(BRAND.v.instagram)+'</div>':''}`};
   const mv=d=>{i=Math.max(0,Math.min(S.length-1,i+d));draw()};
   let x0=null;el.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
   el.addEventListener('touchend',e=>{if(x0==null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>40){e.preventDefault();mv(dx<0?1:-1)}});
@@ -132,7 +132,7 @@ const WR={st:null,
    for(const w of words){const tt=line?line+' '+w:w;if(x.measureText(tt).width>maxW&&line){lines.push(line);line=w}else line=tt}if(line)lines.push(line);
    lines.slice(0,5).forEach((l,k)=>x.fillText(l,W/2,y+k*lh));return y+lines.slice(0,5).length*lh};
   try{const im=new Image();im.src='icons/icon-192.png';await im.decode();x.save();x.beginPath();x.arc(W/2,190,80,0,7);x.clip();x.drawImage(im,W/2-80,110,160,160);x.restore()}catch(e){}
-  x.font=`700 44px ${F}`;x.fillStyle='rgba(255,255,255,.92)';x.textAlign='center';x.fillText('PerGioco Wrapped',W/2,340);
+  x.font=`700 44px ${F}`;x.fillStyle='rgba(255,255,255,.92)';x.textAlign='center';x.fillText(BRAND.v.nome+' Wrapped',W/2,340);
   // contenuto: le storie private senza statistiche pubbliche non vengono mai disegnate con nomi
   let k=s.k,big=s.big,sub=s.sub,list=s.list||[];if(s.priv&&!pub){big='🤫';sub='Questa la tengo per me!';list=[]}
   let y=620;x.font=`200px ${F}`;x.fillText(s.emoji,W/2,y);y+=150;
@@ -141,7 +141,7 @@ const WR={st:null,
   if(sub)y=wrap(sub,y+30,50,'500',900,64,'rgba(255,255,255,.92)')+30;
   for(const l of list.slice(0,5))y=wrap(l,y+20,44,'600',900,56,'rgba(255,255,255,.88)');
   if(s.note){x.font=`400 32px ${F}`;x.fillStyle='rgba(255,255,255,.65)';x.fillText(s.note,W/2,1700)}
-  x.font=`600 36px ${F}`;x.fillStyle='rgba(255,255,255,.85)';x.fillText('Associazione PerGioco · Sant\'Antero',W/2,1830);
+  x.font=`600 36px ${F}`;x.fillStyle='rgba(255,255,255,.85)';x.fillText('Associazione '+BRAND.v.nome+' · '+TXT.g('santo'),W/2,1830);
   return new Promise(r=>cv.toBlob(r,'image/png'))},
  async condividi(s,i,pub,titolo){try{const b=await this.png(s,i,pub);const f=new File([b],`pergioco-wrapped-${i+1}.png`,{type:'image/png'});
    if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:titolo});return}catch(e){if(e&&e.name==='AbortError')return}}
@@ -151,17 +151,17 @@ const WR={st:null,
  anni(st){const now=new Date().getFullYear(),max=st.staff?now:+st.anno,out=[];for(let y=max;y>=Math.max(2020,max-5);y--)out.push(y);return out},
  async card(own,mid){const st=await this.stato();if(!st.staff&&!(st.attivo&&own))return null;const m=(await DB.members()).find(x=>x.id===mid);
   const box=document.createElement('div');box.className='card wrcard';box.id='wrcard';
-  box.innerHTML=`<b>🎁 PerGioco Wrapped</b> ${st.attivo?'':'<span class="muted">(anteprima staff: spento per i soci)</span>'}
+  box.innerHTML=`<b>🎁 ${esc(BRAND.v.nome)} Wrapped</b> ${st.attivo?'':'<span class="muted">(anteprima staff: spento per i soci)</span>'}
    <div class="row" style="gap:8px;margin-top:8px;flex-wrap:wrap"><select id="wranno" aria-label="Anno">${this.anni(st).map(y=>`<option ${y===+st.anno?'selected':''}>${y}</option>`).join('')}</select>
    ${mid?`<button class="p" id="wrmio">${own?'Il mio Wrapped':'Wrapped di '+esc(nm(m))}</button>`:''}<button id="wrass">🏛️ Associazione</button></div>
 `;
   box.addEventListener('click',async e=>{const id=e.target.id,anno=+box.querySelector('#wranno').value;
    try{if(id==='wrmio'){const st=await this.stato();if(!this.puo(st,anno))return toast('Wrapped non ancora disponibile');const pub=!!(m&&m.statsPub);this.apri(this.storieSocio(await this.socio(mid,anno,pub)),'Wrapped '+anno,pub)}
-    if(id==='wrass'){if(!this.puo(await this.stato(),anno))return toast('Wrapped non ancora disponibile');this.apri(this.storieAssoc(await this.assoc(anno)),'Wrapped PerGioco '+anno,true)}
+    if(id==='wrass'){if(!this.puo(await this.stato(),anno))return toast('Wrapped non ancora disponibile');this.apri(this.storieAssoc(await this.assoc(anno)),'Wrapped '+BRAND.v.nome+' '+anno,true)}
 }catch(err){toastErr(err,'WRAP')}});
   return box},
  async gestione(){if(typeof adminMode!=='function'||!adminMode())return null;const st=await this.stato(true);if(!st.staff)return null;const box=document.createElement('div');box.className='card wrcard';box.id='wrgest';
-  const draw=st=>{const on=!!st.attivo;box.innerHTML=`<b>🎁 PerGioco Wrapped</b>
+  const draw=st=>{const on=!!st.attivo;box.innerHTML=`<b>🎁 ${esc(BRAND.v.nome)} Wrapped</b>
    <div class="wrst ${on?'on':'off'}" id="wrstato">${on?'🟢 Wrapped ATTIVO per i soci (anno '+esc(st.anno)+')':'⚪ Wrapped SPENTO per i soci'}</div>
    <label class="row" style="gap:8px;margin:6px 0">Anno <select id="wrsa">${this.anni({staff:true}).map(y=>`<option ${y===+st.anno?'selected':''}>${y}</option>`).join('')}</select></label>
    <div class="row" style="gap:8px;flex-wrap:wrap"><button class="${on?'':'p'}" id="wrtog">${on?'Spegni per i soci':'Attiva per i soci'}</button>${on?'<button id="wranno2">Cambia anno</button>':''}</div>
@@ -170,7 +170,7 @@ const WR={st:null,
    box.querySelector('#wrtog').onclick=()=>save(!on);const a2=box.querySelector('#wranno2');if(a2)a2.onclick=()=>save(true)};
   draw(st);return box},
  async banner(){const st=await this.stato();if(!st.attivo||!st.me)return null;const b=document.createElement('div');b.className='card wrban';b.id='wrban';
-  b.innerHTML=`<span>🎁</span><div><b>Il tuo PerGioco Wrapped ${esc(st.anno)} è pronto!</b><div class="muted">Partite, record, nemesi e il tuo titolo dell'anno.</div></div><button class="p">Apri</button>`;
+  b.innerHTML=`<span>🎁</span><div><b>Il tuo ${esc(BRAND.v.nome)} Wrapped ${esc(st.anno)} è pronto!</b><div class="muted">Partite, record, nemesi e il tuo titolo dell'anno.</div></div><button class="p">Apri</button>`;
   b.querySelector('button').onclick=async()=>{const m=(await DB.members()).find(x=>x.id===st.me);const pub=!!(m&&m.statsPub);this.apri(this.storieSocio(await this.socio(st.me,st.anno,pub)),'Wrapped '+st.anno,pub)};return b}};
 window.WR=WR;
 

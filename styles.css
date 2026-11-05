@@ -394,3 +394,8 @@ details[open]>summary::after{content:'▾'}
 .cfbody button.p{width:auto;margin-top:0}
 /* v41.1 moduli */
 .cfmod{padding:8px 0;border-bottom:1px solid #eef0f5}.cfmod:last-child{border-bottom:0}.cfsw{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0;cursor:pointer}.cfsw input{width:20px;height:20px;margin:0;flex:none;accent-color:var(--b)}.cfmf{margin:6px 0 0 28px}
+/* v41.1 A3 — Testi avanzati (chiuso di default) */
+.cftx>summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.cftx>summary::-webkit-details-marker{display:none}
+.cftx>summary h3{display:inline;margin:0}.cftx>summary h3::after{content:' ▸';color:var(--b2)}.cftx[open]>summary h3::after{content:' ▾'}
+.cftx textarea{width:100%;box-sizing:border-box;font:inherit}.cftg{margin:12px 0 2px}

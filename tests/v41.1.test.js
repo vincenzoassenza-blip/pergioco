@@ -41,7 +41,7 @@ p=await mk('socio',{});await p.evaluate(()=>go('config'));await p.waitForTimeout
 const rd=f=>fs.readFileSync(f,'utf8'),JS=fs.readdirSync('.').filter(f=>/\.js$/.test(f)&&f!=='sw.js');
 const vis=JS.map(rd).join('\n').replace(/^\s*\/\/.*$/gm,'');
 // i default (BADGES, XP_SRC, ERR_*) vengono sostituiti a runtime da MOD.apply (verificato sopra)
-const visUI=vis.split('\n').filter(l=>!/MOD_DEF=|BADGES\.push|^\s*\['c(camp|imb)|XP_SRC=|ERR_AREE=|PARTITA:'partita'|altro:\['Gestione'|replace\(\/Coppa Antero/.test(l)).join('\n');
+const visUI=vis.split('\n').filter(l=>!/MOD_DEF=|BADGES\.push|^\s*\['c(camp|imb)|XP_SRC=|ERR_AREE=|PARTITA:'partita'|altro:\['Gestione'|replace\(\/Coppa Antero|MOD\.nome\('coppa'\):'Coppa Antero'/.test(l)).join('\n');
 chk(!/Coppa Antero|Coppe Antero|Sfida di Antero|Prescelti di Antero/.test(visUI),'niente nomi fissi dei moduli nell’UI');
 const lud=[...vis.matchAll(/[^\n]{0,30}ludoteca[^\n]{0,10}/gi)].map(m=>m[0]).filter(s=>!/views\.ludoteca|'ludoteca'|ludoteca\(\)|#ludoteca|ludoteca:\[|ludoteca#|"ludoteca"/.test(s));chk(!lud.length,'niente «ludoteca» nei testi: '+lud.join(' | '));
 chk(!/\bclub\b/i.test(vis+rd('index.html')),'mai «club»');
