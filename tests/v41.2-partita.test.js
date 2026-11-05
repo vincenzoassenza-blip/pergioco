@@ -1,0 +1,44 @@
+// node tests/v41.2-partita.test.js — v41.2: pagina Partita secondo il mockup approvato
+const pw=require('playwright-core'),fs=require('fs');const {setup,fill}=require('./screenshots-partita.js');
+let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};
+(async()=>{const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome'});const errs=[];
+ let p=await setup(b,'staff');p.on('pageerror',e=>errs.push(e.message));
+ const txt=()=>p.evaluate(()=>{const v=document.getElementById('view').cloneNode(true);v.querySelectorAll('.sr,[hidden]').forEach(x=>x.remove());document.body.append(v);const t=v.innerText;v.remove();return t});
+ let t=await txt();
+ chk(!/Nessun gioco scelto|Aggiungi chi ha giocato|Nessuno selezionato|Scorciatoie/.test(t),'niente scritte di stato vuoto');
+ chk(await p.evaluate(()=>[...document.querySelectorAll('.pth')].map(x=>x.innerText.replace(/\s+/g,' ').trim()).join('|'))==='1 Gioco|2 Giocatori e punti','passi numerati');
+ chk(await p.evaluate(()=>!!document.querySelector('#pth2~.ptsec #mode')&&!document.querySelector('#uxaltro #mode')),'Competitiva/Cooperativa nel passo 2');
+ chk(await p.evaluate(()=>document.querySelector('.ptbtns #pk')&&document.querySelector('.ptbtns #ptob')&&document.getElementById('ptosp').hidden),'Aggiungi giocatori + Ospite affiancati, ospite chiuso');
+ chk(/Altro \(data, durata, nota\)/.test(t)&&/📅 Oggi, /.test(t),'Altro + pillola data');
+ chk(await p.evaluate(()=>{const s=document.querySelector('#uxaltro>summary'),a=getComputedStyle(s,'::after').content;document.getElementById('uxaltro').open=true;const b=getComputedStyle(s,'::after').content;document.getElementById('uxaltro').open=false;return a.includes('▸')&&b.includes('▾')}),'frecce ▸ chiuso / ▾ aperto');
+ chk(await p.evaluate(()=>{const e=document.getElementById('eqo');const r=e&&e.getBoundingClientRect();return r&&r.height>=60&&r.top<300}),'Sfida equilibrata visibile in alto');
+ await fill(p);t=await txt();
+ chk(await p.evaluate(()=>document.querySelector('.gpon b').textContent==='Catan'&&getComputedStyle(document.querySelector('.gpchg'),'::after').content.includes('▸')),'gioco scelto con Cambia ▸');
+ const rows=await p.evaluate(()=>[...document.querySelectorAll('#pl .prow')].map(r=>({n:r.querySelector('.ptnm').textContent,tr:r.querySelector('.pttr').textContent,go:!!r.querySelector('.ptgo'),dec:getComputedStyle(r.querySelector('.ptn')).textDecorationLine,cur:getComputedStyle(r).cursor})));
+ chk(rows.length===4&&rows.every(r=>r.go&&r.dec==='none'&&r.cur==='pointer'),'nomi senza sottolineatura, riga cliccabile con ▸ '+JSON.stringify(rows));
+ chk(rows[1].tr==='🏆'&&rows.filter(r=>r.tr).length===1&&rows[3].n==='Chiara (ospite)','🏆 al migliore, ospite indicato');
+ chk(/Punti mancanti per 1 giocatore: puoi salvare lo stesso/.test(t),'avviso morbido punti mancanti');
+ await p.click('#pl .prow:nth-child(3) .ptnm');chk(await p.evaluate(()=>document.activeElement===document.querySelectorAll('#pl .ps')[2]),'tocco sulla riga → campo punti');
+ // XSS + validazioni invariate
+ await p.evaluate(async()=>{document.getElementById('ptob').click();const g=document.getElementById('gn');g.value='<img src=x onerror="window.X=1">';document.getElementById('ga').click()});await p.waitForTimeout(200);
+ chk(await p.evaluate(()=>!document.querySelector('#pl img')&&!window.X&&[...document.querySelectorAll('.ptnm')].some(x=>x.textContent.includes('<img'))),'XSS: nome ospite come testo');
+ chk(await p.evaluate(()=>document.getElementById('gn').maxLength===40),'ospite max 40');
+ await p.evaluate(()=>[...document.querySelectorAll('#pl .prow')].pop().querySelector('button').click());
+ await p.evaluate(()=>{window._add=[];DB.addPlay=async x=>{_add.push(x);return{...x,id:'n1',players:x.players.map(y=>({...y,winner:false}))}};const ps=document.querySelectorAll('#pl .ps');ps[0].value='999999';ps[0].dispatchEvent(new Event('input',{bubbles:true}))});
+ await p.click('#save');await p.waitForTimeout(400);chk(await p.evaluate(()=>_add.length===0),'punti fuori limite: non salva');
+ await p.evaluate(()=>document.querySelectorAll('.mdl button').forEach(b=>b.click()));await p.waitForTimeout(300);
+ await p.evaluate(()=>{const ps=document.querySelectorAll('#pl .ps');ps[0].value='10';ps[0].dispatchEvent(new Event('input',{bubbles:true}))});await p.click('#save');await p.waitForTimeout(800);
+ chk(await p.evaluate(()=>_add.length===1&&_add[0].players.length===4),'salva anche con punti mancanti');
+ await p.context().close();
+ // socio: io sempre presente con 🔒, colori dalla config
+ p=await setup(b,'socio');p.on('pageerror',e=>errs.push(e.message));
+ const s=await p.evaluate(()=>{const r=document.querySelector('#pl .prow');return{n:r.querySelector('.ptnm').textContent,lk:r.querySelector('button').disabled&&r.querySelector('button').textContent==='🔒'}});
+ chk(s.n==='Vincenzo Assenza (tu)'&&s.lk,'socio: (tu) 🔒 '+JSON.stringify(s));
+ chk(await p.evaluate(()=>{document.documentElement.style.setProperty('--a','rgb(1, 2, 3)');document.documentElement.style.setProperty('--b','rgb(4, 5, 6)');return getComputedStyle(document.querySelector('#pl .ps')).borderTopColor==='rgb(1, 2, 3)'&&getComputedStyle(document.querySelector('.pth .n')).backgroundColor==='rgb(4, 5, 6)'}),'colori dalle variabili della config');
+ await p.evaluate(()=>go('ludoteca'));await p.waitForTimeout(500);chk(!(await p.$('#eqo')),'Sfida equilibrata solo in Partita');
+ await p.context().close();
+ const src=fs.readFileSync('partita.js','utf8'),css=fs.readFileSync('styles.css','utf8').split('/* v41.2 — Partita')[1]||'';
+ chk(!/#[0-9a-f]{3,6}\b/i.test(src.replace(/^\/\/.*$/gm,''))&&!/#[0-9a-f]{6}\b/i.test(css.replace(/#c0392b/g,'')),'niente colori fissi (solo variabili; rosso errore come nel resto dell\'app)');
+ chk(!/PerGioco|Antero/.test(src),'nessun nome dell\'associazione fisso');
+ chk(!errs.length,'nessun errore JS '+errs.join('|'));
+ console.log(`v41.2-partita: ${ok}/${n}`);await b.close();process.exit(ok===n?0:1)})();
