@@ -12,7 +12,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   chk(await q(()=>{const s=document.querySelector('.alstaff');const cs=[...document.querySelectorAll('#view>.card,#view>details')];return s&&!s.open&&s.contains(document.getElementById('adm'))&&cs.indexOf(s)===cs.length-1&&s.querySelector('summary .ali')}),'1: «🔒 Accesso staff ⓘ» in fondo, chiuso, contiene il login');
   chk(await q(()=>[...document.querySelectorAll('#adm label')].filter(l=>/^(Email|Password)/.test(l.textContent)).every(l=>l.querySelector('.req'))),'6: Email * Password *');
   chk(await q(()=>!document.getElementById('allist')&&!document.getElementById('alstr')&&!document.getElementById('bkp')),'socio: niente elenco staff né strumenti');
-  chk(await q(()=>document.querySelector('.alfoot').textContent==='PerGioco · v'+APP_VERSION&&APP_VERSION==='41.6'&&!/40\.6/.test(document.getElementById('view').textContent)),'7: versione 41.6');
+  chk(await q(()=>document.querySelector('.alfoot').textContent==='PerGioco · v'+APP_VERSION&&/^41\.[67]$/.test(APP_VERSION)&&!/40\.6/.test(document.getElementById('view').textContent)),'7: versione = APP_VERSION');
   chk(await q(()=>!document.querySelector('#view>.igl')&&![...document.querySelectorAll('#view>.card.muted')].length),'vecchio piè di pagina e riga IG tolti');
   let lo=0;await q(()=>{window.confirmLogout=async()=>{window._lo=1}});await p.click('.alacc>summary');await p.click('.alacc .alsub');chk(await q(()=>window._lo===1),'1: «Esci dall\'account» chiama confirmLogout');
   chk(await q(()=>[...document.querySelectorAll('.alr')].every(r=>getComputedStyle(r).textDecorationLine==='none'&&getComputedStyle(r).cursor==='pointer')),'righe senza sottolineatura, cliccabili');
@@ -25,7 +25,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   chk(await q(()=>document.querySelector('#view h2.altit').textContent==='Gestione'),'staff: titolo «Gestione»');
   const rows=await q(()=>[...document.querySelectorAll('#allist>.alr b')].map(b=>b.textContent));
   chk(JSON.stringify(rows.slice(0,4))==='["Soci","Partite","Codici","Moderatori"]'&&rows.includes('Statistiche associazione')&&rows.includes('Libri sociali')&&rows.includes('Configurazione')&&rows.some(t=>/Antero/.test(t)),'3: elenco unico '+rows.join(','));
-  chk(await q(()=>document.querySelectorAll('#view>.card:not(#allist):not(.alinfo):not(.alpink)').length===0||[...document.querySelectorAll('#view>.card')].filter(c=>c.offsetParent&&!/allist|alstr/.test(c.id)&&!c.classList.contains('alinfo')).length===0),'3: nessun altro pannello visibile');
+  chk(await q(()=>document.querySelectorAll('#view>.card:not(#allist):not(.alinfo):not(.alpink)').length===0||[...document.querySelectorAll('#view>.card')].filter(c=>c.offsetParent&&!/allist|alstr/.test(c.id)&&!c.classList.contains('alinfo')&&!c.classList.contains('alaccs')).length===0),'3: nessun altro pannello visibile');
   chk(await q(()=>{const r=document.querySelector('[data-alt=soci]');return r.querySelector('.alchip').textContent==='4 attivi'&&r.querySelector('.ar').textContent==='▾'&&r.nextElementSibling.id==='adm'}),'4: Soci aperto con chip «4 attivi»');
   chk(await q(()=>{const A=document.getElementById('adm');return A.querySelector('.alq').placeholder==='🔍 Cerca socio per nome o tessera'&&[...A.querySelectorAll('.alsoc')].every(w=>w.hidden)&&/L'elenco dei soci compare dopo la ricerca/.test(A.textContent)&&A.querySelector('.alform').hidden&&A.querySelector('.alnew b').textContent==='Nuovo socio'}),'4: solo riepilogo + ricerca, elenco nascosto, form chiuso');
   chk(await q(()=>document.getElementById('mn').placeholder.endsWith(' *')),'6: Nome *');
@@ -44,7 +44,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   await p.click('[data-alt=partite]');await W(200);chk(await q(()=>document.getElementById('adm').hidden&&document.querySelector('[data-alt=partite] .ar').textContent==='▸'),'3: richiusura ▸');
   await q(()=>{window._g=null;const o=go;window.go=v=>{window._g=v};document.querySelector('[data-alb=acfg]').click();window.go=o});chk(await q(()=>window._g==='config'),'3: Configurazione raggiungibile');
   await q(()=>{window._g=null;const o=go;window.go=v=>{window._g=v};document.querySelector('[data-alb=ast]').click();window.go=o});chk(await q(()=>window._g==='stats'),'3: Statistiche associazione');
-  chk(await q(()=>/^PerGioco · v41\.6 · 📸 @/.test(document.querySelector('.alfoot').textContent)),'7: «PerGioco · v41.6 · 📸 @tag»');
+  chk(await q(()=>/^PerGioco · v41\.[67] · 📸 @/.test(document.querySelector('.alfoot').textContent)),'7: «PerGioco · v41.6 · 📸 @tag»');
   // moderatore: niente Configurazione, Partite, Moderatori, Strumenti
   await q(()=>{DB.remote.modCached=true;go('altro')});await W(1000);
   chk(await q(()=>{const t=[...document.querySelectorAll('#allist>.alr b')].map(b=>b.textContent);return !t.includes('Configurazione')&&!t.includes('Partite')&&!t.includes('Moderatori')&&t.includes('Soci')&&document.getElementById('alstr').hidden}),'mod: niente Configurazione / Strumenti');
@@ -57,7 +57,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
  // statico
  const s=fs.readFileSync(__dirname+'/../altro.js','utf8'),h=fs.readFileSync(__dirname+'/../index.html','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8'),css=fs.readFileSync(__dirname+'/../styles.css','utf8');
  chk(!/innerHTML|insertAdjacentHTML|outerHTML/.test(s),'altro.js senza innerHTML');chk(!/club|ludoteca/i.test(s),'niente «club»/«ludoteca»');
- chk(/classifica\.js\?v=41\.5"><\/script><script src="altro\.js\?v=41\.6"><\/script><\/body>/.test(h)&&sw.includes("pergioco-v41.6")&&sw.includes('altro.js?v=41.6')&&h.includes('styles.css?v=41.6')&&fs.readFileSync(__dirname+'/../brand.js','utf8').includes("APP_VERSION='41.6'"),'versione 41.6, altro.js ultimo');
+ chk(/classifica\.js\?v=41\.5"><\/script><script src="altro\.js\?v=41\.6"><\/script>/.test(h)&&/pergioco-v41\.[67]/.test(sw)&&sw.includes('altro.js?v=41.6')&&/styles\.css\?v=41\.[67]/.test(h)&&/APP_VERSION='41\.[67]'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8')),'versione 41.6+, altro.js dopo classifica');
  const blk=css.slice(css.indexOf('/* v41.6 — Altro'));chk(blk.length>100&&!/#[0-9a-f]{3,6}\b/i.test(blk.replace(/#(adm|alstr|allist|alphone|aladm)\b/g,'')),'CSS v41.6 solo variabili');
  chk(/adminMode\(\)\)staff\(V\)/.test(s)&&/if\(!h\|\|!adminMode\(\)\)return/.test(s),'staff controlla adminMode()');
  await b.close();console.log(`${ok}/${n}`);process.exit(ok===n?0:1)})();

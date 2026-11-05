@@ -1,4 +1,4 @@
-:root{--b:#14254a;--b2:#2a4785;--bg:#f4f6fb;--c:#fff;--t:#1d2433;--m:#6b7489;--a:#f2b134}
+:root{--b:#14254a;--b2:#2a4785;--bg:#f4f6fb;--c:#fff;--t:#1d2433;--m:#6b7489;--a:#f2b134;--hd1:#0f1c3d;--hd2:#1f3d7a;--hdf:#ffd76a}
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--t);padding-bottom:calc(70px + env(safe-area-inset-bottom))}
 header{background:var(--b);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 18px 14px;position:sticky;top:0;z-index:5}
 .brand{font-weight:800;font-size:22px;letter-spacing:.5px}.sub{font-size:13px;opacity:.75}
@@ -566,3 +566,17 @@ details[open]>summary::after{content:'▾'}
 .alsch .aldis{background:color-mix(in srgb,red 8%,var(--c));color:var(--t);border:1px solid color-mix(in srgb,red 25%,var(--c))}
 .alphone{border-top:1px solid color-mix(in srgb,red 15%,var(--c));padding-top:8px}
 .aladm .pfsec .pfc{margin-left:auto}
+/* v41.7 — Barra in alto, variante A: gradiente --hd1→--hd2 e filo --hdf (dalla config), logo, nome + motto, iniziali → Profilo */
+header{background:linear-gradient(100deg,var(--hd1) 0%,var(--hd2) 100%);border-bottom:3px solid var(--hdf);display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center;padding-top:calc(10px + env(safe-area-inset-top));padding-bottom:10px;min-height:52px}
+header .hlogo{grid-row:1/3;grid-column:1;width:46px;height:46px;display:block;object-fit:contain}
+header .brand{grid-column:2;font-size:21px;font-weight:800;line-height:1.15;padding-right:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+header .sub{grid-column:2;font-size:12px;opacity:1;color:color-mix(in srgb,var(--c) 78%,var(--hd2));padding-right:96px}
+header #hback{grid-column:1/-1}
+body.insub header .hlogo{display:none}
+header #outbtn.hdout{display:none}
+.hbtns{top:50%;transform:translateY(-50%)}
+.hav{width:36px;height:36px;border-radius:50%;border:0;padding:0;background:var(--hdf);color:var(--hd1);font-weight:800;font-size:14px;display:grid;place-items:center;cursor:pointer}
+.hav[hidden]{display:none}
+.alaccs[hidden]{display:none}
+header .sub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.adm header .brand,body.adm header .sub{padding-right:190px}

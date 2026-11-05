@@ -2,9 +2,11 @@
 // Fonte: public.app_settings chiave 'brand' (lettura solo utenti autenticati; scrittura solo admin + CHECK lato server).
 // Prima del login (o se il DB non risponde) si usano l'ultima copia salvata sul telefono o i valori PerGioco.
 // Tutti i valori sono testo dell'utente: mostrarli SEMPRE con esc()/textContent; i loghi solo in <img src> validati.
-const APP_VERSION='41.6';
+const APP_VERSION='41.7';
 const BRAND_DEF=Object.freeze({nome:'PerGioco',motto:'Gioca, prenota, condividi',citta:'Ragusa',instagram:'pergiocoets',email:'info@pergioco.org',logo:'',logo_barra:'',
- colori:Object.freeze({primario:'#14254a',secondario:'#2a4785',accento:'#f2b134',sfondo:'#f4f6fb'})});
+ colori:Object.freeze({primario:'#14254a',secondario:'#2a4785',accento:'#f2b134',sfondo:'#f4f6fb',barra1:'#0f1c3d',barra2:'#1f3d7a',filo:'#ffd76a'})});
+// v41.7 — logo della barra predefinito (dado bianco) se la config non ne ha uno
+const BRAND_LOGO_BARRA='img/logo-barra.svg';
 const BRAND={
  KEY:'pergioco-brand',v:null,loaded:false,
  LIM:{nome:[2,40],motto:[0,80],citta:[0,40]},LOGO_MAX:150000,
@@ -33,7 +35,7 @@ const BRAND={
   const{error}=await c.from('app_settings').upsert({key:'brand',value:v});if(error)throw error;this.v=v;try{localStorage.setItem(this.KEY,JSON.stringify(v))}catch(e){}this.apply();return v},
  ig(){return this.v.instagram?{url:'https://www.instagram.com/'+encodeURIComponent(this.v.instagram)+'/',tag:'@'+this.v.instagram}:null},
  tag(s){return '#'+String(s||'').normalize('NFD').replace(/[^A-Za-z0-9]/g,'')},
- vars(c,el){el=el||document.documentElement;el.style.setProperty('--b',c.primario);el.style.setProperty('--b2',c.secondario);el.style.setProperty('--a',c.accento);el.style.setProperty('--bg',c.sfondo)},
+ vars(c,el){el=el||document.documentElement;el.style.setProperty('--b',c.primario);el.style.setProperty('--b2',c.secondario);el.style.setProperty('--a',c.accento);el.style.setProperty('--bg',c.sfondo);el.style.setProperty('--hd1',c.barra1);el.style.setProperty('--hd2',c.barra2);el.style.setProperty('--hdf',c.filo)},
  apply(){const v=this.v;this.vars(v.colori);const b=document.querySelector('header .brand'),s=document.querySelector('header .sub');if(b)b.textContent=v.nome;if(s){s.textContent=v.motto;s.hidden=!v.motto}
   document.title=v.nome+(v.motto?' – '+v.motto:'');const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=v.colori.primario;const a=document.querySelector('meta[name="apple-mobile-web-app-title"]');if(a)a.content=v.nome}
 };
