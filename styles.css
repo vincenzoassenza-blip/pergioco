@@ -529,3 +529,40 @@ details[open]>summary::after{content:'▾'}
 .cldet a,.clln a,.clp{text-decoration:none}
 .clsub{padding-left:8px}
 .cllink{color:var(--b2);font-weight:600;cursor:pointer}
+/* v41.6 — Altro / Gestione: menu a righe ▸/▾, elenco staff unico, Strumenti avanzati rosati, Soci con ricerca */
+.altit{margin:6px 2px 10px}
+.alcard{padding:4px}
+.alr{display:flex;align-items:center;gap:10px;padding:12px 10px;min-height:44px;cursor:pointer;color:inherit;text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--b2) 10%,var(--c));list-style:none}
+.alr::-webkit-details-marker{display:none}
+.alr:hover,.alr:focus-visible{background:color-mix(in srgb,var(--b2) 6%,var(--c))}
+.alcard>.alr:last-child,.alcard>details:last-child:not([open])>.alr,.alcard>a.alr:last-child{border-bottom:0}
+.alr .ic{width:28px;font-size:20px;text-align:center;flex:none}
+.alr .t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.alr .t b{color:var(--b);font-weight:800}
+.alr .sub{font-size:13px;color:var(--m);overflow-wrap:anywhere}
+.alr .ar{margin-left:auto}
+.alr.alsub{padding-left:48px}
+.alkw{background:color-mix(in srgb,var(--b2) 12%,var(--c));color:var(--b);border-radius:6px;padding:1px 6px;font-weight:700}
+.alchip{display:inline-block;margin-left:8px;background:var(--b);color:var(--c);border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700;vertical-align:middle}
+.alsm{font-weight:400;color:var(--m);font-size:13px;margin-left:6px}
+.alr .t:has(.alchip),.alr .t:has(.alsm){flex-direction:row;align-items:center;flex-wrap:wrap}
+.ali{display:inline-block;color:var(--m);font-weight:400;cursor:help}
+.alhint{font-size:13px;color:var(--m);margin:6px 10px}
+.albox{padding:6px 12px 12px;display:flex;flex-direction:column;gap:6px}
+.allink{color:var(--b2);text-decoration:none;font-weight:700}
+.alstaff #adm{box-shadow:none;margin:0;padding:4px 10px 10px}
+.allist .alpanel{box-shadow:none;margin:0;padding:8px 10px 12px;background:color-mix(in srgb,var(--b2) 4%,var(--c));border-bottom:1px solid color-mix(in srgb,var(--b2) 10%,var(--c))}
+.alpink{background:color-mix(in srgb,red 7%,var(--c));border:1px solid color-mix(in srgb,red 22%,var(--c));padding:4px}
+.alpink>.alr{border-bottom:0}
+.alfoot{text-align:center;font-size:12px;color:var(--m);margin:4px 0 16px}
+.alq{width:100%;box-sizing:border-box;margin:2px 0 6px}
+.alnew{border:1px dashed color-mix(in srgb,var(--b2) 30%,var(--c));border-radius:10px;margin:4px 0}
+.alform{padding:6px 2px 10px}
+.req{color:var(--b2);font-weight:800}
+.alsoc{border-bottom:1px solid color-mix(in srgb,var(--b2) 10%,var(--c))}
+.alsoc:last-child{border-bottom:0}
+.alsr{border-bottom:0;padding:10px 6px}
+.alsch{display:flex;gap:8px;flex-wrap:wrap;padding:0 6px 12px 44px}
+.alsch .aldis{background:color-mix(in srgb,red 8%,var(--c));color:var(--t);border:1px solid color-mix(in srgb,red 25%,var(--c))}
+.alphone{border-top:1px solid color-mix(in srgb,red 15%,var(--c));padding-top:8px}
+.aladm .pfsec .pfc{margin-left:auto}
