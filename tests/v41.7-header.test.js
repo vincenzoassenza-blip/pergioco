@@ -33,7 +33,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   await q(()=>go('config'));await W(1500);chk(await q(()=>['barra1','barra2','filo'].every(k=>document.getElementById('cfc-'+k))),'config: i 3 colori della barra');
   chk(errs.length===0,'staff: nessun errore JS '+errs.join('|'));await p.context().close()}
  const h=fs.readFileSync(__dirname+'/../index.html','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8'),js=fs.readFileSync(__dirname+'/../header.js','utf8'),css=fs.readFileSync(__dirname+'/../styles.css','utf8'),mf=fs.readFileSync(__dirname+'/../manifest.json','utf8');
- chk(/altro\.js\?v=41\.6"><\/script><script src="header\.js\?v=41\.7"><\/script>/.test(h)&&/pergioco-v41\.[78]/.test(sw)&&sw.includes('header.js?v=41.7')&&sw.includes('img/logo-barra.svg')&&/styles\.css\?v=41\.[78]/.test(h)&&/APP_VERSION='41\.[78]'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8')),'versione 41.7, header.js ultimo');
+ chk(/altro\.js\?v=41\.6"><\/script><script src="header\.js\?v=41\.7"><\/script>/.test(h)&&/pergioco-v41\.[78]/.test(sw)&&sw.includes('header.js?v=41.7')&&sw.includes('img/logo-barra.svg')&&/styles\.css\?v=41\.[78]/.test(h)&&/APP_VERSION='41\.[78](\.\d)?'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8')),'versione 41.7, header.js ultimo');
  chk(!/innerHTML|insertAdjacentHTML|outerHTML/.test(js)&&!/club|ludoteca/i.test(js),'header.js: solo textContent, nessun «club»');
  const blk=css.slice(css.indexOf('/* v41.7 — Barra'));chk(blk.length>100&&!/#[0-9a-f]{3,6}\b/i.test(blk.replace(/#(outbtn|hback|modebtn|avbtn)\b/g,'')),'CSS v41.7 solo variabili');
  chk(/name="theme-color"/.test(h)&&!/barra|hd1/.test(mf),'manifest e theme-color non toccati');

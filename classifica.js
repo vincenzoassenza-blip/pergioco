@@ -3,11 +3,11 @@
 // 4 pareggi come +N e testi brevi · 5 icone diverse per record · 6 righe cliccabili ▸/▾ senza sottolineatura.
 // Riordina il DOM già prodotto (dati, calcoli ed escaping restano quelli di app.js / xp.js); il testo nuovo passa da textContent.
 (function(){
-const T={periodo:'Periodo',tutto:'Tutto',tu:'Tu',tutta:'Tutta la classifica',altri:'Altri record',xpNota:'Gli XP sono totali: non cambiano con il periodo.',
+const T={periodo:'Periodo',tutto:'Tutto',tu:'Tu',tutta:'Tutta la classifica',altri:'Altri record',xpNota:'Gli XP sono totali: non cambiano con il periodo.',vuoto:'Nessun record ancora.',partite1:'partita',partiteN:'partite',
  main:['Più presente','Più vittorie','Più partite','Miglior % di vittorie','Più giochi diversi','Gioco più giocato'],
  brevi:{'Pioniere: primo a giocare più giochi dell\'associazione':'Pioniere','Genio della lampada – Più desideri avverati':'Desideri avverati','Più partite in una serata':'Più partite in una sera','Più presenze agli eventi':'Più presenze a eventi'},
  icone:{'Più presente':'⭐','Più vittorie':'🏆','Più partite':'🎲','Miglior % di vittorie':'📈','Più giochi diversi':'🧭','Gioco più giocato':'🧩','Partita più lunga':'⏱️','Serie di vittorie':'🔥'},
- sez:{rgames:'📊',uxnums:'🏛️'}};
+ sez:{rgames:'📊',uxnums:'🏛️'},nums:{Partite:'🎲',Soci:'👥',Ospiti:'🙋'}};
 const OPEN=new Set();window.CL415={T,OPEN};
 const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e};
 const arrow=o=>{const a=el('span','ar',o?'▾':'▸');a.setAttribute('aria-hidden','true');return a};
@@ -44,16 +44,23 @@ function record(V){const g=V.querySelector('.rov');if(!g||g.dataset.cl)return;g.
   const t=el('span','t');t.append(el('small',null,T.brevi[it.lab]||it.lab));const n=el('span','nm');
   if(it.names.length){n.append(el('b','who',it.names[0]));if(it.tie)n.append(el('span','tie',`+${it.tie}`))}else n.append(el('span','muted','—'));t.append(n);r.append(t);
   if(it.v){r.append(el('span','pill',it.v.replace(/\s*\(.*\)\s*$/,'')));}
-  if(!it.names.length){w.append(r);return w}
   r.append(arrow(o));r.setAttribute('aria-expanded',o);w.append(r);
-  if(o){const d=el('div','cldet');const hc=it.h.cloneNode(true);hc.className='cldh';if(it.pid)hc.querySelectorAll('.pv:not([data-pv])').forEach(x=>{x.dataset.pv=it.pid;x.classList.add('cllink')});d.append(hc);if(it.v)d.append(el('div','muted',it.v));w.append(d)}
+  if(o&&!it.names.length){const d=el('div','cldet muted',T.vuoto);w.append(d)}
+  else if(o){const d=el('div','cldet');const hc=it.h.cloneNode(true);hc.className='cldh';if(it.pid)hc.querySelectorAll('.pv:not([data-pv])').forEach(x=>{x.dataset.pv=it.pid;x.classList.add('cllink')});d.append(hc);if(it.v)d.append(el('div','muted',it.v));w.append(d)}
   act(r,()=>{OPEN.has(k)?OPEN.delete(k):OPEN.add(k);draw()});return w};
  const box=el('div','clrec');g.after(box);g.hidden=true;
  const draw=()=>{const M=T.main.map(l=>items.find(i=>i.lab===l)).filter(Boolean),A=items.filter(i=>!T.main.includes(i.lab));box.replaceChildren(...M.map(row));
-  if(A.length){const o=OPEN.has('altri'),r=el('div','clln clrow clmore');r.dataset.clx='altri';r.append(el('span','ic','➕'),el('b','t',`${T.altri} (${A.length})`),arrow(o));r.setAttribute('aria-expanded',o);act(r,()=>{OPEN.has('altri')?OPEN.delete('altri'):OPEN.add('altri');draw()});box.append(r);
+  if(A.length){const o=OPEN.has('altri'),r=el('div','clln clrow clmore');r.dataset.clx='altri';r.append(el('span','ic','🗂️'),el('b','t',T.altri),el('span','pill',String(A.length)),arrow(o));r.setAttribute('aria-expanded',o);act(r,()=>{OPEN.has('altri')?OPEN.delete('altri'):OPEN.add('altri');draw()});box.append(r);
    if(o){const s=el('div','clsub');s.append(...A.map(row));box.append(s)}}};
  draw()}
+
+// v41.8.1 · Statistiche per gioco e Numeri dell'associazione come righe uguali ai record (niente riquadri)
+function stats(V){V.querySelectorAll('#rgames button.rgl:not(.clln)').forEach(b=>{const nm=b.querySelector('span:not(.muted)'),mu=b.querySelector('.muted'),n=parseInt((mu&&mu.textContent)||'0',10)||0;
+  const t=el('span','t');t.append(el('b','who',nm?nm.textContent:b.textContent));b.replaceChildren(el('span','ic','🎲'),t,el('span','pill',`${n} ${n===1?T.partite1:T.partiteN}`),arrow(false));b.classList.add('clln','clrow')})}
+function nums(V){const r=V.querySelector('#uxnums>div.row');if(!r||r.dataset.cl)return;r.dataset.cl='1';const box=el('div','clnums');
+ [...r.querySelectorAll(':scope>.card')].forEach(c=>{const l=((c.querySelector('.muted')||{}).textContent||'').trim(),v=((c.querySelector('.big')||{}).textContent||'').trim(),w=el('div','clrw'),x=el('div','clln clstat');
+  const t=el('span','t');t.append(el('b','who',l));x.append(el('span','ic',T.nums[l]||'📌'),t,el('span','pill',v));w.append(x);box.append(w)});r.replaceWith(box)}
 function sezioni(V){for(const id in T.sez){const s=V.querySelector(`#${id}>summary>b`);if(s){const t=s.textContent.replace(/^\S+\s/,'');if(!s.textContent.startsWith(T.sez[id]))s.textContent=T.sez[id]+' '+t}}}
-const _r=views.record;views.record=async function(...a){const r=await _r.apply(this,a);try{if(RA._p)await RA._p;await new Promise(z=>setTimeout(z,0));periodo(V);podio(V);record(V);sezioni(V)}catch(e){console.warn('classifica',e)}return r};
+const _r=views.record;views.record=async function(...a){const r=await _r.apply(this,a);try{if(RA._p)await RA._p;await new Promise(z=>setTimeout(z,0));periodo(V);podio(V);record(V);stats(V);nums(V);sezioni(V)}catch(e){console.warn('classifica',e)}return r};
 {const m=RA.mount;RA.mount=function(...a){RA._p=m.apply(this,a);return RA._p}}
 })();

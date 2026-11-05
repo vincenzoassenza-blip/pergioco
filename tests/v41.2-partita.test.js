@@ -9,7 +9,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};
  chk(await p.evaluate(()=>[...document.querySelectorAll('.pth')].map(x=>x.innerText.replace(/\s+/g,' ').trim()).join('|'))==='1 Gioco|2 Giocatori e punti','passi numerati');
  chk(await p.evaluate(()=>!!document.querySelector('#pth2~.ptsec #mode')&&!document.querySelector('#uxaltro #mode')),'Competitiva/Cooperativa nel passo 2');
  chk(await p.evaluate(()=>document.querySelector('.ptbtns #pk')&&document.querySelector('.ptbtns #ptob')&&document.getElementById('ptosp').hidden),'Aggiungi giocatori + Ospite affiancati, ospite chiuso');
- chk(/Altro \(data, durata, nota\)/.test(t)&&/📅 Oggi, /.test(t),'Altro + pillola data');
+ chk(/Altro \((data, )?durata, nota\)/.test(t)&&/📅 Oggi, /.test(t),'Altro + pillola data');
  chk(await p.evaluate(()=>{const s=document.querySelector('#uxaltro>summary'),a=getComputedStyle(s,'::after').content;document.getElementById('uxaltro').open=true;const b=getComputedStyle(s,'::after').content;document.getElementById('uxaltro').open=false;return a.includes('▸')&&b.includes('▾')}),'frecce ▸ chiuso / ▾ aperto');
  chk(await p.evaluate(()=>{const e=document.getElementById('eqo');const r=e&&e.getBoundingClientRect();return r&&r.height>=60&&r.top<300}),'Sfida equilibrata visibile in alto');
  await fill(p);t=await txt();

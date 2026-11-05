@@ -33,10 +33,10 @@ chk(r.heads.length===3&&/^Oggi, \S+ \d+ novembre · 1 tavolo/.test(r.heads[0])&&
 chk(r.lv===0&&!r.nm,'niente livelli né N/M');chk(r.hostOnce===1,'host una sola volta');chk(r.sd&&!r.full,'Siediti solo se c’è posto');chk(r.j===0,'socio: nessun picker di tutti i soci');
 chk(!r.o1&&r.o3,'+ Ospite / Chiudi e registra solo all’host');chk(r.lvBtn,'Lascia il posto se seduto');chk(!r.nt&&r.fab,'il + è l’unico modo');chk(r.seg,'tab Tavoli/Eventi');chk(r.cov===5,'copertine');chk(!r.xss&&(SH||r.noteEsc),'XSS escape');
 if(SH)await p.screenshot({path:OUT+'agenda-a-socio.png'});
-await p.click('[data-sd="t1"]');await p.waitForTimeout(500);r=await p.evaluate(()=>SAVED[0]);
+await p.evaluate(()=>{const x=document.querySelector('[data-t="t1"]').closest('.agsec');document.querySelector('.agdays [data-d="'+x.dataset.day+'"]').click()});await p.click('[data-sd="t1"]');await p.waitForTimeout(500);r=await p.evaluate(()=>SAVED[0]);
 chk(r&&r.seat==='t1'&&r.a==='join'&&r.me==='m0','Siediti usa la RPC solo per me');
 const SRC=require('fs').readFileSync('app.js','utf8'),DSRC=require('fs').readFileSync('data.js','utf8');chk(/DB\.seat\(t\.id,'join'/.test(SRC)&&/DB\.seat\(t\.id,'leave'/.test(SRC)&&!/players:\[\.\.\.pl,\{memberId:meM\.id\}\]/.test(SRC),'Siediti/Lascia usano DB.seat');chk(/rpc\('table_seat'/.test(DSRC),'DB.seat chiama la RPC table_seat');
-await p.evaluate(()=>{T[1].players=[{memberId:'m1'},{memberId:'m2'},{memberId:'m4'},{memberId:'m5'}];SAVED.length=0;go('serata')});await p.waitForTimeout(800);
+await p.evaluate(()=>{T[1].players=[{memberId:'m1'},{memberId:'m2'},{memberId:'m4'},{memberId:'m5'}];SAVED.length=0;window._ser={date:romeToday()};go('serata')});await p.waitForTimeout(800);
 await p.evaluate(()=>{T[1].players=[{memberId:'m1'},{memberId:'m2'},{memberId:'m4'},{memberId:'m5'}]});
 await p.click('#tfab');await p.waitForTimeout(500);
 r=await p.evaluate(()=>({sh:!!document.querySelector('.agov .agsheet'),th:document.querySelector('#th')?.value,thType:document.querySelector('#th')?.type,db:document.querySelector('#agdb')?.textContent,tn:document.querySelector('#tn')?.maxLength}));
