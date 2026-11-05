@@ -12,7 +12,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   chk(await q(()=>{const s=document.querySelector('.alstaff');const cs=[...document.querySelectorAll('#view>.card,#view>details')];return s&&!s.open&&s.contains(document.getElementById('adm'))&&cs.indexOf(s)===cs.length-1&&s.querySelector('summary .ali')}),'1: «🔒 Accesso staff ⓘ» in fondo, chiuso, contiene il login');
   chk(await q(()=>[...document.querySelectorAll('#adm label')].filter(l=>/^(Email|Password)/.test(l.textContent)).every(l=>l.querySelector('.req'))),'6: Email * Password *');
   chk(await q(()=>!document.getElementById('allist')&&!document.getElementById('alstr')&&!document.getElementById('bkp')),'socio: niente elenco staff né strumenti');
-  chk(await q(()=>document.querySelector('.alfoot').textContent==='PerGioco · v'+APP_VERSION&&/^41\.[6-8]$/.test(APP_VERSION)&&!/40\.6/.test(document.getElementById('view').textContent)),'7: versione = APP_VERSION');
+  chk(await q(()=>document.querySelector('.alfoot').textContent==='PerGioco · v'+APP_VERSION&&/^41\.[6-8](\.\d)?$/.test(APP_VERSION)&&!/40\.6/.test(document.getElementById('view').textContent)),'7: versione = APP_VERSION');
   chk(await q(()=>!document.querySelector('#view>.igl')&&![...document.querySelectorAll('#view>.card.muted')].length),'vecchio piè di pagina e riga IG tolti');
   let lo=0;await q(()=>{window.confirmLogout=async()=>{window._lo=1}});await p.click('.alacc>summary');await p.click('.alacc .alsub');chk(await q(()=>window._lo===1),'1: «Esci dall\'account» chiama confirmLogout');
   chk(await q(()=>[...document.querySelectorAll('.alr')].every(r=>getComputedStyle(r).textDecorationLine==='none'&&getComputedStyle(r).cursor==='pointer')),'righe senza sottolineatura, cliccabili');
@@ -44,7 +44,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   await p.click('[data-alt=partite]');await W(200);chk(await q(()=>document.getElementById('adm').hidden&&document.querySelector('[data-alt=partite] .ar').textContent==='▸'),'3: richiusura ▸');
   await q(()=>{window._g=null;const o=go;window.go=v=>{window._g=v};document.querySelector('[data-alb=acfg]').click();window.go=o});chk(await q(()=>window._g==='config'),'3: Configurazione raggiungibile');
   await q(()=>{window._g=null;const o=go;window.go=v=>{window._g=v};document.querySelector('[data-alb=ast]').click();window.go=o});chk(await q(()=>window._g==='stats'),'3: Statistiche associazione');
-  chk(await q(()=>/^PerGioco · v41\.[6-8] · 📸 @/.test(document.querySelector('.alfoot').textContent)),'7: «PerGioco · v41.6 · 📸 @tag»');
+  chk(await q(()=>/^PerGioco · v41\.[6-8](\.\d)? · 📸 @/.test(document.querySelector('.alfoot').textContent)),'7: «PerGioco · v41.6 · 📸 @tag»');
   // moderatore: niente Configurazione, Partite, Moderatori, Strumenti
   await q(()=>{DB.remote.modCached=true;go('altro')});await W(1000);
   chk(await q(()=>{const t=[...document.querySelectorAll('#allist>.alr b')].map(b=>b.textContent);return !t.includes('Configurazione')&&!t.includes('Partite')&&!t.includes('Moderatori')&&t.includes('Soci')&&document.getElementById('alstr').hidden}),'mod: niente Configurazione / Strumenti');
@@ -57,7 +57,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
  // statico
  const s=fs.readFileSync(__dirname+'/../altro.js','utf8'),h=fs.readFileSync(__dirname+'/../index.html','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8'),css=fs.readFileSync(__dirname+'/../styles.css','utf8');
  chk(!/innerHTML|insertAdjacentHTML|outerHTML/.test(s),'altro.js senza innerHTML');chk(!/club|ludoteca/i.test(s),'niente «club»/«ludoteca»');
- chk(/classifica\.js\?v=41\.5"><\/script><script src="altro\.js\?v=41\.6"><\/script>/.test(h)&&/pergioco-v41\.[6-8]/.test(sw)&&sw.includes('altro.js?v=41.6')&&/styles\.css\?v=41\.[6-8]/.test(h)&&/APP_VERSION='41\.[6-8]'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8')),'versione 41.6+, altro.js dopo classifica');
+ chk(/classifica\.js\?v=41\.5"><\/script><script src="altro\.js\?v=41\.6"><\/script>/.test(h)&&/pergioco-v41\.[6-8]/.test(sw)&&sw.includes('altro.js?v=41.6')&&/styles\.css\?v=41\.[6-8]/.test(h)&&/APP_VERSION='41\.[6-8](\.\d)?'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8')),'versione 41.6+, altro.js dopo classifica');
  const blk=css.slice(css.indexOf('/* v41.6 — Altro'));chk(blk.length>100&&!/#[0-9a-f]{3,6}\b/i.test(blk.replace(/#(adm|alstr|allist|alphone|aladm)\b/g,'')),'CSS v41.6 solo variabili');
  chk(/adminMode\(\)\)staff\(V\)/.test(s)&&/if\(!h\|\|!adminMode\(\)\)return/.test(s),'staff controlla adminMode()');
  await b.close();console.log(`${ok}/${n}`);process.exit(ok===n?0:1)})();

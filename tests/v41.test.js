@@ -42,7 +42,7 @@ r=await p.evaluate(()=>({u:UPS[0],b:document.querySelector('header .brand').text
 chk(r.u&&r.u.t==='app_settings'&&r.u.x.key==='brand'&&r.u.x.value.nome==='Associazione Prova'&&r.u.x.value.instagram==='prova.ig'&&r.u.x.value.colori.accento==='#00aa9e','upsert brand');chk(r.b==='Associazione Prova','barra aggiornata dopo il salvataggio');
 // sorgenti
 const idx=fs.readFileSync('index.html','utf8'),sw=fs.readFileSync('sw.js','utf8'),sql=fs.readFileSync('supabase/migrate-v41.sql','utf8');
-chk(/const C='pergioco-v41\.\d'/.test(sw)&&/brand\.js\?v=41\.\d/.test(sw)&&/brand\.js\?v=41\.\d[^]*app\.js\?v=41\.\d/.test(idx)&&!/v=40\./.test(idx+sw),'versione 41.0 ovunque, brand.js prima di app.js');
+chk(/const C='pergioco-v41\.\d(\.\d)?'/.test(sw)&&/brand\.js\?v=41\.\d/.test(sw)&&/brand\.js\?v=41\.\d[^]*app\.js\?v=41\.\d/.test(idx)&&!/v=40\./.test(idx+sw),'versione 41.0 ovunque, brand.js prima di app.js');
 chk(!/· v37\.8|@pergiocoets'|Statistiche PerGioco/.test(fs.readFileSync('app.js','utf8')+fs.readFileSync('ig.js','utf8')+fs.readFileSync('stats.js','utf8')),'niente branding fisso residuo');
 chk(/revoke all on public\.app_settings from anon/i.test(sql)&&/brand_valid/.test(sql),'SQL: anon revocato e vincolo');
 chk(!errs.length,'nessun errore JS '+errs.join('|'));

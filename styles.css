@@ -589,3 +589,14 @@ body.adm header .brand,body.adm header .sub{padding-right:190px}
 .uxcolh.g8 .uxsort{position:relative}.uxcolh.g8 .uxsort::after{content:'▾';position:absolute;right:0;top:50%;transform:translateY(-50%);pointer-events:none;font-size:13px}
 .g8s .g8sep{margin:0 5px}.uxcolh.g8 .uxsort select{width:auto;max-width:none;flex:none}.uxcolh.g8 .uxsort{flex:none;margin:0}
 .uxcolh.g8 .uxsort select{field-sizing:content;min-width:0}
+.ptdw{position:relative;display:inline-block}
+/* v41.8.1 — Record uniforme: anche Statistiche per gioco e Numeri sono righe */
+#rgames button.clln{width:100%;background:none;border:0;border-top:1px solid color-mix(in srgb,var(--m) 22%,transparent);border-radius:0;font:inherit;text-align:left;min-height:44px;margin:0}
+#rgames summary+button.clln{border-top:0}.clln.clstat{cursor:default}.clnums .clrw:first-child .clln{border-top:0}
+.clmore .t{flex:1}
+#view.vprep{opacity:0;pointer-events:none}
+/* v41.8.1 — Profilo: livello in evidenza */
+.lvh{display:flex;flex-direction:column;gap:6px;width:100%;margin:12px 0 0;padding:12px 14px;border:1px solid color-mix(in srgb,var(--a) 60%,transparent);border-radius:14px;background:color-mix(in srgb,var(--a) 16%,var(--c));color:var(--b);font:inherit;text-align:left;text-decoration:none;cursor:pointer}
+.lvh .lvht{display:flex;align-items:baseline;gap:8px}.lvh .lvn{font-size:26px;font-weight:800}.lvh .lvt{font-size:20px;font-weight:700}.lvh .lvx{margin-left:auto;font-size:13px;color:var(--m)}
+.lvh .lvbar{display:block;height:10px;border-radius:999px;background:color-mix(in srgb,var(--b) 12%,var(--c));overflow:hidden}.lvh .lvbar i{display:block;height:100%;background:var(--a);border-radius:999px}
+.lvh .lvir{display:flex;align-items:center;font-size:14px;font-weight:600}.lvh .lvir .ar{margin-left:auto}.lvpan{padding:8px 4px 0}.lvpan>b{display:block;margin-bottom:4px;color:var(--b)}

@@ -23,7 +23,7 @@ chk(/min-height:44px/.test(css),'target tattili 44px');
   DB.games=async()=>gs;DB.plays=async()=>ps;DB.members=async()=>ms;DB.allTables=async()=>[{id:'t1',date:T,status:'open',gameId:'g0',hostId:'m0',seats:4,players:[{memberId:'m0'}],time:'21:00'}]});
  const t=async(fn,ms=1200)=>{await p.evaluate(fn);await p.waitForTimeout(ms)};
  await t(()=>go('nuova'));
- const N=await p.evaluate(()=>({alt:!!document.querySelector('#uxaltro:not([open]) #d'),nt:!!document.querySelector('#uxaltro #nt'),du:!!document.querySelector('#uxaltro #du'),pk:!document.querySelector('#uxaltro #pk')&&!!document.querySelector('#pk'),g:!document.querySelector('#uxaltro #g'),today:!!document.querySelector('.uxtoday .gl'),xss:!document.querySelector('.uxtoday b b')}));
+ const N=await p.evaluate(()=>({alt:!!document.querySelector('#uxaltro:not([open]) #du')&&!!document.querySelector('.ptdw #d'),nt:!!document.querySelector('#uxaltro #nt'),du:!!document.querySelector('#uxaltro #du'),pk:!document.querySelector('#uxaltro #pk')&&!!document.querySelector('#pk'),g:!document.querySelector('#uxaltro #g'),today:!!document.querySelector('.uxtoday .gl'),xss:!document.querySelector('.uxtoday b b')}));
  chk(N.alt&&N.nt&&N.du,'Partita: data, durata e nota dentro «Altro» chiuso');chk(N.pk&&N.g,'Partita: gioco e giocatori in alto');chk(N.today,'Partita: tavoli in Agenda oggi con nome cliccabile');chk(N.xss,'nomi dei giochi escapati');
  await p.evaluate(()=>{document.querySelector('#d').value='bad';document.querySelector('#uxaltro').open=false;document.querySelector('#save').click()});await p.waitForTimeout(300);
  chk(await p.evaluate(()=>document.querySelector('#uxaltro').open),'errore sulla data apre «Altro»');

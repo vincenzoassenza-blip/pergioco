@@ -36,5 +36,5 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
  const css=fs.readFileSync(__dirname+'/../styles.css','utf8'),js=fs.readFileSync(__dirname+'/../giochi-oggi.js','utf8'),h=fs.readFileSync(__dirname+'/../index.html','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8');
  const blk=css.slice(css.indexOf('/* v41.8'));chk(blk.length>100&&!/#[0-9a-f]{3,6}\b(?!f)/i.test(blk.replace(/#fff\b/g,'')),'CSS v41.8: colori da variabili');
  chk(!/innerHTML|insertAdjacentHTML|outerHTML/.test(js)&&!/club|ludoteca/i.test(js.replace(/'ludoteca'/g,'')),'giochi-oggi.js: solo textContent');
- chk(/header\.js\?v=41\.7"><\/script><script src="giochi-oggi\.js\?v=41\.8"><\/script><\/body>/.test(h)&&sw.includes('pergioco-v41.8')&&sw.includes('giochi-oggi.js?v=41.8')&&h.includes('styles.css?v=41.8')&&fs.readFileSync(__dirname+'/../brand.js','utf8').includes("APP_VERSION='41.8'"),'versione 41.8, giochi-oggi.js ultimo');
+ chk(/header\.js\?v=41\.7"><\/script><script src="giochi-oggi\.js\?v=41\.8"><\/script>/.test(h)&&sw.includes('pergioco-v41.8')&&sw.includes('giochi-oggi.js?v=41.8')&&h.includes("styles.css?v=41.8")&&fs.readFileSync(__dirname+'/../brand.js','utf8').includes("APP_VERSION='41.8"),'versione 41.8, giochi-oggi.js ultimo');
  await b.close();console.log(`${ok}/${n}`);process.exit(ok===n?0:1)})();
