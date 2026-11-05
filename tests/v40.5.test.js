@@ -33,6 +33,6 @@ chk(/pergioco-v(40\.([5-9]|\d\d)|4[1-9]\.\d+)[.0-9]*'/.test(sw)&&/ux40\.js\?v=(4
  await p.evaluate(()=>{const s=(id,v)=>{const e=document.getElementById(id);e.value=v||[...e.options].find(o=>o.value).value;e.dispatchEvent(new Event('change'))};s('t');s('c');s('m');s('k')});await p.waitForTimeout(300);
  const bd=await p.evaluate(()=>({b:(document.querySelector('#uxfb .uxbadge')||{}).textContent,clr:document.getElementById('gclr').hidden}));chk(bd.b==='4'&&!bd.clr,'badge conta 4 filtri e Azzera visibile ('+bd.b+')');
  await p.click('#gclr');await p.waitForTimeout(300);await p.fill('#q','az');await p.waitForTimeout(400);
- chk(/1 gioco$/.test(await p.$eval('.uxcolh h3',e=>e.textContent)),'conteggio filtrato nel titolo');chk(await p.$$eval('#uxcons',e=>e.length)===1,'card presente anche con pochi risultati');
+ chk(/1 gioco$/.test(await p.$eval('.uxcolh h3 #uxn',e=>e.textContent)),'conteggio filtrato nel titolo');chk(await p.$$eval('#uxcons',e=>e.length)===1,'card presente anche con pochi risultati');
  await p.fill('#q','');await p.waitForTimeout(400);await p.click('#uxcons');await p.waitForTimeout(500);chk(await p.$$eval('.cwz',e=>e.length)===1,'card apre il consigliere');
  chk(!errs.length,'nessun errore JS '+errs.join('|'));console.log(`v40.5: ${ok}/${n}`);await b.close();process.exit(ok===n?0:1)})();

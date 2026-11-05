@@ -2,7 +2,7 @@
 // Fonte: public.app_settings chiave 'brand' (lettura solo utenti autenticati; scrittura solo admin + CHECK lato server).
 // Prima del login (o se il DB non risponde) si usano l'ultima copia salvata sul telefono o i valori PerGioco.
 // Tutti i valori sono testo dell'utente: mostrarli SEMPRE con esc()/textContent; i loghi solo in <img src> validati.
-const APP_VERSION='41.7';
+const APP_VERSION='41.8';
 const BRAND_DEF=Object.freeze({nome:'PerGioco',motto:'Gioca, prenota, condividi',citta:'Ragusa',instagram:'pergiocoets',email:'info@pergioco.org',logo:'',logo_barra:'',
  colori:Object.freeze({primario:'#14254a',secondario:'#2a4785',accento:'#f2b134',sfondo:'#f4f6fb',barra1:'#0f1c3d',barra2:'#1f3d7a',filo:'#ffd76a'})});
 // v41.7 — logo della barra predefinito (dado bianco) se la config non ne ha uno
@@ -71,12 +71,14 @@ const TXT_DEF=Object.freeze({santo:"Sant'Antero",festa:'01-03',antero:'antero',a
  coppa_intro:'Torneo svizzero 1 contro 1 o a tavoli da 3–4: nessun tavolo ripetuto, mai lo stesso gioco due volte.',
  coppa_regole_tavoli:'Regole: mai due volte lo stesso tavolo, si cerca di non ritrovare gli stessi avversari; i tavoli sono equilibrati per punti e ranking; ogni tavolo gioca un gioco adatto al numero di giocatori, mai già giocato da nessuno di loro, scelto per favorire chi ha meno vittorie.',
  coppa_regole_1v1:'Regole: niente rivincite, nessun gioco si ripete per lo stesso giocatore, a chi ha meno vittorie toccano giochi più favorevoli. Con giocatori dispari uno riposa (vittoria a tavolino, al massimo una volta).',
- ente_nome:'PerGioco APS',ente_cf:'92052290886'});
+ ente_nome:'PerGioco APS',ente_cf:'92052290886',
+ // v41.8 — pagina Giochi: titolo della collezione e striscia dei tavoli
+ collezione:'📚 La nostra collezione',g8_oggi:'📅 Oggi',g8_prox:'📅 Prossimo tavolo',g8_tav1:'tavolo',g8_tavn:'tavoli',g8_lib1:'posto libero',g8_libn:'posti liberi',g8_pieni:'nessun posto libero'});
 const TXT={KEY:'pergioco-testi',v:null,loaded:false,
  // [min,max]; brevi: niente < > " & (finiscono dentro testi HTML); lunghi: niente < > e sempre esc()
- LIM:{santo:[2,40],festa:[0,5],antero:[2,20],anteri:[2,20],coppa_breve:[2,30],coppa_plur:[2,30],coppa_intro:[0,400],coppa_regole_tavoli:[0,600],coppa_regole_1v1:[0,600],ente_nome:[2,80],ente_cf:[0,16]},
+ LIM:{santo:[2,40],festa:[0,5],antero:[2,20],anteri:[2,20],coppa_breve:[2,30],coppa_plur:[2,30],coppa_intro:[0,400],coppa_regole_tavoli:[0,600],coppa_regole_1v1:[0,600],ente_nome:[2,80],ente_cf:[0,16],collezione:[2,40],g8_oggi:[2,30],g8_prox:[2,30],g8_tav1:[2,20],g8_tavn:[2,20],g8_lib1:[2,30],g8_libn:[2,30],g8_pieni:[2,40]},
  LUNGHI:['coppa_intro','coppa_regole_tavoli','coppa_regole_1v1'],BADS:/[<>"&]/,BADL:/[<>]/,CF:/^[A-Za-z0-9]*$/,FESTA:/^((0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))?$/,
- L:{santo:'Santo / patrono',festa:'Festa del santo (MM-GG)',antero:'Numero magico (singolare)',anteri:'Numero magico (plurale)',coppa_breve:'Nome breve della Coppa',coppa_plur:'Plurale',coppa_intro:'Descrizione della Coppa',coppa_regole_tavoli:'Regole (a tavoli)',coppa_regole_1v1:'Regole (1 contro 1)',ente_nome:'Nome legale dell\'ente',ente_cf:'Codice fiscale'},
+ L:{santo:'Santo / patrono',festa:'Festa del santo (MM-GG)',antero:'Numero magico (singolare)',anteri:'Numero magico (plurale)',coppa_breve:'Nome breve della Coppa',coppa_plur:'Plurale',coppa_intro:'Descrizione della Coppa',coppa_regole_tavoli:'Regole (a tavoli)',coppa_regole_1v1:'Regole (1 contro 1)',ente_nome:'Nome legale dell\'ente',ente_cf:'Codice fiscale',collezione:'Titolo della collezione',g8_oggi:'Striscia: oggi',g8_prox:'Striscia: prossimo tavolo',g8_tav1:'Tavolo (singolare)',g8_tavn:'Tavoli (plurale)',g8_lib1:'Posto libero (singolare)',g8_libn:'Posti liberi (plurale)',g8_pieni:'Tutti pieni'},
  ok(k,s){const[a,b]=this.LIM[k];s=String(s);const n=s.trim().length;return n>=a&&n<=b&&!(this.LUNGHI.includes(k)?this.BADL:this.BADS).test(s)&&(k!=='ente_cf'||this.CF.test(s))&&(k!=='festa'||this.FESTA.test(s.trim()))},
  norm(x){const o={};x=x&&typeof x==='object'?x:{};for(const k in TXT_DEF){const s=typeof x[k]==='string'?x[k].trim():null;o[k]=s!==null&&this.ok(k,s)?s:TXT_DEF[k]}return o},
  errors(x){const e=[];for(const k in TXT_DEF){const s=String(x[k]??'').trim(),[a,b]=this.LIM[k];
