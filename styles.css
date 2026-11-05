@@ -580,3 +580,12 @@ header #outbtn.hdout{display:none}
 .alaccs[hidden]{display:none}
 header .sub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 body.adm header .brand,body.adm header .sub{padding-right:190px}
+/* v41.8 — Giochi: striscia Oggi e Ordina nel titolo */
+.g8s{display:flex;align-items:center;gap:2px;width:100%;margin:0 0 10px;padding:10px 14px;border:1px solid var(--a);border-radius:14px;background:color-mix(in srgb,var(--a) 18%,var(--c));color:var(--b);font:inherit;font-size:15px;text-align:left;text-decoration:none;cursor:pointer;min-height:44px}
+.g8s .g8h{font-weight:800}.g8s .g8go{margin-left:auto;padding-left:8px}.g8s .g8sep{color:inherit;opacity:.6}
+.g8s.g8soft{background:transparent;border-color:color-mix(in srgb,var(--b) 18%,transparent);font-size:14px}.g8s.g8soft .g8h{font-weight:600}
+.uxcolh.g8 h3{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 4px}.uxcolh.g8 .uxsort{display:inline-flex;font-size:15px;color:var(--b)}
+.uxcolh.g8 .uxsort select{appearance:none;-webkit-appearance:none;background:transparent;border:0;padding:0 16px 0 0;min-height:32px;font-size:15px;font-weight:600;color:var(--b);text-decoration:none;background-image:none;cursor:pointer}
+.uxcolh.g8 .uxsort{position:relative}.uxcolh.g8 .uxsort::after{content:'▾';position:absolute;right:0;top:50%;transform:translateY(-50%);pointer-events:none;font-size:13px}
+.g8s .g8sep{margin:0 5px}.uxcolh.g8 .uxsort select{width:auto;max-width:none;flex:none}.uxcolh.g8 .uxsort{flex:none;margin:0}
+.uxcolh.g8 .uxsort select{field-sizing:content;min-width:0}
