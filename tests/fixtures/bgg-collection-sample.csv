@@ -1,0 +1,10 @@
+objectname,objectid,yearpublished,minplayers,maxplayers,minplaytime,maxplaytime,playingtime,minage,thumbnail,itemtype
+Catan,13,1995,3,4,60,120,90,10,https://cf.geekdo-images.com/sample/catan.jpg,boardgame
+Azul,230802,2017,2,4,30,45,45,8,https://cf.geekdo-images.com/sample/azul.jpg,boardgame
+Wingspan,266192,2019,1,5,40,70,70,10,https://cf.geekdo-images.com/sample/wingspan.jpg,boardgame
+Brass: Birmingham,28720,2018,2,4,60,120,120,14,,boardgame
+Dixit,39856,2008,3,6,30,30,30,8,,boardgame
+Catan: Cities & Knights,478,1999,3,4,120,120,120,10,,boardgameexpansion
+Pandemic,30549,2008,2,4,45,45,45,8,,boardgame
+Gloomhaven,174430,2017,1,4,60,120,120,14,,boardgame
+"<b>XSS</b> Game",999001,2020,2,4,30,30,30,10,,boardgame
