@@ -32,7 +32,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   chk(await q(()=>(document.querySelector('[data-act="go:stats"]')!==null)===(document.body.dataset.r==='staff'||admin)),R('pulsante statistiche admin solo staff'));
   chk(!alerted&&!errs.length,R('nessun errore/alert: '+errs.join(';')));await p.close()}
  const s=fs.readFileSync(__dirname+'/../sw.js','utf8'),h=fs.readFileSync(__dirname+'/../index.html','utf8'),c=fs.readFileSync(__dirname+'/../classifica.js','utf8');
- chk(/pergioco-v41\.[5-8]/.test(s)&&s.includes('classifica.js?v=41.5')&&/community\.js\?v=41\.4"><\/script><script src="classifica\.js\?v=41\.5/.test(h)&&fs.readFileSync(__dirname+'/../brand.js','utf8').match(/APP_VERSION='41\.[5-8](\.\d)?'/),'versione 41.5+, classifica.js dopo community');
+ chk(/pergioco-v41\.[5-9]/.test(s)&&s.includes('classifica.js?v=41.5')&&/community\.js\?v=41\.4"><\/script><script src="classifica\.js\?v=41\.5/.test(h)&&fs.readFileSync(__dirname+'/../brand.js','utf8').match(/APP_VERSION='41\.[5-9](\.\d)?'/),'versione 41.5+, classifica.js dopo community');
  const css=fs.readFileSync(__dirname+'/../styles.css','utf8').split('/* v41.5')[1]||'';chk(css&&!/#[0-9a-f]{3,6}\b|rgb\(/i.test(css)&&!/text-decoration:\s*underline/.test(css),'CSS v41.5 solo variabili, niente sottolineature');
  chk(!/innerHTML|insertAdjacentHTML/.test(c)&&!/\bclub\b|ludoteca/i.test(c),'classifica.js senza innerHTML e senza club/ludoteca');
  console.log(`${ok}/${n}`);await b.close();process.exit(ok===n?0:1)})();

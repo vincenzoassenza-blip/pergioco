@@ -63,6 +63,7 @@ const SupabaseAdapter={
  async setStatsPub(v){const {error}=await this.client.rpc('set_stats_pubbliche',{p:!!v});if(error)throw error;await this.refresh()},
  async updateProfile(p){const {error}=await this.client.rpc('update_my_profile',{p_soprannome:p.soprannome,p_avatar:p.avatar,p_color:p.color,p_fav_game_id:p.favGameId});if(error)throw error;await this.refresh()},
  async codes(){const {data,error}=await this.client.rpc('admin_codes');if(error)throw error;return data||[]},
+ async importGamesBgg(games){const {data,error}=await this.client.rpc('games_import_bgg',{p_games:games});if(error)throw error;await this.refresh();return data},
  async newCode(memberId){const {data,error}=await this.client.rpc('admin_new_code',{p_member_id:memberId});if(error)throw error;return data},
  async deleteCode(memberId){const {error}=await this.client.rpc('admin_delete_code',{p_member_id:memberId});if(error)throw error},
  async setLink(memberId,userId){const {error}=await this.client.from('members').update({user_id:userId}).eq('id',memberId);if(error)throw error;await this.refresh()},

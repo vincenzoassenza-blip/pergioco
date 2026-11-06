@@ -600,3 +600,15 @@ body.adm header .brand,body.adm header .sub{padding-right:190px}
 .lvh .lvht{display:flex;align-items:baseline;gap:8px}.lvh .lvn{font-size:26px;font-weight:800}.lvh .lvt{font-size:20px;font-weight:700}.lvh .lvx{margin-left:auto;font-size:13px;color:var(--m)}
 .lvh .lvbar{display:block;height:10px;border-radius:999px;background:color-mix(in srgb,var(--b) 12%,var(--c));overflow:hidden}.lvh .lvbar i{display:block;height:100%;background:var(--a);border-radius:999px}
 .lvh .lvir{display:flex;align-items:center;font-size:14px;font-weight:600}.lvh .lvir .ar{margin-left:auto}.lvpan{padding:8px 4px 0}.lvpan>b{display:block;margin-bottom:4px;color:var(--b)}
+/* v41.9 — Import BGG */
+.ibggdrop{position:relative;text-align:center;padding:28px 14px;border:2px dashed color-mix(in srgb,var(--b) 22%,transparent);cursor:pointer}
+.ibggico{font-size:36px;margin-bottom:6px}.ibggfile{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.ibggdis{opacity:.55;cursor:default}.ibggsoon{margin-left:auto;font-size:12px;color:var(--m);white-space:nowrap}
+.ibggseg{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ibggrow{display:flex;align-items:center;gap:10px;padding:10px 2px;border-top:1px solid color-mix(in srgb,var(--m) 22%,transparent);cursor:pointer;text-decoration:none;color:inherit}
+.ibggrow:first-child{border-top:0}.ibggrow .t{flex:1;min-width:0;display:flex;flex-direction:column}.ibggrow .t small{color:var(--m);font-size:12px}
+.ibggck{width:22px;height:22px;border-radius:6px;border:2px solid var(--b2);background:var(--c);color:var(--c);flex:none;padding:0;font:inherit;font-size:13px;line-height:1}
+.ibggck.on{background:var(--b2)}.ibggth{width:40px;height:40px;border-radius:8px;background:color-mix(in srgb,var(--b) 8%,var(--c));display:grid;place-items:center;flex:none}.ibggth.big{width:72px;height:72px;font-size:32px}
+.ibggtag{font-size:11px;padding:1px 6px;border-radius:6px;flex:none}.ibggtag.new{background:color-mix(in srgb,var(--b2) 16%,var(--c));color:var(--b)}.ibggtag.dup{background:color-mix(in srgb,var(--m) 18%,var(--c));color:var(--m)}.ibggtag.exp{background:color-mix(in srgb,var(--a) 28%,var(--c));color:var(--b)}
+.ibggdhead{display:flex;gap:12px;align-items:center}.ibgggrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.ibggstat{background:var(--bg);border-radius:12px;padding:10px}.ibggok{text-align:center}
