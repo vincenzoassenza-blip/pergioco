@@ -11,6 +11,7 @@ const T={titSocio:'Altro',titStaff:'Gestione',account:'Il mio account',accCon:'A
  nuovo:'Nuovo socio',modifica:'Modifica socio',hint:'ⓘ L\'elenco dei soci compare dopo la ricerca.',nessuno:'Nessun socio trovato.',btnMod:'✏️ Modifica',
  tabs:{soci:['👥','Soci'],partite:['🎲','Partite'],account:['🔑','Codici'],mods:['🛡️','Moderatori']},
  btns:{ast:['📊','Statistiche associazione'],alib:['📚','Libri sociali','soci e volontari'],aant:['⚖️',null],acfg:['⚙️','Configurazione']},
+ impTit:'Importa da BoardGameGeek',impSub:'File CSV/Excel o nome utente BGG',
  adm:'🔧 Statistiche complete',admChip:'solo admin',req:' *'};
 let OPEN=null,Q='';window.AL416={T};
 const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e};
@@ -58,6 +59,9 @@ function proc(V){const A=V.querySelector('#adm'),L=V.querySelector('#allist');if
  tabs.forEach(b=>{const k=b.dataset.a,[ic,t]=T.tabs[k]||['•',b.textContent],o=OPEN===k&&curK===k;const r=row(ic,t,null,o,'altab');r.dataset.alt=k;r.setAttribute('aria-expanded',o);
   if(k==='soci'&&L._att!=null){r.querySelector('b').after(el('span','alchip',`${L._att} ${T.attivi}`))}
   act(r,()=>{const set=o=>{r.querySelector('.ar').textContent=o?'▾':'▸';r.setAttribute('aria-expanded',o)};if(OPEN===k&&!A.hidden){OPEN='';A.hidden=true;L.after(A);set(false)}else if(curK===k){OPEN=k;r.after(A);A.hidden=false;set(true)}else{OPEN=k;b.click()}});L.append(r);if(o)L.append(A)});
+ // v41.9 — Import BGG solo admin (non i moderatori)
+ if(typeof adminMode==='function'&&adminMode()&&typeof isMod==='function'&&!isMod()){const tit=(typeof TXT!=='undefined'&&TXT.g('ibgg_titolo'))||T.impTit,sub=(typeof TXT!=='undefined'&&TXT.g('ibgg_sub'))||T.impSub;
+  const r=row('📥',tit.replace(/^📥\s*/,''),sub,false,'albtn');r.dataset.alb='ibgg';act(r,()=>go('importbgg'));L.append(r)}
  Object.keys(T.btns).forEach(id=>{const b=A.querySelector(':scope>#'+id);if(!b)return;if(id==='acfg'&&!(adminMode()&&!isMod()))return;const [ic,t,sub]=T.btns[id];
   const r=row(ic,t||b.textContent.replace(/^\S+\s/,''),null,false,'albtn');if(sub)r.querySelector('b').after(el('span','alsm',sub));if(/sola lettura/.test(b.textContent))r.querySelector('b').after(el('span','alsm','sola lettura'));r.dataset.alb=id;act(r,()=>{if(adminMode())b.click()});L.append(r)});
  if(!L.contains(A)){L.after(A);A.hidden=true}else A.hidden=false;}
