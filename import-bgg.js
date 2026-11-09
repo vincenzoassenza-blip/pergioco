@@ -1,5 +1,5 @@
 // v41.10 — Importa giochi da BoardGameGeek (Gestione, solo admin).
-// Via File (CSV) e Nome utente (Edge bgg-collection). Logo Powered by BGG con link ufficiale.
+// Via File (CSV) attiva. Nome utente disattivato finché BGG_TOKEN non risponde 200 (401 rilevato al rilascio). Logo ufficiale presente.
 // Solo textContent / createElement. Testi da TXT (chiavi ibgg_*).
 (()=>{const DEF={titolo:'📥 Importa da BoardGameGeek',sub:'File CSV/Excel o nome utente BGG',soloAdmin:'🔒 Solo gli admin possono importare i giochi.',intro:'I giochi devono avere un ID BGG. Prima dell\'import vedi l\'anteprima e scegli cosa aggiungere.',
  viaFile:'Carica un file',viaFileSub:'CSV o Excel esportato da BGG → Collection → Export',viaUser:'Nome utente BGG',viaUserSub:'Recupera la collezione «owned» dall\'account',viaUserSoon:'Disponibile a breve',viaUserHelp:'Inserisci il nome utente BoardGameGeek (collezione owned). Solo admin.',viaUserGo:'Recupera collezione',viaUserWait:'Recupero da BoardGameGeek… può richiedere un minuto.',viaUserErr:'Collezione non recuperata. Controlla il nome utente e riprova.',attrib:'Dati giochi da BoardGameGeek',
@@ -54,8 +54,8 @@
   const c=el('div','card');
   const f=el('div','alr albtn');f.append(el('span','ic','📄'),(()=>{const x=el('span','t');x.append(el('b',null,t('viaFile')),el('span','sub',t('viaFileSub')));return x})(),el('span','ar','▸'));
   act(f,()=>{ST.step='file';draw()});c.append(f);
-  const u=el('div','alr albtn');u.append(el('span','ic','👤'),(()=>{const x=el('span','t');x.append(el('b',null,t('viaUser')),el('span','sub',t('viaUserSub')));return x})(),el('span','ar','▸'));
-  act(u,()=>{ST.step='user';draw()});c.append(u);V.append(c);V.append(attrib())}
+  const u=el('div','alr albtn ibggdis');u.append(el('span','ic','👤'),(()=>{const x=el('span','t');x.append(el('b',null,t('viaUser')),el('span','sub',t('viaUserSub')));return x})(),el('span','ibggsoon',t('viaUserSoon')));
+  u.setAttribute('aria-disabled','true');c.append(u);V.append(c);V.append(attrib())}
 function attrib(){const w=el('div','ibggpwr');const a=el('a');a.href='https://boardgamegeek.com';a.target='_blank';a.rel='noopener noreferrer';a.title=t('attrib');
   const img=el('img');img.src='img/powered-by-bgg.png';img.alt='Powered by BoardGameGeek';img.width=120;img.height=36;img.loading='lazy';a.append(img);w.append(a);return w}
 function userStep(){V.replaceChildren();V.append(top(t('viaUser')),el('p','muted sm',t('viaUserHelp')));
