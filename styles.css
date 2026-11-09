@@ -612,3 +612,5 @@ body.adm header .brand,body.adm header .sub{padding-right:190px}
 .ibggtag{font-size:11px;padding:1px 6px;border-radius:6px;flex:none}.ibggtag.new{background:color-mix(in srgb,var(--b2) 16%,var(--c));color:var(--b)}.ibggtag.dup{background:color-mix(in srgb,var(--m) 18%,var(--c));color:var(--m)}.ibggtag.exp{background:color-mix(in srgb,var(--a) 28%,var(--c));color:var(--b)}
 .ibggdhead{display:flex;gap:12px;align-items:center}.ibgggrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
 .ibggstat{background:var(--bg);border-radius:12px;padding:10px}.ibggok{text-align:center}
+
+.ibggpwr{display:flex;justify-content:center;padding:12px 8px 4px}.ibggpwr a{display:inline-flex;line-height:0;text-decoration:none}.ibggpwr img{height:28px;width:auto;max-width:140px}

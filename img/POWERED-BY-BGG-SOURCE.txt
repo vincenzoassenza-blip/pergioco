@@ -1,0 +1,6 @@
+Asset attribuzione «Powered by BGG».
+Tentativo download diretto da boardgamegeek.com / cf.geekdo-static.com: HTTP 403 dal box (2026-11-09).
+Wayback CDX: 429/timeout.
+File usato in anteprima: copia PNG usata da find-my-game-parts (changelog: logo BGG reale self-hosted), 1741 byte.
+Prima della pubblicazione: Vincenzo scarichi il file ufficiale dalla pagina https://boardgamegeek.com/using_the_xml_api (o wiki Powered by BGG Logos) e sostituisca img/powered-by-bgg.png.
+Link obbligatorio nell'UI: https://boardgamegeek.com

@@ -1,0 +1,11 @@
+ANTEPRIMA v41.10 — NON eseguire finché Vincenzo non dà il via alla pubblicazione.
+
+Ordine proposto:
+1) Backup tag/bundle/app_settings
+2) Applicare supabase/migrate-v41.10.sql su egmrtcezrjyoynlhknpz
+3) Deploy Edge Functions: bgg-meta (aggiornata) e bgg-collection (nuova)
+   - supabase functions deploy bgg-meta --project-ref egmrtcezrjyoynlhknpz
+   - supabase functions deploy bgg-collection --project-ref egmrtcezrjyoynlhknpz
+4) Verificare secret BGG_TOKEN già presente (solo nome)
+5) Merge/push Pages solo dopo via esplicito
+6) Sostituire img/powered-by-bgg.png con asset scaricato da using_the_xml_api se diverso

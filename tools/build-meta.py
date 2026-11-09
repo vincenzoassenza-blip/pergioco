@@ -1,3 +1,4 @@
+# DEPRECATO v41.10: non usare api.geekdo.com per dati live. Seed storici soltanto; runtime = XML API2 via bgg-meta.
 # Genera supabase/game-meta-ufficiale.json e supabase/seed-meta-v25.sql dai dati grezzi api.geekdo.com
 import json,sys,re
 raw=json.load(open(sys.argv[1]))

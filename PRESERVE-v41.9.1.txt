@@ -1,0 +1,2 @@
+Worktree separato da /workspace/pergioco-hotfix (branch v41.9.1-gestione-preview con WIP non incluso).
+Backup WIP: /workspace/pergioco-backups/v41.9.1-gestione-preview-wip/

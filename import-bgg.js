@@ -1,9 +1,8 @@
-// v41.9 — Importa giochi da BoardGameGeek (Gestione, solo admin).
-// Via File (CSV) attiva: lettura solo sul client, anteprima, dedup su bggId, max 500.
-// Via Nome utente: visibile ma disattivata («Disponibile a breve»). Nessun logo Powered by BGG.
+// v41.10 — Importa giochi da BoardGameGeek (Gestione, solo admin).
+// Via File (CSV) e Nome utente (Edge bgg-collection). Logo Powered by BGG con link ufficiale.
 // Solo textContent / createElement. Testi da TXT (chiavi ibgg_*).
 (()=>{const DEF={titolo:'📥 Importa da BoardGameGeek',sub:'File CSV/Excel o nome utente BGG',soloAdmin:'🔒 Solo gli admin possono importare i giochi.',intro:'I giochi devono avere un ID BGG. Prima dell\'import vedi l\'anteprima e scegli cosa aggiungere.',
- viaFile:'Carica un file',viaFileSub:'CSV o Excel esportato da BGG → Collection → Export',viaUser:'Nome utente BGG',viaUserSub:'Recupera la collezione «owned» dall\'account',viaUserSoon:'Disponibile a breve',
+ viaFile:'Carica un file',viaFileSub:'CSV o Excel esportato da BGG → Collection → Export',viaUser:'Nome utente BGG',viaUserSub:'Recupera la collezione «owned» dall\'account',viaUserSoon:'Disponibile a breve',viaUserHelp:'Inserisci il nome utente BoardGameGeek (collezione owned). Solo admin.',viaUserGo:'Recupera collezione',viaUserWait:'Recupero da BoardGameGeek… può richiedere un minuto.',viaUserErr:'Collezione non recuperata. Controlla il nome utente e riprova.',attrib:'Dati giochi da BoardGameGeek',
  fileHelp:'Su BoardGameGeek: Collection → Export. Accettiamo CSV, massimo 2 MB e 2.000 righe.',filePick:'Tocca per scegliere il file',fileHint:'ⓘ Non condividiamo il file: lo leggiamo solo sul telefono per costruire l\'anteprima.',
  xlsx:'I file Excel (.xlsx) non sono ancora letti qui: aprilo e salvalo come CSV, poi carica il CSV.',troppoGrande:'File troppo grande (massimo 2 MB).',troppoRighe:'Troppe righe (massimo 2.000).',nessunId:'Nessun gioco con ID BGG valido nel file.',continua:'Continua',annulla:'Annulla',
  anteprima:'Anteprima import',letti:'giochi letti',nuovi:'nuovi',presenti:'già presenti',espansioni:'espansioni',mostra:'Mostra',tutto:'Tutto',filtroNuovi:'Nuovi',filtroPres:'Già presenti',filtroExp:'Espansioni',
@@ -55,8 +54,21 @@
   const c=el('div','card');
   const f=el('div','alr albtn');f.append(el('span','ic','📄'),(()=>{const x=el('span','t');x.append(el('b',null,t('viaFile')),el('span','sub',t('viaFileSub')));return x})(),el('span','ar','▸'));
   act(f,()=>{ST.step='file';draw()});c.append(f);
-  const u=el('div','alr albtn ibggdis');u.append(el('span','ic','👤'),(()=>{const x=el('span','t');x.append(el('b',null,t('viaUser')),el('span','sub',t('viaUserSub')));return x})(),el('span','ibggsoon',t('viaUserSoon')));
-  u.setAttribute('aria-disabled','true');c.append(u);V.append(c)}
+  const u=el('div','alr albtn');u.append(el('span','ic','👤'),(()=>{const x=el('span','t');x.append(el('b',null,t('viaUser')),el('span','sub',t('viaUserSub')));return x})(),el('span','ar','▸'));
+  act(u,()=>{ST.step='user';draw()});c.append(u);V.append(c);V.append(attrib())}
+function attrib(){const w=el('div','ibggpwr');const a=el('a');a.href='https://boardgamegeek.com';a.target='_blank';a.rel='noopener noreferrer';a.title=t('attrib');
+  const img=el('img');img.src='img/powered-by-bgg.png';img.alt='Powered by BoardGameGeek';img.width=120;img.height=36;img.loading='lazy';a.append(img);w.append(a);return w}
+function userStep(){V.replaceChildren();V.append(top(t('viaUser')),el('p','muted sm',t('viaUserHelp')));
+  const box=el('div','card');const lb=el('label',null,t('viaUser'));const inp=el('input');inp.type='text';inp.maxLength=40;inp.autocomplete='off';inp.spellcheck=false;inp.placeholder='username';inp.setAttribute('aria-label',t('viaUser'));
+  const goB=el('button','p');goB.type='button';goB.textContent=t('viaUserGo');
+  goB.onclick=async()=>{if(!can())return toast(t('soloAdmin'));const username=String(inp.value||'').trim().replace(/[^A-Za-z0-9_ -]/g,'').slice(0,40);if(username.length<2)return toast(t('viaUserErr'));
+   const c=DB.remote&&DB.remote.client;if(!c||!c.functions)return toast('⚠️ Funzione non disponibile');goB.disabled=true;goB.textContent=t('viaUserWait');
+   try{const{data,error}=await c.functions.invoke('bgg-collection',{body:{username}});if(error||!data||data.error)throw new Error((data&&data.error)||'BGG');
+    const items=Array.isArray(data.items)?data.items:[];const mapped=items.map(it=>({bggId:+it.bgg_id,name:escTxt(it.nome),year:it.anno||null,min:+it.min||1,max:+it.max||1,minT:+it.minT||30,maxT:+it.maxT||30,playTime:+it.durata||null,age:+it.eta||0,isExp:!!it.exp,thumb:it.thumb||null,coop:false})).filter(g=>g.bggId&&g.name);
+    if(!mapped.length){toast(t('nessunId'));goB.disabled=false;goB.textContent=t('viaUserGo');return}
+    ST.rows=await enrichStatus(mapped);ST.filter='all';ST.sel=new Set(ST.rows.filter(r=>r.status==='new').map(r=>r.bggId));ST.step='preview';draw()}
+   catch(e){toast(t('viaUserErr'));goB.disabled=false;goB.textContent=t('viaUserGo')}};
+  box.append(lb,inp,goB);V.append(box,attrib())}
 
  function fileStep(){V.replaceChildren();V.append(top(t('viaFile')),el('p','muted sm',t('fileHelp')));
   const box=el('div','card ibggdrop');const ic=el('div','ibggico','📎');const b=el('b',null,t('filePick'));const inp=el('input');inp.type='file';inp.accept='.csv,text/csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';inp.className='ibggfile';
@@ -87,7 +99,7 @@
    tx.append(el('small',null,sub));const tag=el('span','ibggtag '+g.status,g.status==='new'?t('tagNuovo'):g.status==='dup'?t('tagDup'):t('tagExp'));
    const goD=()=>{ST.detail=g;ST.step='detail';draw()};r.append(ck,th,tx,tag,el('span','ar','▸'));act(r,goD);list.append(r)});
   V.append(list);
-  const n=ST.sel.size;const go=el('button','p');go.type='button';go.textContent=t('importa').replace('{n}',String(n));go.disabled=!n;go.onclick=()=>doImport();V.append(go)}
+  const n=ST.sel.size;const go=el('button','p');go.type='button';go.textContent=t('importa').replace('{n}',String(n));go.disabled=!n;go.onclick=()=>doImport();V.append(go);V.append(attrib())}
 
  function detail(){const g=ST.detail;if(!g){ST.step='preview';return draw()}V.replaceChildren();V.append(top(g.name));
   const c=el('div','card');const head=el('div','ibggdhead');head.append(el('span','ibggth big','🎲'));
@@ -101,7 +113,7 @@
   c.append(el('p','muted sm',`${r.err} ${t('errori')} · ${r.skip} ${t('saltati')} · ${r.expSkip} ${t('nonSel')}`));V.append(c);
   const nav=el('div','card');const a=el('div','alr albtn');a.append(el('span','ic','🎲'),(()=>{const x=el('span','t');x.append(el('b',null,t('vaiColl')));return x})(),el('span','ar','▸'));act(a,()=>go('ludoteca'));
   const b=el('div','alr albtn');b.append(el('span','ic','📥'),(()=>{const x=el('span','t');x.append(el('b',null,t('altroImp')));return x})(),el('span','ar','▸'));act(b,()=>{reset();draw()});
-  nav.append(a,b);V.append(nav)}
+  nav.append(a,b);V.append(nav);V.append(attrib())}
 
  async function doImport(){if(!can())return toast(t('soloAdmin'));const pick=ST.rows.filter(r=>ST.sel.has(r.bggId)&&r.status!=='dup').slice(0,MAXI);
   if(!pick.length)return;const btn=V.querySelector('button.p');if(btn){btn.disabled=true;btn.textContent='…'}
@@ -121,7 +133,7 @@
   (async()=>{for(const id of ids.slice(0,25)){try{await c.functions.invoke('bgg-meta',{body:{game_id:id}})}catch(e){}await new Promise(r=>setTimeout(r,1600))}})()}
 
  function act(r,f){r.tabIndex=0;r.setAttribute('role','button');r.onclick=e=>{if(e.target.closest('button.ibggck'))return;f()};r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}}}
- function draw(){if(ST.step==='file')return fileStep();if(ST.step==='preview')return preview();if(ST.step==='detail')return detail();if(ST.step==='done')return result();return home()}
+ function draw(){if(ST.step==='file')return fileStep();if(ST.step==='user')return userStep();if(ST.step==='preview')return preview();if(ST.step==='detail')return detail();if(ST.step==='done')return result();return home()}
 
  views.importbgg=async function(){if(!can()){V.replaceChildren();V.append(top(t('titolo')),el('div','card',t('soloAdmin')));return}
   reset();draw()};
