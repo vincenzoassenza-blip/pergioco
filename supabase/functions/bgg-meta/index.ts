@@ -1,4 +1,4 @@
-// v41.10 — bgg-meta: SOLO BoardGameGeek XML API2 (Bearer BGG_TOKEN, host senza www).
+// v41.11 — bgg-meta: SOLO BoardGameGeek XML API2 (Bearer BGG_TOKEN, host senza www).
 // Rimosso: api.geekdo.com, search/boardgame scraping, Wikidata come canale dati giochi.
 // Cache server su public.bgg_api_cache (TTL). Token mai nel client / mai nei log.
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
@@ -38,6 +38,19 @@ async function cercaBgg(admin: SB, q: string) {
   if (Array.isArray(hit)) return hit.slice(0, 10);
   const token = await requireToken();
   const r = await bggXml(`/xmlapi2/search?type=boardgame,boardgameexpansion&query=${encodeURIComponent(q)}`, token, { accept202: false, maxAttempt: 4 });
+  if (r.status !== 200) throw new Error(`BGG ${r.status}`);
+  const items = parseSearch(r.body).slice(0, 10);
+  await cacheSet(admin, key, items, TTL_SEARCH_MS);
+  return items;
+}
+
+/** RPGGeek: XML API2 search type=rpgitem (stesso host/token BGG). */
+async function cercaRpg(admin: SB, q: string) {
+  const key = "rpgsearch:" + q.toLowerCase();
+  const hit = await cacheGet(admin, key);
+  if (Array.isArray(hit)) return hit.slice(0, 10);
+  const token = await requireToken();
+  const r = await bggXml(`/xmlapi2/search?type=rpgitem&query=${encodeURIComponent(q)}`, token, { accept202: false, maxAttempt: 4 });
   if (r.status !== 200) throw new Error(`BGG ${r.status}`);
   const items = parseSearch(r.body).slice(0, 10);
   await cacheSet(admin, key, items, TTL_SEARCH_MS);
@@ -138,7 +151,7 @@ Deno.serve(async (req) => {
   const user = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: auth } }, auth: { persistSession: false } });
   const { data: u } = await user.auth.getUser();
 
-  if (body?.mode === "cerca" || body?.mode === "info") {
+  if (body?.mode === "cerca" || body?.mode === "info" || body?.mode === "rpg") {
     if (!u?.user) return new Response('{"error":"non autorizzato"}', { status: 401, headers: h });
     try {
       if (!Deno.env.get("BGG_TOKEN")) return new Response('{"error":"BGG_TOKEN assente"}', { status: 503, headers: h });
@@ -146,6 +159,12 @@ Deno.serve(async (req) => {
         const q = txt(body.q, 60);
         if (q.length < 2) return new Response('{"items":[]}', { headers: h });
         const items = await cercaBgg(admin, q);
+        return new Response(JSON.stringify({ items }), { headers: h });
+      }
+      if (body.mode === "rpg") {
+        const q = txt(body.q, 60);
+        if (q.length < 2) return new Response('{"items":[]}', { headers: h });
+        const items = await cercaRpg(admin, q);
         return new Response(JSON.stringify({ items }), { headers: h });
       }
       const id = int(body.bgg_id, 1, 99999999);

@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+const fs=require('fs');const path=require('path');
+const root=path.join(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+let n=0,ok=0;const chk=(c,m)=>{n++;if(c){ok++;console.log('OK',m)}else{console.error('FAIL',m);process.exitCode=1}};
+const mig=read('supabase/migrate-v41.11.sql');
+const js=read('tavoli-tipi.js');
+const meta=read('supabase/functions/bgg-meta/index.ts');
+const brand=read('brand.js');
+const sb=read('sb.js');
+const ix=read('index.html');
+chk(/create table if not exists public\.table_types/.test(mig),'migrazione table_types');
+chk(/table_type_caps/.test(mig)&&/table_type_capacity/.test(mig),'capienze per data + RPC');
+chk(/tables_type_guard/.test(mig)&&/Tipo pieno/.test(mig),'trigger capienza DB');
+chk(/type_id='board'/.test(mig),'migrazione tavoli esistenti → board');
+chk(/is_staff\(\)/.test(mig)&&/revoke all on table public\.table_types from public, anon/.test(mig),'RLS staff + anon revocato');
+chk(/tavoli_cfg_valid/.test(mig)&&/whatsapp/.test(mig),'config messaggio + WhatsApp');
+chk(/mode === "rpg"/.test(meta)&&/type=rpgitem/.test(meta),'bgg-meta mode rpg → rpgitem');
+chk(/kind==='gdr'/.test(js)&&/kind==='war'/.test(js)&&/TT\.remaining/.test(js),'UI tipi GDR/Warhammer + remaining');
+chk(/gestTavoli|views\.tavolitipi/.test(js),'Gestione → Tipi di tavolo');
+chk(/masterMemberId|bggRpgId|gameName/.test(sb),'MAP tables nuovi campi');
+chk(/APP_VERSION='41\.11'/.test(brand)&&/tt_pieno/.test(brand),'APP_VERSION 41.11 + testi');
+chk(/tavoli-tipi\.js\?v=41\.11/.test(ix),'asset tavoli-tipi in index');
+chk(!/club|ludoteca/i.test(js.match(/pieno_msg:.*?whatsapp/)?.[0]||'')&&!/club|ludoteca/i.test(brand.match(/tt_pieno:'[^']+'/)?.[0]||''),'niente club/ludoteca nei testi nuovi');
+chk(/window\.agSheet/.test(js)&&/window\._agNew/.test(read('app.js')),'agSheet sovrascrivibile');
+console.log(`\n${ok}/${n} controlli`);
+if(ok!==n)process.exit(1);

@@ -183,7 +183,7 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
  V.querySelectorAll('.agdays [data-d]').forEach(b=>b.onclick=()=>go2(b.dataset.d));
  $('#agcal').onclick=()=>{const i=$('#sd');try{i.showPicker()}catch(e){i.click()}};
  $('#sd').onchange=e=>{const v=e.target.value;if(!isoOk(v)||v<oggi){toast('Data non valida');return}S.date=v;go('serata')};
- window._agNew=()=>agSheet({gs,ms,meM,staff,S,oggi});if($('#tfab'))$('#tfab').onclick=tFabGo;
+ window._agNew=()=>(typeof window.agSheet==='function'?window.agSheet:agSheet)({gs,ms,meM,staff,S,oggi});if($('#tfab'))$('#tfab').onclick=tFabGo;
  const T=async id=>(await DB.allTables()).find(t=>t.id===id);
  V.querySelectorAll('[data-sd]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.sd);if(!t||!meM||t.status!=='open')return;const pl=t.players||[];if(pl.some(p=>p.memberId===meM.id))return go('serata');if(pl.length>=t.seats)return toast('Tavolo pieno');
   try{await DB.seat(t.id,'join',meM.id);toast('Ti sei seduto al tavolo')}catch(e){toast('⚠️ '+(e.message||'Non è stato possibile sederti'))}go('serata')});
@@ -423,7 +423,7 @@ document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;c
 function gate(){document.body.classList.add('gate');$('#modebtn').hidden=true;const m=DB.mode;
  if(m==='auth')return authForm();
  V.innerHTML=`<div class="card" style="margin-top:30px;text-align:center"><h2>🎲 ${esc(BRAND.v.nome)}</h2><p class="muted">${m==='missing'?'Il database non è configurato correttamente.':'Serve una connessione a internet per accedere la prima volta.'}</p><button class="p" data-act="reload">Riprova</button></div>`}
-const STAFF_VIEWS=['libri','stats','config','importbgg'];
+const STAFF_VIEWS=['libri','stats','config','importbgg','tavolitipi'];
 // v39.1: rotte con sottoscheda (#profilo/<id>) così «indietro» torna alla scheda precedente
 window._rtk=0;const routeKey=v=>v==='profilo'&&window._pv?'profilo/'+encodeURIComponent(window._pv):v;
 const routeParse=h=>{const [v,id]=String(h||'').replace(/^#/,'').split('/');let d=null;try{d=id?decodeURIComponent(id).slice(0,64):null}catch(e){}return{v,id:d}};

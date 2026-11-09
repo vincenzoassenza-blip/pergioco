@@ -638,3 +638,10 @@ body.adm header .brand,body.adm header .sub{padding-right:190px}
 .ibggchip .chipname{border:0;background:transparent;font:inherit;font-size:13px;padding:0;cursor:pointer;color:inherit}
 .ibggchip .x{border:0;background:transparent;color:var(--m);cursor:pointer;font:inherit;padding:2px 8px;border-radius:999px;line-height:1}
 .ibggchip .x:hover{color:var(--b)}
+
+/* v41.11 — tipi di tavolo */
+.tttypes{margin:8px 0 12px}.ttseg{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.ttseg button{flex:1;min-width:30%}.ttfull{margin:10px 0;background:color-mix(in srgb,var(--m) 12%,var(--c))}
+.ttfull a{display:inline-block;margin-top:6px}.ttbadge{margin-right:6px;font-size:12px}
+button.p.off,button.p:disabled{opacity:.45;cursor:not-allowed}
+.tt-rpg{font:inherit}
