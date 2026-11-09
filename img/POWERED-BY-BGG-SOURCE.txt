@@ -1,0 +1,10 @@
+Asset ufficiale «Powered by BGG» (variante nera per sfondo chiaro).
+
+Provenienza (2026-11-09, Europe/Rome):
+- Pagina ufficiale: https://boardgamegeek.com/using_the_xml_api
+- Cartella Google Drive collegata da BGG: https://drive.google.com/drive/folders/1k3VgEIpNEY59iTVnpTibt31JcO0rEaSw
+- File: https://drive.google.com/file/d/1RV8il5p8pMtw7pPavRhznhAzATFW8ttC/view
+- Copia locale di lavoro: /workspace/powered_by_K_04_XL.png → img/powered-by-bgg.png
+- Dimensioni: 1472×432 PNG, testo leggibile; in UI altezza CSS ~28px con link a https://boardgamegeek.com
+
+Il blocco download automatico dal box (HTTP 403 su boardgamegeek.com / cf.geekdo-static.com) è risolto grazie al recupero manuale dal browser. Non usare più copie di terze parti.
