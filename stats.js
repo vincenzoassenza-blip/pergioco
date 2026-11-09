@@ -107,7 +107,7 @@ function gameAssoc(g,plays,rate){
  <p class="muted sm">Prima volta ${df(L[0].date)} · ultima ${df(L[L.length-1].date)}${comp.length?` · ${win.size} persone diverse hanno vinto almeno una volta (equilibrio)`:''}.</p><p class="sm"><b>Partite per mese</b> <span class="muted">(ultimi 12 mesi)</span></p>${spark(mo)}</details>`;
  return o}
 async function gameMount(o,g,opt){const gpc=o&&o.querySelector('.gpc');if(!gpc)return;const plays=await DB.plays(),gs=await DB.games(),ms=await DB.members();
- const rate=typeof Rate!=='undefined'&&Rate.avg?Rate.avg(g.id):null;const anchor=gpc.querySelector('.row')||gpc.firstElementChild;
+ const rate=typeof Rate!=='undefined'&&Rate.avg?Rate.avg(g.id):null;const anchor=gpc.querySelector(':scope > .row')||gpc.firstElementChild;
  let h=gameAssoc(g,plays,rate);if(opt&&opt.m){opt.m._own=opt.own;h=gameMine(g,opt.m,plays,gs,ms,opt.own||opt.staff,opt.open)+h}
  anchor.insertAdjacentHTML('afterend',h);gpc.querySelectorAll('[data-lp]').forEach(b=>b.onclick=()=>{const d=b.nextElementSibling;d.hidden=!d.hidden;b.setAttribute('aria-expanded',String(!d.hidden))})}
 window.StatsV33={gameMount,async mount(host,m,{own,staff}){
