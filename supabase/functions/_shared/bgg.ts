@@ -21,6 +21,41 @@ export function thumbOk(u: unknown) {
   return /^https:\/\/cf\.geekdo-images\.com\/[A-Za-z0-9_./%=:()-]+$/.test(s) && s.length <= 400 ? s : null;
 }
 
+export function avatarOk(u: unknown) {
+  const s = String(u || "").trim();
+  // Avatar BGG: cf.geekdo-static.com, cf.geekdo-images.com, o host *.boardgamegeek.com (solo https)
+  if (s.length > 400) return null;
+  if (/^https:\/\/cf\.geekdo-static\.com\/[A-Za-z0-9_./%=:?&+-]+$/i.test(s)) return s;
+  if (/^https:\/\/cf\.geekdo-images\.com\/[A-Za-z0-9_./%=:?&+-]+$/i.test(s)) return s;
+  if (/^https:\/\/([A-Za-z0-9-]+\.)*boardgamegeek\.com\/[A-Za-z0-9_./%=:?&+-]+$/i.test(s)) return s;
+  return null;
+}
+
+/** Parse /xmlapi2/user?name=… — id vuoto = utente assente. */
+export function parseUser(xml: string) {
+  const m = xml.match(/<user\b([^>]*)>([\s\S]*?)<\/user>/i) || xml.match(/<user\b([^>]*)\/?>/i);
+  if (!m) return { found: false as const };
+  const attrs = m[1] || "";
+  const block = m[2] || "";
+  const idRaw = (attrs.match(/\bid="([^"]*)"/) || [])[1] ?? "";
+  const nameRaw = (attrs.match(/\bname="([^"]*)"/) || [])[1] ?? "";
+  const id = String(idRaw).trim();
+  const username = txt(decodeXml(nameRaw), 50);
+  if (!id) return { found: false as const, username: username || null };
+  const firstname = txt(decodeXml((block.match(/<firstname[^>]*value="([^"]*)"/i) || [])[1] || ""), 50);
+  const lastname = txt(decodeXml((block.match(/<lastname[^>]*value="([^"]*)"/i) || [])[1] || ""), 50);
+  const avatar = avatarOk((block.match(/<avatarlink[^>]*value="([^"]*)"/i) || [])[1] || "");
+  return {
+    found: true as const,
+    id,
+    username: username || null,
+    firstname: firstname || null,
+    lastname: lastname || null,
+    avatar,
+  };
+}
+
+
 /** Fetch XML API2 with Bearer. Handles 202 (collection queue), 429/5xx with bounded backoff. Never logs token. */
 export async function bggXml(
   pathAndQuery: string,

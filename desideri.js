@@ -31,7 +31,7 @@ async function dsHtml(){if(!DS.cl())return'';await DS.load();const d=DS.d;if(!d)
  return`<h2 id="desideri">🎁 Lista desideri</h2><p class="muted" style="margin-top:-6px">Proponi un gioco che vorresti nella collezione dell'associazione e vota 👍 quelli degli altri. Una proposta attiva a testa; si vede solo il numero dei voti.</p>${ban}${win}${stf}
  ${me?(mia?`<div class="card muted">💡 La tua proposta attiva: <b>${esc(mia.nome)}</b>. Potrai proporne un'altra quando arriva o viene archiviata.</div>`:`<div class="card"><b>➕ Proponi un gioco</b><input id="dsq" placeholder="Cerca su BGG oppure incolla il link/ID del gioco" maxlength="60" autocomplete="off"><div id="dsr"></div></div>`):'<div class="card muted">Collega il tuo account a una scheda socio per proporre e votare.</div>'}
  <div class="row dsord"><span class="muted">Ordina:</span>${[['voti','👍 Voti'],['nuovi','🆕 Nuovi'],['giocatori','👥 Giocatori'],['durata',CLK+' Durata']].map(([k,l])=>`<button class="s${DS.ord===k?' on':''}" data-dso="${k}">${l}</button>`).join('')}</div>
- <div id="dsl">${L.length?L.map(card).join(''):'<div class="card muted">Ancora nessuna proposta: inizia tu!</div>'}</div>`}
+ <div id="dsl">${L.length?L.map(card).join(''):'<div class="card muted">Ancora nessuna proposta: inizia tu!</div>'}</div>${typeof bggPwrHtml==='function'?bggPwrHtml():''}`}
 async function dsDraw(){const w=$('#dsw');if(!w)return;w.innerHTML=await dsHtml();dsBind()}
 const dsDo=async(f,ok)=>{try{await f();if(ok)toast(ok);await dsDraw()}catch(e){toast(dsMsg(e))}};
 function dsBind(){const w=$('#dsw');if(!w)return;const q=$('#dsq');let tm;
