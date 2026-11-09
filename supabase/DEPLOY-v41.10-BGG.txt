@@ -8,4 +8,4 @@ Ordine proposto:
    - supabase functions deploy bgg-collection --project-ref egmrtcezrjyoynlhknpz
 4) Verificare secret BGG_TOKEN già presente (solo nome)
 5) Merge/push Pages solo dopo via esplicito
-6) Sostituire img/powered-by-bgg.png con asset scaricato da using_the_xml_api se diverso
+6) Logo ufficiale già in img/powered-by-bgg.png (Powered by BGG, nero su chiaro; provenienza in img/POWERED-BY-BGG-SOURCE.txt)
