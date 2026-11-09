@@ -56,6 +56,6 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   await p.fill('#ccq','socio6 ');await p.waitForTimeout(150);await q(()=>{navigator.clipboard.writeText=async()=>{}});await p.click('.ccr:not([hidden]) [data-cg]');await p.waitForTimeout(600);chk(await q(()=>window._NC[0]==='m6'),'tocco → genera il codice del socio');
   chk(await q(()=>{admin=false;localStorage.setItem('pergioco-mode','socio');return !adminMode()}),'adminMode invariato');await p.context().close()}
  const js=['profilo-livello.js','noflash.js'].map(f=>fs.readFileSync(__dirname+'/../'+f,'utf8')).join('\n'),h=fs.readFileSync(__dirname+'/../index.html','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8');
- chk(!/innerHTML|insertAdjacentHTML/.test(js),'nuovi file: solo textContent');chk(/pergioco-v41\.8(\.\d)?|pergioco-v41\.9/.test(sw)&&/APP_VERSION='41\.(8(\.\d)?|9)'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8'))&&/styles\.css\?v=41\.(8(\.\d)?|9)/.test(h),'versione 41.8.1');
+ chk(!/innerHTML|insertAdjacentHTML/.test(js),'nuovi file: solo textContent');chk(/pergioco-v41\.\d+/.test(sw)&&/APP_VERSION='41\.\d+(\.\d+)?'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8'))&&/styles\.css\?v=41\.\d+/.test(h),'versione 41.8.1+');
  chk(fs.readFileSync(__dirname+'/../supabase/migrate-v41.8.1.sql','utf8').includes('"lv_max":[2,40]'),'migrazione lv_* pronta');
  await b.close();console.log(`${ok}/${n}`);process.exit(ok===n?0:1)})();

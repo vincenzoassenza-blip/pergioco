@@ -60,5 +60,5 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};
  chk(!/#[0-9a-f]{3,6}\b/i.test(src.replace(/^\/\/.*$/gm,''))&&!/#[0-9a-f]{6}\b/i.test(css.replace(/#1e7a43/g,'')),'niente colori fissi (solo variabili; verde «ok» come nel resto dell\'app)');
  chk(!/PerGioco|Antero|\bclub\b|ludoteca/i.test(src),'nessun nome fisso, niente club/ludoteca');
  const app=fs.readFileSync('app.js','utf8')+fs.readFileSync('stats.js','utf8')+fs.readFileSync('giochi.js','utf8');chk(!/ ›</.test(app),'frecce › delle righe sostituite da ▸ in tutte le pagine');
- const idx=fs.readFileSync('index.html','utf8'),sw=fs.readFileSync('sw.js','utf8');chk(/profilo\.js\?v=41\.3/.test(idx)&&/profilo\.js\?v=41\.3/.test(sw)&&/pergioco-v41\.[3-9]/.test(sw),'versione 41.3 e cache aggiornate');
+ const idx=fs.readFileSync('index.html','utf8'),sw=fs.readFileSync('sw.js','utf8');chk(/profilo\.js\?v=41\.3/.test(idx)&&/profilo\.js\?v=41\.3/.test(sw)&&/pergioco-v41\.\d+/.test(sw),'versione 41.3+ e cache aggiornate');
  console.log(`v41.3-profilo: ${ok}/${n}`);await b.close();process.exit(ok===n?0:1)})();

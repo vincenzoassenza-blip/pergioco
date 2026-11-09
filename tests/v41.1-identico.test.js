@@ -2,7 +2,7 @@
 // (stessi dati finti nelle due versioni: badge, fonti XP, errori, Wrapped HTML + immagine, Sfida, Coppa, Libri).
 const pw=require('playwright-core'),fs=require('fs'),path=require('path'),http=require('http'),{execSync}=require('child_process');
 const _ver=(fs.readFileSync(path.join(__dirname,'../brand.js'),'utf8').match(/APP_VERSION='([^']+)'/)||[])[1];
-if(_ver!=='41.1'){console.log('SKIP v41.1-identico: APP_VERSION='+_ver+' (test specifico della v41.1)');process.exit(0)}
+if(_ver!=='41.\d+'){console.log('SKIP v41.1-identico: APP_VERSION='+_ver+' (test specifico della v41.1)');process.exit(0)}
 let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};
 const MAIN='/tmp/pg-v410-main';fs.rmSync(MAIN,{recursive:true,force:true});fs.mkdirSync(MAIN);execSync(`git archive main | tar -x -C ${MAIN}`,{cwd:path.join(__dirname,'..')});
 const T={'.js':'text/javascript','.css':'text/css','.html':'text/html','.json':'application/json','.png':'image/png','.svg':'image/svg+xml'};

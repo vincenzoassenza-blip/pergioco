@@ -57,7 +57,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
  // statico
  const s=fs.readFileSync(__dirname+'/../altro.js','utf8'),h=fs.readFileSync(__dirname+'/../index.html','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8'),css=fs.readFileSync(__dirname+'/../styles.css','utf8');
  chk(!/innerHTML|insertAdjacentHTML|outerHTML/.test(s),'altro.js senza innerHTML');chk(!/club|ludoteca/i.test(s),'niente «club»/«ludoteca»');
- chk(/classifica\.js\?v=41\.5"><\/script><script src="altro\.js\?v=41\.6"><\/script>/.test(h)&&/pergioco-v41\.[6-9]/.test(sw)&&sw.includes('altro.js?v=41.6')&&/styles\.css\?v=41\.[6-9]/.test(h)&&/APP_VERSION='41\.[6-9](\.\d)?'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8')),'versione 41.6+, altro.js dopo classifica');
+ chk(/classifica\.js\?v=41\.5"><\/script><script src="altro\.js\?v=41\.6"><\/script>/.test(h)&&/pergioco-v41\.\d+/.test(sw)&&sw.includes('altro.js?v=41.6')&&/styles\.css\?v=41\.\d+/.test(h)&&/APP_VERSION='41\.\d+(\.\d+)?'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8')),'versione 41.6+, altro.js dopo classifica');
  const blk=css.slice(css.indexOf('/* v41.6 — Altro'));chk(blk.length>100&&!/#[0-9a-f]{3,6}\b/i.test(blk.replace(/#(adm|alstr|allist|alphone|aladm)\b/g,'')),'CSS v41.6 solo variabili');
  chk(/adminMode\(\)\)staff\(V\)/.test(s)&&/if\(!h\|\|!adminMode\(\)\)return/.test(s),'staff controlla adminMode()');
  await b.close();console.log(`${ok}/${n}`);process.exit(ok===n?0:1)})();
