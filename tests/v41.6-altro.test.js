@@ -12,7 +12,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   chk(await q(()=>{const s=document.querySelector('.alstaff');const cs=[...document.querySelectorAll('#view>.card,#view>details')];return s&&!s.open&&s.contains(document.getElementById('adm'))&&cs.indexOf(s)===cs.length-1&&s.querySelector('summary .ali')}),'1: «🔒 Accesso staff ⓘ» in fondo, chiuso, contiene il login');
   chk(await q(()=>[...document.querySelectorAll('#adm label')].filter(l=>/^(Email|Password)/.test(l.textContent)).every(l=>l.querySelector('.req'))),'6: Email * Password *');
   chk(await q(()=>!document.getElementById('allist')&&!document.getElementById('alstr')&&!document.getElementById('bkp')),'socio: niente elenco staff né strumenti');
-  chk(await q(()=>document.querySelector('.alfoot').textContent==='PerGioco · v'+APP_VERSION&&/^41\.[6-9](\.\d)?$/.test(APP_VERSION)&&!/40\.6/.test(document.getElementById('view').textContent)),'7: versione = APP_VERSION');
+  chk(await q(()=>document.querySelector('.alfoot').textContent==='PerGioco · v'+APP_VERSION&&/^41\.\d+(\.\d+)?$/.test(APP_VERSION)&&+String(APP_VERSION).split('.')[1]>=6&&!/40\.6/.test(document.getElementById('view').textContent)),'7: versione = APP_VERSION');
   chk(await q(()=>!document.querySelector('#view>.igl')&&![...document.querySelectorAll('#view>.card.muted')].length),'vecchio piè di pagina e riga IG tolti');
   let lo=0;await q(()=>{window.confirmLogout=async()=>{window._lo=1}});await p.click('.alacc>summary');await p.click('.alacc .alsub');chk(await q(()=>window._lo===1),'1: «Esci dall\'account» chiama confirmLogout');
   chk(await q(()=>[...document.querySelectorAll('.alr')].every(r=>getComputedStyle(r).textDecorationLine==='none'&&getComputedStyle(r).cursor==='pointer')),'righe senza sottolineatura, cliccabili');
@@ -44,7 +44,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   await p.click('[data-alt=partite]');await W(200);chk(await q(()=>document.getElementById('adm').hidden&&document.querySelector('[data-alt=partite] .ar').textContent==='▸'),'3: richiusura ▸');
   await q(()=>{window._g=null;const o=go;window.go=v=>{window._g=v};document.querySelector('[data-alb=acfg]').click();window.go=o});chk(await q(()=>window._g==='config'),'3: Configurazione raggiungibile');
   await q(()=>{window._g=null;const o=go;window.go=v=>{window._g=v};document.querySelector('[data-alb=ast]').click();window.go=o});chk(await q(()=>window._g==='stats'),'3: Statistiche associazione');
-  chk(await q(()=>/^PerGioco · v41\.[6-9](\.\d)? · 📸 @/.test(document.querySelector('.alfoot').textContent)),'7: «PerGioco · v41.6 · 📸 @tag»');
+  chk(await q(()=>new RegExp('^PerGioco · v'+APP_VERSION.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+' · 📸 @').test(document.querySelector('.alfoot').textContent)),'7: «PerGioco · v{APP_VERSION} · 📸 @tag»');
   // moderatore: niente Configurazione, Partite, Moderatori, Strumenti
   await q(()=>{DB.remote.modCached=true;go('altro')});await W(1000);
   chk(await q(()=>{const t=[...document.querySelectorAll('#allist>.alr b')].map(b=>b.textContent);return !t.includes('Configurazione')&&!t.includes('Partite')&&!t.includes('Moderatori')&&t.includes('Soci')&&document.getElementById('alstr').hidden}),'mod: niente Configurazione / Strumenti');
