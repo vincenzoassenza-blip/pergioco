@@ -17,7 +17,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
    DB.addGame=async g=>{const ng=await _add(g);bag.gs=[...bag.gs,ng];return ng}; go('altro')});await W(1500);
   chk(await p.evaluate(()=>!!document.querySelector('[data-alb="ibgg"]')),'riga in Gestione (admin)');
   await p.evaluate(()=>go('importbgg'));await W(800);
-  chk(await p.evaluate(()=>/Importa da BoardGameGeek/.test(document.querySelector('h2').textContent)&&!!document.querySelector('.ibggsoon')&&!!document.querySelector('.ibggpwr img')),'scelta: utente disattivato + logo');
+  chk(await p.evaluate(()=>/Importa da BoardGameGeek/.test(document.querySelector('h2').textContent)&&!document.querySelector('.ibggsoon')&&!!document.querySelector('.ibggpwr img')),'scelta: utente attivo + logo');
   await p.evaluate(()=>{const r=[...document.querySelectorAll('.alr')].find(x=>/Carica un file/.test(x.textContent));r&&r.click()});await W(400);
   await p.evaluate(async c=>{const f=new File([c],'bgg-collection-sample.csv',{type:'text/csv'});const dt=new DataTransfer();dt.items.add(f);const inp=document.querySelector('.ibggfile');inp.files=dt.files;inp.dispatchEvent(new Event('change',{bubbles:true}))},csv);await W(1500);
   const prev=await p.evaluate(()=>({h2:document.querySelector('h2').textContent,sum:[...document.querySelectorAll('#view p')].map(p=>p.textContent).join(' | '),sel:document.querySelectorAll('.ibggck.on').length,tags:[...document.querySelectorAll('.ibggtag')].map(t=>t.textContent),filt:[...document.querySelectorAll('#view select option')].map(o=>o.textContent).join('|')}));
@@ -45,7 +45,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   await p.evaluate(()=>{const f=new File(['PK'],'coli.xlsx',{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});const dt=new DataTransfer();dt.items.add(f);const inp=document.querySelector('.ibggfile');inp.files=dt.files;inp.dispatchEvent(new Event('change',{bubbles:true}))});
   await W(500);chk(await p.evaluate(()=>[...document.querySelectorAll('.toast')].some(e=>/CSV|Excel|xlsx/i.test(e.textContent))),'xlsx → invito a salvare come CSV');await p.context().close()}
  const h=fs.readFileSync(__dirname+'/../index.html','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8'),js=fs.readFileSync(__dirname+'/../import-bgg.js','utf8'),mig=fs.readFileSync(__dirname+'/../supabase/migrate-v41.9.sql','utf8');
- chk(/import-bgg\.js\?v=41\.(9|10)/.test(h)&&/pergioco-v41\.(9|10)/.test(sw)&&/APP_VERSION='41\.(9|10)'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8')),'versione 41.9/41.10');
+ chk(/import-bgg\.js\?v=41\.(?:9|10)(?:\.\d+)?/.test(h)&&/pergioco-v41\.(?:9|10)(?:\.\d+)?/.test(sw)&&/APP_VERSION='41\.(?:9|10)(?:\.\d+)?'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8')),'versione 41.9/41.10.x');
  chk(!/innerHTML|insertAdjacentHTML/.test(js),'import-bgg.js: solo textContent');
  chk(/games_import_bgg/.test(mig)&&/is_admin/.test(mig)&&/ibgg_titolo/.test(mig)&&/revoke all on function public.games_import_bgg/.test(mig),'migrazione RPC + testi');
  chk(fs.existsSync(__dirname+'/../supabase/functions/bgg-collection/index.ts')&&/is_admin/.test(fs.readFileSync(__dirname+'/../supabase/functions/bgg-collection/index.ts','utf8')),'Edge Function collection admin-only');
