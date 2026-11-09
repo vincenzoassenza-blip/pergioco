@@ -8,7 +8,7 @@ const W=ms=>new Promise(r=>setTimeout(r,ms));
 
 const seed=async(p,{fullGdr=false}={})=>{
   await p.evaluate(({fullGdr})=>{
-    document.body.classList.remove('gate');
+    document.documentElement.lang='it';document.body.classList.remove('gate');
     localStorage.clear();
     admin=true;
     localStorage.setItem('pergioco-mode','admin');
@@ -85,7 +85,7 @@ const seed=async(p,{fullGdr=false}={})=>{
 };
 
 (async()=>{
-  const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage']});
+  const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage','--lang=it-IT','--accept-lang=it-IT,it']});
 
   // 1) Gestione → Tipi di tavolo
   {
@@ -101,12 +101,16 @@ const seed=async(p,{fullGdr=false}={})=>{
     const gest=await p.evaluate(()=>({
       h2:(document.querySelector('#view h2, #V h2, h2')||{}).textContent||'',
       tipi:[...document.querySelectorAll('.alr b')].map(x=>x.textContent),
+      subs:[...document.querySelectorAll('.alr .sub')].map(x=>x.textContent),
+      labOra:([...document.querySelectorAll('label')].find(l=>l.htmlFor==='tt-ora'||(l.nextElementSibling&&l.nextElementSibling.id==='tt-ora'))||{}).textContent||'',
       msg:(document.querySelector('#tt-msg')||{}).value||'',
       ora:(document.querySelector('#tt-ora')||{}).value||''
     }));
     chk(/Tipi di tavolo/.test(gest.h2),'titolo Gestione Tipi di tavolo');
     chk(gest.tipi.some(t=>/Gioco da tavolo/.test(t))&&gest.tipi.some(t=>/GDR/.test(t))&&gest.tipi.some(t=>/Warhammer/.test(t)),'tipi default in lista');
     chk(/al completo/.test(gest.msg)&&gest.ora==='21:00','cfg messaggio + orario default');
+    chk(gest.labOra==='Orario della serata','etichetta Orario della serata');
+    chk(gest.subs.every(s=>/Disponibili per serata: \d+/.test(s)&&!/\b(board|gdr|war)\b/.test(s)),'sottotitoli senza id tecnici');
     chk(!/club|ludoteca/i.test(gest.msg),'niente club/ludoteca nel messaggio');
     await p.screenshot({path:path.join(OUT,'01-gestione-tipi.png'),fullPage:true});
     chk(errs.length===0,'gestione: no JS errors '+errs.join('|'));
@@ -206,13 +210,16 @@ const seed=async(p,{fullGdr=false}={})=>{
     await W(500);
     const full=await p.evaluate(()=>({
       msg:(document.querySelector('.ttfull p')||{}).textContent||'',
-      wa:(document.querySelector('.ttfull a')||{}).href||'',
+      waBtn:!![...document.querySelectorAll('.ttfull button.s')].find(b=>/WhatsApp/.test(b.textContent)),
+      waIsA:!!document.querySelector('.ttfull a'),
       dis:!!document.querySelector('#tsv')?.disabled,
-      grey:document.querySelector('#tsv')?.classList.contains('off')
+      grey:document.querySelector('#tsv')?.classList.contains('off'),
+      gdrOff:[...document.querySelectorAll('.ttseg button')].find(b=>/GDR/.test(b.textContent))?.classList.contains('off')
     }));
     chk(/GDR/.test(full.msg)&&/al completo/.test(full.msg)&&/WhatsApp/.test(full.msg),'messaggio tipo pieno');
-    chk(/chat\.whatsapp\.com/.test(full.wa),'link WhatsApp configurabile');
-    chk(full.dis&&full.grey,'pulsante grigio/disabilitato');
+    chk(full.waBtn&&!full.waIsA,'WhatsApp come pulsante non sottolineato');
+    chk(full.dis&&full.grey,'pulsante Crea grigio/disabilitato');
+    chk(full.gdrOff,'pulsante tipo GDR grigio quando esaurito');
     await p.screenshot({path:path.join(OUT,'04-tipo-esaurito.png'),fullPage:false,clip:{x:0,y:0,width:430,height:900}});
     await ctx.close();
   }

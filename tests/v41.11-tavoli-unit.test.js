@@ -18,6 +18,11 @@ chk(/tavoli_cfg_valid/.test(mig)&&/whatsapp/.test(mig),'config messaggio + Whats
 chk(/mode === "rpg"/.test(meta)&&/type=rpgitem/.test(meta),'bgg-meta mode rpg → rpgitem');
 chk(/kind==='gdr'/.test(js)&&/kind==='war'/.test(js)&&/TT\.remaining/.test(js),'UI tipi GDR/Warhammer + remaining');
 chk(/gestTavoli|views\.tavolitipi/.test(js),'Gestione → Tipi di tavolo');
+chk(/ora_lab|'Orario della serata'/.test(js)&&/tt_ora_lab/.test(brand),'etichetta Orario della serata');
+chk(!/`\$\{TT\.t\('cap'\)}: \$\{t\.capacity_default} · \$\{t\.kind}`/.test(js)&&/Disponibili per serata/.test(js),'sottotitoli senza id tecnici');
+chk(/className='s'/.test(js)&&/Apri il gruppo WhatsApp/.test(js),'WA come pulsante');
+chk(/classList\.add\('off'\)/.test(js)&&/remaining\(D,t\.id\)/.test(js),'tipo pieno → selettore grigio');
+
 chk(/masterMemberId|bggRpgId|gameName/.test(sb),'MAP tables nuovi campi');
 chk(/APP_VERSION='41\.11'/.test(brand)&&/tt_pieno/.test(brand),'APP_VERSION 41.11 + testi');
 chk(/tavoli-tipi\.js\?v=41\.11/.test(ix),'asset tavoli-tipi in index');

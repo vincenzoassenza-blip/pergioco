@@ -13,7 +13,7 @@ const TT={
   caps:{}, // 'YYYY-MM-DD|typeId' -> n
   cfg:{...CFG_DEF},
   loaded:false,
-  t(k){const K='tt_'+k;return(typeof TXT!=='undefined'&&TXT.v&&typeof TXT.v[K]==='string'&&TXT.v[K])||({pieno:CFG_DEF.pieno_msg,wa:'',ora:'21:00',gest:'Tipi di tavolo',tipi:'Tipi',cap:'Disponibili per serata',master:'Master',gioco:'Gioco',nota:'Nota',posti:'Posti (master compreso)'})[k]||k},
+  t(k){const K='tt_'+k;return(typeof TXT!=='undefined'&&TXT.v&&typeof TXT.v[K]==='string'&&TXT.v[K])||({pieno:CFG_DEF.pieno_msg,wa:'',ora:'21:00',ora_lab:'Orario della serata',gest:'Tipi di tavolo',tipi:'Tipi',cap:'Disponibili per serata',master:'Master',gioco:'Gioco',nota:'Nota',posti:'Posti (master compreso)'})[k]||k},
   async load(){
     const c=DB.remote&&DB.remote.client;
     if(!c){this.types=DEF_TYPES.slice();this.cfg={...CFG_DEF};this.loaded=true;return}
@@ -61,7 +61,7 @@ async function gestTavoli(){
     V.append(Object.assign(document.createElement('p'),{className:'muted sm',textContent:'ⓘ Tipi di tavolo, capienza per serata e messaggio quando un tipo è pieno. Valori di default = testi di oggi.'}));
     // cfg card
     const cfg=document.createElement('div');cfg.className='card';
-    const lbOra=document.createElement('label');lbOra.textContent=TT.t('ora')||'Orario serata predefinito';
+    const lbOra=document.createElement('label');lbOra.textContent=TT.t('ora_lab')||'Orario della serata';
     const inOra=document.createElement('input');inOra.type='time';inOra.id='tt-ora';inOra.value=TT.oraDefault();inOra.required=true;
     const lbMsg=document.createElement('label');lbMsg.textContent='Messaggio tipo pieno ({tipo} = nome)';
     const taMsg=document.createElement('textarea');taMsg.id='tt-msg';taMsg.maxLength=280;taMsg.rows=3;taMsg.value=TT.cfg.pieno_msg||CFG_DEF.pieno_msg;
@@ -90,7 +90,7 @@ async function gestTavoli(){
       const ic=document.createElement('span');ic.className='ic';ic.textContent=t.icona;
       const tx=document.createElement('span');tx.className='t';
       const b=document.createElement('b');b.textContent=t.nome+(t.attivo?'':' (disattivo)');
-      const sub=document.createElement('span');sub.className='sub';sub.textContent=`${TT.t('cap')}: ${t.capacity_default} · ${t.kind}`;
+      const sub=document.createElement('span');sub.className='sub';sub.textContent=`${TT.t('cap')}: ${t.capacity_default}`;
       tx.append(b,sub);const ar=document.createElement('span');ar.className='ar';ar.textContent='▸';
       row.append(ic,tx,ar);row.onclick=()=>editType(t);list.append(row);
     });
@@ -226,7 +226,7 @@ window.agSheet=async function(opts){
 
   const sd=()=>{dayBtn.textContent='📅 '+(D===oggi?'Oggi, ':'')+agLbl(D)};sd();
   dayBtn.onclick=()=>{try{dayIn.showPicker()}catch(e){dayIn.click()}};
-  dayIn.onchange=e=>{const v=e.target.value;if(isoOk(v)&&v>=oggi){D=v;sd();paintType()}else{toast('Data non valida');e.target.value=D}};
+  dayIn.onchange=e=>{const v=e.target.value;if(isoOk(v)&&v>=oggi){D=v;sd();paintSeg().then(paintType)}else{toast('Data non valida');e.target.value=D}};
 
   let rpgSel=null;
   const paintType=async()=>{
@@ -235,7 +235,7 @@ window.agSheet=async function(opts){
     if(rem<=0){
       pieno.hidden=false;pieno.replaceChildren();
       const p=document.createElement('p');p.textContent=TT.pienoMsg(typeId);pieno.append(p);
-      const wa=TT.waUrl();if(wa){const a=document.createElement('a');a.href=wa;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Apri il gruppo WhatsApp ▸';pieno.append(a)}
+      const wa=TT.waUrl();if(wa){const a=document.createElement('button');a.type='button';a.className='s';a.style.width='100%';a.style.marginTop='8px';a.style.textDecoration='none';a.textContent='Apri il gruppo WhatsApp ▸';a.onclick=()=>window.open(wa,'_blank','noopener,noreferrer');pieno.append(a)}
       goBtn.disabled=true;goBtn.classList.add('off');
     }
     // time always
@@ -306,16 +306,18 @@ window.agSheet=async function(opts){
     }
   };
 
-  const paintSeg=()=>{
+  const paintSeg=async()=>{
     typeSeg.replaceChildren();
-    TT.attivo().forEach(t=>{
+    for(const t of TT.attivo()){
+      const rem=await TT.remaining(D,t.id);
       const b=document.createElement('button');b.type='button';b.dataset.tid=t.id;b.textContent=`${t.icona} ${t.nome}`;
       if(t.id===typeId)b.classList.add('on');
-      b.onclick=()=>{typeId=t.id;paintSeg();paintType()};
+      if(rem<=0)b.classList.add('off');
+      b.onclick=()=>{typeId=t.id;paintSeg().then(paintType)};
       typeSeg.append(b);
-    });
+    }
   };
-  paintSeg();await paintType();
+  await paintSeg();await paintType();
 
   goBtn.onclick=async()=>{
     if(goBtn.disabled)return;
