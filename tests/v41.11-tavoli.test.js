@@ -85,7 +85,7 @@ const seed=async(p,{fullGdr=false}={})=>{
 };
 
 (async()=>{
-  const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage','--lang=it-IT','--accept-lang=it-IT,it']});
+  const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage','--lang=it-IT','--accept-lang=it-IT,it'],env:{...process.env,LANG:'it_IT.UTF-8',LC_ALL:'it_IT.UTF-8',LC_TIME:'it_IT.UTF-8',LANGUAGE:'it_IT:it'}});
 
   // 1) Gestione → Tipi di tavolo
   {

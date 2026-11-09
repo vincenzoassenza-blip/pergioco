@@ -644,6 +644,6 @@ body.adm header .brand,body.adm header .sub{padding-right:190px}
 .ttseg button{flex:1;min-width:30%}.ttfull{margin:10px 0;background:color-mix(in srgb,var(--m) 12%,var(--c))}
 .ttfull a{display:inline-block;margin-top:6px}.ttbadge{margin-right:6px;font-size:12px}
 button.p.off,button.p:disabled{opacity:.45;cursor:not-allowed}
-.ttseg button.off,.ttseg button:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.4)}
+.ttseg button.off{opacity:.45;filter:grayscale(.45)}.ttseg button:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.45)}
 .ttfull a,.ttfull button{text-decoration:none}
 .tt-rpg{font:inherit}
