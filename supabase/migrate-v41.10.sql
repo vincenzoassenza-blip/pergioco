@@ -1,6 +1,6 @@
 -- v41.10 — Cache server BGG XML API2 + nuove chiavi testi import username/attribuzione.
 -- Idempotente. Nessun GRANT a anon; cache solo service_role (Edge Functions).
--- NON applicata in anteprima: richiede approvazione prima del deploy.
+-- Applicare dopo migrate-v41.9.1.sql.
 
 create table if not exists public.bgg_api_cache (
   key text primary key,

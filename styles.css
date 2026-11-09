@@ -296,7 +296,7 @@ img.imgko{display:none!important}
 
 .gfab{position:fixed;right:16px;bottom:calc(78px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;border:0;background:var(--b);color:#fff;font-size:32px;line-height:1;box-shadow:0 4px 12px #0003;z-index:20;display:flex;align-items:center;justify-content:center;padding:0}.gfab:focus-visible{outline:3px solid #ffbf47;outline-offset:2px}#gl{padding-bottom:64px}
 #gadd{scroll-margin-top:80px}
-.gp{margin:4px 0 8px}.gpt{font-size:13px;margin:8px 0 4px;display:block}.gpchips{display:flex;flex-wrap:wrap;gap:6px}
+.gp{margin:4px 0 8px}.gp .gpt{font-size:13px;margin:8px 0 4px;display:block}.gpchips{display:flex;flex-wrap:wrap;gap:6px}
 .gpchip{display:flex;align-items:center;gap:6px;border:1px solid #d9deea;background:#f5f7fb;border-radius:20px;padding:4px 10px 4px 4px;font-size:13px;max-width:100%;color:inherit}.gpchip span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
 .gpimg.dsimg,.gpimg{width:32px;height:32px;min-width:32px;border-radius:8px;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:16px;background:#eef1f6}.gpchip .gpimg{width:26px;height:26px;min-width:26px;border-radius:50%}
 .gpres{max-height:300px;overflow:auto;margin-top:6px}.gpit{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;border-bottom:1px solid #eef1f6;background:none;padding:8px 4px;font-size:15px;color:inherit}.gpit:focus,.gpchip:focus{outline:2px solid var(--b)}
@@ -614,3 +614,13 @@ body.adm header .brand,body.adm header .sub{padding-right:190px}
 .ibggstat{background:var(--bg);border-radius:12px;padding:10px}.ibggok{text-align:center}
 
 .ibggpwr{display:flex;justify-content:center;padding:12px 8px 4px}.ibggpwr a{display:inline-flex;line-height:0;text-decoration:none}.ibggpwr img{height:28px;width:auto;max-width:140px}
+/* v41.9.1 — anteprima responsive scheda gioco e Gestione */
+.gpg .gpc{width:100%;min-width:0;max-width:640px}
+.gpg .gpt{display:flex}.gpg .gpt>div{min-width:0;flex:1}.gpg h2,.gpg summary,.gpg .gdl dd{overflow-wrap:anywhere}
+.gpg .card,.gpg .row>*,.gpg .gdl>*{min-width:0;max-width:100%}
+.gpg .stg{grid-template-columns:repeat(3,minmax(0,1fr))}.gpg .stg2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gpg .gdl{grid-template-columns:auto minmax(0,1fr)}
+.alsch[hidden]{display:none}
+.agfilters{display:flex;flex-wrap:wrap;gap:8px}.agfilters>div{flex:1 1 160px;min-width:0}
+.gestionepartita>span:first-child{min-width:0;flex:1;overflow-wrap:anywhere}.gestionepartita{gap:8px;align-items:flex-start}
+.gpdate{font-weight:700;color:var(--b)}.gpnames{font-size:14px;color:var(--t)}
