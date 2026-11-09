@@ -55,6 +55,10 @@ alter table public.tables add column if not exists game_name text;
 alter table public.tables add column if not exists bgg_rpg_id int;
 
 -- Migrazione: tavoli esistenti → Gioco da tavolo
+-- Disabilita trigger host (auth.uid assente in SQL admin) durante i backfill
+alter table public.tables disable trigger tables_host_guard;
+alter table public.tables disable trigger tables_no_past;
+alter table public.tables disable trigger zz_tables_evening;
 update public.tables set type_id='board' where type_id is null;
 
 do $$ begin
@@ -81,6 +85,10 @@ exception when others then null; end $$;
 
 -- Backfill orario mancante a 21:00 (orario serata di default)
 update public.tables set start_time='21:00' where coalesce(btrim(start_time),'')='';
+-- Riabilita trigger di protezione (il nuovo tables_type_guard arriva dopo)
+alter table public.tables enable trigger tables_host_guard;
+alter table public.tables enable trigger tables_no_past;
+alter table public.tables enable trigger zz_tables_evening;
 
 -- Config messaggi / orario serata in app_settings
 create or replace function public.tavoli_cfg_valid(v jsonb) returns boolean
