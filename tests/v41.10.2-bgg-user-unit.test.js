@@ -15,6 +15,7 @@ const cm=read('community.js');
 const mig=read('supabase/migrate-v41.10.2.sql');
 
 chk(/mode === "user"/.test(coll)&&/xmlapi2\/user\?name=/.test(coll),'bgg-collection mode user → XML API2 user');
+chk(/status === 404/.test(coll),'404 username → found false');
 chk(/parseUser/.test(shared)&&/avatarOk/.test(shared),'shared parseUser + avatarOk');
 chk(/cf\.geekdo-static\.com/.test(shared),'avatar consente geekdo-static');
 chk(/is_admin/.test(coll),'collection resta solo admin');

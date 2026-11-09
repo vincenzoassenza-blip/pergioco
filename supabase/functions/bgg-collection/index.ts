@@ -54,6 +54,17 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ ...cached.payload, cached: true }), { headers: h });
       }
       const r = await bggXml(`/xmlapi2/user?name=${encodeURIComponent(username)}`, token, { maxAttempt: 4, accept202: false });
+      // BGG risponde 404 (o XML con id vuoto) se l'username non esiste.
+      if (r.status === 404) {
+        const payload = { found: false, username };
+        await admin.from("bgg_api_cache").upsert({
+          key: cacheKey,
+          payload,
+          created_at: new Date().toISOString(),
+          expires_at: new Date(Date.now() + TTL_USER_MS).toISOString(),
+        });
+        return new Response(JSON.stringify({ ...payload, cached: false }), { headers: h });
+      }
       if (r.status !== 200) return new Response(JSON.stringify({ error: `BGG ${r.status}` }), { status: 502, headers: h });
       const parsed = parseUser(r.body);
       const payload = parsed.found
