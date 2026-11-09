@@ -45,7 +45,7 @@ dsHtml=async function(){if(!DS.cl())return'';await DS.load();const d=DS.d;if(!d)
  <div class="cmth"><h3>${T.proposte} <button type="button" class="cmi" id="cminfo" aria-label="${T.infoL}" aria-expanded="${!!DS.info}">ⓘ</button></h3>${sel}${pbtn}</div>
  ${DS.info?`<div class="cmhelp" id="cminfot">${T.info}</div>`:''}${pH}${fil}${form}
  <div id="dsl">${L.length?L.map(card).join(''):`<div class="card muted">${act.length?T.nessuno:(arrv.length||arch.length?T.nessuno:T.vuoto)}</div>`}</div>
- ${sec('arr',T.arrivati,arrv)}${sec('arch',T.archiviati,arch)}</section>`};
+ ${typeof bggPwrHtml==='function'?bggPwrHtml():''}${sec('arr',T.arrivati,arrv)}${sec('arch',T.archiviati,arch)}</section>`};
 // interazioni aggiuntive (una sola volta per contenitore; dsBind continua a gestire voti, proposte e staff)
 function bindCm(w){if(w._cm)return;w._cm=1;
  const tog=k=>{DS.open.has(k)?DS.open.delete(k):DS.open.add(k);dsDraw()};

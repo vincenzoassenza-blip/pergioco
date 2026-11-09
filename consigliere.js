@@ -191,6 +191,7 @@ async function cWizard(mode){if(!CFLOW[mode])return;const gs=await DB.games(),ps
    <p class="cwz-why">${esc(r.txt)}</p>${r.warn?`<p class="cwz-miss">⚠️ ${esc(r.warn)}</p>`:''}
    <div class="cwz-btns"><button data-see="${esc(r.g.id)}">📖 Vedi scheda</button><button class="p" data-book="${esc(r.g.id)}">📅 Prenota un tavolo con questo</button></div></div>`).join('')
    :'<p class="muted">Non ho trovato giochi adatti nemmeno allargando i criteri. Provate a cambiare qualche risposta.</p>'}
+  ${typeof bggPwrHtml==='function'?bggPwrHtml():''}
   <div class="cwz-btns"><button id="cwr">🔄 Rifai le domande</button><button id="cwm">🔀 Cambia modalità</button><button id="cwg">Torna ai giochi</button></div></div>`;
   $('#cwb').onclick=()=>{i=flow.length-1;step()};$('#cwr').onclick=()=>{for(const k in A)delete A[k];i=0;step()};$('#cwg').onclick=()=>go('ludoteca');$('#cwm').onclick=()=>cChoose();
   V.querySelectorAll('[data-see]').forEach(b=>b.onclick=()=>{const g=gs.find(x=>x.id===b.dataset.see);if(g)gamePage(g,ps)});

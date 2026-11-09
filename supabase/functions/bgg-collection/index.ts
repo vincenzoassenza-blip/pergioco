@@ -1,7 +1,9 @@
-// v41.10 — Edge Function bgg-collection (admin-only, non moderator).
-// XML API2 collection own=1, retry 202, throttle, cache TTL, Bearer BGG_TOKEN. Nessun token nel client.
+// v41.10.2 — Edge Function bgg-collection (admin-only, non moderator).
+// mode omesso/collection: XML API2 collection own=1.
+// mode "user": XML API2 user?name=… (verifica username + avatar).
+// Retry 202, throttle, cache TTL, Bearer BGG_TOKEN. Nessun token nel client.
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
-import { bggXml, parseCollectionItems, txt } from "../_shared/bgg.ts";
+import { bggXml, parseCollectionItems, parseUser, txt } from "../_shared/bgg.ts";
 
 const ORIGINS = ["https://app.pergioco.org", "https://vincenzoassenza-blip.github.io", "http://localhost:8765", "http://localhost:8799", "http://127.0.0.1:8799"];
 const cors = (o: string | null) => ({
@@ -10,7 +12,15 @@ const cors = (o: string | null) => ({
   "Access-Control-Allow-Methods": "POST, OPTIONS", Vary: "Origin",
 });
 const TTL_MS = 6 * 60 * 60 * 1000;
+const TTL_USER_MS = 24 * 60 * 60 * 1000;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const UNAME = /^[A-Za-z0-9][A-Za-z0-9_ -]{0,49}$/;
+
+function cleanUsername(raw: unknown) {
+  const u = txt(raw, 50).replace(/[^A-Za-z0-9_ -]/g, "").trim();
+  if (u.length < 1 || u.length > 50 || !UNAME.test(u)) return null;
+  return u;
+}
 
 Deno.serve(async (req) => {
   const h = { ...cors(req.headers.get("origin")), "Content-Type": "application/json" };
@@ -31,8 +41,43 @@ Deno.serve(async (req) => {
   const { data: adm } = await user.rpc("is_admin");
   // Solo admin (is_admin). I moderatori non passano.
   if (!u?.user || adm !== true) return new Response('{"error":"solo admin"}', { status: 403, headers: h });
-  const username = txt(body?.username, 40).replace(/[^A-Za-z0-9_ -]/g, "").trim();
-  if (username.length < 2 || username.length > 40) return new Response('{"error":"username non valido"}', { status: 400, headers: h });
+
+  const mode = body?.mode === "user" ? "user" : "collection";
+  const username = cleanUsername(body?.username);
+  if (!username) return new Response('{"error":"username non valido"}', { status: 400, headers: h });
+
+  if (mode === "user") {
+    const cacheKey = "user:" + username.toLowerCase();
+    try {
+      const { data: cached } = await admin.from("bgg_api_cache").select("payload,expires_at").eq("key", cacheKey).maybeSingle();
+      if (cached?.payload && new Date(cached.expires_at).getTime() > Date.now()) {
+        return new Response(JSON.stringify({ ...cached.payload, cached: true }), { headers: h });
+      }
+      const r = await bggXml(`/xmlapi2/user?name=${encodeURIComponent(username)}`, token, { maxAttempt: 4, accept202: false });
+      if (r.status !== 200) return new Response(JSON.stringify({ error: `BGG ${r.status}` }), { status: 502, headers: h });
+      const parsed = parseUser(r.body);
+      const payload = parsed.found
+        ? {
+          found: true,
+          id: parsed.id,
+          username: parsed.username || username,
+          firstname: parsed.firstname,
+          lastname: parsed.lastname,
+          avatar: parsed.avatar,
+        }
+        : { found: false, username };
+      await admin.from("bgg_api_cache").upsert({
+        key: cacheKey,
+        payload,
+        created_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + TTL_USER_MS).toISOString(),
+      });
+      return new Response(JSON.stringify({ ...payload, cached: false }), { headers: h });
+    } catch {
+      return new Response(JSON.stringify({ error: "BGG non raggiungibile" }), { status: 502, headers: h });
+    }
+  }
+
   const cacheKey = "collection:" + username.toLowerCase();
   try {
     const { data: cached } = await admin.from("bgg_api_cache").select("payload,expires_at").eq("key", cacheKey).maybeSingle();
