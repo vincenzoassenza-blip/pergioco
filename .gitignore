@@ -4,3 +4,4 @@ docs/
 *.xlsx
 !vendor/**
 data/
+supabase/.temp/
