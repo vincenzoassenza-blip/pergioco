@@ -653,3 +653,12 @@ button.p.off,button.p:disabled{opacity:.45;cursor:not-allowed}
 .agtf .chip{white-space:nowrap;flex:0 0 auto;font-size:13px;padding:6px 10px;min-height:36px}
 .ttbadge{display:inline-block;margin-left:6px;font-size:12px;font-weight:500;color:var(--m)}
 .ttwait{opacity:.7}
+
+/* v41.12 — Record e badge GDR: righe come Classifica, senza sottolineatura, con ▸ */
+.gdrrec{margin:8px 2px 12px}
+.gdrrec .rsec{margin:16px 2px 4px}
+.gdrrec .gdrvuoto{margin:4px 4px 8px;font-size:13px}
+.gdrln,.gdrln .who,.gdrln a{text-decoration:none}
+.gdrfg .gdrb{margin:0 0 12px;padding-top:8px;border-top:1px solid color-mix(in srgb,var(--m, #888) 22%,transparent)}
+.gdrfg .gdrb:first-of-type{border-top:0;padding-top:0}
+#cfgdr input[type=number]{width:6.5em}

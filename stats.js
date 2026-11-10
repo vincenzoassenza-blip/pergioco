@@ -13,17 +13,17 @@ function from(per){const t=romeToday();if(per==='12m'){const d=dd(t);d.setUTCFul
 function calc(mid,plays,gs,per){
  const today=romeToday(),f=from(per),allMine=plays.filter(p=>p.players.some(x=>x.memberId===mid)&&/^\d{4}-\d{2}-\d{2}$/.test(p.date||''));
  const mine=allMine.filter(p=>p.date>=f&&p.date<=today).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
- const me=p=>p.players.find(x=>x.memberId===mid)||{},won=p=>p.coop?!!p.groupWin:!!me(p).winner;
+ const me=p=>p.players.find(x=>x.memberId===mid)||{},gdr=p=>typeof isGdrPlay==='function'&&isGdrPlay(p),won=p=>gdr(p)?false:p.coop?!!p.groupWin:!!me(p).winner;
  const G=new Map(),dates=new Set();let w=0,min=0,minN=0;
  for(const p of mine){dates.add(p.date);if(won(p))w++;const g=gs.find(x=>x.id===p.gameId),mm=durOk(p.duration)?+p.duration:gmin(g);if(mm){min+=mm;minN++}
-  const k=p.gameId;if(!G.has(k))G.set(k,{id:k,name:g?g.name:'Gioco rimosso',n:0,w:0,first:p.date,last:p.date,sc:[],coop:0});const r=G.get(k);r.n++;if(won(p))r.w++;r.last=p.date;if(p.coop)r.coop++;else{const s=num(me(p).score);if(s!==null)r.sc.push(s)}}
+  if(gdr(p))continue;const k=p.gameId;if(!G.has(k))G.set(k,{id:k,name:g?g.name:'Gioco rimosso',n:0,w:0,first:p.date,last:p.date,sc:[],coop:0});const r=G.get(k);r.n++;if(won(p))r.w++;r.last=p.date;if(p.coop)r.coop++;else{const s=num(me(p).score);if(s!==null)r.sc.push(s)}}
  const games=[...G.values()].sort((a,b)=>b.n-a.n||a.name.localeCompare(b.name));
  let h=0;games.map(g=>g.n).sort((a,b)=>b-a).forEach((n,i)=>{if(n>=i+1)h=i+1});
- const lastAll=new Map();for(const p of allMine)if(!lastAll.has(p.gameId)||lastAll.get(p.gameId)<p.date)lastAll.set(p.gameId,p.date);
+ const lastAll=new Map();for(const p of allMine)if(!gdr(p)&&p.gameId&&(!lastAll.has(p.gameId)||lastAll.get(p.gameId)<p.date))lastAll.set(p.gameId,p.date);
  const dusty=[...lastAll].filter(([,d])=>days(d,today)>60).map(([id,d])=>({id:gs.some(x=>x.id===id)?id:null,name:(gs.find(x=>x.id===id)||{}).name||'Gioco rimosso',d,ago:days(d,today)})).sort((a,b)=>b.ago-a.ago);
  // avversari
  const O=new Map();let guest=0;
- for(const p of mine){const iw=!!me(p).winner;for(const x of p.players){if(x.memberId===mid)continue;if(!x.memberId){guest++;continue}
+ for(const p of mine){if(gdr(p))continue;const iw=!!me(p).winner;for(const x of p.players){if(x.memberId===mid)continue;if(!x.memberId){guest++;continue}
   if(!O.has(x.memberId))O.set(x.memberId,{id:x.memberId,n:0,beatMe:0,beat:0,coop:0,coopW:0,comp:0});const o=O.get(x.memberId);o.n++;
   if(p.coop){o.coop++;if(p.groupWin)o.coopW++}else{o.comp++;if(x.winner&&!iw)o.beatMe++;if(iw&&!x.winner)o.beat++}}}
  const opp=[...O.values()];
