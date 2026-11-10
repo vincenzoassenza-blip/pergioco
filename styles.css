@@ -744,3 +744,8 @@ header .brand,header .sub,body.adm header .brand,body.adm header .sub{padding-ri
 #havmenu [role=menuitem]{display:block;width:100%;box-sizing:border-box;margin:0;border:0;border-radius:10px;background:none;color:var(--b);font:inherit;font-size:15px;font-weight:700;text-align:left;text-decoration:none;padding:12px;min-height:44px;cursor:pointer}
 #havmenu [role=menuitem]:hover,#havmenu [role=menuitem]:focus,#havmenu [role=menuitem]:active{background:color-mix(in srgb,var(--b) 8%,var(--c));text-decoration:none;outline:none}
 #havmenu [role=menuitem]:focus-visible{box-shadow:inset 0 0 0 2px var(--a)}
+
+/* v41.13.2 — Stato vuoto sondaggi in modalità admin */
+#psempty{text-align:center;padding:22px 16px}
+#psempty p{margin:0 0 8px}
+#psempty .p{margin-top:14px}

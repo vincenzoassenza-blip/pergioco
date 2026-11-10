@@ -12,8 +12,8 @@ const js=fs.readFileSync(path.join(ROOT,'sondaggi.js'),'utf8');
 const cm=fs.readFileSync(path.join(ROOT,'community.js'),'utf8');
 const css=fs.readFileSync(path.join(ROOT,'styles.css'),'utf8');
 
-chk(/APP_VERSION='41\.13'/.test(brand),'versione 41.13');
-chk(/const C='pergioco-v41\.13'/.test(sw)&&/sondaggi\.js\?v=41\.13/.test(sw)&&/styles\.css\?v=41\.13/.test(sw),'cache sw 41.13 e sondaggi.js');
+chk(/APP_VERSION='41\.13(\.[0-9]+)?'/.test(brand),'versione 41.13+');
+chk(/const C='pergioco-v41\.13(\.[0-9]+)?'/.test(sw)&&/sondaggi\.js\?v=41\.13/.test(sw)&&/styles\.css\?v=41\.13/.test(sw),'cache sw 41.13+ e sondaggi.js');
 chk(/sondaggi\.js\?v=41\.13/.test(idx)&&/community\.js\?v=41\.13/.test(idx)&&idx.indexOf('sondaggi.js')<idx.indexOf('community.js'),'index: sondaggi.js prima di community.js');
 chk(/styles\.css\?v=41\.13/.test(idx),'styles ?v=41.13');
 
@@ -35,11 +35,11 @@ chk(/create or replace function public\.member_xp\(\)/.test(sql)&&/poll_xp_grant
 chk(/is_staff\(\)/.test(sql)&&/Solo lo staff/.test(sql),'scrittura riservata allo staff lato DB');
 chk(/des_proponi/.test(sql)&&/poll_collega_desideri/.test(sql),'collegamento a lista desideri');
 
-chk(/PS\.showTab=\(\)=>!!\(PS\.d&&\(PS\.d\.staff\|\|PS\.d\.has_active\)\)/.test(js),'tab: staff o sondaggio attivo');
+chk(/adminMode/.test(js)&&/PS\.showTab=/.test(js)&&/has_active/.test(js)&&!/PS\.d\.staff\|\|PS\.d\.has_active/.test(js),'tab: visibile in adminMode o con sondaggio attivo');
 chk(/data-cmt="sondaggi"/.test(cm)&&/showSon/.test(cm)&&/PS\.showTab/.test(cm),'community.js rispetta la visibilità del tab');
 chk(!/club|ludoteca/i.test(js)&&!/club|ludoteca/i.test(cm),'niente club/ludoteca nei testi nuovi');
 chk(/esc\(p\.title\)/.test(js)&&/esc\(o\.label\)/.test(js)&&/esc\(p\.help\)/.test(js),'testi utente passano da esc()');
-chk(/Invia il voto/.test(js)&&/Nuovo sondaggio/.test(js)&&/Fissa in alto/.test(js),'testi italiani del mockup');
+chk(/Invia il voto/.test(js)&&/Nuovo sondaggio/.test(js)&&/Crea sondaggio/.test(js)&&/Fissa in alto/.test(js),'testi italiani del mockup');
 chk(/poll_vota/.test(js)&&/poll_salva/.test(js)&&/poll_azione/.test(js)&&/poll_collega_desideri/.test(js),'client chiama le RPC');
 chk(/\.card\.pin/.test(css)&&/\.types/.test(css)&&/\.dyn button/.test(css),'stili lista, tipi e doodle');
 chk(/v41\.13 — Sondaggi/.test(js),'file marcato v41.13');

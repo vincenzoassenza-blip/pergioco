@@ -13,7 +13,7 @@ const T={
   tit:'🗳️ Sondaggi', infoL:'Come funzionano i sondaggi',
   info:'I soci votano sui sondaggi aperti. Quelli fissati restano in cima finché sono aperti.',
   mostra:'Mostra', tutto:'Tutto', aperti:'Aperti', chiusi:'Chiusi',
-  vuoto:'Ancora nessun sondaggio.', nessuno:'Nessun sondaggio con questo filtro.',
+  vuoto:'Ancora nessun sondaggio.', vuotoH:'Crea il primo: i soci lo vedranno in Community quando è aperto.', nessuno:'Nessun sondaggio con questo filtro.', creaBtn:'➕ Crea sondaggio',
   indietro:'← Sondaggi', invia:'Invia il voto', salvaDisp:'Salva le disponibilità', salvaCl:'Salva la classifica',
   cambia:'Puoi cambiare idea fino alla chiusura.', noCambia:'Nei sondaggi anonimi il voto non si può cambiare.',
   max:(n,u)=>`${u} di ${n} scelte usate.`,
@@ -43,7 +43,7 @@ PS.cl=()=>DB.remote&&DB.remote.client;
 PS.rpc=async(n,a)=>{const c=PS.cl();if(!c)throw new Error('I sondaggi richiedono la connessione al database');const{data,error}=await c.rpc(n,a||{});if(error)throw error;return data};
 PS.load=async()=>{try{if(PS.cl())PS.d=await PS.rpc('poll_lista')}catch(e){console.warn('PS',e);PS.d=null;PS.err=e&&e.message}};
 PS.hasActive=()=>!!(PS.d&&PS.d.has_active);
-PS.showTab=()=>!!(PS.d&&(PS.d.staff||PS.d.has_active));
+PS.showTab=()=>!!((typeof adminMode==='function'&&adminMode())||(PS.d&&PS.d.has_active));
 PS.staffUi=()=>!!(PS.d&&PS.d.staff&&typeof adminMode==='function'&&adminMode());
 
 function meta(p){
@@ -95,11 +95,11 @@ function listHtml(){
         <option value="aperti"${PS.fil==='aperti'?' selected':''}>${T.mostra}: ${T.aperti}</option>
         <option value="chiusi"${PS.fil==='chiusi'?' selected':''}>${T.mostra}: ${T.chiusi}</option>
       </select></label>
-      ${st?`<button type="button" class="cmprop" id="psnew">${T.nuovo}</button>`:''}
+      ${st&&all.length?`<button type="button" class="cmprop" id="psnew">${T.nuovo}</button>`:''}
     </div>
     ${PS.info?`<div class="cmhelp">${T.info}</div>`:''}
     ${st?`<p class="cmhelp">${T.gestH}</p>`:''}
-    <div id="psl">${apertiVis.length?apertiVis.map(card).join(''):((chiusiVis.length&&PS.fil!=='chiusi')?'':`<div class="card muted">${all.length?T.nessuno:T.vuoto}</div>`)}</div>
+    <div id="psl">${apertiVis.length?apertiVis.map(card).join(''):((chiusiVis.length&&PS.fil!=='chiusi')?'':(st&&!all.length?`<div class="card" id="psempty"><p><b>${T.vuoto}</b></p><p class="muted">${T.vuotoH}</p><button type="button" class="p" id="pscrea">${T.creaBtn}</button></div>`:`<div class="card muted">${all.length?T.nessuno:T.vuoto}</div>`))}</div>
     ${sec('chiusi',T.chiusiLab,chiusiVis)}
   </section>`;
 }
@@ -276,7 +276,7 @@ function bind(w){
   w.onclick=async ev=>{
     const t=ev.target;
     if(t.closest('#psinfo')){PS.info=!PS.info;return PS.draw()}
-    if(t.closest('#psnew')){PS.form={typ:'singola',results_vis:'dopo_voto',notify_on:true,remind_hours:24,xp:0,max_choices:2,options:[{label:''},{label:''}]};PS.formTyp='singola';PS.view='form';return PS.draw()}
+    if(t.closest('#psnew,#pscrea')){PS.form={typ:'singola',results_vis:'dopo_voto',notify_on:true,remind_hours:24,xp:0,max_choices:2,options:[{label:''},{label:''}]};PS.formTyp='singola';PS.view='form';return PS.draw()}
     if(t.closest('#psback')){PS.view=null;PS.form=null;return PS.draw()}
     const typb=t.closest('[data-pst]');
     if(typb&&$('#psform')){PS.formTyp=typb.dataset.pst;const cur=readForm();PS.form=Object.assign(PS.form||{},cur,{typ:PS.formTyp});return PS.draw()}
