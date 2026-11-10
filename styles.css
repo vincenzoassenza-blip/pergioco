@@ -732,3 +732,15 @@ button.p.off,button.p:disabled{opacity:.45;cursor:not-allowed}
 .cmseg button[data-cmt]{font-size:13px;padding:8px 4px}
 #psopts{display:flex;flex-direction:column;gap:8px;margin:0 0 8px}#psform{padding-bottom:8px}
 .psnotice{background:color-mix(in srgb,var(--ok,#1e7a43) 12%,var(--c));border:1px solid color-mix(in srgb,var(--ok,#1e7a43) 40%,var(--c));color:#1e6b3a;border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:8px}
+
+/* v41.13.1 — Menu sull'avatar, bollino admin, cerchio perfetto, niente pulsante modalità in barra */
+#modebtn{display:none!important}
+header .brand,header .sub,body.adm header .brand,body.adm header .sub{padding-right:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hav{width:36px;height:36px;min-width:36px;min-height:36px;max-width:36px;max-height:36px;aspect-ratio:1;flex-shrink:0;box-sizing:border-box;padding:0;border:0;border-radius:50%;overflow:visible;position:relative;display:grid;place-items:center;line-height:1}
+.hav .havin{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:1;border-radius:50%;overflow:hidden;display:grid;place-items:center;pointer-events:none;box-sizing:border-box;line-height:1;font-size:inherit;font-weight:inherit;color:inherit;background:inherit}
+.hav .havin .avimg,.hav .avimg,.av.avph .avimg{display:block;width:100%;height:100%;aspect-ratio:1;object-fit:cover;border-radius:50%;flex-shrink:0;pointer-events:none}
+.hav.adm::after{content:"🛡️";position:absolute;right:-3px;bottom:-3px;width:16px;height:16px;min-width:16px;min-height:16px;aspect-ratio:1;flex-shrink:0;border-radius:50%;background:var(--hdf);color:var(--hd1);font-size:9px;line-height:16px;display:grid;place-items:center;box-shadow:0 0 0 2px var(--hd2);pointer-events:none;z-index:1}
+#havmenu{position:fixed;z-index:80;box-sizing:border-box;padding:6px;background:var(--c);color:var(--t);border-radius:14px;border:1px solid color-mix(in srgb,var(--b) 12%,transparent);box-shadow:0 8px 28px rgb(0 0 0 / .18)}
+#havmenu [role=menuitem]{display:block;width:100%;box-sizing:border-box;margin:0;border:0;border-radius:10px;background:none;color:var(--b);font:inherit;font-size:15px;font-weight:700;text-align:left;text-decoration:none;padding:12px;min-height:44px;cursor:pointer}
+#havmenu [role=menuitem]:hover,#havmenu [role=menuitem]:focus,#havmenu [role=menuitem]:active{background:color-mix(in srgb,var(--b) 8%,var(--c));text-decoration:none;outline:none}
+#havmenu [role=menuitem]:focus-visible{box-shadow:inset 0 0 0 2px var(--a)}
