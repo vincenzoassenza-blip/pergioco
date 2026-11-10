@@ -21,11 +21,11 @@ chk(/gestTavoli|views\.tavolitipi/.test(js),'Gestione → Tipi di tavolo');
 chk(/ora_lab|'Orario della serata'/.test(js)&&/tt_ora_lab/.test(brand),'etichetta Orario della serata');
 chk(!/`\$\{TT\.t\('cap'\)}: \$\{t\.capacity_default} · \$\{t\.kind}`/.test(js)&&/Disponibili per serata/.test(js),'sottotitoli senza id tecnici');
 chk(/className='s'/.test(js)&&/Apri il gruppo WhatsApp/.test(js),'WA come pulsante');
-chk(/classList\.add\('off'\)/.test(js)&&/remaining\(D,t\.id\)/.test(js),'tipo pieno → selettore grigio');
+chk(/classList\.add\('off'\)/.test(js)&&(/remainingCached\(D,t\.id\)/.test(js)||/remaining\([^)]*t\.id\)/.test(js)),'tipo pieno → selettore grigio');
 
 chk(/masterMemberId|bggRpgId|gameName/.test(sb),'MAP tables nuovi campi');
-chk(/APP_VERSION='41\.11'/.test(brand)&&/tt_pieno/.test(brand),'APP_VERSION 41.11 + testi');
-chk(/tavoli-tipi\.js\?v=41\.11/.test(ix),'asset tavoli-tipi in index');
+const {APP_VERSION,swCache,hasAsset}=require('./appver');chk(!!APP_VERSION&&swCache()&&/tt_pieno/.test(brand),'APP_VERSION dal codice + testi tt_pieno');
+chk(hasAsset('tavoli-tipi.js'),'asset tavoli-tipi in index e sw');
 chk(!/club|ludoteca/i.test(js.match(/pieno_msg:.*?whatsapp/)?.[0]||'')&&!/club|ludoteca/i.test(brand.match(/tt_pieno:'[^']+'/)?.[0]||''),'niente club/ludoteca nei testi nuovi');
 chk(/window\.agSheet/.test(js)&&/window\._agNew/.test(read('app.js')),'agSheet sovrascrivibile');
 console.log(`\n${ok}/${n} controlli`);

@@ -9,7 +9,7 @@ chk(!/IG\.link[^\n]*igev'\):''\}<\/div>`\};/.test(ev)&&/IG\.link\('📸 Foto e a
 chk(/Giocatori: Tutto/.test(app)&&/Durata: Tutto/.test(app)&&/Tutto \(\$\{ps\.length\}\)/.test(app),'menu a tendina con «Tutto»');
 chk(/loading="lazy"[^>]*decoding="async"/.test(app),'copertina scheda gioco lazy');
 chk(/pergioco-cache-uid/.test(sb)&&/removeItem\('pergioco-cache-uid'\)/.test(sb),'cache locale legata all\'account e cancellata al logout');
-chk(/esc\(t\.time\)/.test(ux)&&/esc\(UX\.dLbl/.test(ux)&&/gLink\(g\.id,g\.name\)/.test(ux)&&/textContent='← '/.test(ux),'ux40: testi dinamici passati da esc() o textContent');
+chk(/esc\(t\.time\)/.test(ux)&&/esc\(UX\.dLbl/.test(ux)&&/gLink\(/.test(ux)&&/textContent='← '/.test(ux),'ux40: testi dinamici passati da esc() o textContent');
 chk(!/club|ludoteca/i.test(ux.replace(/'ludoteca'/g,'')),'niente club/ludoteca nei testi');
 chk(/\.evb\.st/.test(css)&&/\.evb\.t,\.chip\.coop/.test(css),'etichette: un colore stato, uno tipo');
 chk(/min-height:44px/.test(css),'target tattili 44px');

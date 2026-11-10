@@ -1,4 +1,5 @@
-docs/
+docs/*
+!docs/rilascio.md
 *backup*
 *.csv
 *.xlsx

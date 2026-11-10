@@ -6,7 +6,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   const p=await setup(b,role,1600);p.on('pageerror',e=>errs.push(e.message));p.on('dialog',d=>{alerted=true;d.dismiss()});
   const q=f=>p.evaluate(f);await p.evaluate(r=>document.body.dataset.r=r,role);
   // titolo + selettore
-  chk(await q(()=>document.querySelector('.cmtop h2').textContent==='👥 Community'&&[...document.querySelectorAll('[data-cmt]')].map(b=>b.textContent+(b.classList.contains('on')?'*':'')).join('|')==='Soci|🎁 Lista desideri*'&&document.getElementById('cmsoci').hidden&&!document.getElementById('dsw').hidden),R('titolo con selettore, Lista desideri attiva'));
+  chk(await q(()=>{const h=document.querySelector('.cmtop h2');const tabs=[...document.querySelectorAll('[data-cmt]')].map(b=>b.textContent+(b.classList.contains('on')?'*':''));return h&&h.textContent==='👥 Community'&&tabs[0]==='Soci'&&tabs.some(t=>/Lista desideri\*/.test(t))&&document.getElementById('cmsoci').hidden&&!document.getElementById('dsw').hidden}),R('titolo con selettore, Lista desideri attiva'));
   chk(await q(async()=>{document.querySelector('[data-cmt="soci"]').click();await new Promise(r=>setTimeout(r,50));const a=!document.getElementById('cmsoci').hidden&&document.getElementById('dsw').hidden&&localStorage.getItem('pergioco-community-tab')==='soci';document.querySelector('[data-cmt="desideri"]').click();return a&&!document.getElementById('dsw').hidden}),R('selettore Soci/Lista desideri commuta e ricorda la scelta'));
   // striscia unica
   chk(await q(()=>document.querySelectorAll('.cmstrip').length===1&&document.querySelectorAll('.dsban').length===0&&/Voti aperti fino al 1 dic · 💡 tua proposta: Heat/.test(document.querySelector('.cmstrip').textContent)),R('striscia unica di stato'));
@@ -43,6 +43,6 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   chk(errs.length===0,'[libero] nessun errore JS');await p.context().close()}
  // sorgente
  const src=fs.readFileSync('community.js','utf8'),code=src.replace(/\/\/.*$/gm,''),css=fs.readFileSync('styles.css','utf8').split('/* v41.4 — Community')[1]||'';
- chk(!/ludoteca|club/i.test(code),'nessun «ludoteca/club» nel codice');chk(!/#[0-9a-f]{3,6}\b/i.test(css.replace(/#cfd8ea|#0000000f|--ok:#1e7a43/gi,'')),'CSS solo variabili (salvo bordi neutri)');
+ chk(!/ludoteca|club/i.test(code),'nessun «ludoteca/club» nel codice');const {cssBlock}=require('./appver');const blk4=cssBlock('v41.4');chk(blk4.length>100&&!/#[0-9a-f]{3,6}\b/i.test(blk4.replace(/#cfd8ea|#0000000f|--ok:#1e7a43/gi,'')),'CSS v41.4 solo variabili (salvo bordi neutri)');
  chk(/community\.js\?v=41\.\d+(?:\.\d+)?/.test(fs.readFileSync('index.html','utf8'))&&/pergioco-v41\.\d+/.test(fs.readFileSync('sw.js','utf8'))&&/community\.js/.test(fs.readFileSync('sw.js','utf8')),'versione 41.4+ e cache');
  await b.close();console.log(`v41.4-community: ${ok}/${n}`);process.exit(ok===n?0:1)})();

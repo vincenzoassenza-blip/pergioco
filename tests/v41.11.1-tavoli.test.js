@@ -214,7 +214,7 @@ const seed=async(p,opt={})=>{
   }
 
   const brand=fs.readFileSync(path.join(__dirname,'../brand.js'),'utf8');
-  chk(/APP_VERSION='41\.11\.1'/.test(brand),'versione brand 41.11.1');
+  const {APP_VERSION,swCache}=require('./appver');chk(!!APP_VERSION&&swCache(),'APP_VERSION dal codice, cache SW allineata');
   await b.close();
   console.log(`\n${ok}/${n} controlli`);
   console.log('screenshot:',fs.readdirSync(OUT).filter(f=>f.endsWith('.png')).sort().join(', '));

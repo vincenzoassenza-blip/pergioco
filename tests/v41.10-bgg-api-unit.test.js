@@ -35,7 +35,7 @@ chk(/DS\.bgg/.test(giochi),'giochi usa DS.bgg → bgg-meta');
 chk(/invoke\('bgg-meta'/.test(cons),'consigliere resta su bgg-meta');
 chk(fs.existsSync(path.join(root,'img/powered-by-bgg.png')),'asset logo presente');
 chk(fs.existsSync(path.join(root,'supabase/migrate-v41.10.sql')),'migrazione locale pronta');
-chk(/APP_VERSION='41\.10(?:\.\d+)?'/.test(brand),'APP_VERSION 41.10.x');
+const {APP_VERSION,swCache}=require('./appver');chk(!!APP_VERSION&&swCache(),'APP_VERSION dal codice, cache SW allineata');
 function parseSearch(xml){const out=[];for(const m of xml.matchAll(/<item\b([^>]*)>([\s\S]*?)<\/item>/g)){const id=+(m[1].match(/\bid="(\d+)"/)||[])[1];const nm=(m[2].match(/<name[^>]*value="([^"]*)"/)||[])[1];if(id&&nm)out.push({bgg_id:id,nome:nm})}return out}
 chk(parseSearch('<items><item id="13" type="boardgame"><name type="primary" value="Catan"/><yearpublished value="1995"/></item></items>')[0]?.bgg_id===13,'parser search Catan');
 console.log(`\n${ok}/${n} controlli`);

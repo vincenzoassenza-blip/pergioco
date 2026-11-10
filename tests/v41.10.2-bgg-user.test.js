@@ -73,6 +73,7 @@ fs.mkdirSync(OUT,{recursive:true});
   await p.context().close()}
  // static checks
  const h=fs.readFileSync(__dirname+'/../index.html','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8');
- chk(/pergioco-v41\.10\.2/.test(sw)&&/APP_VERSION='41\.10\.2'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8')),'versione 41.10.2');
- chk(/import-bgg\.js\?v=41\.10\.2/.test(h)&&/giochi\.js\?v=41\.10\.2/.test(h),'cache bust import+giochi');
+ const {APP_VERSION,swCache,hasAsset}=require('./appver');
+ chk(!!APP_VERSION&&swCache(),'APP_VERSION dal codice, cache SW allineata');
+ chk(hasAsset('import-bgg.js')&&hasAsset('giochi.js'),'cache bust import+giochi');
  await b.close();console.log(`${ok}/${n}`);process.exit(ok===n?0:1)})();

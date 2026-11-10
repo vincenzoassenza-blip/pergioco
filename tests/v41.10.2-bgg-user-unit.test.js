@@ -24,7 +24,7 @@ chk(/UDEB=600/.test(imp)&&/UMIN=3/.test(imp)&&/UMAX=50/.test(imp),'debounce 600 
 chk(/mode:'user'/.test(imp)&&/viaUserCheck/.test(imp)&&/viaUserMissing/.test(imp),'UI verifica username');
 chk(/ibggchip/.test(imp)&&/pushRecent/.test(imp)&&/bgg_recent_users/.test(imp),'chip recenti + app_settings');
 chk(/ibgg_viaUserCheck/.test(brand)&&/ibgg_viaUserMissing/.test(brand)&&/ibgg_viaUserRecent/.test(brand),'testi configurabili nuovi');
-chk(/APP_VERSION='41\.10\.2'/.test(brand),'APP_VERSION 41.10.2');
+const {APP_VERSION,swCache}=require('./appver');chk(!!APP_VERSION&&swCache(),'APP_VERSION dal codice, cache SW allineata');
 chk(/bgg_recent_users_valid/.test(mig)&&/ibgg_viaUserCheck/.test(mig),'migrazione recenti + testi');
 chk(!/club|ludoteca/i.test(imp.match(/viaUserCheck:.*?viaUserRemove:[^,]+/)?.[0]||''),'nuovi testi senza club/ludoteca');
 chk(/function bggPwrHtml/.test(brand),'helper logo condiviso');

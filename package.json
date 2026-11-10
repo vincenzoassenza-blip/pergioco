@@ -1,0 +1,8 @@
+{
+  "name": "pergioco",
+  "private": true,
+  "description": "App soci PerGioco",
+  "scripts": {
+    "test": "scripts/test-all.sh"
+  }
+}

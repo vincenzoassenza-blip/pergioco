@@ -48,9 +48,9 @@ chk(/members_photo_url_chk/.test(sql)&&/user_id::text/.test(sql),'CHECK: URL del
 chk(/file_size_limit/.test(sql)&&/image\/webp/.test(sql)&&/image\/svg/.test(sql)===false,'limite file e mime senza SVG');
 
 const brand=fs.readFileSync(path.join(ROOT,'brand.js'),'utf8');
-chk(/APP_VERSION='41\.12\.2'/.test(brand),'versione 41.12.2');
+const {APP_VERSION,swCache,hasAsset}=require('./appver');chk(!!APP_VERSION&&swCache(),'APP_VERSION dal codice, cache SW allineata');
 const sw=fs.readFileSync(path.join(ROOT,'sw.js'),'utf8'),idx=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
-chk(/pergioco-v41\.12\.2/.test(sw)&&/header\.js\?v=41\.12\.2/.test(idx)&&/sicurezza\.js\?v=41\.12\.2/.test(sw),'cache sw e file con ?v=41.12.2');
+chk(hasAsset('header.js')&&hasAsset('sicurezza.js'),'header.js e sicurezza.js in index e sw');
 const hdr=fs.readFileSync(path.join(ROOT,'header.js'),'utf8');
 chk(!/innerHTML|insertAdjacentHTML|outerHTML/.test(hdr)&&!/club|ludoteca/i.test(hdr),'header.js senza HTML iniettato né club/ludoteca');
 const app=fs.readFileSync(path.join(ROOT,'app.js'),'utf8');

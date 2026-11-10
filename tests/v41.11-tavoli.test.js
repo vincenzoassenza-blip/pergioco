@@ -228,8 +228,9 @@ const seed=async(p,{fullGdr=false}={})=>{
   const brand=fs.readFileSync(path.join(__dirname,'../brand.js'),'utf8');
   const sw=fs.readFileSync(path.join(__dirname,'../sw.js'),'utf8');
   const ix=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
-  chk(/APP_VERSION='41\.11'/.test(brand)&&/pergioco-v41\.11/.test(sw),'versione 41.11');
-  chk(/tavoli-tipi\.js\?v=41\.11/.test(ix)&&/tavoli-tipi\.js\?v=41\.11/.test(sw),'asset in index+sw');
+  const {APP_VERSION,swCache,hasAsset}=require('./appver');
+  chk(!!APP_VERSION&&swCache(),'APP_VERSION dal codice, cache SW allineata');
+  chk(hasAsset('tavoli-tipi.js'),'asset in index+sw');
   chk(fs.existsSync(path.join(__dirname,'../supabase/migrate-v41.11.sql')),'migrazione presente');
 
   await b.close();

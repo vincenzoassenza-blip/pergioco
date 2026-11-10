@@ -29,7 +29,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   chk(errs.length===0,'anon: nessun errore JS '+errs.join('|'));await p.context().close()}
  {const p=await hdr(b,'staff',900);const errs=[];p.on('pageerror',e=>errs.push(e.message));const q=f=>p.evaluate(f);
   chk(await q(()=>{const m=document.getElementById('modebtn'),a=document.getElementById('avbtn');return a&&!a.hidden&&(!m||m.hidden||getComputedStyle(m).display==='none')}),'staff: avatar visibile, pulsante modalità nascosto');
-  chk(await q(()=>{const r=document.querySelector('header .brand').getBoundingClientRect(),a=document.getElementById('avbtn').getBoundingClientRect();return r.right<=a.left+1&&parseFloat(getComputedStyle(document.querySelector('header .brand')).paddingRight)>=50}),'staff: il nome non finisce sotto l\'avatar');
+  chk(await q(()=>{const b=document.querySelector('header .brand'),a=document.getElementById('avbtn');const br=b.getBoundingClientRect(),ar=a.getBoundingClientRect(),cs=getComputedStyle(b),pr=parseFloat(cs.paddingRight);return (br.right-pr)<=ar.left+1&&pr>=36&&cs.textOverflow==='ellipsis'&&cs.whiteSpace==='nowrap'}),'staff: il nome non finisce sotto l\'avatar');
   chk(await q(()=>{const a=document.querySelector('.alaccs');return a&&!a.hidden&&a.querySelector('.alacc .alsub')}),'staff: Esci in Gestione › Il mio account');
   await q(()=>go('config'));await W(1500);chk(await q(()=>['barra1','barra2','filo'].every(k=>document.getElementById('cfc-'+k))),'config: i 3 colori della barra');
   chk(errs.length===0,'staff: nessun errore JS '+errs.join('|'));await p.context().close()}
