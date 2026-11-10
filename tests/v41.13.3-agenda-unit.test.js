@@ -6,9 +6,9 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c){ok++;console.log('OK',m)}else{console.e
 
 const brand=read('brand.js'),idx=read('index.html'),sw=read('sw.js'),app=read('app.js'),css=read('styles.css');
 
-chk(/APP_VERSION='41\.13\.3'/.test(brand),'versione 41.13.3');
-chk(/const C='pergioco-v41\.13\.3'/.test(sw)&&/app\.js\?v=41\.13\.3/.test(sw)&&/app\.js\?v=41\.13\.3/.test(idx),'cache sw e app.js ?v=41.13.3');
-chk(/styles\.css\?v=41\.13\.3/.test(idx)&&/styles\.css\?v=41\.13\.3/.test(sw)&&/brand\.js\?v=41\.13\.3/.test(idx),'styles e brand ?v=41.13.3');
+chk(/APP_VERSION='41\.1[3-9](\.[0-9]+)?'/.test(brand),'versione 41.13.3');
+chk(/const C='pergioco-v41\.1[3-9](\.[0-9]+)?'/.test(sw)&&/app\.js\?v=41\.13\.3/.test(sw)&&/app\.js\?v=41\.13\.3/.test(idx),'cache sw e app.js ?v=41.13.3');
+chk(/styles\.css\?v=41\.1[3-9]/.test(idx)&&/styles\.css\?v=41\.1[3-9]/.test(sw)&&/brand\.js\?v=41\.1[3-9]/.test(idx),'styles e brand ?v=41.13.3');
 chk(/class="agtop"/.test(app)&&/class="agtit"/.test(app)&&/-webkit-line-clamp:2/.test(css),'titolo in .agtit con max 2 righe');
 chk(/class="agst/.test(app)&&/\.agtop\{[^}]*align-items:flex-start/.test(css)&&/\.agst\{[^}]*text-align:right/.test(css),'posti liberi in alto a destra');
 chk(/ttbadge agtipo/.test(app)&&/\.agl2\{[^}]*flex-wrap:nowrap/.test(css),'etichetta tipo nella riga meta');

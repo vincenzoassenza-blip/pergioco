@@ -28,7 +28,7 @@ await p.evaluate(()=>go('altro'));await p.waitForTimeout(600);chk(await p.evalua
 // XSS / valori non validi
 r=await p.evaluate(()=>MOD.norm({coppa:{attivo:true,nome:'<img src=x onerror=window.XSS=1>'},sfida:{attivo:'si'}}));chk(r.coppa.nome==='Coppa Antero'&&r.sfida.attivo===true,'norm scarta nomi con < > e tipi errati');
 // Configurazione
-p=await mk('staff',{});await p.evaluate(()=>go('config'));await p.waitForTimeout(1000);
+p=await mk('staff',{});await p.evaluate(()=>go('config'));await p.waitForTimeout(1000);await p.evaluate(()=>{/* v41.14: sezioni a righe, si mostrano tutte per il test */document.querySelectorAll('#cfg2 .cfsec').forEach(s=>s.hidden=false);document.querySelectorAll('#cfg2 details.cfd').forEach(d=>d.open=true)});
 r=await p.evaluate(()=>({c:['coppa','sfida','libri'].map(k=>!!document.getElementById('cm-'+k)&&document.getElementById('cm-'+k).checked),nm:$('#cm-coppa-nome').value}));
 chk(r.c.every(Boolean)&&r.nm==='Coppa Antero','Configurazione: interruttori accesi e nomi');
 await p.click('#cm-sfida');chk(await p.evaluate(()=>$('#cmf-sfida').hidden),'spegnere nasconde i campi del modulo');

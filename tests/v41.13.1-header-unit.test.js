@@ -6,10 +6,10 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c){ok++;console.log('OK',m)}else{console.e
 
 const brand=read('brand.js'),idx=read('index.html'),sw=read('sw.js'),js=read('header.js'),css=read('styles.css'),app=read('app.js');
 
-chk(/APP_VERSION='41\.13(\.[0-9]+)?'/.test(brand),'versione 41.13+');
-chk(/const C='pergioco-v41\.13(\.[0-9]+)?'/.test(sw)&&/header\.js\?v=41\.13\.1/.test(sw)&&/header\.js\?v=41\.13\.1/.test(idx),'cache sw 41.13+ e header.js ?v=41.13.1');
-chk(/styles\.css\?v=41\.13/.test(idx)&&/styles\.css\?v=41\.13/.test(sw),'styles ?v=41.13+');
-chk(/app\.js\?v=41\.13/.test(idx)&&/brand\.js\?v=41\.13/.test(idx),'app.js e brand.js ?v=41.13+');
+chk(/APP_VERSION='41\.1[3-9](\.[0-9]+)?'/.test(brand),'versione 41.13+');
+chk(/const C='pergioco-v41\.1[3-9](\.[0-9]+)?'/.test(sw)&&/header\.js\?v=41\.13\.1/.test(sw)&&/header\.js\?v=41\.13\.1/.test(idx),'cache sw 41.13+ e header.js ?v=41.13.1');
+chk(/styles\.css\?v=41\.1[3-9]/.test(idx)&&/styles\.css\?v=41\.1[3-9]/.test(sw),'styles ?v=41.13+');
+chk(/app\.js\?v=41\.13/.test(idx)&&/brand\.js\?v=41\.1[3-9]/.test(idx),'app.js e brand.js ?v=41.13+');
 chk(!/innerHTML|insertAdjacentHTML|outerHTML/.test(js),'header.js: nessun HTML iniettato');
 chk(!/club|ludoteca/i.test(js),'header.js: niente club/ludoteca');
 chk(/b\.hidden=true/.test(app)&&/#modebtn\{display:none!important\}/.test(css),'pulsante modalità rimosso dalla barra');
