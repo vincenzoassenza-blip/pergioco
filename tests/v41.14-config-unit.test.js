@@ -1,0 +1,20 @@
+// node tests/v41.14-config-unit.test.js
+const fs=require('fs'),path=require('path');const R=path.join(__dirname,'..'),rd=f=>fs.readFileSync(path.join(R,f),'utf8');
+let ok=0,n=0;const chk=(c,m)=>{n++;if(c){ok++;console.log('OK',m)}else{console.error('FAIL',m);process.exitCode=1}};
+const js=rd('config2.js'),idx=rd('index.html'),sw=rd('sw.js'),br=rd('brand.js'),css=rd('styles.css');
+chk(/APP_VERSION='41\.14'/.test(br),'versione 41.14');
+chk(/const C='pergioco-v41\.14'/.test(sw)&&sw.includes('./config2.js?v=41.14')&&sw.includes('styles.css?v=41.14'),'cache sw 41.14 con config2.js');
+chk(idx.indexOf('gdr-rec.js')<idx.indexOf('config2.js?v=41.14')&&idx.indexOf('tavoli-tipi.js')<idx.indexOf('config2.js'),'config2.js dopo gdr-rec e tavoli-tipi');
+chk(!/innerHTML|insertAdjacentHTML|outerHTML/.test(js),'config2.js: nessun HTML iniettato');
+chk(!/club|ludoteca/i.test(js),'niente club/ludoteca');
+chk(/adminMode\(\)/.test(js),'montaggio solo in adminMode');
+chk(!/upsert|\.from\(/.test(js),'nessuna scrittura nuova: salva il codice originale');
+chk(/orig\.call\(sv,e\)/.test(js),'Salva richiama il salvataggio originale');
+chk(js.includes("'Identità'")&&js.includes("'Funzioni'")&&js.includes("'Testi'"),'gruppi dell\'indice');
+chk(js.includes('Gruppo')&&js.includes("tutto:'Tutto'")&&js.includes('Solo modificati')&&js.includes('↺ Originale')&&js.includes("modificato:'modificato'"),'testi: tendine, modificato, Originale');
+chk(js.includes('Scegli immagine')&&js.includes("role','switch'"),'logo e interruttori');
+chk(/beforeunload/.test(js)&&/Hai modifiche non salvate/.test(js),'conferma all\'uscita');
+chk(/aria-invalid/.test(js)&&/\.cfe\{/.test(css),'errori accanto al campo');
+chk(/maxLength=60/.test(js),'ricerca con limite di lunghezza');
+chk(/v41\.14 — Configurazione/.test(css)&&/\.cfr\{[^}]*text-decoration:none/.test(css),'stili v41.14, righe senza sottolineatura');
+console.log(ok+'/'+n+' controlli');if(ok!==n)process.exit(1);

@@ -28,7 +28,7 @@ r=await p.evaluate(()=>BRAND.v);chk(r.nome==='PerGioco'&&r.colori.primario==='#1
 // 4) staff
 ({p,errs}=await mk('staff',null));await p.evaluate(()=>BRAND.load(true));await p.evaluate(()=>go('altro'));await p.waitForTimeout(800);
 chk(await p.evaluate(()=>!!document.getElementById('acfg')),'staff: pulsante ⚙️ Configurazione');
-await p.click('[data-alb=acfg]') /* v41.6: riga «Configurazione» dell'elenco Gestione */;await p.waitForTimeout(800);
+await p.click('[data-alb=acfg]') /* v41.6: riga «Configurazione» dell'elenco Gestione */;await p.waitForTimeout(800);await p.evaluate(()=>{/* v41.14: sezioni a righe, si mostrano tutte per il test */document.querySelectorAll('#cfg2 .cfsec').forEach(s=>s.hidden=false);document.querySelectorAll('#cfg2 details.cfd').forEach(d=>d.open=true)});
 r=await p.evaluate(()=>({h:V.querySelector('h2').textContent,n:$('#cf-nome').value,c:$('#cfc-primario').value}));chk(r.h==='⚙️ Configurazione'&&r.n==='PerGioco'&&r.c==='#14254a','form precompilato');
 await p.fill('#cf-nome','<script>x</script>Prova');await p.evaluate(()=>{const i=$('#cfc-accento');i.value='#00aa9e';i.dispatchEvent(new Event('input'))});
 r=await p.evaluate(()=>({pn:$('#cfpn').textContent,ph:$('#cfpn').innerHTML,pa:$('#cfprev').style.getPropertyValue('--a'),root:getComputedStyle(document.documentElement).getPropertyValue('--a').trim()}));

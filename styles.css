@@ -778,3 +778,40 @@ header .brand,header .sub,body.adm header .brand,body.adm header .sub{padding-ri
 #agmenu button.danger{color:#c62828}
 #agmenu button[aria-selected="true"]{background:color-mix(in srgb,var(--b) 8%,var(--c))}
 #agmenu button:disabled{opacity:.4}
+
+/* v41.14 — Configurazione: indice a righe, barra Salva fissa, sezioni compatte */
+#cfg2 .hrow{display:flex;align-items:center;gap:10px}#cfg2 .hrow h2{margin:6px 2px}#cfbk{width:auto;margin:0;flex:none}
+#cfg2 .cfhelp,.cfhelp{font-size:13px;color:var(--m);margin:6px 4px 10px;font-weight:400}
+.cfgh{font-size:12px;font-weight:800;color:var(--m);text-transform:uppercase;letter-spacing:.04em;margin:14px 6px 6px}
+.cflist{padding:4px}
+.cfr{display:flex;align-items:center;gap:10px;padding:12px 10px;min-height:44px;cursor:pointer;color:inherit;text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--b2) 10%,var(--c));list-style:none}
+.cfr::-webkit-details-marker{display:none}.cflist>.cfr:last-child,.cflist>details:last-child>.cfr{border-bottom:0}
+.cfr:hover,.cfr:focus-visible{background:color-mix(in srgb,var(--b2) 6%,var(--c));outline:none}
+.cfr .ic{width:28px;font-size:20px;text-align:center;flex:none}.cfr .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.cfr .t b{color:var(--b);font-weight:800;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cfr .sub,.cfr .cfpv{font-size:13px;color:var(--m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cfr .cfpv{color:var(--t);font-size:14px}
+.cfr small{font-size:12px;color:var(--m);display:flex;align-items:center;gap:6px}.cfr .ar{color:var(--b2);font-weight:700;flex:none}
+.cfpill{font-size:12px;font-weight:700;border-radius:999px;padding:2px 8px;background:#e3f4e8;color:#1d7a3a}.cfpill.off{background:#eef0f5;color:#6b7489}
+.cfdots{display:inline-flex;gap:3px}.cfdots i{width:12px;height:12px;border-radius:50%;display:inline-block;border:1px solid #0002}
+.cfmod{font-size:11px;font-weight:700;color:#8a5a00;background:#fff2d6;border-radius:999px;padding:1px 7px}.cfmod[hidden]{display:none}
+.cfd{border-bottom:1px solid color-mix(in srgb,var(--b2) 10%,var(--c))}.cfd>.cfr{border-bottom:0}.cfd:last-child{border-bottom:0}
+.cfdb,.cfd>.gdrb{padding:0 10px 12px}.cfvh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.cfq{width:100%;box-sizing:border-box;margin:0 0 8px}.cfsels{display:flex;gap:8px;margin:0 0 6px}.cfsels select{flex:1;min-width:0;margin:0}
+.cforig{width:auto;margin-top:8px}.cfrst{margin-top:10px}
+.cfsec[hidden],#cfidx[hidden],#cfbk[hidden],.cftf[hidden],.cftg2[hidden],.cfgh[hidden]{display:none!important}
+#cfg2 .cfh{display:block;font-size:12px;color:var(--m);font-weight:400;margin-top:1px}
+#cfg2 label{font-weight:600}
+.cfe{color:#b3261e;font-size:13px;margin:4px 2px 6px;font-weight:600}#cfg2 [aria-invalid="true"]{border-color:#b3261e;box-shadow:0 0 0 1px #b3261e}
+.cflogo .cffile{position:absolute;width:1px!important;height:1px!important;min-width:0!important;min-height:0!important;flex:none!important;padding:0!important;border:0!important;opacity:0;pointer-events:none}.cfpick{width:auto;margin:0}.cffn{flex:1;min-width:0;font-size:13px;color:var(--m);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cflogo{flex-wrap:nowrap}
+.cfswr{padding:6px 0;min-height:44px}
+.cfsw2{appearance:none;-webkit-appearance:none;width:44px!important;height:26px!important;border-radius:999px;background:#c9cfdc;position:relative;cursor:pointer;transition:background .15s;flex:none;margin:0}
+.cfsw2::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 2px #0003;transition:left .15s}
+.cfsw2:checked{background:var(--b)}.cfsw2:checked::after{left:21px}.cfsw2:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+#cfg2 .cfswr{order:0}#cfg2 .cfmod.cfmod2{display:none}
+.cfsbsp{height:86px}
+.cfsb{position:fixed;left:0;right:0;bottom:var(--navh,64px);z-index:40;display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--c);box-shadow:0 -4px 14px rgb(0 0 0/.12);max-width:560px;margin:0 auto}
+.cfsb span{flex:1;font-size:13px;color:var(--m)}.cfsb.dirty span{color:var(--b);font-weight:700}.cfsb button{width:auto!important;margin:0;min-height:44px;padding:0 18px}
+@media (min-width:900px){.cfsb{bottom:16px;border-radius:14px}}
+#cfg2 .cftx>summary[hidden]{display:none!important}#cfg2 summary.cfr::after,#cfg2 summary.cfr::before{content:none!important;display:none!important}
+#cfg2 .cfsec{padding-top:6px}

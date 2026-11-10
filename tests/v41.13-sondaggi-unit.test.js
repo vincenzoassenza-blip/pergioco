@@ -12,10 +12,10 @@ const js=fs.readFileSync(path.join(ROOT,'sondaggi.js'),'utf8');
 const cm=fs.readFileSync(path.join(ROOT,'community.js'),'utf8');
 const css=fs.readFileSync(path.join(ROOT,'styles.css'),'utf8');
 
-chk(/APP_VERSION='41\.13(\.[0-9]+)?'/.test(brand),'versione 41.13+');
-chk(/const C='pergioco-v41\.13(\.[0-9]+)?'/.test(sw)&&/sondaggi\.js\?v=41\.13/.test(sw)&&/styles\.css\?v=41\.13/.test(sw),'cache sw 41.13+ e sondaggi.js');
+chk(/APP_VERSION='41\.1[3-9](\.[0-9]+)?'/.test(brand),'versione 41.13+');
+chk(/const C='pergioco-v41\.1[3-9](\.[0-9]+)?'/.test(sw)&&/sondaggi\.js\?v=41\.13/.test(sw)&&/styles\.css\?v=41\.1[3-9]/.test(sw),'cache sw 41.13+ e sondaggi.js');
 chk(/sondaggi\.js\?v=41\.13/.test(idx)&&/community\.js\?v=41\.13/.test(idx)&&idx.indexOf('sondaggi.js')<idx.indexOf('community.js'),'index: sondaggi.js prima di community.js');
-chk(/styles\.css\?v=41\.13/.test(idx),'styles ?v=41.13');
+chk(/styles\.css\?v=41\.1[3-9]/.test(idx),'styles ?v=41.13');
 
 chk(!/insert into public\.(plays|games|game_meta)/i.test(low)&&!/update public\.(plays|games|game_meta|member_xp_base|member_xp_cp)\b/i.test(low),'migrazione non altera plays/games/xp di base');
 chk(/create table if not exists public\.polls/.test(sql)&&/poll_options/.test(sql)&&/poll_participants/.test(sql)&&/poll_ballots/.test(sql),'4 tabelle principali');
