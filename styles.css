@@ -662,3 +662,10 @@ button.p.off,button.p:disabled{opacity:.45;cursor:not-allowed}
 .gdrfg .gdrb{margin:0 0 12px;padding-top:8px;border-top:1px solid color-mix(in srgb,var(--m, #888) 22%,transparent)}
 .gdrfg .gdrb:first-of-type{border-top:0;padding-top:0}
 #cfgdr input[type=number]{width:6.5em}
+
+/* v41.12.1 — foto profilo in barra e negli avatar, ritaglio circolare */
+.hav{overflow:hidden;position:relative}
+.hav .avimg,.av.avph .avimg{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;pointer-events:none}
+.av.avph{padding:0;overflow:hidden}
+.pfoto{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 10px}
+.pfoto .muted{flex:1 1 100%;margin:0}
