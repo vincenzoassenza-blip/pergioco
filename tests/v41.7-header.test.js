@@ -11,7 +11,8 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   chk(await q(()=>{const a=document.getElementById('avbtn');return a&&!a.hidden&&a.textContent==='VA'&&a.getAttribute('aria-label')}),'iniziali del socio');
   chk(await q(()=>getComputedStyle(document.getElementById('outbtn')).display==='none'),'Esci non è più nella barra');
   chk(await q(()=>!!document.querySelector('.alacc .alsub')),'Esci in Altro › Il mio account');
-  await p.click('#avbtn');await W(1200);chk(await q(()=>location.hash.startsWith('#profilo')&&!window._pv&&!!document.querySelector('.card.prof')),'le iniziali aprono il proprio Profilo');
+  await p.click('#avbtn');await W(200);chk(await q(()=>!!document.getElementById('havmenu')),'le iniziali aprono il menu account');
+  await p.click('#havmenu [data-hav="profilo"]');await W(1200);chk(await q(()=>location.hash.startsWith('#profilo')&&!window._pv&&!!document.querySelector('.card.prof')),'Profilo dal menu apre il proprio Profilo');
   // config: un'altra associazione cambia colori, logo, nome e motto (XSS come testo)
   await q(()=>{BRAND.v=BRAND.norm({nome:'<b>Ass</b> X',motto:'Motto <i>y</i>',logo_barra:'data:image/png;base64,iVBORw0KGgo=',colori:{primario:'#14254a',secondario:'#2a4785',accento:'#f2b134',sfondo:'#f4f6fb',barra1:'#112233',barra2:'#445566',filo:'#abcdef'}});BRAND.apply()});
   const s2=await q(()=>{const h=getComputedStyle(document.querySelector('header'));return{bg:h.backgroundImage,bb:h.borderBottomColor,src:document.querySelector('header img.hlogo').getAttribute('src'),b:document.querySelector('header .brand').innerHTML,s:document.querySelector('header .sub').textContent}});
@@ -27,15 +28,15 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   chk(await q(()=>!!document.querySelector('header img.hlogo')&&document.querySelector('header .brand').textContent==='PerGioco'),'non collegato: logo e nome');
   chk(errs.length===0,'anon: nessun errore JS '+errs.join('|'));await p.context().close()}
  {const p=await hdr(b,'staff',900);const errs=[];p.on('pageerror',e=>errs.push(e.message));const q=f=>p.evaluate(f);
-  chk(await q(()=>!document.getElementById('modebtn').hidden&&!document.getElementById('avbtn').hidden),'staff: modalità + iniziali');
-  chk(await q(()=>{const r=document.querySelector('header .brand').getBoundingClientRect(),m=document.getElementById('modebtn').getBoundingClientRect();return r.right<=m.left+1||document.querySelector('header .brand').scrollWidth>=0&&parseFloat(getComputedStyle(document.querySelector('header .brand')).paddingRight)>=180}),'staff: il nome non finisce sotto i pulsanti');
+  chk(await q(()=>{const m=document.getElementById('modebtn'),a=document.getElementById('avbtn');return a&&!a.hidden&&(!m||m.hidden||getComputedStyle(m).display==='none')}),'staff: avatar visibile, pulsante modalità nascosto');
+  chk(await q(()=>{const r=document.querySelector('header .brand').getBoundingClientRect(),a=document.getElementById('avbtn').getBoundingClientRect();return r.right<=a.left+1&&parseFloat(getComputedStyle(document.querySelector('header .brand')).paddingRight)>=50}),'staff: il nome non finisce sotto l\'avatar');
   chk(await q(()=>{const a=document.querySelector('.alaccs');return a&&!a.hidden&&a.querySelector('.alacc .alsub')}),'staff: Esci in Gestione › Il mio account');
   await q(()=>go('config'));await W(1500);chk(await q(()=>['barra1','barra2','filo'].every(k=>document.getElementById('cfc-'+k))),'config: i 3 colori della barra');
   chk(errs.length===0,'staff: nessun errore JS '+errs.join('|'));await p.context().close()}
  const h=fs.readFileSync(__dirname+'/../index.html','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8'),js=fs.readFileSync(__dirname+'/../header.js','utf8'),css=fs.readFileSync(__dirname+'/../styles.css','utf8'),mf=fs.readFileSync(__dirname+'/../manifest.json','utf8');
- chk(/altro\.js\?v=41\.6"><\/script><script src="header\.js\?v=41\.12\.2"><\/script>/.test(h)&&/pergioco-v41\.\d+/.test(sw)&&sw.includes('header.js?v=41.12.2')&&sw.includes('img/logo-barra.svg')&&/styles\.css\?v=41\.\d+/.test(h)&&/APP_VERSION='41\.\d+(\.\d+)?'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8')),'versione 41.7+, header.js presente');
+ chk(/altro\.js\?v=41\.6"><\/script><script src="header\.js\?v=41\.13\.1"><\/script>/.test(h)&&/pergioco-v41\.\d+/.test(sw)&&sw.includes('header.js?v=41.13.1')&&sw.includes('img/logo-barra.svg')&&/styles\.css\?v=41\.\d+/.test(h)&&/APP_VERSION='41\.\d+(\.\d+)?'/.test(fs.readFileSync(__dirname+'/../brand.js','utf8')),'versione 41.7+, header.js presente');
  chk(!/innerHTML|insertAdjacentHTML|outerHTML/.test(js)&&!/club|ludoteca/i.test(js),'header.js: solo textContent, nessun «club»');
- const blk=css.slice(css.indexOf('/* v41.7 — Barra'));chk(blk.length>100&&!/#[0-9a-f]{3,6}\b/i.test(blk.replace(/#(outbtn|hback|modebtn|avbtn)\b/g,'')),'CSS v41.7 solo variabili');
+ const i7=css.indexOf('/* v41.7 — Barra'),i8=css.indexOf('/* v41.8');const blk=css.slice(i7,i8>i7?i8:undefined);chk(blk.length>100&&!/#[0-9a-f]{3,6}\b/i.test(blk.replace(/#(outbtn|hback|modebtn|avbtn)\b/g,'')),'CSS v41.7 solo variabili');
  chk(/name="theme-color"/.test(h)&&!/barra|hd1/.test(mf),'manifest e theme-color non toccati');
  chk(fs.existsSync(__dirname+'/../supabase/migrate-v41.7.sql'),'migrazione CHECK pronta');
  await b.close();console.log(`${ok}/${n}`);process.exit(ok===n?0:1)})();
