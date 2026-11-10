@@ -18,7 +18,8 @@ const pw=require('playwright-core');let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++
  chk(r.err.slice(0,5).every(x=>x>0)&&r.err[5]===0&&r.err[6]>0,'validazione '+r.err);
  await p.evaluate(()=>go('config'));await p.waitForTimeout(800);await p.evaluate(()=>{/* v41.14: sezioni a righe, si mostrano tutte per il test */document.querySelectorAll('#cfg2 .cfsec').forEach(s=>s.hidden=false);document.querySelectorAll('#cfg2 details.cfd').forEach(d=>d.open=true)});
  chk(await p.$eval('#cftx',e=>!!e.closest('.cfsec')),'Testi in una sezione propria (v41.14: si apre dall\'indice)');
- chk(await p.$$eval('#cftx textarea',e=>e.length)===3,'3 textarea per i testi lunghi');
+ const lunghi=await p.evaluate(()=>{const tas=[...document.querySelectorAll('#cftx textarea')];const ids=tas.map(e=>e.id).sort();const exp=TXT.LUNGHI.map(k=>'ct-'+k).sort();return {n:tas.length,nL:TXT.LUNGHI.length,ok:tas.length===TXT.LUNGHI.length&&ids.join()===exp.join()}});
+ chk(lunghi.ok&&lunghi.nL>0,lunghi.nL+' textarea per i testi lunghi (da TXT.LUNGHI)');
  chk(await p.$eval('#ct-santo',e=>e.value)==="Sant'Antero",'valori predefiniti nei campi');
  await p.fill('#ct-santo','San <img src=x onerror=alert(1)>');
  const sv=await p.$$eval('button',bs=>bs.map(b=>b.id+'|'+b.textContent).filter(t=>/Salva/.test(t))[0]);
