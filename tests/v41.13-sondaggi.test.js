@@ -30,7 +30,7 @@ const seed=async(p,opt={})=>{
     localStorage.clear();
     const staff=!!opt.staff;
     admin=staff;
-    localStorage.setItem('pergioco-mode',staff?'admin':'user');
+    localStorage.setItem('pergioco-mode',opt.mode||(staff?'admin':'user'));
     if(opt.tab)localStorage.setItem('pergioco-community-tab',opt.tab);
     const ms=[
       {id:'m1',nome:'Vincenzo',cognome:'Assenza',active:true,userId:'u1',avatar:'🦊',color:'#455a64'},
@@ -118,10 +118,10 @@ const seed=async(p,opt={})=>{
     const{c,p}=await ctx(2200);
     await goCm(p,{noPolls:true,staff:true,tab:'sondaggi'});
     const vis=await p.$('[data-cmt="sondaggi"]');
-    chk(!!vis,'staff senza sondaggi: tab sempre visibile');
-    const nuovo=await p.$('#psnew');
-    chk(!!nuovo,'staff: pulsante Nuovo sondaggio');
-    await p.click('#psnew');await W(300);
+    chk(!!vis,'staff in modalità admin senza sondaggi: tab visibile');
+    const nuovo=await p.$('#pscrea');
+    chk(!!nuovo,'staff admin: pulsante Crea sondaggio nello stato vuoto');
+    await p.click('#pscrea');await W(300);
     chk(await p.$('#psform') && await p.$('.type'),'form di creazione staff');
     chk(!!await p.$('#pssalva'),'pulsante Pubblica il sondaggio');
     await p.screenshot({path:path.join(OUT,'04-staff-crea.png')});
