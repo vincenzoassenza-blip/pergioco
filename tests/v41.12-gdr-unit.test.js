@@ -13,7 +13,7 @@ const xp=read('xp.js');
 const idx=read('index.html');
 const sw=read('sw.js');
 
-chk(/APP_VERSION='41\.12'/.test(brand)&&/pergioco-v41\.12/.test(sw)&&/gdr-rec\.js\?v=41\.12/.test(idx)&&/gdr-rec\.js\?v=41\.12/.test(sw),'versione 41.12 + asset gdr-rec');
+const {APP_VERSION,swCache,hasAsset,cssBlock}=require('./appver');chk(!!APP_VERSION&&swCache()&&hasAsset('gdr-rec.js'),'APP_VERSION dal codice + asset gdr-rec');
 chk(/gdr_rec_valid/.test(mig)&&/key='gdr_rec'/.test(mig)&&/app_settings_gdr_rec_chk/.test(mig),'migrazione gdr_rec + vincolo');
 chk(/revoke all on function public\.gdr_rec_valid/.test(mig)&&/grant execute[\s\S]*authenticated/.test(mig),'GRANT solo authenticated, revoke anon/public');
 chk(!/alter table public\.(plays|games|game_meta)/.test(mig)&&!/create or replace function public\.member_xp/.test(mig),'migrazione non altera plays/games/game_meta né member_xp');
@@ -22,7 +22,7 @@ chk(/mine\.filter\(isBoardGamePlay\)/.test(data)&&/!isGdrPlay\(p\)&&!p\.coop&&!i
 chk(/filter\(p=>p\.gameId===g\.id&&!p\.coop&&!isGdrPlay/.test(data)&&/mine\.filter\(isBoardGamePlay\)/.test(data),'Stats.records + Badges.distinct senza GDR');
 chk(/ps\.filter\(board\)/.test(xp)&&/if\(gdr\(p\)\)return/.test(xp),'RA: gioco più giocato / vittorie senza sessioni GDR');
 chk(/GDRB\.formHtml/.test(app)&&/GDRB\.save/.test(app)&&/adminMode\(\)\|\|isMod\(\)/.test(app),'config in Gestione (admin) + salvataggio');
-chk(/text-decoration:none/.test(read('styles.css').split('v41.12')[1]||'')&&/gdrln/.test(read('styles.css')),'righe GDR senza sottolineatura');
+chk(/text-decoration:none/.test(cssBlock('v41.12'))&&/gdrln/.test(read('styles.css')),'righe GDR senza sottolineatura');
 chk(/Campagne concluse/.test(rec)&&/avventura\+sistema|a\+'\|'\+s|a\+['"]\|['"]\+s/.test(rec),'campagne per avventura+sistema');
 chk(/masterId\(p\)===id/.test(rec)&&/character/.test(rec),'master solo socio + personaggi');
 chk(!/club|ludoteca/i.test(rec),'niente club/ludoteca nei testi nuovi');

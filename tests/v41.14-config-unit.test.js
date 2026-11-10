@@ -2,9 +2,9 @@
 const fs=require('fs'),path=require('path');const R=path.join(__dirname,'..'),rd=f=>fs.readFileSync(path.join(R,f),'utf8');
 let ok=0,n=0;const chk=(c,m)=>{n++;if(c){ok++;console.log('OK',m)}else{console.error('FAIL',m);process.exitCode=1}};
 const js=rd('config2.js'),idx=rd('index.html'),sw=rd('sw.js'),br=rd('brand.js'),css=rd('styles.css');
-chk(/APP_VERSION='41\.14'/.test(br),'versione 41.14');
-chk(/const C='pergioco-v41\.14'/.test(sw)&&sw.includes('./config2.js?v=41.14')&&sw.includes('styles.css?v=41.14'),'cache sw 41.14 con config2.js');
-chk(idx.indexOf('gdr-rec.js')<idx.indexOf('config2.js?v=41.14')&&idx.indexOf('tavoli-tipi.js')<idx.indexOf('config2.js'),'config2.js dopo gdr-rec e tavoli-tipi');
+const {APP_VERSION,swCache,hasAsset}=require('./appver');chk(!!APP_VERSION&&swCache(),'APP_VERSION dal codice, cache SW allineata');
+chk(hasAsset('config2.js')&&hasAsset('styles.css'),'cache sw con config2.js e styles');
+chk(idx.indexOf('gdr-rec.js')<idx.indexOf('config2.js')&&idx.indexOf('tavoli-tipi.js')<idx.indexOf('config2.js'),'config2.js dopo gdr-rec e tavoli-tipi');
 chk(!/innerHTML|insertAdjacentHTML|outerHTML/.test(js),'config2.js: nessun HTML iniettato');
 chk(!/club|ludoteca/i.test(js),'niente club/ludoteca');
 chk(/adminMode\(\)/.test(js),'montaggio solo in adminMode');

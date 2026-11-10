@@ -34,7 +34,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   await p.context().close()}
  chk(fs.existsSync(__dirname+'/../supabase/migrate-v41.8.sql')&&fs.readFileSync(__dirname+'/../supabase/migrate-v41.8.sql','utf8').includes('"g8_pieni":[2,40]'),'migrazione testi_valid pronta');
  const css=fs.readFileSync(__dirname+'/../styles.css','utf8'),js=fs.readFileSync(__dirname+'/../giochi-oggi.js','utf8'),h=fs.readFileSync(__dirname+'/../index.html','utf8'),sw=fs.readFileSync(__dirname+'/../sw.js','utf8');
- const blk=css.slice(css.indexOf('/* v41.8'));chk(blk.length>100&&!/#[0-9a-f]{3,6}\b(?!f)/i.test(blk.replace(/#fff\b/g,'')),'CSS v41.8: colori da variabili');
+ const {cssBlock}=require('./appver');const blk=cssBlock('v41.8');chk(blk.length>100&&!/#[0-9a-f]{3,6}\b(?!f)/i.test(blk.replace(/#fff\b/g,'')),'CSS v41.8: colori da variabili');
  chk(!/innerHTML|insertAdjacentHTML|outerHTML/.test(js)&&!/club|ludoteca/i.test(js.replace(/'ludoteca'/g,'')),'giochi-oggi.js: solo textContent');
  chk(/giochi-oggi\.js\?v=41\.8/.test(h)&& /pergioco-v41\.\d+/.test(sw)&&sw.includes('giochi-oggi.js?v=41.8')&&/styles\.css\?v=41\.\d+/.test(h)&&fs.readFileSync(__dirname+'/../brand.js','utf8').match(/APP_VERSION='41\.\d+(\.\d+)?'/),'versione 41.8+, giochi-oggi.js');
  await b.close();console.log(`${ok}/${n}`);process.exit(ok===n?0:1)})();

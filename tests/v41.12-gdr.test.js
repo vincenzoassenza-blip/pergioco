@@ -235,7 +235,7 @@ const seed=async(p,opt={})=>{
   }
 
   const brand=fs.readFileSync(path.join(ROOT,'brand.js'),'utf8');
-  chk(/APP_VERSION='41\.12'/.test(brand),'versione brand 41.12');
+  const {APP_VERSION,swCache,hasAsset}=require('./appver');chk(!!APP_VERSION&&swCache()&&hasAsset('gdr-rec.js'),'APP_VERSION dal codice + asset gdr-rec');
   await b.close();
   srv.close();
   console.log(`\n${ok}/${n} controlli`);
