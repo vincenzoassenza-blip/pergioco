@@ -53,7 +53,7 @@ if(typeof SupabaseAdapter!=='undefined'){const _run=SupabaseAdapter.run.bind(Sup
 if(typeof LB!=='undefined'){const _s=LB.save.bind(LB);LB.save=(t,r)=>_s(t,rowClean(t,r))}
 if(typeof EV!=='undefined'){const _s=EV.save;EV.save=e=>_s(rowClean('eventi',e))}
 // immagini rotte (al posto di onerror inline, bloccato dalla CSP)
-document.addEventListener('error',e=>{const t=e.target;if(!t||t.tagName!=='IMG')return;if(t.classList.contains('evimg')){t.remove();return}if(t.classList.contains('avimg')){const p=t.parentElement,ini=p&&p.getAttribute('data-ini')||'';t.remove();if(p){p.classList.remove('avph');if(p.id==='avbtn'||p.classList.contains('hav')){p.textContent=ini}else if(ini)p.textContent=ini}}},true);
+document.addEventListener('error',e=>{const t=e.target;if(!t||t.tagName!=='IMG')return;if(t.classList.contains('evimg')){t.remove();return}if(t.classList.contains('avimg')){const p=t.parentElement,ini=p&&p.getAttribute('data-ini')||'',av=p&&p.getAttribute('data-av')||'';t.remove();if(p){p.classList.remove('avph');p.textContent=av||ini}}},true);
 document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;if(b.dataset.act==='reload')location.reload();else if(b.dataset.act.startsWith('go:'))go(b.dataset.act.slice(3))});
 // errori globali: messaggio invece della pagina bianca
 let _errAt=0;function appErr(m){if(Date.now()-_errAt<3000)return;_errAt=Date.now();try{const r=(typeof errSpiega==='function')?errSpiega(m,'APP'):{code:'E-APP-99'};toast(r.msg?`⚠️ ${r.msg} [${r.code}]`:`⚠️ Qualcosa non ha funzionato. Chiudi e riapri l'app; se succede ancora avvisa lo staff con il codice [${r.code}].`,true)}catch(_){}

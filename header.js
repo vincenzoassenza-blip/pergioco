@@ -1,4 +1,4 @@
-// v41.12.1 — Barra in alto: logo e nome a sinistra; a destra la foto del socio (o le iniziali) → Profilo.
+// v41.12.2 — Barra in alto: logo e nome a sinistra; a destra foto, altrimenti avatar già scelto, altrimenti iniziali → Profilo.
 // «Esci» è in Altro › Il mio account. Solo textContent / attributi validati (niente HTML iniettato).
 (function(){
 const T={profilo:'Apri il tuo profilo'};
@@ -8,12 +8,15 @@ const ap=BRAND.apply;BRAND.apply=function(...a){const r=ap.apply(this,a);try{log
 const H=()=>document.querySelector('header');
 // iniziali: nome + cognome del socio collegato all'account (soprannome escluso: è libero)
 const ini=(m,u)=>{const w=m?[m.nome,m.cognome].map(x=>String(x||'').trim()).filter(Boolean):[];let s=w.length>1?w[0][0]+w[w.length-1][0]:w.length?w[0].slice(0,2):String(u&&u.email||'').slice(0,2);return [...s].slice(0,2).join('').toUpperCase()};
-function paintAv(b,m,u){const t=ini(m,u),src=typeof photoUrlOk==='function'?photoUrlOk(m&&m.photoUrl):'';
- b.setAttribute('data-ini',t);
+function avEmoji(m){const a=m&&m.avatar!=null?String(m.avatar):'';return a&&a.length<=16&&!/[<>]|https?:/i.test(a)?a:''}
+function avColor(m){return m&&m.color&&/^#[0-9a-f]{6}$/i.test(m.color)?m.color:''}
+function paintAv(b,m,u){const t=ini(m,u),emo=avEmoji(m),src=typeof photoUrlOk==='function'?photoUrlOk(m&&m.photoUrl):'';
+ b.setAttribute('data-ini',t);if(emo)b.setAttribute('data-av',emo);else b.removeAttribute('data-av');
  b.querySelectorAll('img').forEach(i=>i.remove());
+ const col=avColor(m);
  if(src){const img=document.createElement('img');img.className='avimg';img.alt='';img.width=36;img.height=36;img.decoding='async';img.referrerPolicy='no-referrer';
-  b.textContent='';b.append(img);img.src=src+(m&&m.photoRev?('?v='+encodeURIComponent(m.photoRev)):'');b.hidden=false}
- else{b.textContent=t;b.hidden=!t}}
+  b.textContent='';b.style.background='';b.style.color='';b.style.fontSize='';b.append(img);img.src=src+(m&&m.photoRev?('?v='+encodeURIComponent(m.photoRev)):'');b.hidden=false}
+ else{b.textContent=emo||t;if(emo&&col){b.style.background=col;b.style.color='#fff';b.style.fontSize='18px'}else{b.style.background='';b.style.color='';b.style.fontSize=''}b.hidden=!(emo||t)}}
 async function av(){const h=H();if(!h)return;const bx=h.querySelector('.hbtns');if(!bx)return;let b=document.getElementById('avbtn');
  if(!b){b=document.createElement('button');b.id='avbtn';b.type='button';b.className='hav';b.hidden=true;b.title=T.profilo;b.setAttribute('aria-label',T.profilo);bx.append(b);
   b.onclick=()=>{window._pv=null;const n=document.querySelector('nav [data-v="profilo"]');if(n)n.click();else go('profilo')}}
