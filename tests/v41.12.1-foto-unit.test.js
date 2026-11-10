@@ -1,4 +1,4 @@
-// node tests/v41.12.1-foto-unit.test.js
+// node tests/v41.12.2-foto-unit.test.js
 const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('assert');
 const ROOT=path.join(__dirname,'..');
 let ok=0,n=0;const chk=(c,m)=>{n++;if(c){ok++;console.log('OK',m)}else{console.log('FAIL',m);process.exitCode=1}};
@@ -48,14 +48,15 @@ chk(/members_photo_url_chk/.test(sql)&&/user_id::text/.test(sql),'CHECK: URL del
 chk(/file_size_limit/.test(sql)&&/image\/webp/.test(sql)&&/image\/svg/.test(sql)===false,'limite file e mime senza SVG');
 
 const brand=fs.readFileSync(path.join(ROOT,'brand.js'),'utf8');
-chk(/APP_VERSION='41\.12\.1'/.test(brand),'versione 41.12.1');
+chk(/APP_VERSION='41\.12\.2'/.test(brand),'versione 41.12.2');
 const sw=fs.readFileSync(path.join(ROOT,'sw.js'),'utf8'),idx=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
-chk(/pergioco-v41\.12\.1/.test(sw)&&/header\.js\?v=41\.12\.1/.test(idx)&&/sicurezza\.js\?v=41\.12\.1/.test(sw),'cache sw e file con ?v=41.12.1');
+chk(/pergioco-v41\.12\.2/.test(sw)&&/header\.js\?v=41\.12\.2/.test(idx)&&/sicurezza\.js\?v=41\.12\.2/.test(sw),'cache sw e file con ?v=41.12.2');
 const hdr=fs.readFileSync(path.join(ROOT,'header.js'),'utf8');
 chk(!/innerHTML|insertAdjacentHTML|outerHTML/.test(hdr)&&!/club|ludoteca/i.test(hdr),'header.js senza HTML iniettato né club/ludoteca');
 const app=fs.readFileSync(path.join(ROOT,'app.js'),'utf8');
 chk(/Scegli foto/.test(app)&&/Rimuovi foto/.test(app)&&/processAvatar/.test(app)&&!/club|ludoteca/i.test(app.split('Foto profilo')[1].slice(0,2000)),'testi italiani in modifica profilo');
 chk(/class="avimg"/.test(app)&&/data-ini/.test(app),'avatarHtml con foto e fallback');
 chk(/photo_url/.test(fs.readFileSync(path.join(ROOT,'sb.js'),'utf8'))&&/uploadPhoto/.test(fs.readFileSync(path.join(ROOT,'sb.js'),'utf8')),'sb.js colonna e upload');
+chk(/avEmoji/.test(hdr)&&/data-av/.test(hdr)&&/emo\|\|t/.test(hdr),'header: foto, altrimenti avatar già scelto, altrimenti iniziali');
 console.log(ok+'/'+n+' controlli');
 process.exit(ok===n?0:1);

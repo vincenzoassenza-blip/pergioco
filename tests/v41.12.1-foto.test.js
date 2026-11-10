@@ -1,4 +1,4 @@
-// node tests/v41.12.1-foto.test.js — foto profilo in barra e in modifica (porta 8814)
+// node tests/v41.12.2-foto.test.js — foto profilo in barra e in modifica (porta 8814)
 const pw=require('playwright-core'),fs=require('fs'),path=require('path'),http=require('http');
 const ROOT=path.join(__dirname,'..');
 const BASE='http://127.0.0.1:8814/';
@@ -21,7 +21,7 @@ const seed=async(p,opt={})=>{
     localStorage.clear();admin=false;
     localStorage.setItem('pergioco-mode','socio');
     const ms=[
-      {id:'m1',nome:'Vincenzo',cognome:'Assenza',active:true,userId:'u1',soprannome:'Vince',photoUrl:opt.photo?PHOTO:''},
+      {id:'m1',nome:'Vincenzo',cognome:'Assenza',active:true,userId:'u1',soprannome:'Vince',avatar:opt.avatar||'',color:opt.avatar?'#455a64':'',photoUrl:opt.photo?PHOTO:''},
       {id:'m2',nome:'Giulia',cognome:'Rossi',active:true,photoUrl:opt.other?PHOTO:''}
     ];
     const gs=[{id:'g1',name:'Catan',min:3,max:4}];
@@ -60,6 +60,19 @@ const seed=async(p,opt={})=>{
     chk(await p.evaluate(()=>document.getElementById('avbtn')&&!document.getElementById('avbtn').hidden&&document.getElementById('avbtn').textContent==='VA'&&!document.querySelector('#avbtn img')),'senza foto: iniziali in barra');
     chk(await p.evaluate(()=>!!document.querySelector('#efotogo')&&/Scegli foto/.test(document.getElementById('efotogo').textContent)),'modifica profilo: Scegli foto');
     chk(await p.evaluate(()=>{const d=document.getElementById('efotodel');return d&&d.hidden}),'senza foto: Rimuovi nascosto');
+    await p.context().close()}
+
+  {const p=await ctx();await seed(p,{avatar:'🦊'});
+    await p.evaluate(async()=>{if(window.HD417&&HD417.av)await HD417.av()});
+    await W(200);
+    chk(await p.evaluate(()=>{const b=document.getElementById('avbtn');return b&&!b.hidden&&b.textContent==='🦊'&&!b.querySelector('img')}),'avatar già scelto in barra al posto delle iniziali');
+    chk(await p.evaluate(()=>getComputedStyle(document.getElementById('avbtn')).backgroundColor==='rgb(69, 90, 100)'),'cerchio con il colore del socio');
+    await p.context().close()}
+
+  {const p=await ctx();await seed(p,{photo:true,avatar:'🦊',broken:true});
+    await p.evaluate(async()=>{if(window.HD417&&HD417.av)await HD417.av()});
+    await W(600);
+    chk(await p.evaluate(()=>{const b=document.getElementById('avbtn');return b&&!b.querySelector('img')&&b.textContent==='🦊'}),'foto non caricabile: torna all\'avatar già scelto, non alle iniziali');
     await p.context().close()}
 
   {const p=await ctx();await seed(p,{photo:true});
@@ -122,7 +135,7 @@ const seed=async(p,opt={})=>{
     chk(await p.evaluate(()=>!!document.querySelector('.card.prof img.avimg')),'foto visibile anche sull\'avatar di un altro socio');
     await p.context().close()}
 
-  chk(/APP_VERSION='41\.12\.1'/.test(fs.readFileSync(path.join(ROOT,'brand.js'),'utf8')),'versione brand 41.12.1');
+  chk(/APP_VERSION='41\.12\.2'/.test(fs.readFileSync(path.join(ROOT,'brand.js'),'utf8')),'versione brand 41.12.2');
 
   await b.close();srv.close();
   console.log(ok+'/'+n+' controlli');
