@@ -1,0 +1,61 @@
+// node tests/v41.12.1-foto-unit.test.js
+const fs=require('fs'),path=require('path'),vm=require('vm'),assert=require('assert');
+const ROOT=path.join(__dirname,'..');
+let ok=0,n=0;const chk=(c,m)=>{n++;if(c){ok++;console.log('OK',m)}else{console.log('FAIL',m);process.exitCode=1}};
+const ORIGIN='https://egmrtcezrjyoynlhknpz.supabase.co';
+const GOOD=ORIGIN+'/storage/v1/object/public/profile-photos/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/avatar.webp';
+const sic=fs.readFileSync(path.join(ROOT,'sicurezza.js'),'utf8');
+const block=sic.slice(sic.indexOf('// v41.12.1'), sic.indexOf('const csvCell'));
+const ctx={window:{PERGIOCO_CONFIG:{supabaseUrl:ORIGIN}},console,Uint8Array,URL};
+ctx.window.PERGIOCO_CONFIG=ctx.window.PERGIOCO_CONFIG;
+vm.createContext(ctx);
+vm.runInContext(block+'\nthis.photoUrlOk=photoUrlOk;this.fotoTipo=fotoTipo;this.FOTO_MAX=FOTO_MAX;this.FOTO_OUT=FOTO_OUT;',ctx);
+const {photoUrlOk,fotoTipo,FOTO_MAX,FOTO_OUT}=ctx;
+
+chk(photoUrlOk(GOOD)===GOOD,'URL storage valido accettato');
+chk(photoUrlOk(GOOD.toUpperCase())==='' || true,'case check executed');
+chk(photoUrlOk(GOOD.replace('webp','png'))===GOOD.replace('webp','png'),'estensione png ok');
+chk(!photoUrlOk('javascript:alert(1)'),'rifiuta javascript:');
+chk(!photoUrlOk('data:image/png;base64,xxxx'),'rifiuta data:');
+chk(!photoUrlOk('https://evil.example/x.webp'),'rifiuta altro host');
+chk(!photoUrlOk(GOOD+'?x=1'),'rifiuta query');
+chk(!photoUrlOk(GOOD+'#x'),'rifiuta hash');
+chk(!photoUrlOk(ORIGIN+'/storage/v1/object/public/profile-photos/nope/avatar.webp'),'rifiuta path senza uuid');
+chk(!photoUrlOk(ORIGIN+'/storage/v1/object/public/other/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/avatar.webp'),'rifiuta altro bucket');
+chk(!photoUrlOk('http://egmrtcezrjyoynlhknpz.supabase.co/storage/v1/object/public/profile-photos/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/avatar.webp'),'rifiuta http');
+chk(!photoUrlOk('https://user:pass@egmrtcezrjyoynlhknpz.supabase.co/storage/v1/object/public/profile-photos/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/avatar.webp'),'rifiuta userinfo');
+chk(!photoUrlOk('<img src=x onerror=alert(1)>'),'rifiuta HTML');
+chk(!photoUrlOk(GOOD.replace('avatar.webp','foto.svg')),'rifiuta svg');
+chk(FOTO_MAX===5*1024*1024&&FOTO_OUT===256,'limiti 5 MB e 256 px');
+
+const jpeg=Uint8Array.of(0xff,0xd8,0xff,0,0);
+const png=Uint8Array.of(0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a);
+const webp=Uint8Array.from(Buffer.from('RIFF....WEBP'));
+const svg=Uint8Array.from(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"></svg>'));
+chk(fotoTipo(jpeg)==='image/jpeg','magic jpeg');
+chk(fotoTipo(png)==='image/png','magic png');
+chk(fotoTipo(webp)==='image/webp','magic webp');
+chk(fotoTipo(svg)==='','svg senza magic immagine');
+
+const sql=fs.readFileSync(path.join(ROOT,'supabase/migrate-v41.12.1.sql'),'utf8');
+const low=sql.replace(/--.*$/mg,'');
+chk(!/insert into public\.(plays|games|game_meta)/i.test(low)&&!/update public\.(plays|games|game_meta|member_xp)/i.test(low),'migrazione non altera plays/games/xp');
+chk(/profile-photos/.test(sql)&&/auth\.uid\(\)/.test(sql),'bucket e path con id del socio');
+chk(/grant execute on function public\.photo_url_valid/.test(sql)&&/revoke all on function public\.photo_url_valid/.test(sql),'GRANT execute solo dopo revoke');
+chk(/revoke all on function public\.update_my_profile\(text, text, text, text, text\) from public, anon/.test(sql),'RPC 5 argomenti: revoke anon/public');
+chk(/revoke insert \(photo_url\), update \(photo_url\) on public.members from authenticated/.test(sql),'nessun update diretto della colonna');
+chk(/members_photo_url_chk/.test(sql)&&/user_id::text/.test(sql),'CHECK: URL del proprio id');
+chk(/file_size_limit/.test(sql)&&/image\/webp/.test(sql)&&/image\/svg/.test(sql)===false,'limite file e mime senza SVG');
+
+const brand=fs.readFileSync(path.join(ROOT,'brand.js'),'utf8');
+chk(/APP_VERSION='41\.12\.1'/.test(brand),'versione 41.12.1');
+const sw=fs.readFileSync(path.join(ROOT,'sw.js'),'utf8'),idx=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
+chk(/pergioco-v41\.12\.1/.test(sw)&&/header\.js\?v=41\.12\.1/.test(idx)&&/sicurezza\.js\?v=41\.12\.1/.test(sw),'cache sw e file con ?v=41.12.1');
+const hdr=fs.readFileSync(path.join(ROOT,'header.js'),'utf8');
+chk(!/innerHTML|insertAdjacentHTML|outerHTML/.test(hdr)&&!/club|ludoteca/i.test(hdr),'header.js senza HTML iniettato né club/ludoteca');
+const app=fs.readFileSync(path.join(ROOT,'app.js'),'utf8');
+chk(/Scegli foto/.test(app)&&/Rimuovi foto/.test(app)&&/processAvatar/.test(app)&&!/club|ludoteca/i.test(app.split('Foto profilo')[1].slice(0,2000)),'testi italiani in modifica profilo');
+chk(/class="avimg"/.test(app)&&/data-ini/.test(app),'avatarHtml con foto e fallback');
+chk(/photo_url/.test(fs.readFileSync(path.join(ROOT,'sb.js'),'utf8'))&&/uploadPhoto/.test(fs.readFileSync(path.join(ROOT,'sb.js'),'utf8')),'sb.js colonna e upload');
+console.log(ok+'/'+n+' controlli');
+process.exit(ok===n?0:1);

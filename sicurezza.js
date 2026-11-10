@@ -37,6 +37,14 @@ function rowClean(table,row){const lim=COL_MAX[table]||{};const multi=['descrizi
  if(row.thumb&&!safeUrl(row.thumb,true))row.thumb=null;return row}
 // URL: solo https (http ammesso solo dove indicato); niente javascript:, data:, ecc.
 function safeUrl(u,http){try{const s=String(u??'').trim();if(!s||s.length>500)return'';const x=new URL(s);return(x.protocol==='https:'||(http&&x.protocol==='http:'))&&/^https?:\/\//i.test(s)?x.href:''}catch(e){return''}}
+// v41.12.1 — foto profilo: solo URL pubblici dello storage di questa app (niente XSS, niente altri host)
+const FOTO_MAX=5*1024*1024,FOTO_OUT=256,FOTO_OUT_MAX=512*1024;
+const FOTO_RE=/^\/storage\/v1\/object\/public\/profile-photos\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/avatar\.(webp|jpg|jpeg|png)$/i;
+function fotoOrigin(){try{const c=window.PERGIOCO_CONFIG||{},u=(c.supabaseUrl||'').trim().replace(/\/$/,'');return u&&new URL(u).protocol==='https:'?new URL(u).origin:''}catch(e){return''}}
+function photoUrlOk(u){try{const s=String(u??'').trim();if(!s||s.length>300)return'';const x=new URL(s);if(x.protocol!=='https:'||x.username||x.password||x.search||x.hash)return'';const origin=fotoOrigin();if(!origin||x.origin!==origin)return'';return FOTO_RE.test(x.pathname)?x.origin+x.pathname:''}catch(e){return''}}
+function fotoTipo(buf){const u=buf instanceof Uint8Array?buf:new Uint8Array(buf||[]);if(u.length>=3&&u[0]===0xff&&u[1]===0xd8&&u[2]===0xff)return'image/jpeg';if(u.length>=8&&u[0]===0x89&&u[1]===0x50&&u[2]===0x4e&&u[3]===0x47)return'image/png';if(u.length>=12&&u[0]===0x52&&u[1]===0x49&&u[2]===0x46&&u[3]===0x46&&u[8]===0x57&&u[9]===0x45&&u[10]===0x42&&u[11]===0x50)return'image/webp';return''}
+async function processAvatar(file){if(!file)throw new Error('Scegli una foto.');const n=String(file.name||'').toLowerCase();if(/\.svgz?$/.test(n)||file.type==='image/svg+xml')throw new Error('Scegli un file JPEG, PNG o WebP (niente SVG).');if(file.size>FOTO_MAX)throw new Error('La foto è troppo grande (massimo 5 MB).');const buf=new Uint8Array(await file.arrayBuffer());if(!fotoTipo(buf))throw new Error('Scegli un file JPEG, PNG o WebP (niente SVG).');let bmp;try{bmp=await createImageBitmap(new Blob([buf],{type:fotoTipo(buf)}),{imageOrientation:'from-image'})}catch(e){throw new Error('Impossibile leggere l\'immagine. Prova un altro file.')}if(!bmp.width||!bmp.height){try{bmp.close()}catch(e){}throw new Error('Impossibile leggere l\'immagine. Prova un altro file.')}const s=Math.min(bmp.width,bmp.height),sx=(bmp.width-s)/2,sy=(bmp.height-s)/2,c=document.createElement('canvas');c.width=c.height=FOTO_OUT;c.getContext('2d').drawImage(bmp,sx,sy,s,s,0,0,FOTO_OUT,FOTO_OUT);try{bmp.close()}catch(e){}const blob=await new Promise(res=>{try{c.toBlob(b=>{if(b&&b.size)res(b);else c.toBlob(res,'image/jpeg',.85)},'image/webp',.85)}catch(e){res(null)}});if(!blob||!blob.size)throw new Error('Impossibile leggere l\'immagine. Prova un altro file.');if(blob.size>FOTO_OUT_MAX)throw new Error('La foto compressa è ancora troppo pesante. Prova un\'altra immagine.');return blob}
+
 // CSV: virgolette e niente formule (= + - @ tab a inizio cella)
 const csvCell=v=>{let s=String(v??'');if(/^[=+\-@\t\r]/.test(s))s="'"+s;return'"'+s.replace(/"/g,'""')+'"'};
 const IMP_MAX_MB=5,IMP_MAX_ROWS=5000;
@@ -45,7 +53,7 @@ if(typeof SupabaseAdapter!=='undefined'){const _run=SupabaseAdapter.run.bind(Sup
 if(typeof LB!=='undefined'){const _s=LB.save.bind(LB);LB.save=(t,r)=>_s(t,rowClean(t,r))}
 if(typeof EV!=='undefined'){const _s=EV.save;EV.save=e=>_s(rowClean('eventi',e))}
 // immagini rotte (al posto di onerror inline, bloccato dalla CSP)
-document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.classList.contains('evimg'))t.remove()},true);
+document.addEventListener('error',e=>{const t=e.target;if(!t||t.tagName!=='IMG')return;if(t.classList.contains('evimg')){t.remove();return}if(t.classList.contains('avimg')){const p=t.parentElement,ini=p&&p.getAttribute('data-ini')||'';t.remove();if(p){p.classList.remove('avph');if(p.id==='avbtn'||p.classList.contains('hav')){p.textContent=ini}else if(ini)p.textContent=ini}}},true);
 document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b)return;if(b.dataset.act==='reload')location.reload();else if(b.dataset.act.startsWith('go:'))go(b.dataset.act.slice(3))});
 // errori globali: messaggio invece della pagina bianca
 let _errAt=0;function appErr(m){if(Date.now()-_errAt<3000)return;_errAt=Date.now();try{const r=(typeof errSpiega==='function')?errSpiega(m,'APP'):{code:'E-APP-99'};toast(r.msg?`⚠️ ${r.msg} [${r.code}]`:`⚠️ Qualcosa non ha funzionato. Chiudi e riapri l'app; se succede ancora avvisa lo staff con il codice [${r.code}].`,true)}catch(_){}
