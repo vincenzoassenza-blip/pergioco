@@ -93,6 +93,6 @@ const _pf=views.profilo;views.profilo=async(...a)=>{await _pf(...a);try{const V=
  const ctx={};const rw=[...V.querySelectorAll(':scope>.row')].find(r=>/Tavoli organizzati/.test(r.textContent)&&V.querySelector('#st33'));
  if(rw){rw.querySelectorAll('.card').forEach(c=>{const l=(c.querySelector('.muted')||{}).textContent,v=(c.querySelector('.big')||{}).textContent;if(l==='Tavoli')ctx.tav=v;if(l==='Tavoli organizzati')ctx.org=v});rw.remove()}
  try{const ms=await DB.members(),u=DB.remote&&DB.status==='online'?await DB.remote.user():null;const m=window._pv?ms.find(x=>x.id===window._pv):(u?ms.find(x=>x.userId===u.id):null);if(m){ctx.mid=m.id;ctx.ts=await DB.allTables()}}catch(e){}
- apply(V,ctx);const h=V.querySelector('#st33h');if(h&&!h._pfo){h._pfo=new MutationObserver(()=>{if(h.querySelector('#st33:not([data-p413])'))stats(V,ctx)});h._pfo.observe(h,{childList:true,subtree:true})}}catch(e){console.warn('profilo v41.3',e)}};
+ apply(V,ctx);if(typeof pwProfilo==='function')try{pwProfilo(V)}catch(e){console.warn('cambia-password',e)};const h=V.querySelector('#st33h');if(h&&!h._pfo){h._pfo=new MutationObserver(()=>{if(h.querySelector('#st33:not([data-p413])'))stats(V,ctx)});h._pfo.observe(h,{childList:true,subtree:true})}}catch(e){console.warn('profilo v41.3',e)}};
 window.PF413={apply,T};
 })();

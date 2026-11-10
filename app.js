@@ -95,6 +95,64 @@ const badgeSnap=async()=>{const c=await badgeCtx(),ms=await DB.members(),o={};ms
 const badgeNew=async(before,keys)=>{const c=await badgeCtx(),ms=await DB.members(),out=[];keys.forEach(k=>{const b=Badges.list(k,c).filter(b=>b.on&&!(before[k]||[]).includes(b.id));const m=ms.find(m=>'m:'+m.id===k);b.forEach(x=>out.push(`${x.icon} ${m?memberName(m):''}: ${x.name}`))});
  out.forEach((t,i)=>setTimeout(()=>{const e=document.createElement('div');e.className='toast badge-toast';e.textContent='Nuovo badge! '+t;const g=document.createElement('div');g.className='igb';g.textContent=BRAND.ig()?'📸 Condividi e taggaci '+BRAND.ig().tag:'📸 Condividi le foto della serata';e.append(g);document.body.append(e);setTimeout(()=>e.remove(),3200)},2300+i*3300))};
 const nextEvening=()=>{const d=new Date(),wd=d.getDay();const add=wd===4||wd===0?0:(wd<4?4-wd:7-wd);d.setDate(d.getDate()+add);return{date:d.toLocaleDateString('sv-SE')}};
+const PW_MIN=8;
+function pwChangeVal(cur,neu,neu2){
+  cur=String(cur||'');neu=String(neu||'');neu2=String(neu2??'');
+  if(!cur)return{ok:false,msg:'Inserisci la password attuale',code:'E-PWD-V1'};
+  if(!neu)return{ok:false,msg:'Inserisci la nuova password',code:'E-PWD-V2'};
+  if(neu.length<PW_MIN)return{ok:false,msg:'La password deve avere almeno 8 caratteri',code:'E-PWD-V3'};
+  if(neu!==neu2)return{ok:false,msg:'Le due password non coincidono: riscrivile uguali',code:'E-PWD-V4'};
+  if(neu===cur)return{ok:false,msg:'La nuova password deve essere diversa da quella attuale',code:'E-PWD-V5'};
+  return{ok:true};
+}
+function pwProfilo(V){
+  if(!V||window._pv||V.querySelector('#pwbox'))return;
+  if(!V.querySelector('#ed')||!V.querySelector('.card.prof'))return;
+  const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+  const box=el('div','card pfl');box.id='pwbox';
+  const row=el('div','lr');row.id='pwopen';row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-expanded','false');row.setAttribute('aria-controls','pwform');
+  row.append(el('span','ic','🔑'),el('span','t',null),el('span','ar','▸'));
+  row.querySelector('.t').append(el('b',null,'Cambia password'));
+  const form=el('div','pwform');form.id='pwform';form.hidden=true;
+  const field=(id,lab,auto)=>{const l=el('label',null,lab);l.setAttribute('for',id);const i=document.createElement('input');i.id=id;i.type='password';i.autocomplete=auto;i.maxLength=128;form.append(l,i)};
+  field('pwcur','Password attuale','current-password');
+  field('pwnew','Nuova password (almeno 8 caratteri)','new-password');
+  field('pwnew2','Ripeti nuova password','new-password');
+  const show=el('label','gck');const cb=document.createElement('input');cb.type='checkbox';cb.id='pwshow';cb.style.width='auto';
+  show.append(cb,document.createTextNode(' Mostra password'));form.append(show);
+  const err=el('p','warn');err.id='pwerr';err.hidden=true;err.setAttribute('role','alert');form.append(err);
+  const goB=el('button','p','Aggiorna password');goB.type='button';goB.id='pwgo';
+  const cancel=el('button','s','Annulla');cancel.type='button';cancel.id='pwx';
+  form.append(goB,cancel);
+  box.append(row,form);
+  V.querySelector('.card.prof').after(box);
+  const setOpen=on=>{form.hidden=!on;row.setAttribute('aria-expanded',String(on));row.querySelector('.ar').textContent=on?'▾':'▸';if(on)setTimeout(()=>{const i=document.getElementById('pwcur');if(i)i.focus({preventScroll:true})},150)};
+  const clear=()=>{['pwcur','pwnew','pwnew2'].forEach(id=>{const i=document.getElementById(id);if(i){i.value='';i.type='password'}});cb.checked=false;err.hidden=true;err.textContent=''};
+  const showErr=(msg,code)=>{err.hidden=false;err.textContent=msg+(code?' ['+code+']':'');if(typeof toastVal==='function')toastVal(msg,code)};
+  row.onclick=()=>setOpen(form.hidden);
+  row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setOpen(form.hidden)}};
+  cancel.onclick=()=>{clear();setOpen(false)};
+  cb.onchange=()=>['pwcur','pwnew','pwnew2'].forEach(id=>{const i=document.getElementById(id);if(i)i.type=cb.checked?'text':'password'});
+  goB.onclick=async()=>{
+    const cur=(document.getElementById('pwcur')||{}).value||'',neu=(document.getElementById('pwnew')||{}).value||'',neu2=(document.getElementById('pwnew2')||{}).value||'';
+    const v=pwChangeVal(cur,neu,neu2);if(!v.ok)return showErr(v.msg,v.code);
+    if(!DB.remote||DB.status!=='online')return showErr('Sei offline: il cambio password richiede la connessione','E-PWD-V7');
+    goB.disabled=true;
+    try{await DB.remote.changePassword(cur,neu);clear();setOpen(false);toast('Password aggiornata')}
+    catch(e){
+      const raw=typeof errTesto==='function'?errTesto(e):String((e&&e.message)||e||'');
+      if(/invalid login credentials|invalid_credentials|invalid_grant|password attuale non è corretta/i.test(raw))showErr('La password attuale non è corretta','E-PWD-V8');
+      else if(typeof errSpiega==='function'){const r=errSpiega(e,'PWD');err.hidden=false;err.textContent=r.msg+(r.code?' ['+r.code+']':'');if(typeof toastErr==='function')toastErr(e,'PWD')}
+      else showErr('Non sono riuscito ad aggiornare la password.','E-PWD-99');
+    }finally{goB.disabled=false}
+  };
+  const ed=V.querySelector('#ed');
+  if(ed&&!ed.querySelector('#pwfromed')){
+    const b=el('button','s','🔑 Cambia password');b.type='button';b.id='pwfromed';
+    b.onclick=()=>{setOpen(true);box.scrollIntoView({block:'nearest',behavior:'smooth'})};
+    const sav=ed.querySelector('#esv');if(sav)sav.after(b);else ed.append(b);
+  }
+}
 const APP_LINK='https://app.pergioco.org';
 function tavoloShareText(t,gs){
   const lab=(typeof TT!=='undefined'&&TT.label)?TT.label(t,gs):{name:(gs.find(g=>g.id===t.gameId)||{}).name||'Tavolo'};

@@ -49,6 +49,14 @@ const SupabaseAdapter={
   catch(e){if(isMissing(e))return 'missing';return this.cache._load()?'offline':'nolib'}},
  // --- autenticazione admin (Supabase Auth, email + password) ---
  async signIn(email,password){const {error}=await this.client.auth.signInWithPassword({email,password});if(error)throw error;return this.isAdmin()},
+ async changePassword(cur,neu){
+  const u=await this.user();const email=u&&u.email;
+  if(!email){const e=new Error('Non trovo l\'email del tuo account. Esci e accedi di nuovo.');e.code='E-PWD-V6';throw e}
+  const {error:e1}=await this.client.auth.signInWithPassword({email,password:cur});
+  if(e1){const bad=/invalid login credentials|invalid_credentials|invalid_grant/i.test((e1.message||'')+' '+(e1.code||''));
+   const e=new Error(bad?'La password attuale non è corretta':(e1.message||'Non sono riuscito a verificare la password attuale'));throw e}
+  const {error:e2}=await this.client.auth.updateUser({password:neu});if(e2)throw e2;
+ },
  async signOut(){await this.client.auth.signOut()},
  async isAdmin(){const {data:s}=await this.client.auth.getSession();if(!s.session){this.modCached=false;return this.adminCached=false}const {data,error}=await this.client.rpc('is_admin');const a=!error&&data===true;if(a&&!this.adminCached){this.adminCached=true;try{await this.refresh()}catch(e){}}this.adminCached=a;let m=false;if(!a){const r=await this.client.rpc('is_moderator');m=!r.error&&r.data===true}this.modCached=m;return a||m},
  async searchMembers(q){const {data,error}=await this.client.rpc('search_members',{p_q:q});if(error)throw error;return (data||[]).map(r=>r.id)},
