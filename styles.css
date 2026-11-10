@@ -647,3 +647,9 @@ button.p.off,button.p:disabled{opacity:.45;cursor:not-allowed}
 .ttseg button.off{opacity:.45;filter:grayscale(.45)}.ttseg button:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.45)}
 .ttfull a,.ttfull button{text-decoration:none}
 .tt-rpg{font:inherit}
+
+/* v41.11.1 — filtro tipi + badge card */
+.agtf{display:flex;gap:6px;overflow-x:auto;margin:0 0 10px;padding-bottom:2px}
+.agtf .chip{white-space:nowrap;flex:0 0 auto;font-size:13px;padding:6px 10px;min-height:36px}
+.ttbadge{display:inline-block;margin-left:6px;font-size:12px;font-weight:500;color:var(--m)}
+.ttwait{opacity:.7}

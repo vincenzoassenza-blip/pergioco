@@ -1,4 +1,4 @@
-// v41.11 — Tipi di tavolo configurabili (Gioco da tavolo / GDR / Warhammer).
+// v41.11.1 — Tipi di tavolo configurabili (Gioco da tavolo / GDR / Warhammer).
 // Staff (admin + moderatori): Gestione → Tavoli. Capienza lato DB + UI.
 // Solo textContent/createElement o esc() negli HTML. Mai «club»/«ludoteca».
 (()=>{
@@ -13,10 +13,10 @@ const TT={
   caps:{}, // 'YYYY-MM-DD|typeId' -> n
   cfg:{...CFG_DEF},
   loaded:false,
-  t(k){const K='tt_'+k;return(typeof TXT!=='undefined'&&TXT.v&&typeof TXT.v[K]==='string'&&TXT.v[K])||({pieno:CFG_DEF.pieno_msg,wa:'',ora:'21:00',ora_lab:'Orario della serata',gest:'Tipi di tavolo',tipi:'Tipi',cap:'Disponibili per serata',master:'Master',gioco:'Gioco',nota:'Nota',posti:'Posti (master compreso)'})[k]||k},
+  t(k){const K='tt_'+k;return(typeof TXT!=='undefined'&&TXT.v&&typeof TXT.v[K]==='string'&&TXT.v[K])||({pieno:CFG_DEF.pieno_msg,wa:'',ora:'21:00',ora_lab:'Orario della serata',gest:'Tipi di tavolo',tipi:'Tipi',cap:'Disponibili per serata',master:'Master',gioco:'Gioco',nota:'Nota',posti:'Posti (master compreso)',versione:'Versione',versione_ph:'es. Warhammer 40.000 10ª edizione',filtro:'Tipo di tavolo',tutto:'Tutto',reg_gdr:'Registra sessione GDR',reg_altro:'Registra una partita',sistema:'Sistema / gioco',avventura:'Avventura / campagna',sessione:'Sessione',oneshot:'One-shot',campagna:'Campagna',sess_n:'Sessione n°',esito:'Esito',conclusa:'Avventura conclusa',incorso:'In corso',esito_nota:"Nota sull'esito",pg:'Personaggio',nome_partita:'Nome'})[k]||k},
   async load(){
     const c=DB.remote&&DB.remote.client;
-    if(!c){this.types=DEF_TYPES.slice();this.cfg={...CFG_DEF};this.loaded=true;return}
+    if(!c){this.types=DEF_TYPES.slice();this.cfg={...CFG_DEF};this.loaded=true;this.loadThumbs();return}
     try{
       const[{data:types},{data:cfgRow}]=await Promise.all([
         c.from('table_types').select('*').order('sort'),
@@ -27,7 +27,7 @@ const TT={
       if(cfgRow&&cfgRow.value) this.cfg={ora_default:cfgRow.value.ora_default||CFG_DEF.ora_default,pieno_msg:cfgRow.value.pieno_msg||CFG_DEF.pieno_msg,whatsapp_url:cfgRow.value.whatsapp_url||''};
       else this.cfg={...CFG_DEF};
     }catch(e){console.warn('tavoli-tipi load',e);this.types=DEF_TYPES.slice();this.cfg={...CFG_DEF}}
-    this.loaded=true;
+    this.loaded=true;this.loadThumbs();
   },
   attivo(){return this.types.filter(t=>t.attivo).sort((a,b)=>a.sort-b.sort)},
   byId(id){return this.types.find(t=>t.id===id)||DEF_TYPES[0]},
@@ -42,11 +42,47 @@ const TT={
     const ts=await DB.allTables();
     return ts.filter(t=>t.date===date&&(t.typeId||'board')===typeId&&t.status==='open').length;
   },
-  async remaining(date,typeId){const cap=await this.capacity(date,typeId),n=await this.countOpen(date,typeId);return Math.max(0,cap-n)},
+  async remaining(date,typeId){const cap=await this.capacity(date,typeId),n=await this.countOpen(date,typeId);const r=Math.max(0,cap-n);this.remCache[date+'|'+typeId]=r;return r},
   pienoMsg(typeId){const t=this.byId(typeId);const msg=(typeof TXT!=='undefined'&&TXT.g('tt_pieno'))||this.cfg.pieno_msg||CFG_DEF.pieno_msg;return String(msg).replace(/\{tipo\}/g,t.nome)},
   waUrl(){const u=(typeof TXT!=='undefined'&&TXT.g('tt_wa'))||this.cfg.whatsapp_url||'';return /^https:\/\/(chat\.whatsapp\.com|wa\.me)\//.test(u)?u:''},
-  oraDefault(){const o=(typeof TXT!=='undefined'&&TXT.g('tt_ora'))||this.cfg.ora_default||'21:00';return /^[0-2]\d:[0-5]\d$/.test(o)?o:'21:00'}
+  oraDefault(){const o=(typeof TXT!=='undefined'&&TXT.g('tt_ora'))||this.cfg.ora_default||'21:00';return /^[0-2]\d:[0-5]\d$/.test(o)?o:'21:00'},
+  remCache:{},
+  remainingCached(date,typeId){const v=this.remCache[date+'|'+typeId];return typeof v==='number'?v:null},
+  label(t,gs){
+    gs=gs||[];
+    if(t&&t.gameId){const g=gs.find(x=>x.id===t.gameId);if(g&&g.name)return{id:g.id,name:g.name}}
+    const n=String((t&&(t.gameName||t.versione||(t.gdr&&t.gdr.sistema)))||'').trim();
+    if(n)return{id:null,name:n};
+    const typ=this.byId((t&&(t.typeId||t.playKind))||'board');
+    return{id:null,name:typ.nome||'Tavolo'};
+  },
+  _thumbs:{},
+  loadThumbs(){try{this._thumbs=Object.assign({},JSON.parse(localStorage.getItem('pergioco-rpg-thumbs')||'{}'))}catch(e){this._thumbs={}}},
+  saveThumbs(){try{localStorage.setItem('pergioco-rpg-thumbs',JSON.stringify(this._thumbs))}catch(e){}},
+  thumbUrl(id){if(!id)return'';const u=this._thumbs[String(id)];return(typeof safeUrl==='function'?safeUrl(u,true):(/^https:\/\/cf\.geekdo-images\.com\//.test(u)?u:''))||''},
+  cov(t,gs){
+    const typ=this.byId((t&&(t.typeId||t.playKind))||'board');
+    if(t&&t.gameId){const g=(gs||[]).find(x=>x.id===t.gameId);if(g&&typeof gCov==='function')return gCov(g);if(g)return'<div class="gcov" aria-hidden="true">🎲</div>'}
+    const rpg=t&&(t.bggRpgId||(t.gdr&&t.gdr.bggRpgId));
+    if(typ.kind==='gdr'||rpg){
+      const u=this.thumbUrl(rpg);
+      if(u)return`<div class="gcov" aria-hidden="true"><img src="${esc(u)}" alt="" loading="lazy" decoding="async" width="48" height="48" referrerpolicy="no-referrer"></div>`;
+      return'<div class="gcov" aria-hidden="true">🐉</div>';
+    }
+    return`<div class="gcov" aria-hidden="true">${esc(typ.icona||(typ.kind==='war'?'⚔️':'🎲'))}</div>`;
+  },
+  async fetchThumb(id){
+    id=id?String(id):'';if(!id)return'';if(this.thumbUrl(id))return this.thumbUrl(id);
+    const c=DB.remote&&DB.remote.client;if(!c||!c.functions)return'';
+    try{
+      const{data}=await c.functions.invoke('bgg-meta',{body:{mode:'info',bgg_id:+id}});
+      const u=data&&data.thumb;const ok=typeof safeUrl==='function'?safeUrl(u,true):u;
+      if(ok){this._thumbs[id]=ok;this.saveThumbs();return ok}
+    }catch(e){}
+    return'';
+  }
 };
+
 window.TT=TT;
 
 const escTxt=s=>String(s||'').replace(/<[^>]*>/g,'').replace(/[<>]/g,'').trim();
@@ -226,19 +262,21 @@ window.agSheet=async function(opts){
 
   const sd=()=>{dayBtn.textContent='📅 '+(D===oggi?'Oggi, ':'')+agLbl(D)};sd();
   dayBtn.onclick=()=>{try{dayIn.showPicker()}catch(e){dayIn.click()}};
-  dayIn.onchange=e=>{const v=e.target.value;if(isoOk(v)&&v>=oggi){D=v;sd();paintSeg().then(paintType)}else{toast('Data non valida');e.target.value=D}};
+  dayIn.onchange=e=>{const v=e.target.value;if(isoOk(v)&&v>=oggi){D=v;sd();paintNow()}else{toast('Data non valida');e.target.value=D}};
 
   let rpgSel=null;
-  const paintType=async()=>{
+  const paintFields=()=>{
     fields.replaceChildren();logoSlot.replaceChildren();rpgSel=null;goBtn.disabled=false;goBtn.classList.remove('off');pieno.hidden=true;
-    const t=TT.byId(typeId);const rem=await TT.remaining(D,typeId);
-    if(rem<=0){
+    const t=TT.byId(typeId);
+    const cached=TT.remainingCached(D,typeId);
+    if(cached===0){
       pieno.hidden=false;pieno.replaceChildren();
       const p=document.createElement('p');p.textContent=TT.pienoMsg(typeId);pieno.append(p);
       const wa=TT.waUrl();if(wa){const a=document.createElement('button');a.type='button';a.className='s';a.style.width='100%';a.style.marginTop='8px';a.style.textDecoration='none';a.textContent='Apri il gruppo WhatsApp ▸';a.onclick=()=>window.open(wa,'_blank','noopener,noreferrer');pieno.append(a)}
       goBtn.disabled=true;goBtn.classList.add('off');
+    }else if(cached==null){
+      pieno.hidden=true;
     }
-    // time always
     const row=document.createElement('div');row.className='row';
     const d1=document.createElement('div');
     const lp=document.createElement('label');lp.htmlFor='tp';lp.textContent=t.kind==='gdr'?(TT.t('posti')||'Posti (master compreso)'):'Posti (te compreso)';
@@ -260,7 +298,6 @@ window.agSheet=async function(opts){
       const inn=document.createElement('input');inn.id='tn';inn.maxLength=120;inn.placeholder='es. spiego io le regole';
       fields.append(ln,inn);
     }else if(t.kind==='gdr'){
-      // master
       const lm=document.createElement('label');lm.textContent=TT.t('master')||'Master';
       const sm=document.createElement('select');sm.id='tt-master';
       const oSelf=document.createElement('option');oSelf.value=meM?meM.id:'';oSelf.textContent=meM?('Io · '+memberName(meM)):'—';sm.append(oSelf);
@@ -271,9 +308,8 @@ window.agSheet=async function(opts){
       const free=document.createElement('input');free.id='tt-master-free';free.maxLength=60;free.placeholder='Nome del master';free.hidden=true;
       sm.onchange=()=>{free.hidden=sm.value!=='__free__'};
       fields.append(lm,sm,free);
-      // game RPG search
       const lg=document.createElement('label');lg.textContent=TT.t('gioco')||'Gioco';
-      const iq=document.createElement('input');iq.id='tt-rpgq';iq.maxLength=60;iq.placeholder='Cerca su RPGGeek oppure scrivi il nome';iq.autocomplete='off';
+      const iq=document.createElement('input');iq.id='tt-rpgq';iq.maxLength=100;iq.placeholder='Cerca su RPGGeek oppure scrivi il nome';iq.autocomplete='off';
       const res=document.createElement('div');res.id='tt-rpgr';
       const picked=document.createElement('div');picked.id='tt-rpgpick';picked.className='muted sm';
       let tm;
@@ -291,7 +327,7 @@ window.agSheet=async function(opts){
             items.forEach(it=>{
               const a=document.createElement('button');a.type='button';a.className='s tt-rpg';a.style.display='block';a.style.width='100%';a.style.textAlign='left';a.style.marginTop='4px';
               a.textContent=it.nome+(it.anno?` (${it.anno})`:'');
-              a.onclick=()=>{rpgSel={id:it.bgg_id,nome:it.nome};iq.value=it.nome;picked.textContent='Selezionato: '+it.nome;res.replaceChildren()};
+              a.onclick=()=>{rpgSel={id:it.bgg_id,nome:it.nome};iq.value=it.nome;picked.textContent='Selezionato: '+it.nome;res.replaceChildren();if(it.bgg_id)TT.fetchThumb(it.bgg_id)};
               res.append(a);
             });
           }catch(e){res.textContent='Nessun risultato: puoi scrivere il nome a mano.'}
@@ -302,22 +338,44 @@ window.agSheet=async function(opts){
       const ln=document.createElement('label');ln.htmlFor='tn';ln.textContent=(TT.t('nota')||'Nota')+' (facoltativa)';
       const inn=document.createElement('input');inn.id='tn';inn.maxLength=120;fields.append(ln,inn);
     }else{
-      // war / custom: only seats + time (already in row)
+      const lv=document.createElement('label');lv.htmlFor='tt-ver';lv.textContent=(TT.t('versione')||'Versione')+' (facoltativa)';
+      const iv=document.createElement('input');iv.id='tt-ver';iv.maxLength=60;iv.placeholder=TT.t('versione_ph')||'es. Warhammer 40.000 10ª edizione';
+      fields.append(lv,iv);
     }
   };
 
-  const paintSeg=async()=>{
+  const paintSeg=()=>{
     typeSeg.replaceChildren();
-    for(const t of TT.attivo()){
-      const rem=await TT.remaining(D,t.id);
+    TT.attivo().forEach(t=>{
+      const rem=TT.remainingCached(D,t.id);
       const b=document.createElement('button');b.type='button';b.dataset.tid=t.id;b.textContent=`${t.icona} ${t.nome}`;
       if(t.id===typeId)b.classList.add('on');
-      if(rem<=0)b.classList.add('off');
-      b.onclick=()=>{typeId=t.id;paintSeg().then(paintType)};
+      if(rem===0)b.classList.add('off');
+      b.onclick=()=>{typeId=t.id;paintNow()};
       typeSeg.append(b);
+    });
+  };
+
+  let capTok=0;
+  const refreshCap=async()=>{
+    const tok=++capTok,date=D,cur=typeId;
+    await Promise.all(TT.attivo().map(t=>TT.remaining(date,t.id)));
+    if(tok!==capTok||date!==D)return;
+    paintSeg();
+    const rem=TT.remainingCached(D,cur);
+    if(cur!==typeId)return;
+    if(rem===0){
+      pieno.hidden=false;pieno.replaceChildren();
+      const p=document.createElement('p');p.textContent=TT.pienoMsg(cur);pieno.append(p);
+      const wa=TT.waUrl();if(wa){const a=document.createElement('button');a.type='button';a.className='s';a.style.width='100%';a.style.marginTop='8px';a.style.textDecoration='none';a.textContent='Apri il gruppo WhatsApp ▸';a.onclick=()=>window.open(wa,'_blank','noopener,noreferrer');pieno.append(a)}
+      goBtn.disabled=true;goBtn.classList.add('off');
+    }else if(rem!=null){
+      if(!goBtn.disabled||cur===typeId){/* keep fields */}
+      if(rem>0){pieno.hidden=true;goBtn.disabled=false;goBtn.classList.remove('off')}
     }
   };
-  await paintSeg();await paintType();
+  const paintNow=()=>{paintSeg();paintFields();refreshCap()};
+  paintNow();
 
   goBtn.onclick=async()=>{
     if(goBtn.disabled)return;
@@ -350,6 +408,7 @@ window.agSheet=async function(opts){
       if(payload.players.length>seats)return toast('Aumenta i posti: il master deve avere posto');
     }else{
       payload.gameId=null;payload.gameName=null;payload.masterMemberId=null;payload.masterName=null;payload.bggRpgId=null;
+      const ver=escTxt(($('#tt-ver')&&$('#tt-ver').value)||'').slice(0,60);payload.versione=ver||null;
     }
     try{
       await DB.saveTable(payload);close();S.date=D;toast('Tavolo aperto');go('serata');
@@ -364,28 +423,22 @@ window.agSheet=async function(opts){
 
 // Patch serata cards to show type icon + load TT
 {const _ser=views.serata;views.serata=async function(...a){await TT.load();
-  // monkey-patch card rendering by wrapping after original is heavy; instead intercept V HTML post-render
   await _ser.apply(this,a);
   try{
     const ts=await DB.allTables();
-    V.querySelectorAll('.agcard, .card').forEach(el=>{
-      // find table id from data attributes on buttons inside
-      const bid=el.querySelector('[data-sd],[data-lv],[data-c],[data-o],[data-x],[data-j]');
-      // skip
+    const ids=[...new Set(ts.map(t=>t.bggRpgId).filter(Boolean))];
+    const missing=ids.filter(id=>!TT.thumbUrl(id));
+    if(!missing.length)return;
+    await Promise.all(missing.map(id=>TT.fetchThumb(id)));
+    V.querySelectorAll('.card.agt[data-t]').forEach(card=>{
+      const t=ts.find(x=>x.id===card.dataset.t);if(!t||!t.bggRpgId||!TT.thumbUrl(t.bggRpgId))return;
+      const box=card.querySelector('.gcov');if(!box)return;
+      const u=TT.thumbUrl(t.bggRpgId);
+      box.replaceChildren();
+      const img=document.createElement('img');img.src=u;img.alt='';img.loading='lazy';img.decoding='async';img.width=48;img.height=48;img.referrerPolicy='no-referrer';
+      box.append(img);
     });
-    // Annotate open buttons area: prepend type badge on each table card via scanning data-c / structure
-    // Cards don't have data-id on root; enhance head titles by matching game names — lighter approach:
-    // re-query tables for current date and inject badges into .agsec visible
-    const sec=V.querySelector('#tl .agsec:not([hidden])');if(!sec)return;
-    const date=sec.dataset.day;const list=ts.filter(t=>t.date===date);
-    sec.querySelectorAll('.card').forEach((card,i)=>{
-      const t=list[i];if(!t)return;const typ=TT.byId(t.typeId||'board');
-      if(card.querySelector('.ttbadge'))return;
-      const badge=document.createElement('span');badge.className='ttbadge chip';badge.textContent=`${typ.icona} ${typ.nome}`;
-      const h=card.querySelector('b, .hrow, .agtitle')||card.firstElementChild;if(h)h.prepend(badge);
-      else card.prepend(badge);
-    });
-  }catch(e){console.warn('tt badge',e)}
+  }catch(e){console.warn('tt cover',e)}
 }}
 
 // Gestione row
@@ -419,6 +472,238 @@ window.agSheet=async function(opts){
     }
   }catch(e){console.warn('tt gest row',e)}return r};
 };boot()}
+
+
+// --- Chiudi e registra coerente col tipo ---
+const el=(tag,cls,txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!=null)n.textContent=txt;return n};
+async function registraAltro(t,typ,ed){
+  const all=await DB.members(),gs=await DB.games(),ms=all.filter(m=>m.active||((ed||t)&&(ed&&ed.players||t.players||[]).some(x=>x.memberId===m.id)));
+  const staff=typeof adminMode==='function'&&adminMode();
+  const src=ed&&ed.id?ed:null;
+  const titlePref=(src&&(src.gameName||src.versione))||(t&&(t.versione||t.gameName))||typ.nome;
+  const date0=(src&&src.date)||(t&&t.date)||romeToday();
+  const players0=(src&&src.players)||(t&&t.players)||[];
+  V.replaceChildren();
+  const h2=el('h2',null,TT.t('reg_altro')||'Registra una partita');
+  const card=el('div','card ttreg');
+  V.append(h2,card);
+  const lbN=el('label',null,TT.t('nome_partita')||'Nome');lbN.htmlFor='tt-pn';
+  const inN=el('input');inN.id='tt-pn';inN.maxLength=100;inN.value=titlePref||'';inN.readOnly=!staff;
+  const lbD=el('label',null,'Data');lbD.htmlFor='d';
+  const inD=document.createElement('input');inD.id='d';inD.type='date';inD.required=true;inD.value=date0;
+  const dday=el('div','dday');
+  const lbM=el('label',null,'Modalità');
+  const mode=el('div','seg');mode.id='mode';
+  const b0=el('button',null,'Competitiva');b0.type='button';b0.dataset.m='0';b0.className='on';
+  const b1=el('button',null,'Cooperativa');b1.type='button';b1.dataset.m='1';
+  mode.append(b0,b1);
+  const hint=el('p','muted hint','ⓘ Competitiva: ognuno per sé, vince chi arriva primo. Cooperativa: si vince o si perde tutti insieme.');
+  const coopBox=el('div');coopBox.id='coop';coopBox.hidden=true;
+  const lbSc=el('label',null,'Scenario');
+  const inSc=el('input');inSc.id='sc';inSc.maxLength=100;inSc.placeholder='es. Scenario 3';
+  const lbRes=el('label',null,'Esito del gruppo');
+  const res=el('div','seg');res.id='res';
+  const r1=el('button',null,'Vittoria');r1.type='button';r1.dataset.r='1';r1.className='on';
+  const r0=el('button',null,'Sconfitta');r0.type='button';r0.dataset.r='0';
+  res.append(r1,r0);coopBox.append(lbSc,inSc,lbRes,res);
+  const lbPl=el('label',null,'Giocatori e punteggi');
+  const pl=el('div');pl.id='pl';
+  const pk=el('button','s','👥 Aggiungi giocatori');pk.type='button';pk.id='pk';pk.style.width='100%';
+  const lbO=el('label',null,'Ospite (non socio)');
+  const rowO=el('div','row');
+  const gn=el('input');gn.id='gn';gn.maxLength=40;gn.placeholder='Nome ospite';
+  const ga=el('button','s','+ Ospite');ga.type='button';ga.id='ga';ga.style.flex='0 0 auto';
+  rowO.append(gn,ga);
+  const lbDu=el('label',null,'Durata (minuti, facoltativa)');
+  const du=el('input');du.id='du';du.maxLength=4;du.placeholder='es. 45';if(typeof nA==='function'){/* skip */}
+  const lbNt=el('label',null,(TT.t('nota')||'Nota')+' (facoltativa)');
+  const nt=document.createElement('textarea');nt.id='nt';nt.rows=2;nt.maxLength=1000;
+  const save=el('button','p',src&&src.id?'Salva modifiche':'Salva partita');save.type='button';save.id='save';
+  const cx=el('button','s','Annulla');cx.type='button';cx.id='cx';cx.style.width='100%';cx.style.marginTop='6px';
+  card.append(lbN,inN,lbD,inD,dday,lbM,mode,hint,coopBox,lbPl,pk,lbO,rowO,pl,lbDu,du,lbNt,nt,save,cx);
+  let coop=!!(src&&src.coop),win=src&&src.groupWin!==false;
+  const sel=[];
+  (players0||[]).forEach(x=>sel.push({...x,score:x.score??''}));
+  const drawSel=()=>{pl.replaceChildren();if(!sel.length)pl.append(el('p','muted','Nessuno selezionato.'));
+    sel.forEach((s,i)=>{const d=el('div','prow');
+      const name=s.memberId?memberName(all.find(m=>m.id===s.memberId)):((s.name||'')+(s.guest?' (ospite)':''));
+      const a=el('input');a.disabled=true;a.value=name;
+      const b=el('input','ps');b.placeholder='Punti';b.value=s.score??'';b.hidden=coop;b.oninput=e=>s.score=e.target.value;
+      const rm=el('button','s','✕');rm.type='button';rm.onclick=()=>{sel.splice(i,1);drawSel()};
+      d.append(a,b,rm);pl.append(d)});
+  };
+  const setMode=c=>{coop=c;coopBox.hidden=!c;card.querySelectorAll('.ps').forEach(i=>i.hidden=c);[...mode.querySelectorAll('button')].forEach(b=>b.classList.toggle('on',(b.dataset.m==='1')===c))};
+  const setRes=w=>{win=w;[...res.querySelectorAll('button')].forEach(b=>b.classList.toggle('on',(b.dataset.r==='1')===w))};
+  mode.onclick=e=>e.target.dataset.m&&setMode(e.target.dataset.m==='1');
+  res.onclick=e=>e.target.dataset.r&&setRes(e.target.dataset.r==='1');
+  pk.onclick=async()=>{const ids=await pickMembers(ms,sel.filter(x=>x.memberId).map(x=>x.memberId),'Aggiungi giocatori');if(!ids)return;
+    for(let i=sel.length-1;i>=0;i--)if(sel[i].memberId&&!ids.includes(sel[i].memberId))sel.splice(i,1);
+    ids.forEach(id=>sel.some(x=>x.memberId===id)||sel.push({memberId:id,score:''}));drawSel()};
+  ga.onclick=()=>{const n=escTxt(gn.value).slice(0,40);if(!n)return toast('Scrivi il nome dell\'ospite');sel.push({guest:true,name:n,score:''});gn.value='';drawSel()};
+  const dd=()=>{dday.textContent=(typeof dayLbl==='function'&&dayLbl(inD.value))?'📅 '+dayLbl(inD.value):''};inD.oninput=dd;inD.onchange=dd;dd();
+  if(src){inSc.value=src.scenario||'';nt.value=src.note||'';du.value=src.duration??'';setMode(!!src.coop);if(src.coop)setRes(!!src.groupWin)}
+  else setMode(false);
+  drawSel();
+  cx.onclick=()=>go(src&&src.id?'altro':'serata');
+  save.onclick=async()=>{
+    const name=escTxt(inN.value).slice(0,100);if(name.length<1)return toast('Indica il nome della partita');
+    if(!isoOk(inD.value))return toast('Data non valida');
+    if(!sel.length)return toast('Aggiungi almeno un giocatore');
+    const players=sel.map(s=>s.memberId?{memberId:s.memberId,score:coop?null:(s.score===''?null:s.score)}:{guest:true,name:s.name,score:coop?null:(s.score===''?null:s.score)});
+    const p={gameId:null,playKind:typ.kind||'custom',typeId:typ.id,gameName:name,versione:typ.kind==='war'?name.slice(0,60):null,date:inD.value,evening:dayName(inD.value),coop,groupWin:coop?win:null,scenario:coop?escTxt(inSc.value).slice(0,100):'',players,note:escTxt(nt.value).slice(0,1000),duration:durOk(du.value.trim())};
+    try{
+      if(src&&src.id){p.id=src.id;await DB.updatePlay(p);toast('Partita aggiornata');return go('altro')}
+      const r=await DB.addPlay(p);if(t&&t.id)await DB.saveTable({id:t.id,status:'closed',playId:r.id});
+      if(typeof XP!=='undefined'&&XP.refresh)XP.refresh();
+      toast(coop?(win?'Vittoria del gruppo! 🎉':'Sconfitta… alla prossima!'):'Partita salvata');
+      go('record');
+    }catch(e){toast('⚠️ '+(e.message||'Non è stato possibile salvare'))}
+  };
+}
+
+async function registraGdr(t,ed){
+  const all=await DB.members(),ms=all.filter(m=>m.active||((ed||t)&&(ed&&ed.players||t.players||[]).some(x=>x.memberId===m.id)));
+  const staff=typeof adminMode==='function'&&adminMode();
+  const src=ed&&ed.id?ed:null;
+  const gdr=src&&src.gdr||{};
+  const date0=(src&&src.date)||(t&&t.date)||romeToday();
+  const sistema0=(src&&src.gameName)||gdr.sistema||(t&&t.gameName)||'';
+  const bgg0=(src&&src.bggRpgId)||gdr.bggRpgId||(t&&t.bggRpgId)||null;
+  let rpgSel=bgg0?{id:bgg0,nome:sistema0}:null;
+  const masterId0=gdr.masterMemberId||(t&&t.masterMemberId)||(t&&t.hostId)||'';
+  const masterName0=gdr.masterName||(t&&t.masterName)||'';
+  const players0=(src&&src.players)||(t&&t.players)||[];
+  V.replaceChildren();
+  const h2=el('h2',null,TT.t('reg_gdr')||'Registra sessione GDR');
+  const card=el('div','card ttreg');
+  V.append(h2,card);
+  const add= (...nodes)=>card.append(...nodes);
+  const lbM=el('label',null,TT.t('master')||'Master');
+  const sm=document.createElement('select');sm.id='tt-rmaster';sm.disabled=!staff;
+  ms.sort((a,b)=>memberName(a).localeCompare(memberName(b),'it')).forEach(m=>{
+    const o=document.createElement('option');o.value=m.id;o.textContent=memberName(m);if(m.id===masterId0)o.selected=true;sm.append(o);
+  });
+  const oFree=document.createElement('option');oFree.value='__free__';oFree.textContent='Altro (testo libero)…';if(!masterId0&&masterName0)oFree.selected=true;sm.append(oFree);
+  const free=el('input');free.id='tt-rmaster-free';free.maxLength=60;free.placeholder='Nome del master';free.value=masterName0||'';free.hidden=sm.value!=='__free__';free.disabled=!staff;
+  sm.onchange=()=>{free.hidden=sm.value!=='__free__'};
+  const lbS=el('label',null,TT.t('sistema')||'Sistema / gioco');
+  const iq=el('input');iq.id='tt-rsist';iq.maxLength=100;iq.value=sistema0;iq.placeholder='Cerca su RPGGeek oppure scrivi il nome';iq.readOnly=!staff;
+  const res=el('div');res.id='tt-rsistr';
+  const picked=el('div','muted sm');if(rpgSel&&rpgSel.nome)picked.textContent='Selezionato: '+rpgSel.nome;
+  if(staff){let tm;iq.oninput=()=>{clearTimeout(tm);rpgSel=null;picked.textContent='';const s=iq.value.trim();if(s.length<2){res.replaceChildren();return}
+    tm=setTimeout(async()=>{
+      res.textContent='Cerco…';
+      try{
+        const c=DB.remote&&DB.remote.client;if(!c||!c.functions){res.textContent='Scrivi il nome a mano (ricerca non disponibile).';return}
+        const{data,error}=await c.functions.invoke('bgg-meta',{body:{mode:'rpg',q:s}});
+        if(iq.value.trim()!==s)return;
+        const items=(data&&Array.isArray(data.items))?data.items:[];
+        res.replaceChildren();
+        if(error||!items.length){res.textContent='Nessun risultato: puoi scrivere il nome a mano.';return}
+        items.forEach(it=>{
+          const a=el('button','s tt-rpg',it.nome+(it.anno?` (${it.anno})`:''));a.type='button';a.style.display='block';a.style.width='100%';a.style.textAlign='left';a.style.marginTop='4px';
+          a.onclick=()=>{rpgSel={id:it.bgg_id,nome:it.nome};iq.value=it.nome;picked.textContent='Selezionato: '+it.nome;res.replaceChildren();TT.fetchThumb(it.bgg_id)};
+          res.append(a);
+        });
+      }catch(e){res.textContent='Nessun risultato: puoi scrivere il nome a mano.'}
+    },400);
+  }}
+  const logo=el('div');if(typeof bggPwrHtml==='function'){const w=document.createElement('div');w.innerHTML=bggPwrHtml();if(w.firstChild)logo.append(w.firstChild)}
+  const lbA=el('label',null,(TT.t('avventura')||'Avventura / campagna')+' (facoltativa)');
+  const inA=el('input');inA.id='tt-ravv';inA.maxLength=120;inA.value=gdr.avventura||'';
+  const lbSe=el('label',null,TT.t('sessione')||'Sessione');
+  const segS=el('div','seg');
+  const s1=el('button',null,TT.t('oneshot')||'One-shot');s1.type='button';s1.dataset.s='one-shot';
+  const s2=el('button',null,TT.t('campagna')||'Campagna');s2.type='button';s2.dataset.s='campagna';
+  segS.append(s1,s2);
+  let sess=gdr.sessione==='campagna'?'campagna':'one-shot';
+  const nWrap=el('div');nWrap.id='tt-rsessn';
+  const lbN=el('label',null,TT.t('sess_n')||'Sessione n°');
+  const inN=el('input');inN.type='number';inN.min='1';inN.max='999';inN.value=String(gdr.sessione_n||1);
+  nWrap.append(lbN,inN);
+  const setSess=v=>{sess=v;[s1,s2].forEach(b=>b.classList.toggle('on',b.dataset.s===v));nWrap.hidden=v!=='campagna'};
+  segS.onclick=e=>e.target.dataset.s&&setSess(e.target.dataset.s);setSess(sess);
+  const lbD=el('label',null,'Data');
+  const inD=document.createElement('input');inD.type='date';inD.id='d';inD.required=true;inD.value=date0;
+  const lbDu=el('label',null,'Durata (minuti, facoltativa)');
+  const du=el('input');du.maxLength=4;du.placeholder='es. 180';du.value=(src&&src.duration)||'';
+  const lbP=el('label',null,'Giocatori');
+  const pl=el('div');pl.id='pl';
+  const pk=el('button','s','👥 Aggiungi giocatori');pk.type='button';pk.style.width='100%';
+  const lbO=el('label',null,'Ospite (non socio)');
+  const rowO=el('div','row');
+  const gn=el('input');gn.maxLength=40;gn.placeholder='Nome ospite';
+  const ga=el('button','s','+ Ospite');ga.type='button';ga.style.flex='0 0 auto';
+  rowO.append(gn,ga);
+  const sel=[];
+  (players0||[]).forEach(x=>sel.push({...x,character:x.character||''}));
+  const drawSel=()=>{pl.replaceChildren();if(!sel.length)pl.append(el('p','muted','Nessuno selezionato.'));
+    sel.forEach((s,i)=>{
+      const d=el('div','prow');
+      const name=s.memberId?memberName(all.find(m=>m.id===s.memberId)):((s.name||'')+(s.guest?' (ospite)':''));
+      const a=el('input');a.disabled=true;a.value=name;
+      const ch=el('input');ch.placeholder=TT.t('pg')||'Personaggio';ch.maxLength=40;ch.value=s.character||'';ch.oninput=e=>s.character=escTxt(e.target.value).slice(0,40);
+      const rm=el('button','s','✕');rm.type='button';rm.onclick=()=>{sel.splice(i,1);drawSel()};
+      d.append(a,ch,rm);pl.append(d);
+    });
+  };
+  pk.onclick=async()=>{const ids=await pickMembers(ms,sel.filter(x=>x.memberId).map(x=>x.memberId),'Aggiungi giocatori');if(!ids)return;
+    for(let i=sel.length-1;i>=0;i--)if(sel[i].memberId&&!ids.includes(sel[i].memberId))sel.splice(i,1);
+    ids.forEach(id=>sel.some(x=>x.memberId===id)||sel.push({memberId:id,character:''}));drawSel()};
+  ga.onclick=()=>{const n=escTxt(gn.value).slice(0,40);if(!n)return toast('Scrivi il nome dell\'ospite');sel.push({guest:true,name:n,character:''});gn.value='';drawSel()};
+  const lbE=el('label',null,TT.t('esito')||'Esito');
+  const segE=el('div','seg');
+  const e1=el('button',null,TT.t('conclusa')||'Avventura conclusa');e1.type='button';e1.dataset.e='conclusa';
+  const e2=el('button',null,TT.t('incorso')||'In corso');e2.type='button';e2.dataset.e='in_corso';
+  segE.append(e1,e2);
+  let esito=gdr.esito==='conclusa'?'conclusa':'in_corso';
+  const setEs=v=>{esito=v;[e1,e2].forEach(b=>b.classList.toggle('on',b.dataset.e===v))};
+  segE.onclick=e=>e.target.dataset.e&&setEs(e.target.dataset.e);setEs(esito);
+  const lbEn=el('label',null,(TT.t('esito_nota')||'Nota sull\'esito')+' (facoltativa)');
+  const inEn=el('input');inEn.maxLength=200;inEn.value=gdr.esito_nota||'';
+  const lbNt=el('label',null,(TT.t('nota')||'Nota')+' (facoltativa)');
+  const nt=document.createElement('textarea');nt.rows=2;nt.maxLength=1000;nt.value=(src&&src.note)||'';
+  const save=el('button','p',src&&src.id?'Salva modifiche':'Salva sessione');save.type='button';save.id='save';
+  const cx=el('button','s','Annulla');cx.type='button';cx.style.width='100%';cx.style.marginTop='6px';
+  add(lbM,sm,free,lbS,iq,res,picked,logo,lbA,inA,lbSe,segS,nWrap,lbD,inD,lbDu,du,lbP,pk,lbO,rowO,pl,lbE,segE,lbEn,inEn,lbNt,nt,save,cx);
+  drawSel();
+  cx.onclick=()=>go(src&&src.id?'altro':'serata');
+  save.onclick=async()=>{
+    const sistema=escTxt((rpgSel&&rpgSel.nome)||iq.value).slice(0,100);if(!sistema)return toast('Indica il sistema o il gioco');
+    if(!isoOk(inD.value))return toast('Data non valida');
+    if(!sel.length)return toast('Aggiungi almeno un giocatore');
+    let mid=sm.value,mname='';
+    if(mid==='__free__'){mid=null;mname=escTxt(free.value).slice(0,60);if(!mname)return toast('Indica il master')}
+    const players=sel.map(s=>{
+      const o=s.memberId?{memberId:s.memberId}:{guest:true,name:s.name};
+      const ch=escTxt(s.character||'').slice(0,40);if(ch)o.character=ch;
+      o.winner=false;
+      return o;
+    });
+    const gdrObj={sistema,bggRpgId:rpgSel?rpgSel.id:null,masterMemberId:mid||null,masterName:mname||null,avventura:escTxt(inA.value).slice(0,120)||null,sessione:sess,sessione_n:sess==='campagna'?Math.max(1,Math.min(999,+inN.value||1)):null,esito,esito_nota:escTxt(inEn.value).slice(0,200)||null};
+    const p={gameId:null,playKind:'gdr',typeId:'gdr',gameName:sistema,bggRpgId:rpgSel?rpgSel.id:null,date:inD.value,evening:dayName(inD.value),coop:true,groupWin:null,players,note:escTxt(nt.value).slice(0,1000),duration:durOk(du.value.trim()),gdr:gdrObj,scenario:escTxt(inA.value).slice(0,100)};
+    try{
+      if(src&&src.id){p.id=src.id;await DB.updatePlay(p);toast('Sessione aggiornata');return go('altro')}
+      const r=await DB.addPlay(p);if(t&&t.id)await DB.saveTable({id:t.id,status:'closed',playId:r.id});
+      if(typeof XP!=='undefined'&&XP.refresh)XP.refresh();
+      toast('Sessione GDR registrata');
+      go('record');
+    }catch(e){toast('⚠️ '+(e.message||'Non è stato possibile salvare'))}
+  };
+}
+
+{const _nuova=views.nuova;views.nuova=async function(ed,...a){
+  try{
+    await TT.load();
+    let t=null;
+    if(ed&&ed.fromTable)t=(await DB.allTables()).find(x=>x.id===ed.fromTable)||null;
+    const kind=(t&&TT.byId(t.typeId||'board').kind)||(ed&&ed.playKind)||'board';
+    const typ=t?TT.byId(t.typeId||'board'):(ed&&(ed.typeId||ed.playKind)?TT.byId(ed.typeId||ed.playKind):null);
+    if(kind==='gdr'||(typ&&typ.kind==='gdr'))return registraGdr(t,ed);
+    if(typ&&typ.kind&&typ.kind!=='board')return registraAltro(t,typ,ed);
+  }catch(e){console.warn('tt registra',e)}
+  return _nuova.call(this,ed,...a);
+}}
 
 // Preload
 if(typeof DB!=='undefined'){try{TT.load()}catch(e){}}

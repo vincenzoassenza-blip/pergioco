@@ -7,7 +7,7 @@
 (()=>{const _n=views.nuova;views.nuova=async function(ed,...a){const r=await _n.call(this,ed,...a);try{ptApply(ed)}catch(e){console.warn('partita',e)}return r};
 const lab=(card,t)=>[...card.querySelectorAll('label')].find(l=>l.textContent.trim().startsWith(t));
 const mkH=(n,t)=>{const h=document.createElement('div');h.className='pth';h.innerHTML=`<span class="n" aria-hidden="true">${n}</span><span>${esc(t)}</span>`;return h};
-function ptApply(ed){const card=V.querySelector('.card');if(!card||!$('#save')||card.classList.contains('pt'))return;card.classList.add('pt');
+function ptApply(ed){const card=V.querySelector('.card');if(!card||!$('#save')||card.classList.contains('pt')||card.classList.contains('ttreg'))return;card.classList.add('pt');
  // 1 + 2 + 3 — Gioco
  const lg=lab(card,'Gioco');if(lg){const h=mkH(1,'Gioco');h.id='pth1';lg.replaceWith(h)}
  const gp=card.querySelector('.gp');if(gp){gp.querySelectorAll('.gpt').forEach(x=>x.classList.add('sr'));const q=gp.querySelector('.gpq');if(q)q.placeholder='🔎 Cerca un gioco…'}

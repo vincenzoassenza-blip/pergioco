@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+const fs=require('fs');const path=require('path');
+const root=path.join(__dirname,'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+let n=0,ok=0;const chk=(c,m)=>{n++;if(c){ok++;console.log('OK',m)}else{console.error('FAIL',m);process.exitCode=1}};
+const mig=read('supabase/migrate-v41.11.1.sql');
+const js=read('tavoli-tipi.js');
+const brand=read('brand.js');
+const app=read('app.js');
+const sb=read('sb.js');
+const data=read('data.js');
+chk(/APP_VERSION='41\.11\.1'/.test(brand)&&/pergioco-v41\.11\.1/.test(read('sw.js')),'versione 41.11.1');
+chk(/tables add column if not exists versione/.test(mig)&&/plays add column if not exists play_kind/.test(mig),'migrazione versione + play_kind');
+chk(/game_id drop not null/.test(mig)&&/plays_title_chk/.test(mig),'game_id nullable + titolo non-board');
+chk(/revoke all on function public.plays_gdr_ok/.test(mig)&&/grant execute[\s\S]*authenticated/.test(mig),'GRANT authenticated su validatori');
+chk(/paintNow=/.test(js)&&/paintFields=/.test(js)&&!/paintSeg\(\)\.then\(paintType\)/.test(js),'cambio tipo immediato (niente then su capienza)');
+chk(/label\(t,gs\)/.test(js)&&/thumbUrl/.test(js)&&/gcov.*aria-hidden/.test(js),'label da game_name + copertina GDR');
+chk(/tt-ver/.test(js)&&/tt_versione/.test(brand),'campo Versione Warhammer');
+chk(/agtf/.test(app)&&/pergioco-ag-tipo/.test(app)&&/TT\.t\('tutto'\)/.test(app),'filtro Agenda Tutto + localStorage');
+chk(/registraGdr/.test(js)&&/registraAltro/.test(js)&&/playKind==='gdr'/.test(data),'registra GDR/altro + setWinners skip');
+chk(/playTitle/.test(app)&&/playExtra/.test(app),'storico usa titolo partita, non gioco sconosciuto');
+chk(/versione:t.versione/.test(sb)&&/play_kind:p.playKind/.test(sb),'MAP tables.versione + plays.playKind');
+chk(!/club|ludoteca/i.test(js.match(/pieno_msg:.*?whatsapp/)?.[0]||''),'niente club/ludoteca');
+console.log(`\n${ok}/${n} controlli`);
+if(ok!==n)process.exit(1);
