@@ -171,25 +171,52 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
  const card=t=>{const pl=t.players||[],n=pl.length,full=n>=t.seats,lab=(typeof TT!=='undefined'&&TT.label)?TT.label(t,gs):{id:t.gameId,name:(gs.find(g=>g.id===t.gameId)||{}).name||'Gioco'},g=lab.id?gs.find(x=>x.id===lab.id)||{id:lab.id,name:lab.name}:{name:lab.name},op=t.status==='open',seduto=!!meM&&pl.some(p=>p.memberId===meM.id),host=!!meM&&meM.id===t.hostId;
   const altri=pl.filter(p=>p.memberId!==t.hostId).map(p=>p.memberId?mLink(p.memberId,esc(mn(p.memberId))):esc(p.name)+' <span class="muted">(ospite)</span>');
   const st=op?(full?'<span class="agst">Pieno</span>':`<span class="agst free">${t.seats-n} ${t.seats-n===1?'posto libero':'posti liberi'}</span>`):'<span class="agst">✅ Chiuso</span>';
+  // v41.13.3 — scheda compatta: titolo max 2 righe, posti in alto a destra, azioni in ⋯
   let act='';if(op){if(seduto)act+=`<button type="button" class="s agbtn" data-lv="${esc(t.id)}">Lascia il posto</button>`;else if(meM&&!full)act+=`<button type="button" class="p agbtn" data-sd="${esc(t.id)}">Siediti</button>`;
-   if(host||staff)act+=`<div class="agx"><button type="button" class="lnk" data-o="${esc(t.id)}"${full?' disabled':''}>+ Ospite</button><button type="button" class="lnk" data-c="${esc(t.id)}">🏁 Chiudi e registra</button>${staff?`<button type="button" class="lnk" data-j="${esc(t.id)}">👥 Giocatori</button>`:''}${staff&&!isMod()?`<button type="button" class="lnk" data-x="${esc(t.id)}">🗑 Elimina</button>`:''}</div>`}
+   if(host||staff){act=`${host||staff?`<button type="button" class="s agchiudi" data-c="${esc(t.id)}">🏁 Chiudi e registra</button>`:''}`+act+`<button type="button" class="agmore" data-agmore="${esc(t.id)}" aria-label="Altre azioni" aria-haspopup="menu" aria-expanded="false">⋯</button><div class="agx" hidden><button type="button" data-o="${esc(t.id)}"${full?' disabled':''}>+ Ospite</button>${staff?`<button type="button" data-j="${esc(t.id)}">👥 Giocatori</button>`:''}${staff&&!isMod()?`<button type="button" data-x="${esc(t.id)}">🗑 Elimina</button>`:''}</div>`}}
   const typ=(typeof TT!=='undefined'&&TT.byId)?TT.byId(t.typeId||'board'):null;
   const cov=(typeof TT!=='undefined'&&TT.cov)?TT.cov(t,gs):(typeof gCov==='function'?gCov(g):'<div class="gcov">🎲</div>');
+  const typLab=typ&&typ.id?'<span class="ttbadge agtipo">'+esc((typ.icona||'')+' '+typ.nome)+'</span>':'';
   return`<div class="card tavolo agt${op?'':' closed'}" data-t="${esc(t.id)}" data-tipo="${esc(t.typeId||'board')}"><div class="agrow">${cov}<div class="agtx">
-  <div class="agl1"><b>${g.id?gLink(g.id,g.name):esc(g.name)}</b>${typ&&typ.id?'<span class="ttbadge">'+esc((typ.icona||'')+' '+typ.nome)+'</span>':''}${st}</div>
-  <div class="agl2"><span class="agi">🕒</span> ${t.time?esc(t.time):'<span class="muted">ora libera</span>'}<span class="agsep">·</span><span class="agi">🏠</span> ${mLink(t.hostId,esc(mn(t.hostId)))}</div>
+  <div class="agtop"><b class="agtit">${g.id?gLink(g.id,g.name):esc(g.name)}</b>${st}</div>
+  <div class="agl2"><span class="agi">🕒</span> ${t.time?esc(t.time):'<span class="muted">ora libera</span>'}<span class="agsep">·</span><span class="agi">🏠</span> ${mLink(t.hostId,esc(mn(t.hostId)))}${typLab?`<span class="agsep">·</span>${typLab}`:''}</div>
   ${altri.length?`<div class="agl3">Con ${altri.join(', ')}</div>`:''}${t.note?`<div class="agl3 muted">${esc(t.note)}</div>`:''}</div></div>${act?`<div class="agact">${act}</div>`:''}</div>`};
  const head=d=>{const x=by(d),pers=new Set();x.filter(t=>t.status==='open').forEach(t=>(t.players||[]).forEach(p=>pers.add(p.memberId?'m:'+p.memberId:'g:'+t.id+p.name)));const k=nOpen(d);
   return`<h3 class="agday" id="agd-${d}">${d===oggi?'Oggi, ':''}${esc(agLbl(d))}<span class="muted"> · ${k} ${k===1?'tavolo':'tavoli'}${pers.size?` · ${pers.size} ${pers.size===1?'persona':'persone'} (ospiti inclusi)`:''}</span></h3>`};
  const can=staff?ms.length:meM;
  V.innerHTML=`<h2>📅 Agenda</h2>${DB.tablesMissing?'<p class="warn">Tabella «tables» non ancora creata su Supabase.</p>':''}
- <div class="agdays" role="tablist" aria-label="Giorni">${days.map(d=>`<button type="button" class="chip pick${d===S.date?' on':''}" data-d="${d}">${d===oggi?'Oggi':esc(UX_d(d))}${nOpen(d)?` · ${nOpen(d)}`:''}</button>`).join('')}<button type="button" class="chip pick agcal" id="agcal" aria-label="Scegli un'altra data">📅</button><input type="date" id="sd" lang="it" min="${oggi}" value="${S.date}" class="agdi" tabindex="-1" aria-hidden="true"></div>
- ${(tipiAtt.length>1)?`<div class="agtf" id="agtf" role="tablist" aria-label="${esc((typeof TT!=='undefined'&&TT.t)?TT.t('filtro'):'Tipo di tavolo')}"><button type="button" class="chip pick${tipoF?'':' on'}" data-tf="" aria-selected="${tipoF?'false':'true'}">${esc((typeof TT!=='undefined'&&TT.t)?TT.t('tutto'):'Tutto')}</button>${tipiAtt.map(x=>`<button type="button" class="chip pick${tipoF===x.id?' on':''}" data-tf="${esc(x.id)}" aria-selected="${tipoF===x.id?'true':'false'}">${esc((x.icona||'')+' '+x.nome)}</button>`).join('')}</div>`:''}
+ <div class="agdays" role="tablist" aria-label="Giorni">${days.map(d=>`<button type="button" class="chip pick${d===S.date?' on':''}" data-d="${d}">${d===oggi?'Oggi':esc(UX_d(d))}${nOpen(d)?` · ${nOpen(d)}`:''}</button>`).join('')}<button type="button" class="chip pick agcal" id="agcal" aria-label="Scegli un'altra data"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18" stroke="currentColor" stroke-width="1.8"/><rect x="7" y="2.5" width="1.8" height="5" rx=".8" fill="currentColor"/><rect x="15.2" y="2.5" width="1.8" height="5" rx=".8" fill="currentColor"/></svg></button><input type="date" id="sd" lang="it" min="${oggi}" value="${S.date}" class="agdi" tabindex="-1" aria-hidden="true"></div>
+ ${(()=>{const fLab=(typeof TT!=='undefined'&&TT.t)?TT.t('filtro'):'Tipo di tavolo',tutto=(typeof TT!=='undefined'&&TT.t)?TT.t('tutto'):'Tutto',cur=tipoF&&tipiAtt.find(x=>x.id===tipoF),curLab=cur?((cur.icona||'')+' '+cur.nome).trim():tutto;
+  if(tipiAtt.length>3)return `<div class="agtf agtf-dd" id="agtf"><button type="button" class="chip pick on" id="agtipobtn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(fLab)}">Tipo: ${esc(curLab)} ▾</button></div>`;
+  if(tipiAtt.length>1)return `<div class="agtf" id="agtf" role="tablist" aria-label="${esc(fLab)}"><button type="button" class="chip pick${tipoF?'':' on'}" data-tf="" aria-selected="${tipoF?'false':'true'}">${esc(tutto)}</button>${tipiAtt.map(x=>`<button type="button" class="chip pick${tipoF===x.id?' on':''}" data-tf="${esc(x.id)}" aria-selected="${tipoF===x.id?'true':'false'}">${esc((x.icona||'')+' '+x.nome)}</button>`).join('')}</div>`;
+  return ''})()}
  <div id="tl">${days.map(d=>`<section class="agsec" data-day="${d}"${d===S.date?'':' hidden'}>`+head(d)+(by(d).map(card).join('')||`<p class="muted agnone">Nessun tavolo${can?': tocca + per aprirne uno.':'.'}</p>`)+'</section>').join('')}</div>${tFab(can)}`;
  // v41.8.1 — si vede solo il giorno scelto (prima: elenco unico + scroll, che con pochi tavoli lasciava in vista quelli di oggi)
  const go2=d=>{S.date=d;V.querySelectorAll('.agdays [data-d]').forEach(b=>{const on=b.dataset.d===d;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false')});V.querySelectorAll('#tl .agsec').forEach(x=>x.hidden=x.dataset.day!==d)};
  V.querySelectorAll('.agdays [data-d]').forEach(b=>b.onclick=()=>go2(b.dataset.d));
- V.querySelectorAll('#agtf [data-tf]').forEach(b=>b.onclick=()=>{try{if(b.dataset.tf)localStorage.setItem('pergioco-ag-tipo',b.dataset.tf);else localStorage.removeItem('pergioco-ag-tipo')}catch(e){}go('serata')});
+ const setTipo=v=>{try{if(v)localStorage.setItem('pergioco-ag-tipo',v);else localStorage.removeItem('pergioco-ag-tipo')}catch(e){}go('serata')};
+ V.querySelectorAll('#agtf [data-tf]').forEach(b=>b.onclick=()=>setTipo(b.dataset.tf));
+ if(window._agPopClose)window._agPopClose();
+ let agPopEl=null,agPopPd=null,agPopKd=null;
+ const closeAgPop=()=>{if(agPopEl){agPopEl.remove();agPopEl=null}if(agPopPd){document.removeEventListener('pointerdown',agPopPd,true);agPopPd=null}if(agPopKd){document.removeEventListener('keydown',agPopKd,true);agPopKd=null}
+  V.querySelectorAll('.agmore,[id="agtipobtn"]').forEach(b=>b.setAttribute('aria-expanded','false'))};
+ window._agPopClose=closeAgPop;
+ const placeAg= (m,b)=>{const r=b.getBoundingClientRect(),pad=8,mw=Math.min(240,window.innerWidth-pad*2);m.style.width=mw+'px';
+  const left=Math.min(Math.max(pad,r.right-mw),window.innerWidth-mw-pad);let top=Math.round(r.bottom+6);document.body.append(m);const mh=m.getBoundingClientRect().height;if(top+mh>window.innerHeight-pad)top=Math.max(pad,Math.round(r.top-mh-6));m.style.top=top+'px';m.style.left=left+'px'};
+ const openAgPop=(btn,items,role)=>{const was=btn.getAttribute('aria-expanded')==='true';closeAgPop();if(was||!items.length)return;
+  const m=document.createElement('div');m.id='agmenu';m.setAttribute('role',role||'menu');
+  items.forEach(it=>{const x=document.createElement('button');x.type='button';x.setAttribute('role',role==='listbox'?'option':'menuitem');x.textContent=it.lab;if(it.danger)x.classList.add('danger');if(it.disabled)x.disabled=true;if(it.selected)x.setAttribute('aria-selected','true');x.onclick=()=>{closeAgPop();it.act()};m.append(x)});
+  placeAg(m,btn);btn.setAttribute('aria-expanded','true');btn.setAttribute('aria-controls','agmenu');agPopEl=m;
+  agPopPd=e=>{if(m.contains(e.target)||btn.contains(e.target))return;closeAgPop()};
+  agPopKd=e=>{if(e.key==='Escape'){e.preventDefault();closeAgPop();btn.focus();return}if(e.key==='Tab')closeAgPop()};
+  document.addEventListener('pointerdown',agPopPd,true);document.addEventListener('keydown',agPopKd,true)};
+ V.querySelectorAll('.agmore').forEach(btn=>btn.onclick=ev=>{ev.preventDefault();ev.stopPropagation();const card=btn.closest('.card');if(!card)return;
+  const extras=[...card.querySelectorAll('.agx [data-o],.agx [data-j],.agx [data-x]')].map(el=>({lab:el.textContent.trim(),danger:el.hasAttribute('data-x'),disabled:el.disabled,act:()=>el.click()}));
+  openAgPop(btn,extras,'menu')});
+ const tipobtn=$('#agtipobtn');
+ if(tipobtn)tipobtn.onclick=ev=>{ev.preventDefault();ev.stopPropagation();const tutto=(typeof TT!=='undefined'&&TT.t)?TT.t('tutto'):'Tutto';
+  const items=[{lab:tutto,selected:!tipoF,act:()=>setTipo('')}].concat(tipiAtt.map(x=>({lab:((x.icona||'')+' '+x.nome).trim(),selected:tipoF===x.id,act:()=>setTipo(x.id)})));
+  openAgPop(tipobtn,items,'listbox')};
  $('#agcal').onclick=()=>{const i=$('#sd');try{i.showPicker()}catch(e){i.click()}};
  $('#sd').onchange=e=>{const v=e.target.value;if(!isoOk(v)||v<oggi){toast('Data non valida');return}S.date=v;go('serata')};
  window._agNew=()=>(typeof window.agSheet==='function'?window.agSheet:agSheet)({gs,ms,meM,staff,S,oggi});if($('#tfab'))$('#tfab').onclick=tFabGo;
