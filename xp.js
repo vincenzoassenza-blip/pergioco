@@ -67,7 +67,8 @@ const RA={
  cnt(arr){const m=new Map();arr.forEach(x=>{if(x!=null&&x!=='')m.set(x,(m.get(x)||0)+1)});return m},
  async server(){try{if(!DB.remote||!DB.remote.client)return[];const{data,error}=await DB.remote.client.rpc('record_assoluti');if(error)throw error;return data||[]}catch(e){console.warn('record_assoluti',e);return[]}},
  async html(){const ps0=await DB.plays(),ps=typeof pf==='function'?pf(ps0):ps0,gs=await DB.games(),ms=await DB.members(),act=new Set(ms.filter(m=>m.active!==false).map(m=>m.id)),gn=id=>{const g=gs.find(x=>x.id===id);return g?g.name:'Gioco'};
-  const nm=id=>{const m=ms.find(x=>x.id===id);return m?memberName(m):'Socio'},P=[];ps.forEach(p=>(p.players||[]).forEach(x=>{if(x.memberId&&act.has(x.memberId))P.push({p,id:x.memberId,w:!!x.winner})}));
+  const gdr=p=>typeof isGdrPlay==='function'&&isGdrPlay(p),board=p=>typeof isBoardGamePlay==='function'?isBoardGamePlay(p):!!(p&&p.gameId)&&!gdr(p);
+  const nm=id=>{const m=ms.find(x=>x.id===id);return m?memberName(m):'Socio'},P=[];ps.forEach(p=>{if(gdr(p))return;(p.players||[]).forEach(x=>{if(x.memberId&&act.has(x.memberId))P.push({p,id:x.memberId,w:!!x.winner})})});
   const comp=P.filter(x=>!x.p.coop),out=[],who=t=>{const s=t.ids.slice(0,3).map(id=>`<a class="pv" data-pv="${esc(id)}">${esc(nm(id))}${lv(id)}</a>`).join(', ');return s+(t.ids.length>3?` <span class="muted">+${t.ids.length-3}</span>`:'')},
    txt=t=>t.ids.slice(0,2).map(esc).join(', ')+(t.ids.length>2?` <span class="muted">+${t.ids.length-2}</span>`:''),
    add=(ic,t,top,f,lab)=>{if(top)out.push([ic,t,lab?txt(top):who(top),f(top.v)]),0},pl=(v,a,b)=>v+' '+(v==1?a:b);
@@ -76,12 +77,12 @@ const RA={
   // % vittorie (min 10 competitive)
   {const n=RA.cnt(comp.map(x=>x.id)),w=RA.cnt(comp.filter(x=>x.w).map(x=>x.id)),m=new Map();n.forEach((c,id)=>{if(c>=10)m.set(id,Math.round(1000*(w.get(id)||0)/c))});const t=RA.top(m);add('🎯','Miglior % di vittorie',t,v=>String(Math.round(v)/10).replace('.',',')+'% (min. 10 partite)')}
   {const m=new Map();comp.filter(x=>x.w).forEach(x=>{if(!m.has(x.id))m.set(x.id,new Set());m.get(x.id).add(x.p.gameId)});add('🏅','Vincitore eclettico',RA.top(new Map([...m].map(([k,s])=>[k,s.size]))),v=>pl(v,'gioco diverso vinto','giochi diversi vinti'))}
-  {const first=new Map();[...ps].sort((a,b)=>String(a.date).localeCompare(String(b.date))).forEach(p=>{if(first.has(p.gameId))return;const d=p.date;first.set(p.gameId,ps.filter(q=>q.gameId===p.gameId&&q.date===d).flatMap(q=>(q.players||[]).map(x=>x.memberId)).filter(id=>id&&act.has(id)))});
+  {const first=new Map();[...ps].filter(board).sort((a,b)=>String(a.date).localeCompare(String(b.date))).forEach(p=>{if(first.has(p.gameId))return;const d=p.date;first.set(p.gameId,ps.filter(q=>q.gameId===p.gameId&&q.date===d).flatMap(q=>(q.players||[]).map(x=>x.memberId)).filter(id=>id&&act.has(id)))});
    const m=new Map();first.forEach(ids=>new Set(ids).forEach(id=>m.set(id,(m.get(id)||0)+1)));add('🧪','Pioniere: primo a giocare più giochi dell\'associazione',RA.top(m),v=>pl(v,'gioco','giochi'))}
   add('📝','Critico più attivo',RA.top(RA.cnt(XP.rt.filter(r=>act.has(r.member_id)).map(r=>r.member_id))),v=>pl(v,'voto','voti'));
-  {const t=RA.top(RA.cnt(ps.map(p=>p.gameId)));if(t)t.ids=t.ids.map(gn);add('🎲','Gioco più giocato',t,v=>pl(v,'partita','partite'),1)}
-  {const t=RA.top(new Map(ps.map(p=>[p.id,(p.players||[]).length])));if(t)t.ids=t.ids.map(id=>{const p=ps.find(x=>x.id===id);return gn(p.gameId)+' · '+RA.fd(p.date)});add('👥','Partita più affollata',t,v=>pl(v,'giocatore','giocatori'),1)}
-  {const t=RA.top(new Map(ps.filter(p=>+p.duration>0).map(p=>[p.id,+p.duration])));if(t)t.ids=t.ids.map(id=>{const p=ps.find(x=>x.id===id);return gn(p.gameId)+' · '+RA.fd(p.date)});add('🕒','Partita più lunga',t,v=>v+' min',1)}
+  {const t=RA.top(RA.cnt(ps.filter(board).map(p=>p.gameId)));if(t)t.ids=t.ids.map(gn);add('🎲','Gioco più giocato',t,v=>pl(v,'partita','partite'),1)}
+  {const t=RA.top(new Map(ps.filter(p=>!gdr(p)).map(p=>[p.id,(p.players||[]).length])));if(t)t.ids=t.ids.map(id=>{const p=ps.find(x=>x.id===id);return gn(p.gameId)+' · '+RA.fd(p.date)});add('👥','Partita più affollata',t,v=>pl(v,'giocatore','giocatori'),1)}
+  {const t=RA.top(new Map(ps.filter(p=>!gdr(p)&&+p.duration>0).map(p=>[p.id,+p.duration])));if(t)t.ids=t.ids.map(id=>{const p=ps.find(x=>x.id===id);return gn(p.gameId)+' · '+RA.fd(p.date)});add('🕒','Partita più lunga',t,v=>v+' min',1)}
   {let tb=[];try{tb=await DB.allTables()}catch(e){}add('🪑','Padrone di casa',RA.top(RA.cnt((tb||[]).map(t=>t.hostId).filter(id=>act.has(id)))),v=>pl(v,'tavolo organizzato','tavoli organizzati'))}
   {const sf=P.filter(x=>x.p.sfidaId);add('⚔️','Più Sfide giocate',RA.top(RA.cnt(sf.map(x=>x.id))),v=>pl(v,'sfida','sfide'));add('🗡️','Più Sfide vinte',RA.top(RA.cnt(sf.filter(x=>x.w).map(x=>x.id))),v=>pl(v,'sfida vinta','sfide vinte'))}
   const sv=await RA.server(),S=k=>RA.top(new Map(sv.filter(r=>r.k===k&&act.has(r.member_id)).map(r=>[r.member_id,+r.v])));
