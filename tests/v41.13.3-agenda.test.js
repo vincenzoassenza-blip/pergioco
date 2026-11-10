@@ -145,13 +145,14 @@ const overlap=(a,b)=>!(a.right<=b.left+0.5||b.right<=a.left+0.5||a.bottom<=b.top
     await c.close();
   }
 
-  // 3) socio: solo azione principale, niente Chiudi né ⋯
+  // 3) socio: Siediti/Lascia + Condividi, niente Chiudi né ⋯
   {
     const{c,p}=await ctx();
     await goAg(p,{staff:false,mode:'user'});
     const info=await p.evaluate(()=>[...document.querySelectorAll('.card.agt')].map(c=>({act:(c.querySelector('.agact')||{}).innerText||'',more:!!c.querySelector('.agmore'),chi:!!c.querySelector('.agchiudi')})));
     chk(info.length===3&&info.every(x=>!x.more&&!x.chi),'socio: niente ⋯ né Chiudi');
-    chk(info[0].act.trim()==='Siediti'&&info[1].act.trim()==='Lascia il posto'&&info[2].act.trim()==='Siediti','socio: solo Siediti/Lascia il posto');
+    chk(info[0].act.replace(/\s+/g,' ').trim()==='Siediti Condividi'&&info[1].act.replace(/\s+/g,' ').trim()==='Lascia il posto Condividi'&&info[2].act.replace(/\s+/g,' ').trim()==='Siediti Condividi','socio: Siediti/Lascia e Condividi');
+    chk(info.every(x=>/Condividi/.test(x.act)),'socio: Condividi visibile su ogni tavolo aperto');
     await p.screenshot({path:path.join(OUT,'live-03-socio.png')});
     await c.close();
   }

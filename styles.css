@@ -766,7 +766,9 @@ header .brand,header .sub,body.adm header .brand,body.adm header .sub{padding-ri
 .agl2 .agsep{margin:0 5px;flex:none}
 .agl2 .agi{flex:none}
 .agl2 .agtipo,.agl2 .ttbadge{display:inline-block;flex:none;margin:0;font-size:11px;font-weight:700;color:var(--m);background:color-mix(in srgb,var(--b) 7%,var(--c));border-radius:999px;padding:1px 7px;line-height:1.5;white-space:nowrap}
-.agact{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;margin-top:10px}
+.agact{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
+.agact .agshare{flex:1;width:auto;margin:0;min-height:44px;white-space:nowrap;font-size:14px}
+.agact:has(.agmore) .agshare{flex:1 0 100%;order:5}
 .agact .agbtn{flex:1.15;width:auto;margin:0;min-height:44px;white-space:nowrap}
 .agact .agchiudi{flex:1;width:auto;margin:0;min-height:44px;font-size:13px;padding:8px 8px;font-weight:700;white-space:nowrap}
 .agmore{flex:none;width:44px;height:44px;min-width:44px;min-height:44px;max-height:44px;padding:0;margin:0;border:0;border-radius:10px;background:#e7ecf7;color:var(--b);font-size:22px;font-weight:800;line-height:44px;letter-spacing:0;white-space:nowrap}

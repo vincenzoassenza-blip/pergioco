@@ -95,6 +95,23 @@ const badgeSnap=async()=>{const c=await badgeCtx(),ms=await DB.members(),o={};ms
 const badgeNew=async(before,keys)=>{const c=await badgeCtx(),ms=await DB.members(),out=[];keys.forEach(k=>{const b=Badges.list(k,c).filter(b=>b.on&&!(before[k]||[]).includes(b.id));const m=ms.find(m=>'m:'+m.id===k);b.forEach(x=>out.push(`${x.icon} ${m?memberName(m):''}: ${x.name}`))});
  out.forEach((t,i)=>setTimeout(()=>{const e=document.createElement('div');e.className='toast badge-toast';e.textContent='Nuovo badge! '+t;const g=document.createElement('div');g.className='igb';g.textContent=BRAND.ig()?'📸 Condividi e taggaci '+BRAND.ig().tag:'📸 Condividi le foto della serata';e.append(g);document.body.append(e);setTimeout(()=>e.remove(),3200)},2300+i*3300))};
 const nextEvening=()=>{const d=new Date(),wd=d.getDay();const add=wd===4||wd===0?0:(wd<4?4-wd:7-wd);d.setDate(d.getDate()+add);return{date:d.toLocaleDateString('sv-SE')}};
+const APP_LINK='https://app.pergioco.org';
+function tavoloShareText(t,gs){
+  const lab=(typeof TT!=='undefined'&&TT.label)?TT.label(t,gs):{name:(gs.find(g=>g.id===t.gameId)||{}).name||'Tavolo'};
+  const name=(lab&&lab.name)||'Tavolo';
+  const giorno=typeof agLbl==='function'?agLbl(t.date):(dayName(t.date)+' '+fmt(t.date));
+  const ora=t.time||'ora libera';
+  const lib=Math.max(0,(+t.seats||0)-(t.players||[]).length);
+  const posti=lib===0?'Nessun posto libero':(lib===1?'1 posto libero':lib+' posti liberi');
+  const url=APP_LINK;
+  return{title:name,url,text:`${name}\n${giorno} · ${ora}\n${posti}\n${url}`};
+}
+async function condividiTavolo(t,gs){
+  const {title,url,text}=tavoloShareText(t,gs);
+  try{if(navigator.share){await navigator.share({title,text,url});return}}
+  catch(e){if(e&&e.name==='AbortError')return}
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank','noopener,noreferrer');
+}
 const views={
 async ludoteca(){const gs=await DB.games(),ps=await DB.plays();const f={n:'',t:'',q:'',s:''};
  V.innerHTML=`<h2>I nostri giochi</h2><div class="card"><input id="q" placeholder="Cerca un gioco…"><div class="row" style="margin-top:8px">
@@ -173,6 +190,7 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
   const st=op?(full?'<span class="agst">Pieno</span>':`<span class="agst free">${t.seats-n} ${t.seats-n===1?'posto libero':'posti liberi'}</span>`):'<span class="agst">✅ Chiuso</span>';
   // v41.13.3 — scheda compatta: titolo max 2 righe, posti in alto a destra, azioni in ⋯
   let act='';if(op){if(seduto)act+=`<button type="button" class="s agbtn" data-lv="${esc(t.id)}">Lascia il posto</button>`;else if(meM&&!full)act+=`<button type="button" class="p agbtn" data-sd="${esc(t.id)}">Siediti</button>`;
+   act+=`<button type="button" class="s agbtn agshare" data-sh="${esc(t.id)}">Condividi</button>`;
    if(host||staff){act=`${host||staff?`<button type="button" class="s agchiudi" data-c="${esc(t.id)}">🏁 Chiudi e registra</button>`:''}`+act+`<button type="button" class="agmore" data-agmore="${esc(t.id)}" aria-label="Altre azioni" aria-haspopup="menu" aria-expanded="false">⋯</button><div class="agx" hidden><button type="button" data-o="${esc(t.id)}"${full?' disabled':''}>+ Ospite</button>${staff?`<button type="button" data-j="${esc(t.id)}">👥 Giocatori</button>`:''}${staff&&!isMod()?`<button type="button" data-x="${esc(t.id)}">🗑 Elimina</button>`:''}</div>`}}
   const typ=(typeof TT!=='undefined'&&TT.byId)?TT.byId(t.typeId||'board'):null;
   const cov=(typeof TT!=='undefined'&&TT.cov)?TT.cov(t,gs):(typeof gCov==='function'?gCov(g):'<div class="gcov">🎲</div>');
@@ -230,7 +248,8 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
  V.querySelectorAll('[data-o]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.o);if(!t)return;if(!(adminMode()||meM&&meM.id===t.hostId))return;if(t.players.length>=t.seats)return toast('Tavolo pieno');const n=(await askText('Nome dell\'ospite')||'').trim().slice(0,40);if(!n)return;await DB.saveTable({id:t.id,players:[...t.players,{guest:true,name:n}]});go('serata')});
  V.querySelectorAll('[data-c]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.c);if(!t)return;if(!(adminMode()||meM&&meM.id===t.hostId))return;
   views.nuova({fromTable:t.id,gameId:t.gameId,date:t.date,players:t.players.map(p=>p.memberId?{memberId:p.memberId}:{guest:true,name:p.name})})});
- V.querySelectorAll('[data-x]').forEach(b=>b.onclick=async()=>{if(!adminMode()||isMod())return;if(!await ask('Eliminare il tavolo?'))return;await DB.deleteTable(b.dataset.x);toast('Tavolo eliminato');go('serata')})},
+ V.querySelectorAll('[data-x]').forEach(b=>b.onclick=async()=>{if(!adminMode()||isMod())return;if(!await ask('Eliminare il tavolo?'))return;await DB.deleteTable(b.dataset.x);toast('Tavolo eliminato');go('serata')});
+ V.querySelectorAll('[data-sh]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.sh);if(!t)return;await condividiTavolo(t,gs)})},
 async config(){if(!adminMode()||isMod()){V.innerHTML='<div class="card"><p class="muted">🔒 Solo gli admin possono modificare la configurazione.</p></div>';return}
  await Promise.all([BRAND.load(true),MOD.load(true),TXT.load(true),typeof GDRB!=='undefined'?GDRB.load(true):Promise.resolve()]);const v=JSON.parse(JSON.stringify(BRAND.v)),mv=JSON.parse(JSON.stringify(MOD.v)),tv=JSON.parse(JSON.stringify(TXT.v)),C=[['primario','Colore principale','pulsanti e titoli'],['secondario','Colore secondario','dettagli e collegamenti'],['accento','Colore di risalto','evidenziazioni'],['sfondo','Sfondo pagina',''],['barra1','Barra in alto: inizio','gradiente a sinistra'],['barra2','Barra in alto: fine','gradiente a destra'],['filo','Filo sotto la barra','']];
  const fld=(k,l,ph,max,h)=>`<label for="cf-${k}"><span class="kw">${l}</span>${h?` <span class="muted sm">${h}</span>`:''}</label><input id="cf-${k}" maxlength="${max}" placeholder="${esc(ph)}" value="${esc(v[k])}">`;
