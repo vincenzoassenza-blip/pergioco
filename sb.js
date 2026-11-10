@@ -28,10 +28,10 @@ const SupabaseAdapter={
   await this.cache.replaceAll({...d,admin:null});this.setQueue(this.queue().concat(ops));await this.flush()},
  async run(o){const t=this.client.from(MAP[o.k].t);
   const r=o.op==='insert'?await t.insert(o.row):o.op==='update'?await t.update(o.row).eq('id',o.row.id):o.op==='upsert'?await t.upsert(o.row):await t.delete().eq('id',o.id);return r.error},
- async flush(){if(!this.client||this.flushing)return;this.flushing=true;let q=this.queue(),denied=0;
-  try{while(q.length){const e=await this.run(q[0]);if(e&&isNet(e)){DB.setStatus('offline');break}if(e){denied++;console.warn('Supabase',e)}q.shift();this.setQueue(q)}
+ async flush(){if(!this.client||this.flushing)return;this.flushing=true;let q=this.queue(),denied=0,last=null;
+  try{while(q.length){const e=await this.run(q[0]);if(e&&isNet(e)){DB.setStatus('offline');break}if(e){denied++;last=e;const raw=typeof errTesto==='function'?errTesto(e):(e&&e.message)||'';console.warn('Supabase',e.code||'',typeof errPulisci==='function'?errPulisci(raw):String(raw).slice(0,200))}q.shift();this.setQueue(q)}
    if(!q.length){DB.setStatus('online');await this.refresh()}}finally{this.flushing=false}
-  if(denied)toast&&toast('Alcune modifiche non sono state accettate dal database (servono i permessi admin)')},
+  if(denied){if(typeof toastErr==='function')toastErr(last,'EVENTO');else toast&&toast('Alcune modifiche non sono state accettate dal database')}},
  async refresh(){const d={version:2,games:[],members:[],plays:[],tables:[],admin:null};
   for(const k of Object.keys(MAP)){let {data,error}=await this.client.from(MAP[k].t).select(MAP[k].cols||'*');
    if(error&&MAP[k].cols&&(error.code==='42703'||/column/i.test(error.message||''))){DB.v6Missing=true;({data,error}=await this.client.from(MAP[k].t).select('*'))}else if(MAP[k].cols)DB.v6Missing=false;if(error&&k==='tables'&&isMissing(error)){DB.tablesMissing=true;d.tables=[];continue}if(error)throw error;d[k]=data.map(MAP[k].from)}
