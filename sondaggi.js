@@ -14,6 +14,7 @@ const T={
   info:'I soci votano sui sondaggi aperti. Quelli fissati restano in cima finché sono aperti.',
   mostra:'Mostra', tutto:'Tutto', aperti:'Aperti', chiusi:'Chiusi',
   vuoto:'Ancora nessun sondaggio.', vuotoH:'Crea il primo: i soci lo vedranno in Community quando è aperto.', nessuno:'Nessun sondaggio con questo filtro.', creaBtn:'➕ Crea sondaggio',
+  errLoad:'Non riesco a caricare i sondaggi.',
   indietro:'← Sondaggi', invia:'Invia il voto', salvaDisp:'Salva le disponibilità', salvaCl:'Salva la classifica',
   cambia:'Puoi cambiare idea fino alla chiusura.', noCambia:'Nei sondaggi anonimi il voto non si può cambiare.',
   max:(n,u)=>`${u} di ${n} scelte usate.`,
@@ -41,7 +42,7 @@ function cover(o){
 const PS={d:null,fil:'tutto',open:new Set(),view:null,form:null,info:false,err:null};
 PS.cl=()=>DB.remote&&DB.remote.client;
 PS.rpc=async(n,a)=>{const c=PS.cl();if(!c)throw new Error('I sondaggi richiedono la connessione al database');const{data,error}=await c.rpc(n,a||{});if(error)throw error;return data};
-PS.load=async()=>{try{if(PS.cl())PS.d=await PS.rpc('poll_lista')}catch(e){console.warn('PS',e);PS.d=null;PS.err=e&&e.message}};
+PS.load=async()=>{try{if(PS.cl()){PS.d=await PS.rpc('poll_lista');PS.err=null}}catch(e){console.warn('PS',e);PS.d=null;PS.err=e&&e.message}};
 PS.hasActive=()=>!!(PS.d&&PS.d.has_active);
 PS.showTab=()=>!!((typeof adminMode==='function'&&adminMode())||(PS.d&&PS.d.has_active));
 PS.staffUi=()=>!!(PS.d&&PS.d.staff&&typeof adminMode==='function'&&adminMode());
@@ -99,7 +100,7 @@ function listHtml(){
     </div>
     ${PS.info?`<div class="cmhelp">${T.info}</div>`:''}
     ${st?`<p class="cmhelp">${T.gestH}</p>`:''}
-    <div id="psl">${apertiVis.length?apertiVis.map(card).join(''):((chiusiVis.length&&PS.fil!=='chiusi')?'':(st&&!all.length?`<div class="card" id="psempty"><p><b>${T.vuoto}</b></p><p class="muted">${T.vuotoH}</p><button type="button" class="p" id="pscrea">${T.creaBtn}</button></div>`:`<div class="card muted">${all.length?T.nessuno:T.vuoto}</div>`))}</div>
+    <div id="psl">${PS.err&&!PS.d?`<div class="card" id="pserr"><p><b>${T.errLoad}</b></p><p class="muted">${esc(PS.err)}</p></div>`:(apertiVis.length?apertiVis.map(card).join(''):((chiusiVis.length&&PS.fil!=='chiusi')?'':(st&&!all.length?`<div class="card" id="psempty"><p><b>${T.vuoto}</b></p><p class="muted">${T.vuotoH}</p><button type="button" class="p" id="pscrea">${T.creaBtn}</button></div>`:`<div class="card muted">${all.length?T.nessuno:T.vuoto}</div>`)))}</div>
     ${sec('chiusi',T.chiusiLab,chiusiVis)}
   </section>`;
 }
