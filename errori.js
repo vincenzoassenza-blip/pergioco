@@ -34,7 +34,7 @@ const ERR_AZIONI={save:['PARTITA','salvare la partita',1],'nuova#ga':['PARTITA',
  evbook:['PREN','prenotarti all\'evento',0],evpr:['PREN','prenotarti al tavolo',0],evcanc:['PREN','annullare la prenotazione',0],
  cpsave:['COPPA','salvare la configurazione della Coppa',1],cpnew:['COPPA','creare l\'edizione della Coppa',0],cpme:['COPPA','iscriverti o ritirarti dalla Coppa',0],cpdel:['COPPA','eliminare l\'edizione',0],cpapri:['COPPA','aprire le iscrizioni',0],
  dsok:['DES','proporre il gioco',1],dsapri:['DES','aprire la votazione',0],dschiudi:['DES','chiudere la votazione',0],dsscad:['DES','salvare la scadenza',1],
- msv:['SOCI','salvare il socio',1],ma:['MOD','nominare il moderatore',1],smg:['PROF','collegare il tuo account',0],
+ msv:['SOCI','salvare il socio',1],ma:['MOD','nominare il moderatore',1],smg:['PROF','collegare il tuo account',0],pwgo:['PWD','cambiare la password',1],
  lsv:['LIBRI','salvare la scheda nel registro',1],ldel:['LIBRI','eliminare la scheda',0],limp:['LIBRI','importare il file Excel',0],lcsv:['LIBRI','scaricare il CSV',0],lpdf:['LIBRI','preparare il PDF',0],
  ago:['LOGIN','entrare',1],lg:['LOGIN','entrare come admin',1],eqgo:['SFIDA','trovare la sfida',0],eqq:['SFIDA','calcolare la sfida',1],antadd:['SFIDA','aggiungere la meccanica',1],
  ex:['BACKUP','esportare il backup',0],wrass:['WRAP','aprire il Wrapped dell\'associazione',0],ast:['STAT','aprire le statistiche',0]};

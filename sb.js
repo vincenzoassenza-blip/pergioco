@@ -28,10 +28,10 @@ const SupabaseAdapter={
   await this.cache.replaceAll({...d,admin:null});this.setQueue(this.queue().concat(ops));await this.flush()},
  async run(o){const t=this.client.from(MAP[o.k].t);
   const r=o.op==='insert'?await t.insert(o.row):o.op==='update'?await t.update(o.row).eq('id',o.row.id):o.op==='upsert'?await t.upsert(o.row):await t.delete().eq('id',o.id);return r.error},
- async flush(){if(!this.client||this.flushing)return;this.flushing=true;let q=this.queue(),denied=0;
-  try{while(q.length){const e=await this.run(q[0]);if(e&&isNet(e)){DB.setStatus('offline');break}if(e){denied++;console.warn('Supabase',e)}q.shift();this.setQueue(q)}
+ async flush(){if(!this.client||this.flushing)return;this.flushing=true;let q=this.queue(),denied=0,last=null;
+  try{while(q.length){const e=await this.run(q[0]);if(e&&isNet(e)){DB.setStatus('offline');break}if(e){denied++;last=e;const raw=typeof errTesto==='function'?errTesto(e):(e&&e.message)||'';console.warn('Supabase',e.code||'',typeof errPulisci==='function'?errPulisci(raw):String(raw).slice(0,200))}q.shift();this.setQueue(q)}
    if(!q.length){DB.setStatus('online');await this.refresh()}}finally{this.flushing=false}
-  if(denied)toast&&toast('Alcune modifiche non sono state accettate dal database (servono i permessi admin)')},
+  if(denied){if(typeof toastErr==='function')toastErr(last,'EVENTO');else toast&&toast('Alcune modifiche non sono state accettate dal database')}},
  async refresh(){const d={version:2,games:[],members:[],plays:[],tables:[],admin:null};
   for(const k of Object.keys(MAP)){let {data,error}=await this.client.from(MAP[k].t).select(MAP[k].cols||'*');
    if(error&&MAP[k].cols&&(error.code==='42703'||/column/i.test(error.message||''))){DB.v6Missing=true;({data,error}=await this.client.from(MAP[k].t).select('*'))}else if(MAP[k].cols)DB.v6Missing=false;if(error&&k==='tables'&&isMissing(error)){DB.tablesMissing=true;d.tables=[];continue}if(error)throw error;d[k]=data.map(MAP[k].from)}
@@ -49,6 +49,14 @@ const SupabaseAdapter={
   catch(e){if(isMissing(e))return 'missing';return this.cache._load()?'offline':'nolib'}},
  // --- autenticazione admin (Supabase Auth, email + password) ---
  async signIn(email,password){const {error}=await this.client.auth.signInWithPassword({email,password});if(error)throw error;return this.isAdmin()},
+ async changePassword(cur,neu){
+  const u=await this.user();const email=u&&u.email;
+  if(!email){const e=new Error('Non trovo l\'email del tuo account. Esci e accedi di nuovo.');e.code='E-PWD-V6';throw e}
+  const {error:e1}=await this.client.auth.signInWithPassword({email,password:cur});
+  if(e1){const bad=/invalid login credentials|invalid_credentials|invalid_grant/i.test((e1.message||'')+' '+(e1.code||''));
+   const e=new Error(bad?'La password attuale non è corretta':(e1.message||'Non sono riuscito a verificare la password attuale'));throw e}
+  const {error:e2}=await this.client.auth.updateUser({password:neu});if(e2)throw e2;
+ },
  async signOut(){await this.client.auth.signOut()},
  async isAdmin(){const {data:s}=await this.client.auth.getSession();if(!s.session){this.modCached=false;return this.adminCached=false}const {data,error}=await this.client.rpc('is_admin');const a=!error&&data===true;if(a&&!this.adminCached){this.adminCached=true;try{await this.refresh()}catch(e){}}this.adminCached=a;let m=false;if(!a){const r=await this.client.rpc('is_moderator');m=!r.error&&r.data===true}this.modCached=m;return a||m},
  async searchMembers(q){const {data,error}=await this.client.rpc('search_members',{p_q:q});if(error)throw error;return (data||[]).map(r=>r.id)},
