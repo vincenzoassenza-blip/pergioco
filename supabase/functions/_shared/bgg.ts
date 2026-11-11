@@ -95,7 +95,7 @@ export function parseSearch(xml: string): SearchHit[] {
     const attrs = m[1], block = m[2];
     const id = int((attrs.match(/\bid="(\d+)"/) || [])[1], 1, 99999999);
     if (!id) continue;
-    const n = block.match(/<name[^>]*type="primary"[^>]*value="([^"]*)"/) || block.match(/<name[^>]*value="([^"]*)"/);
+    const n = block.match(/<name[^>]*type="primary"[^>]*value="([^"]*)"/) || block.match(/<name[^>]*value="([^"]*)"[^>]*type="primary"/) || block.match(/<name[^>]*value="([^"]*)"/);
     const y = block.match(/<yearpublished[^>]*value="(\d+)"/);
     const nome = txt(decodeXml(n?.[1] || ""), 100);
     if (!nome) continue;

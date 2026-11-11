@@ -64,6 +64,9 @@ chk(parsed.length===10,'parser: 10 oggetti');
 const sys=parsed.find(x=>x.bgg_id===17181);
 chk(!!sys&&sys.tipo==='rpg'&&sys.nome==='Dungeons & Dragons (5th Edition)','parser: 17181 usa il nome primary, non l\'alternativo D&D 5e');
 chk(parsed.find(x=>x.bgg_id===162994)?.tipo==='rpgitem','parser: il PHB è rpgitem');
+const mixed=`<items><item id="17181" type="rpg"><name type="alternate" value="D&amp;D 5e"/><name value="Dungeons &amp; Dragons (5th Edition)" type="primary"/></item></items>`;
+chk(parseSearch(mixed)[0]?.nome==='Dungeons & Dragons (5th Edition)','parser: nome primary anche se l\'alternativo sta prima e value precede type');
+
 
 function top(q){return rankRpgSearch(parsed,q).slice(0,10)}
 function ids(q){return top(q).map(x=>x.bgg_id)}
