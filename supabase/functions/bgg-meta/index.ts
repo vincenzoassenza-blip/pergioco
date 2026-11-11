@@ -78,14 +78,25 @@ async function thingInfo(admin: SB, id: number) {
 
 // v41.15 — scheda GDR per la collezione (stesso token, cache come thing).
 async function rpgInfo(admin: SB, id: number) {
-  const key = "rpgthing:" + id;
+  const key = "rpgthing-v3:" + id;
   const hit = await cacheGet(admin, key);
   if (hit && typeof hit === "object") return hit as any;
   const token = await requireToken();
-  const r = await bggXml(`/xmlapi2/thing?id=${id}`, token, { accept202: false, maxAttempt: 4 });
-  if (r.status !== 200) throw new Error(`BGG ${r.status}`);
-  const parsed = parseRpgThing(r.body, id);
-  if (!parsed) throw new Error("dati RPGGeek assenti");
+  // type=rpg è una family, non una thing (BGG XML API2). type=rpgitem è una thing.
+  // Lo stesso id può essere un boardgame su /thing senza type.
+  let parsed=null, last=0;
+  const paths = [
+    `/xmlapi2/family?id=${id}&type=rpg`,
+    `/xmlapi2/thing?id=${id}&type=rpgitem`,
+  ];
+  for (const q of paths) {
+    const r = await bggXml(q, token, { accept202: false, maxAttempt: 4, maxBytes: 400_000 });
+    last=r.status;
+    if (r.status !== 200) continue;
+    parsed = parseRpgThing(r.body, id);
+    if (parsed) break;
+  }
+  if (!parsed) throw new Error(last && last!==200 ? `BGG ${last}` : "dati RPGGeek assenti");
   await cacheSet(admin, key, parsed, TTL_THING_MS);
   return parsed;
 }
@@ -203,7 +214,10 @@ Deno.serve(async (req) => {
     } catch (e) {
       const msg = txt((e as Error).message, 80);
       if (msg.includes("BGG_TOKEN")) return new Response('{"error":"BGG_TOKEN assente"}', { status: 503, headers: h });
-      return new Response('{"error":"BGG non raggiungibile, riprova"}', { status: 502, headers: h });
+      const safe = /^BGG \d+$/.test(msg) || msg === "dati RPGGeek assenti" || msg === "dati BGG assenti" || msg === "risposta troppo grande"
+        ? msg
+        : "BGG non raggiungibile, riprova";
+      return new Response(JSON.stringify({ error: safe }), { status: 502, headers: h });
     }
   }
 
