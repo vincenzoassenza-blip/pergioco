@@ -1,9 +1,15 @@
 // node tests/v41.11.1-tavoli.test.js — anteprima v41.11.1 (porta 8812)
-const pw=require('playwright-core'),fs=require('fs'),path=require('path');
+const pw=require('playwright-core'),fs=require('fs'),path=require('path'),http=require('http');
+const ROOT=path.join(__dirname,'..');
 const OUT='/workspace/pergioco-mockups/ux/v41.11.1-tavoli';
 const BASE='http://127.0.0.1:8812/';
 const THUMB='https://cf.geekdo-images.com/last-sabbath/open/pic402323.jpg';
 fs.mkdirSync(OUT,{recursive:true});
+const T={'.js':'text/javascript','.css':'text/css','.html':'text/html','.json':'application/json','.png':'image/png','.svg':'image/svg+xml','.woff2':'font/woff2'};
+const srv=http.createServer((q,r)=>{let p=decodeURIComponent((q.url||'/').split('?')[0]);if(p==='/')p='/index.html';
+  fs.readFile(path.join(ROOT,p),(e,b)=>{if(e){r.writeHead(404);r.end();return}r.writeHead(200,{'content-type':T[path.extname(p)]||'application/octet-stream'});r.end(b)})});
+const PNG1=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==','base64');
+if(!fs.existsSync('/tmp/rpg-cover.png'))fs.writeFileSync('/tmp/rpg-cover.png',PNG1);
 let ok=0,n=0;const chk=(c,m)=>{n++;if(c){ok++;console.log('OK',m)}else{console.error('FAIL',m);process.exitCode=1}};
 const W=ms=>new Promise(r=>setTimeout(r,ms));
 
@@ -73,6 +79,7 @@ const seed=async(p,opt={})=>{
 };
 
 (async()=>{
+  await new Promise((res,rej)=>srv.listen(8812,'127.0.0.1',e=>e?rej(e):res()));
   const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage','--lang=it-IT','--accept-lang=it-IT,it'],env:{...process.env,LANG:'it_IT.UTF-8',LC_ALL:'it_IT.UTF-8',LC_TIME:'it_IT.UTF-8',LANGUAGE:'it_IT:it'}});
   const ctx=async(h=1200)=>{
     const c=await b.newContext({serviceWorkers:'block',viewport:{width:430,height:h},deviceScaleFactor:2,locale:'it-IT',timezoneId:'Europe/Rome'});
@@ -113,7 +120,7 @@ const seed=async(p,opt={})=>{
     await p.evaluate(async()=>{if(window.TT){TT.loaded=false;await TT.load()}go('serata')});
     await W(1200);
     const cards=await p.evaluate(()=>[...document.querySelectorAll('.card.agt')].map(el=>({
-      t:el.dataset.t,title:(el.querySelector('.agl1 b')||{}).textContent||'',
+      t:el.dataset.t,title:(el.querySelector('.agtit')||{}).textContent||'',
       img:!!el.querySelector('.gcov img'),emoji:(el.querySelector('.gcov')||{}).textContent||'',
       tipo:el.dataset.tipo
     })));
@@ -165,7 +172,7 @@ const seed=async(p,opt={})=>{
     await W(1000);
     const war=await p.evaluate(()=>{
       const el=[...document.querySelectorAll('.card.agt')].find(x=>x.dataset.tipo==='war');
-      return el?{title:el.querySelector('.agl1 b')?.textContent||'',cov:el.querySelector('.gcov')?.textContent||''}:null;
+      return el?{title:el.querySelector('.agtit')?.textContent||'',cov:el.querySelector('.gcov')?.textContent||''}:null;
     });
     chk(war&&/40\.000/.test(war.title)&&!/^Gioco$/.test(war.title),'card Warhammer mostra la versione');
     await p.screenshot({path:path.join(OUT,'04-card-warhammer-versione.png'),fullPage:true});
@@ -216,7 +223,8 @@ const seed=async(p,opt={})=>{
   const brand=fs.readFileSync(path.join(__dirname,'../brand.js'),'utf8');
   const {APP_VERSION,swCache}=require('./appver');chk(!!APP_VERSION&&swCache(),'APP_VERSION dal codice, cache SW allineata');
   await b.close();
+  srv.close();
   console.log(`\n${ok}/${n} controlli`);
   console.log('screenshot:',fs.readdirSync(OUT).filter(f=>f.endsWith('.png')).sort().join(', '));
   process.exit(ok===n?0:1);
-})().catch(e=>{console.error(e);process.exit(1)});
+})().catch(e=>{try{srv.close()}catch(x){}console.error(e);process.exit(1)});

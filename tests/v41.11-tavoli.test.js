@@ -1,8 +1,12 @@
 // node tests/v41.11-tavoli.test.js — anteprima tipi tavolo (porta 8811)
-const pw=require('playwright-core'),fs=require('fs'),path=require('path');
+const pw=require('playwright-core'),fs=require('fs'),path=require('path'),http=require('http');
+const ROOT=path.join(__dirname,'..');
 const OUT='/workspace/pergioco-mockups/ux/v41.11-tavoli';
 const BASE='http://127.0.0.1:8811/';
 fs.mkdirSync(OUT,{recursive:true});
+const T={'.js':'text/javascript','.css':'text/css','.html':'text/html','.json':'application/json','.png':'image/png','.svg':'image/svg+xml','.woff2':'font/woff2'};
+const srv=http.createServer((q,r)=>{let p=decodeURIComponent((q.url||'/').split('?')[0]);if(p==='/')p='/index.html';
+  fs.readFile(path.join(ROOT,p),(e,b)=>{if(e){r.writeHead(404);r.end();return}r.writeHead(200,{'content-type':T[path.extname(p)]||'application/octet-stream'});r.end(b)})});
 let ok=0,n=0;const chk=(c,m)=>{n++;if(c){ok++;console.log('OK',m)}else{console.error('FAIL',m);process.exitCode=1}};
 const W=ms=>new Promise(r=>setTimeout(r,ms));
 
@@ -85,6 +89,7 @@ const seed=async(p,{fullGdr=false}={})=>{
 };
 
 (async()=>{
+  await new Promise((res,rej)=>srv.listen(8811,'127.0.0.1',e=>e?rej(e):res()));
   const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox','--disable-dev-shm-usage','--lang=it-IT','--accept-lang=it-IT,it'],env:{...process.env,LANG:'it_IT.UTF-8',LC_ALL:'it_IT.UTF-8',LC_TIME:'it_IT.UTF-8',LANGUAGE:'it_IT:it'}});
 
   // 1) Gestione → Tipi di tavolo
@@ -234,7 +239,8 @@ const seed=async(p,{fullGdr=false}={})=>{
   chk(fs.existsSync(path.join(__dirname,'../supabase/migrate-v41.11.sql')),'migrazione presente');
 
   await b.close();
+  srv.close();
   console.log(`\n${ok}/${n} controlli`);
   console.log('screenshot:',fs.readdirSync(OUT).filter(f=>f.endsWith('.png')).join(', '));
   process.exit(ok===n?0:1);
-})().catch(e=>{console.error(e);process.exit(1)});
+})().catch(e=>{try{srv.close()}catch(x){}console.error(e);process.exit(1)});
