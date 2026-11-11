@@ -15,7 +15,7 @@ chk(/tables_type_guard/.test(mig)&&/Tipo pieno/.test(mig),'trigger capienza DB')
 chk(/type_id='board'/.test(mig),'migrazione tavoli esistenti → board');
 chk(/is_staff\(\)/.test(mig)&&/revoke all on table public\.table_types from public, anon/.test(mig),'RLS staff + anon revocato');
 chk(/tavoli_cfg_valid/.test(mig)&&/whatsapp/.test(mig),'config messaggio + WhatsApp');
-chk(/mode === "rpg"/.test(meta)&&/type=rpgitem/.test(meta),'bgg-meta mode rpg → rpgitem');
+chk(/mode === "rpg"/.test(meta)&&/type=rpg,rpgitem/.test(meta)&&!/type=rpgitem&/.test(meta),'bgg-meta mode rpg → rpg e rpgitem');
 chk(/kind==='gdr'/.test(js)&&/kind==='war'/.test(js)&&/TT\.remaining/.test(js),'UI tipi GDR/Warhammer + remaining');
 chk(/gestTavoli|views\.tavolitipi/.test(js),'Gestione → Tipi di tavolo');
 chk(/ora_lab|'Orario della serata'/.test(js)&&/tt_ora_lab/.test(brand),'etichetta Orario della serata');

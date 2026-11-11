@@ -87,8 +87,10 @@ export async function bggXml(
   return { status: 504, body: "" };
 }
 
-export function parseSearch(xml: string) {
-  const out: { bgg_id: number; nome: string; anno: number | null }[] = [];
+export type SearchHit = { bgg_id: number; nome: string; anno: number | null; tipo: string | null };
+
+export function parseSearch(xml: string): SearchHit[] {
+  const out: SearchHit[] = [];
   for (const m of xml.matchAll(/<item\b([^>]*)>([\s\S]*?)<\/item>/g)) {
     const attrs = m[1], block = m[2];
     const id = int((attrs.match(/\bid="(\d+)"/) || [])[1], 1, 99999999);
@@ -97,7 +99,56 @@ export function parseSearch(xml: string) {
     const y = block.match(/<yearpublished[^>]*value="(\d+)"/);
     const nome = txt(decodeXml(n?.[1] || ""), 100);
     if (!nome) continue;
-    out.push({ bgg_id: id, nome, anno: int(y?.[1], 1800, 2100) });
+    const tipoRaw = (attrs.match(/\btype="([^"]*)"/) || [])[1] || "";
+    const tipo = txt(tipoRaw, 40) || null;
+    out.push({ bgg_id: id, nome, anno: int(y?.[1], 1800, 2100), tipo });
+  }
+  return out;
+}
+
+/** Normalizza per confrontare query e titoli RPGGeek (&, punteggiatura, maiuscole). */
+export function rpgNorm(s: string) {
+  return String(s || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/&/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+/**
+ * Ordina i risultati della ricerca GDR: prima i sistemi (type=rpg),
+ * poi i manuali (rpgitem), con priorità alle corrispondenze sul nome.
+ * Così «Dungeons & Dragons (5th Edition)» (rpg 17181) emerge rispetto
+ * ai tanti manuali/avventure che l'API restituisce per la stessa query.
+ */
+export function rankRpgSearch(items: SearchHit[], q: string): SearchHit[] {
+  const nq = rpgNorm(q);
+  const toks = nq.split(/\s+/).filter((t) => t.length > 1);
+  const q5 = /\b(5e|5th|fifth)\b/.test(nq);
+  const qdd = /d\s*&\s*d|\bdnd\b/i.test(q);
+  const scored = items.map((it) => {
+    const n = rpgNorm(it.nome);
+    let s = 0;
+    if (nq) {
+      if (n === nq) s += 100;
+      else if (n.startsWith(nq)) s += 40;
+      else if (n.includes(nq)) s += 20;
+      if (toks.length) s += Math.round((20 * toks.filter((t) => n.includes(t)).length) / toks.length);
+    }
+    if ((it.tipo || "") === "rpg") s += 30;
+    if (q5 && /\b(5e|5th|fifth)\b/.test(n)) s += 25;
+    if (qdd && n.includes("dungeons") && n.includes("dragons")) s += 25;
+    return { it, s };
+  });
+  scored.sort((a, b) => b.s - a.s || ((a.it.tipo === "rpg" ? 0 : 1) - (b.it.tipo === "rpg" ? 0 : 1)) || a.it.nome.localeCompare(b.it.nome, "en"));
+  const seen = new Set<number>();
+  const out: SearchHit[] = [];
+  for (const { it } of scored) {
+    if (seen.has(it.bgg_id)) continue;
+    seen.add(it.bgg_id);
+    out.push(it);
   }
   return out;
 }

@@ -2,7 +2,7 @@
 // Rimosso: api.geekdo.com, search/boardgame scraping, Wikidata come canale dati giochi.
 // Cache server su public.bgg_api_cache (TTL). Token mai nel client / mai nei log.
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
-import { bggXml, int, parseSearch, parseThing, txt } from "../_shared/bgg.ts";
+import { bggXml, int, parseSearch, parseThing, rankRpgSearch, txt } from "../_shared/bgg.ts";
 
 const ORIGINS = ["https://app.pergioco.org", "https://vincenzoassenza-blip.github.io", "http://localhost:8765", "http://localhost:8799", "http://127.0.0.1:8799"];
 const cors = (o: string | null) => ({
@@ -44,15 +44,21 @@ async function cercaBgg(admin: SB, q: string) {
   return items;
 }
 
-/** RPGGeek: XML API2 search type=rpgitem (stesso host/token BGG). */
+/**
+ * RPGGeek: XML API2 search type=rpg,rpgitem (stesso host/token BGG).
+ * type=rpg è il sistema/edizione (es. «Dungeons & Dragons (5th Edition)», id 17181);
+ * type=rpgitem sono i prodotti (manuali, avventure). Solo rpgitem non trova
+ * quello che l'utente vede come scheda RPG sul sito. encodeURIComponent
+ * protegge la «&» nella query. Cache v2 perché i payload vecchi erano solo rpgitem.
+ */
 async function cercaRpg(admin: SB, q: string) {
-  const key = "rpgsearch:" + q.toLowerCase();
+  const key = "rpgsearch-v2:" + q.toLowerCase();
   const hit = await cacheGet(admin, key);
   if (Array.isArray(hit)) return hit.slice(0, 10);
   const token = await requireToken();
-  const r = await bggXml(`/xmlapi2/search?type=rpgitem&query=${encodeURIComponent(q)}`, token, { accept202: false, maxAttempt: 4 });
+  const r = await bggXml(`/xmlapi2/search?type=rpg,rpgitem&query=${encodeURIComponent(q)}`, token, { accept202: false, maxAttempt: 4 });
   if (r.status !== 200) throw new Error(`BGG ${r.status}`);
-  const items = parseSearch(r.body).slice(0, 10);
+  const items = rankRpgSearch(parseSearch(r.body), q).slice(0, 10);
   await cacheSet(admin, key, items, TTL_SEARCH_MS);
   return items;
 }
