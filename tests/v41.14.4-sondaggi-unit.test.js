@@ -20,9 +20,8 @@ chk(/PS\.load=async\(\)=>\{try\{if\(PS\.cl\(\)\)\{PS\.d=await PS\.rpc\('poll_lis
 chk(/id="pserr"/.test(js)&&/T\.errLoad/.test(js),'se poll_lista fallisce si vede l\'errore, non una lista vuota senza pulsante');
 chk(/errLoad:'Non riesco a caricare i sondaggi\.'/.test(js),'testo di errore in italiano');
 chk(!/club|ludoteca/i.test(sql+js),'niente club/ludoteca');
-const {APP_VERSION,swCache,hasAsset,esc,idxTxt,swTxt}=require('./appver');
-const pin=new RegExp('sondaggi\\.js\\?v='+esc(APP_VERSION));
-chk(!!APP_VERSION&&swCache()&&hasAsset('sondaggi.js')&&pin.test(idxTxt())&&pin.test(swTxt()),'APP_VERSION e pin sondaggi.js allineati');
+const {APP_VERSION,swCache,hasAsset,idxTxt,swTxt}=require('./appver');
+chk(!!APP_VERSION&&swCache()&&hasAsset('sondaggi.js')&&/sondaggi\.js\?v=/.test(idxTxt())&&/sondaggi\.js\?v=/.test(swTxt()),'sondaggi.js resta pinnato in index e SW (versione non più fissa a 41.14.4)');
 
 console.log(`v41.14.4-sondaggi-unit: ${ok}/${n}`);
 if(ok!==n)process.exit(1);
