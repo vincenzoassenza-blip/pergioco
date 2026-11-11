@@ -247,9 +247,9 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
   const altri=pl.filter(p=>p.memberId!==t.hostId).map(p=>p.memberId?mLink(p.memberId,esc(mn(p.memberId))):esc(p.name)+' <span class="muted">(ospite)</span>');
   const st=op?(full?'<span class="agst">Pieno</span>':`<span class="agst free">${t.seats-n} ${t.seats-n===1?'posto libero':'posti liberi'}</span>`):'<span class="agst">✅ Chiuso</span>';
   // v41.13.3 — scheda compatta: titolo max 2 righe, posti in alto a destra, azioni in ⋯
-  let act='';if(op){if(seduto)act+=`<button type="button" class="s agbtn" data-lv="${esc(t.id)}">Lascia il posto</button>`;else if(meM&&!full)act+=`<button type="button" class="p agbtn" data-sd="${esc(t.id)}">Siediti</button>`;
+  let act='';if(op){if(seduto&&!(host&&!staff))act+=`<button type="button" class="s agbtn" data-lv="${esc(t.id)}">Lascia il posto</button>`;else if(meM&&!full&&!seduto)act+=`<button type="button" class="p agbtn" data-sd="${esc(t.id)}">Siediti</button>`;
    act+=`<button type="button" class="s agbtn agshare" data-sh="${esc(t.id)}">Condividi</button>`;
-   if(host||staff){act=`${host||staff?`<button type="button" class="s agchiudi" data-c="${esc(t.id)}">🏁 Chiudi e registra</button>`:''}`+act+`<button type="button" class="agmore" data-agmore="${esc(t.id)}" aria-label="Altre azioni" aria-haspopup="menu" aria-expanded="false">⋯</button><div class="agx" hidden><button type="button" data-o="${esc(t.id)}"${full?' disabled':''}>+ Ospite</button>${staff?`<button type="button" data-j="${esc(t.id)}">👥 Giocatori</button>`:''}${staff&&!isMod()?`<button type="button" data-x="${esc(t.id)}">🗑 Elimina</button>`:''}</div>`}}
+   if(host||staff){act=`${host||staff?`<button type="button" class="s agchiudi" data-c="${esc(t.id)}">🏁 Chiudi e registra</button>`:''}`+act+`<button type="button" class="agmore" data-agmore="${esc(t.id)}" aria-label="Altre azioni" aria-haspopup="menu" aria-expanded="false">⋯</button><div class="agx" hidden><button type="button" data-o="${esc(t.id)}"${full?' disabled':''}>+ Ospite</button>${staff?`<button type="button" data-j="${esc(t.id)}">👥 Giocatori</button>`:''}${host&&!staff?`<button type="button" data-cancel="${esc(t.id)}">Annulla tavolo</button>`:''}${staff&&!isMod()?`<button type="button" data-x="${esc(t.id)}">🗑 Elimina</button>`:''}</div>`}}
   const typ=(typeof TT!=='undefined'&&TT.byId)?TT.byId(t.typeId||'board'):null;
   const cov=(typeof TT!=='undefined'&&TT.cov)?TT.cov(t,gs):(typeof gCov==='function'?gCov(g):'<div class="gcov">🎲</div>');
   const typLab=typ&&typ.id?'<span class="ttbadge agtipo">'+esc((typ.icona||'')+' '+typ.nome)+'</span>':'';
@@ -287,7 +287,7 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
   agPopKd=e=>{if(e.key==='Escape'){e.preventDefault();closeAgPop();btn.focus();return}if(e.key==='Tab')closeAgPop()};
   document.addEventListener('pointerdown',agPopPd,true);document.addEventListener('keydown',agPopKd,true)};
  V.querySelectorAll('.agmore').forEach(btn=>btn.onclick=ev=>{ev.preventDefault();ev.stopPropagation();const card=btn.closest('.card');if(!card)return;
-  const extras=[...card.querySelectorAll('.agx [data-o],.agx [data-j],.agx [data-x]')].map(el=>({lab:el.textContent.trim(),danger:el.hasAttribute('data-x'),disabled:el.disabled,act:()=>el.click()}));
+  const extras=[...card.querySelectorAll('.agx [data-o],.agx [data-j],.agx [data-cancel],.agx [data-x]')].map(el=>({lab:el.textContent.trim(),danger:el.hasAttribute('data-x')||el.hasAttribute('data-cancel'),disabled:el.disabled,act:()=>el.click()}));
   openAgPop(btn,extras,'menu')});
  const tipobtn=$('#agtipobtn');
  if(tipobtn)tipobtn.onclick=ev=>{ev.preventDefault();ev.stopPropagation();const tutto=(typeof TT!=='undefined'&&TT.t)?TT.t('tutto'):'Tutto';
@@ -299,13 +299,15 @@ async serata(){const gs=await DB.games(),all=await DB.members(),ms=all.filter(m=
  const T=async id=>(await DB.allTables()).find(t=>t.id===id);
  V.querySelectorAll('[data-sd]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.sd);if(!t||!meM||t.status!=='open')return;const pl=t.players||[];if(pl.some(p=>p.memberId===meM.id))return go('serata');if(pl.length>=t.seats)return toast('Tavolo pieno');
   try{await DB.seat(t.id,'join',meM.id);toast('Ti sei seduto al tavolo')}catch(e){toast('⚠️ '+(e.message||'Non è stato possibile sederti'))}go('serata')});
- V.querySelectorAll('[data-lv]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.lv);if(!t||!meM)return;if(t.hostId===meM.id&&!await ask('Hai aperto tu questo tavolo: vuoi davvero lasciarlo?'))return;
+ V.querySelectorAll('[data-lv]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.lv);if(!t||!meM)return;if(t.hostId===meM.id&&!adminMode()){toast('Non puoi lasciare il tavolo che hai aperto: annullalo');return}
   try{await DB.seat(t.id,'leave',meM.id);toast('Hai lasciato il posto')}catch(e){toast('⚠️ '+(e.message||'Non è stato possibile lasciare il posto'))}go('serata')});
  V.querySelectorAll('[data-j]').forEach(b=>b.onclick=async()=>{if(!adminMode())return;const t=await T(b.dataset.j);if(!t)return;const guests=(t.players||[]).filter(p=>!p.memberId);const ids=await pickMembers(ms,t.players.filter(p=>p.memberId).map(p=>p.memberId),'Giocatori al tavolo',t.seats-guests.length);if(!ids)return;
   if(!ids.includes(t.hostId)&&!await ask('Il padrone di casa lascia il tavolo?'))return;await DB.saveTable({id:t.id,players:[...ids.map(memberId=>({memberId})),...guests]});go('serata')});
  V.querySelectorAll('[data-o]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.o);if(!t)return;if(!(adminMode()||meM&&meM.id===t.hostId))return;if(t.players.length>=t.seats)return toast('Tavolo pieno');const n=(await askText('Nome dell\'ospite')||'').trim().slice(0,40);if(!n)return;await DB.saveTable({id:t.id,players:[...t.players,{guest:true,name:n}]});go('serata')});
  V.querySelectorAll('[data-c]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.c);if(!t)return;if(!(adminMode()||meM&&meM.id===t.hostId))return;
   views.nuova({fromTable:t.id,gameId:t.gameId,date:t.date,players:t.players.map(p=>p.memberId?{memberId:p.memberId}:{guest:true,name:p.name})})});
+ V.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.cancel);if(!t||!meM||meM.id!==t.hostId||adminMode())return;if(t.status!=='open')return toast('Il tavolo è già chiuso');if(!await ask('Vuoi annullare questo tavolo? I posti prenotati verranno liberati e il tavolo sparirà dall\'Agenda.'))return;
+  try{await DB.cancelTable(t.id);toast('Tavolo annullato')}catch(e){toast('⚠️ '+(e.message||'Non è stato possibile annullare il tavolo'))}go('serata')});
  V.querySelectorAll('[data-x]').forEach(b=>b.onclick=async()=>{if(!adminMode()||isMod())return;if(!await ask('Eliminare il tavolo?'))return;await DB.deleteTable(b.dataset.x);toast('Tavolo eliminato');go('serata')});
  V.querySelectorAll('[data-sh]').forEach(b=>b.onclick=async()=>{const t=await T(b.dataset.sh);if(!t)return;await condividiTavolo(t,gs)})},
 async config(){if(!adminMode()||isMod()){V.innerHTML='<div class="card"><p class="muted">🔒 Solo gli admin possono modificare la configurazione.</p></div>';return}
