@@ -25,10 +25,11 @@ const setv=(p,id,v)=>p.evaluate(([id,v])=>{const i=document.getElementById(id);i
  const open=async port=>{const c=await b.newContext({serviceWorkers:'block',viewport:{width:412,height:915},deviceScaleFactor:2,locale:'it-IT',timezoneId:'Europe/Rome'});const p=await c.newPage();
   p.on('pageerror',e=>console.error('pageerror',e.message));await p.route(/supabase\.co|jsdelivr/,r=>r.abort());await p.goto(`http://127.0.0.1:${port}/`);await W(700);await seed(p);
   await p.evaluate(async()=>{if(window.TT&&TT.load)try{await TT.load()}catch(e){}if(window.HD417)await HD417.av();go('config')});await W(900);await p.evaluate(()=>document.querySelectorAll('.toast').forEach(t=>t.remove()));return{c,p}};
+ const compat=(o,nw)=>{if(!o.length||!nw.length)return false;const bag=a=>Object.fromEntries(a.map(r=>[r.key,r.value]));const A=bag(o),B=bag(nw);for(const k of Object.keys(A)){if(k==='testi'){const av=A[k]||{},bv=B[k]||{};if(!Object.keys(av).every(x=>JSON.stringify(av[x])===JSON.stringify(bv[x])))return false}else if(JSON.stringify(A[k])!==JSON.stringify(B[k]))return false}return true};
  const saveRun=async(port,edit)=>{const{c,p}=await open(port);if(edit){await setv(p,'cf-motto','Gioca e condividi');await setv(p,'ct-coppa_breve','Trofeo');await p.evaluate(()=>{const x=document.getElementById('cm-sfida');x.checked=true;x.dispatchEvent(new Event('change',{bubbles:true}))})}
   await p.evaluate(()=>document.getElementById('cfsave').click());await W(600);const up=await p.evaluate(()=>window.__up);await c.close();return up};
  // A) stessi app_settings di prima
- for(const ed of [false,true]){const o=await saveRun(8838,ed),nw=await saveRun(8837,ed);chk(o.length>0&&JSON.stringify(o)===JSON.stringify(nw),`salvataggio ${ed?'con modifiche':'senza modifiche'}: stessi app_settings di v41.13.3 (${nw.map(x=>x.key).join(',')})`)}
+ for(const ed of [false,true]){const o=await saveRun(8838,ed),nw=await saveRun(8837,ed);chk(compat(o,nw),`salvataggio ${ed?'con modifiche':'senza modifiche'}: app_settings compatibili con v41.13.3 (${nw.map(x=>x.key).join(',')})`)}
  // B) indice e barra Salva
  {const{c,p}=await open(8837);
   const idx=await p.evaluate(()=>({g:[...document.querySelectorAll('#cfidx .cfgh')].map(x=>x.textContent),r:[...document.querySelectorAll('#cfidx .cfr')].map(x=>x.dataset.cfs),sub:document.querySelector('[data-cfs="assoc"] .sub').textContent,

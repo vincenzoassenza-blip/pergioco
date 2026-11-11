@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
   // Solo admin (is_admin). I moderatori non passano.
   if (!u?.user || adm !== true) return new Response('{"error":"solo admin"}', { status: 403, headers: h });
 
-  const mode = body?.mode === "user" ? "user" : "collection";
+  const mode = body?.mode === "user" ? "user" : body?.mode === "rpg" ? "rpg" : "collection";
   const username = cleanUsername(body?.username);
   if (!username) return new Response('{"error":"username non valido"}', { status: 400, headers: h });
 
@@ -84,6 +84,26 @@ Deno.serve(async (req) => {
         expires_at: new Date(Date.now() + TTL_USER_MS).toISOString(),
       });
       return new Response(JSON.stringify({ ...payload, cached: false }), { headers: h });
+    } catch {
+      return new Response(JSON.stringify({ error: "BGG non raggiungibile" }), { status: 502, headers: h });
+    }
+  }
+
+  // v41.15 — collezione RPGGeek (subtype=rpgitem, own=1): stessi account BGG/RPGGeek.
+  if (mode === "rpg") {
+    const key = "rpgcollection:" + username.toLowerCase();
+    try {
+      const { data: cached } = await admin.from("bgg_api_cache").select("payload,expires_at").eq("key", key).maybeSingle();
+      if (cached?.payload && new Date(cached.expires_at).getTime() > Date.now()) {
+        return new Response(JSON.stringify({ items: cached.payload, cached: true }), { headers: h });
+      }
+      const a = await bggXml(`/xmlapi2/collection?username=${encodeURIComponent(username)}&own=1&subtype=rpgitem`, token, { maxAttempt: 8, accept202: true });
+      if (a.status !== 200) return new Response(JSON.stringify({ error: `BGG ${a.status}` }), { status: 502, headers: h });
+      const seen = new Set<number>();
+      const uniq = parseCollectionItems(a.body, false).filter((x) => !seen.has(x.bgg_id) && seen.add(x.bgg_id));
+      if (uniq.length > 2000) return new Response('{"error":"collezione troppo grande"}', { status: 413, headers: h });
+      await admin.from("bgg_api_cache").upsert({ key, payload: uniq, created_at: new Date().toISOString(), expires_at: new Date(Date.now() + TTL_MS).toISOString() });
+      return new Response(JSON.stringify({ items: uniq, cached: false }), { headers: h });
     } catch {
       return new Response(JSON.stringify({ error: "BGG non raggiungibile" }), { status: 502, headers: h });
     }

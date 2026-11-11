@@ -1,10 +1,10 @@
-// v41.10.2 — Importa giochi da BoardGameGeek (Gestione, solo admin).
-// Via File (CSV) e Nome utente (Edge bgg-collection + verifica user). Logo Powered by BGG con link ufficiale.
-// Solo textContent / createElement. Testi da TXT (chiavi ibgg_*).
+// v41.15 — Importa giochi da BoardGameGeek e RPGGeek (Gestione, solo admin).
+// Via File (CSV/Excel) e Nome utente (Edge bgg-collection, mode collection o rpg). Logo Powered by BGG per BGG.
+// Solo textContent / createElement. Testi da TXT (chiavi ibgg_* e irpg_*).
 (()=>{const DEF={titolo:'📥 Importa da BoardGameGeek',sub:'File CSV/Excel o nome utente BGG',soloAdmin:'🔒 Solo gli admin possono importare i giochi.',intro:'I giochi devono avere un ID BGG. Prima dell\'import vedi l\'anteprima e scegli cosa aggiungere.',
  viaFile:'Carica un file',viaFileSub:'CSV o Excel esportato da BGG → Collection → Export',viaUser:'Nome utente BGG',viaUserSub:'Recupera la collezione «owned» dall\'account',viaUserSoon:'Disponibile a breve',viaUserHelp:'Inserisci il nome utente BoardGameGeek (collezione owned). Solo admin.',viaUserGo:'Recupera collezione',viaUserWait:'Recupero da BoardGameGeek… può richiedere un minuto.',viaUserErr:'Collezione non recuperata. Controlla il nome utente e riprova.',viaUserCheck:'Verifico…',viaUserOk:'Utente trovato',viaUserMissing:'Nome utente non trovato su BGG',viaUserRecent:'Usati di recente',viaUserRemove:'Rimuovi',attrib:'Dati giochi da BoardGameGeek',
  fileHelp:'Su BoardGameGeek: Collection → Export. Accettiamo CSV, massimo 2 MB e 2.000 righe.',filePick:'Tocca per scegliere il file',fileHint:'ⓘ Non condividiamo il file: lo leggiamo solo sul telefono per costruire l\'anteprima.',
- xlsx:'I file Excel (.xlsx) non sono ancora letti qui: aprilo e salvalo come CSV, poi carica il CSV.',troppoGrande:'File troppo grande (massimo 2 MB).',troppoRighe:'Troppe righe (massimo 2.000).',nessunId:'Nessun gioco con ID BGG valido nel file.',continua:'Continua',annulla:'Annulla',
+ xlsx:'File Excel non leggibile. Esportalo di nuovo oppure salvalo come CSV.',troppoGrande:'File troppo grande (massimo 2 MB).',troppoRighe:'Troppe righe (massimo 2.000).',nessunId:'Nessun gioco con ID BGG valido nel file.',continua:'Continua',annulla:'Annulla',
  anteprima:'Anteprima import',letti:'giochi letti',nuovi:'nuovi',presenti:'già presenti',espansioni:'espansioni',mostra:'Mostra',tutto:'Tutto',filtroNuovi:'Nuovi',filtroPres:'Già presenti',filtroExp:'Espansioni',
  selNuovi:'Seleziona nuovi',desel:'Deseleziona tutto',importa:'Importa {n} giochi selezionati',maxSel:'Puoi importare al massimo 500 giochi per volta: deselezionane qualcuno.',
  tagNuovo:'nuovo',tagDup:'già presente',tagExp:'espansione',detAnno:'ID BGG {id}',giaColl:'già in collezione · ID {id}',expAnno:'espansione · {y}',
@@ -15,8 +15,10 @@
  const escTxt=s=>String(s||'').replace(/<[^>]*>/g,'').replace(/[<>]/g,'').trim().slice(0,100);
  const clamp=(v,lo,hi)=>{const n=+v;return Number.isInteger(n)&&n>=lo&&n<=hi?n:null};
  const MAXB=2*1024*1024,MAXR=2000,MAXI=500;
- const ST={step:'home',rows:[],filter:'all',sel:new Set(),detail:null,result:null,userDraft:'',lastUser:null};
- const reset=()=>{ST.step='home';ST.rows=[];ST.filter='all';ST.sel=new Set();ST.detail=null;ST.result=null;ST.userDraft='';ST.lastUser=null};
+ const ST={step:'home',rows:[],filter:'all',sel:new Set(),detail:null,result:null,userDraft:'',lastUser:null,src:'bgg'};
+ const reset=()=>{ST.step='home';ST.rows=[];ST.filter='all';ST.sel=new Set();ST.detail=null;ST.result=null;ST.userDraft='';ST.lastUser=null;ST.src=ST.src||'bgg'};
+ const isRpg=()=>ST.src==='rpg';
+ const tr=k=>{if(isRpg()){const K='irpg_'+k;if(typeof TXT!=='undefined'&&TXT.g&&typeof TXT_DEF!=='undefined'&&TXT_DEF[K])return TXT.g(K);if(typeof TXT_DEF!=='undefined'&&TXT_DEF[K])return TXT_DEF[K]}return t(k)};
 
  const can=()=>typeof adminMode==='function'&&adminMode()&&typeof isMod==='function'&&!isMod();
 
@@ -50,96 +52,111 @@
  const HDR={id:['objectid','object id','id','bggid','bgg_id','gameid'],name:['objectname','object name','name','title','gamename'],
   year:['yearpublished','year published','year'],minp:['minplayers','min players','minplayer'],maxp:['maxplayers','max players','maxplayer'],
   mint:['minplaytime','min playtime','minplayingtime'],maxt:['maxplaytime','max playtime','maxplayingtime'],pt:['playingtime','playing time','avgplayingtime'],
-  age:['minage','min age','age'],thumb:['thumbnail','image','imageurl','image url'],type:['itemtype','subtype','type','objecttype']};
+  age:['minage','min age','age'],thumb:['thumbnail','image','imageurl','image url'],type:['itemtype','subtype','type','objecttype'],sys:['rpgsystem','rpg system','system','sistema','rpg'],genre:['rpggenre','rpg genre','genre','genere','rpgsetting'],pub:['rpgpublisher','publisher','editore'],lang:['language','languages','lingua','lang']};
  const normH=h=>String(h||'').toLowerCase().replace(/[\s_-]+/g,' ').trim();
  const mapHdr=hs=>{const m={};Object.keys(HDR).forEach(k=>{const i=hs.findIndex(h=>HDR[k].includes(normH(h)));if(i>=0)m[k]=i});return m};
  function parseCsv(text){const rows=[];let i=0,cur='',row=[],q=false;const push=()=>{row.push(cur);cur=''};const end=()=>{push();if(row.some(c=>c.trim()))rows.push(row);row=[]};
   while(i<text.length){const c=text[i];if(q){if(c==='"'){if(text[i+1]==='"'){cur+='"';i++}else q=false}else cur+=c}
    else if(c==='"')q=true;else if(c===','||c===';'){push();if(c===';')end()}else if(c==='\n'){if(text[i-1]!=='\r')end()}else if(c!=='\r')cur+=c;i++}
   if(cur||row.length)end();return rows}
- function rowsFromCsv(text){const raw=parseCsv(text);if(raw.length<2)return[];const map=mapHdr(raw[0]);if(map.id==null||map.name==null)return null;
-  const out=[],seen=new Set();
+ const splitTxt=(v,n,len)=>{const a=[...new Set(String(v||'').split(/[,;/|]/).map(s=>s.replace(/[<>]/g,'').trim()).filter(Boolean).map(s=>s.slice(0,len)))];return a.slice(0,n)};
+ function rowsFromCsv(text,kind){const raw=parseCsv(text);if(raw.length<2)return[];const map=mapHdr(raw[0]);if(map.id==null||map.name==null)return null;
+  const out=[],seen=new Set(),force=kind==='gdr';
   for(let r=1;r<raw.length&&r<=MAXR;r++){const cells=raw[r],id=clamp(cells[map.id],1,99999999);if(!id||seen.has(id))continue;seen.add(id);
    const name=escTxt(cells[map.name]);if(!name)continue;
-   let min=clamp(cells[map.minp],1,100)||1,max=clamp(cells[map.maxp],1,100)||min;if(max<min)max=min;
+   const typ=normH(cells[map.type]||''),rpg=force||/rpgitem|\brpg\b/.test(typ),exp=!rpg&&/expansion|boardgameexpansion/.test(typ);
+   let min=clamp(cells[map.minp],1,100)||(rpg?2:1),max=clamp(cells[map.maxp],1,100)||(rpg?6:min);if(max<min)max=min;
    let minT=clamp(cells[map.mint],0,1440),maxT=clamp(cells[map.maxt],0,1440),pt=clamp(cells[map.pt],0,1440);
-   if(minT==null&&maxT==null&&pt!=null){minT=maxT=pt}if(minT==null)minT=maxT||30;if(maxT==null)maxT=minT;if(maxT<minT)maxT=minT;
-   const typ=normH(cells[map.type]||''),exp=/expansion|boardgameexpansion/.test(typ);
+   if(minT==null&&maxT==null&&pt!=null){minT=maxT=pt}if(minT==null)minT=maxT||(rpg?120:30);if(maxT==null)maxT=minT||(rpg?240:minT);if(maxT<minT)maxT=minT;
    const th=String(cells[map.thumb]||'').trim();const thumb=/^https:\/\/cf\.geekdo-images\.com\/[A-Za-z0-9_./%=:()-]+$/.test(th)&&th.length<=400?th:null;
-   out.push({bggId:id,name,year:clamp(cells[map.year],1800,2100),min,max,minT,maxT,playTime:pt||maxT,age:clamp(cells[map.age],0,99)||0,isExp:exp,thumb,coop:false})}
+   const row={bggId:id,name,year:clamp(cells[map.year],1800,2100),min,max,minT,maxT,playTime:pt||maxT,age:clamp(cells[map.age],0,99)||(rpg?12:0),isExp:exp,thumb,coop:false,kind:rpg?'gdr':'gdt'};
+   if(rpg){row.rpgSystem=splitTxt(cells[map.sys],10,100);row.rpgGenre=splitTxt(cells[map.genre],20,60);row.rpgPublisher=splitTxt(cells[map.pub],10,100);row.rpgLang=splitTxt(cells[map.lang],10,40)}
+   out.push(row)}
   return out}
+ async function textFromFile(f){const excel=/\.xlsx$/i.test(f.name)||/sheet|excel/i.test(f.type);
+  if(!excel)return f.text();
+  const buf=await f.arrayBuffer(),u=new Uint8Array(buf);
+  if(u.length<4||u[0]!==0x50||u[1]!==0x4b)throw new Error('xlsx');
+  if(typeof loadXLSX!=='function')throw new Error('xlsx');
+  await loadXLSX();const wb=XLSX.read(buf,{type:'array'});const sh=wb.Sheets[wb.SheetNames[0]];if(!sh)throw new Error('xlsx');
+  return XLSX.utils.sheet_to_csv(sh)}
 
  async function enrichStatus(list){const gs=await DB.games(),have=new Set(gs.filter(g=>g.bggId).map(g=>+g.bggId));
   return list.map(g=>({...g,status:have.has(+g.bggId)?'dup':g.isExp?'exp':'new'}))}
 
  // --- render ---
  function top(title){const h=el('div','hrow');h.append(el('h2',null,title));const b=el('button','s');b.type='button';b.textContent='← Gestione';b.onclick=()=>go('altro');h.append(b);return h}
- function home(){V.replaceChildren();V.append(top(t('titolo')));
+ function srcBar(){const bar=el('div','seg ibggsrc');bar.setAttribute('role','group');bar.setAttribute('aria-label','Fonte');
+  [['bgg',(typeof TXT!=='undefined'&&TXT.g&&typeof TXT_DEF!=='undefined'&&TXT_DEF.ibgg_src)?TXT.g('ibgg_src'):'BoardGameGeek'],['rpg',(typeof TXT!=='undefined'&&TXT.g&&typeof TXT_DEF!=='undefined'&&TXT_DEF.irpg_src)?TXT.g('irpg_src'):'RPGGeek']].forEach(([v,l])=>{const b=el('button');b.type='button';b.textContent=l;b.className=ST.src===v?'on':'';b.setAttribute('aria-pressed',ST.src===v?'true':'false');b.onclick=()=>{ST.src=v;draw()};bar.append(b)});return bar}
+function home(){V.replaceChildren();V.append(top(isRpg()?tr('titolo'):t('titolo')));
   if(!can()){V.append(el('div','card',t('soloAdmin')));return}
-  V.append(el('p','muted sm',t('intro')));
+  V.append(srcBar(),el('p','muted sm',t('intro')));
   const c=el('div','card');
-  const f=el('div','alr albtn');f.append(el('span','ic','📄'),(()=>{const x=el('span','t');x.append(el('b',null,t('viaFile')),el('span','sub',t('viaFileSub')));return x})(),el('span','ar','▸'));
+  const f=el('div','alr albtn');f.append(el('span','ic','📄'),(()=>{const x=el('span','t');x.append(el('b',null,t('viaFile')),el('span','sub',tr('viaFileSub')));return x})(),el('span','ar','▸'));
   act(f,()=>{ST.step='file';draw()});c.append(f);
-  const u=el('div','alr albtn');u.append(el('span','ic','👤'),(()=>{const x=el('span','t');x.append(el('b',null,t('viaUser')),el('span','sub',t('viaUserSub')));return x})(),el('span','ar','▸'));
+  const u=el('div','alr albtn');u.append(el('span','ic','👤'),(()=>{const x=el('span','t');x.append(el('b',null,tr('viaUser')),el('span','sub',tr('viaUserSub')));return x})(),el('span','ar','▸'));
   act(u,()=>{ST.step='user';draw()});c.append(u);V.append(c);V.append(attrib())}
-function attrib(){const w=el('div','ibggpwr');const a=el('a');a.href='https://boardgamegeek.com';a.target='_blank';a.rel='noopener noreferrer';a.title=t('attrib');
+function attrib(){const w=el('div','ibggpwr');
+  if(isRpg()){const a=el('a');a.href='https://rpggeek.com';a.target='_blank';a.rel='noopener noreferrer';a.textContent=tr('attrib');w.append(a);return w}
+  const a=el('a');a.href='https://boardgamegeek.com';a.target='_blank';a.rel='noopener noreferrer';a.title=t('attrib');
   const img=el('img');img.src='img/powered-by-bgg.png';img.alt='Powered by BoardGameGeek';img.width=120;img.height=36;img.loading='lazy';a.append(img);w.append(a);return w}
-function userStep(){V.replaceChildren();V.append(top(t('viaUser')),el('p','muted sm',t('viaUserHelp')));
-  const box=el('div','card');const lb=el('label',null,t('viaUser'));const inp=el('input');inp.type='text';inp.maxLength=UMAX;inp.autocomplete='off';inp.spellcheck=false;inp.placeholder='username';inp.setAttribute('aria-label',t('viaUser'));
+function userStep(){V.replaceChildren();V.append(top(tr('viaUser')),el('p','muted sm',tr('viaUserHelp')));
+  const box=el('div','card');const lb=el('label',null,tr('viaUser'));const inp=el('input');inp.type='text';inp.maxLength=UMAX;inp.autocomplete='off';inp.spellcheck=false;inp.placeholder='username';inp.setAttribute('aria-label',tr('viaUser'));
   if(ST.userDraft)inp.value=ST.userDraft;
   const status=el('div','ibggverify');status.setAttribute('aria-live','polite');
-  const goB=el('button','p');goB.type='button';goB.textContent=t('viaUserGo');goB.disabled=true;
+  const goB=el('button','p');goB.type='button';goB.textContent=tr('viaUserGo');goB.disabled=true;
   let timer=null,seq=0,verified=null; // verified={found,username,...}|null
-  const setBtn=()=>{const ok=verified&&verified.found&&cleanUser(inp.value)===verified.username;goB.disabled=!ok;goB.textContent=t('viaUserGo')};
-  const showWait=()=>{status.className='ibggverify wait';status.replaceChildren();status.append(document.createTextNode(t('viaUserCheck')));verified=null;setBtn()};
-  const showMissing=()=>{status.className='ibggverify err';status.replaceChildren();status.append(document.createTextNode(t('viaUserMissing')));verified={found:false};setBtn()};
+  const setBtn=()=>{const ok=verified&&verified.found&&cleanUser(inp.value)===verified.username;goB.disabled=!ok;goB.textContent=tr('viaUserGo')};
+  const showWait=()=>{status.className='ibggverify wait';status.replaceChildren();status.append(document.createTextNode(tr('viaUserCheck')));verified=null;setBtn()};
+  const showMissing=()=>{status.className='ibggverify err';status.replaceChildren();status.append(document.createTextNode(tr('viaUserMissing')));verified={found:false};setBtn()};
   const showFound=u=>{status.className='ibggverify';status.replaceChildren();
    const row=el('div','ibgguserok');const av=el('span','ibggav');const aurl=avatarOk(u.avatar);
    if(aurl){const img=el('img');img.src=aurl;img.alt='';img.width=40;img.height=40;img.loading='lazy';av.append(img)}else av.append(document.createTextNode('👤'));
    const tx=el('span','t');const full=[u.firstname,u.lastname].filter(Boolean).map(escTxt).join(' ');
    tx.append(el('b',null,escTxt(u.username||'')));
    if(full)tx.append(el('small',null,full));
-   else tx.append(el('small',null,t('viaUserOk')));
+   else tx.append(el('small',null,tr('viaUserOk')));
    row.append(av,tx);status.append(row);verified={...u,found:true,username:cleanUser(u.username||inp.value)};setBtn()};
   const clearStatus=()=>{status.className='ibggverify';status.replaceChildren();verified=null;setBtn()};
   const verify=async(reason)=>{const username=cleanUser(inp.value);ST.userDraft=username;
    if(username.length<UMIN||!URE.test(username)){clearStatus();goB.disabled=true;return}
    const my=++seq;showWait();
-   const c=DB.remote&&DB.remote.client;if(!c||!c.functions){if(my===seq){status.className='ibggverify err';status.textContent=t('viaUserErr');verified=null;setBtn()}return}
+   const c=DB.remote&&DB.remote.client;if(!c||!c.functions){if(my===seq){status.className='ibggverify err';status.textContent=tr('viaUserErr');verified=null;setBtn()}return}
    try{const{data,error}=await c.functions.invoke('bgg-collection',{body:{mode:'user',username}});if(my!==seq)return;
-    if(error||!data){status.className='ibggverify err';status.textContent=t('viaUserErr');verified=null;setBtn();return}
-    if(data.error){status.className='ibggverify err';status.textContent=t('viaUserErr');verified=null;setBtn();return}
+    if(error||!data){status.className='ibggverify err';status.textContent=tr('viaUserErr');verified=null;setBtn();return}
+    if(data.error){status.className='ibggverify err';status.textContent=tr('viaUserErr');verified=null;setBtn();return}
     if(!data.found)showMissing();else showFound({username:data.username||username,firstname:data.firstname,lastname:data.lastname,avatar:data.avatar,id:data.id})}
-   catch(e){if(my!==seq)return;status.className='ibggverify err';status.textContent=t('viaUserErr');verified=null;setBtn()}};
+   catch(e){if(my!==seq)return;status.className='ibggverify err';status.textContent=tr('viaUserErr');verified=null;setBtn()}};
   inp.oninput=()=>{ST.userDraft=cleanUser(inp.value);verified=null;setBtn();if(timer)clearTimeout(timer);timer=setTimeout(()=>verify('deb'),UDEB)};
   inp.onblur=()=>{if(timer)clearTimeout(timer);verify('blur')};
-  goB.onclick=async()=>{if(!can())return toast(t('soloAdmin'));const username=cleanUser(inp.value);if(!verified||!verified.found||username!==verified.username)return toast(t('viaUserMissing'));
-   const c=DB.remote&&DB.remote.client;if(!c||!c.functions)return toast('⚠️ Funzione non disponibile');goB.disabled=true;goB.textContent=t('viaUserWait');
-   try{const{data,error}=await c.functions.invoke('bgg-collection',{body:{username}});if(error||!data||data.error)throw new Error((data&&data.error)||'BGG');
-    const items=Array.isArray(data.items)?data.items:[];const mapped=items.map(it=>({bggId:+it.bgg_id,name:escTxt(it.nome),year:it.anno||null,min:+it.min||1,max:+it.max||1,minT:+it.minT||30,maxT:+it.maxT||30,playTime:+it.durata||null,age:+it.eta||0,isExp:!!it.exp,thumb:it.thumb||null,coop:false})).filter(g=>g.bggId&&g.name);
-    if(!mapped.length){toast(t('nessunId'));goB.disabled=false;goB.textContent=t('viaUserGo');return}
+  goB.onclick=async()=>{if(!can())return toast(t('soloAdmin'));const username=cleanUser(inp.value);if(!verified||!verified.found||username!==verified.username)return toast(tr('viaUserMissing'));
+   const c=DB.remote&&DB.remote.client;if(!c||!c.functions)return toast('⚠️ Funzione non disponibile');goB.disabled=true;goB.textContent=tr('viaUserWait');
+   try{const rpg=isRpg();const{data,error}=await c.functions.invoke('bgg-collection',{body:rpg?{username,mode:'rpg'}:{username}});if(error||!data||data.error)throw new Error((data&&data.error)||(rpg?'RPGGeek':'BGG'));
+    const items=Array.isArray(data.items)?data.items:[];const mapped=items.map(it=>{const row={bggId:+it.bgg_id,name:escTxt(it.nome),year:it.anno||null,min:+it.min||(rpg?2:1),max:+it.max||(rpg?6:(+it.min||1)),minT:+it.minT||(rpg?120:30),maxT:+it.maxT||(rpg?240:30),playTime:+it.durata||null,age:+it.eta||(rpg?12:0),isExp:rpg?false:!!it.exp,thumb:it.thumb||null,coop:false,kind:rpg?'gdr':'gdt'};
+     if(rpg){row.rpgSystem=[];row.rpgGenre=[];row.rpgPublisher=[];row.rpgLang=[]}return row}).filter(g=>g.bggId&&g.name);
+    if(!mapped.length){toast(t('nessunId'));goB.disabled=false;goB.textContent=tr('viaUserGo');return}
     await pushRecent(username);ST.lastUser=username;ST.rows=await enrichStatus(mapped);ST.filter='all';ST.sel=new Set(ST.rows.filter(r=>r.status==='new').map(r=>r.bggId));ST.step='preview';draw()}
-   catch(e){toast(t('viaUserErr'));goB.disabled=false;goB.textContent=t('viaUserGo');setBtn()}};
+   catch(e){toast(tr('viaUserErr'));goB.disabled=false;goB.textContent=tr('viaUserGo');setBtn()}};
   box.append(lb,inp,status,goB);V.append(box);
   const paintChips=(recent)=>{
    const old=V.querySelector('.ibggrecent');if(old)old.remove();
    if(!recent.length||ST.step!=='user')return;
-   const wrap=el('div','ibggrecent card');wrap.append(el('div','lab',t('viaUserRecent')));
+   const wrap=el('div','ibggrecent card');wrap.append(el('div','lab',tr('viaUserRecent')));
    const chips=el('div','ibggchips');
    recent.forEach(name=>{const chip=el('span','ibggchip');const b=el('button','chipname');b.type='button';b.textContent=name;b.onclick=()=>{inp.value=name;ST.userDraft=name;verify('chip')};
-    const x=el('button','x');x.type='button';x.textContent='×';x.setAttribute('aria-label',t('viaUserRemove')+' '+name);
+    const x=el('button','x');x.type='button';x.textContent='×';x.setAttribute('aria-label',tr('viaUserRemove')+' '+name);
     x.onclick=async e=>{e.stopPropagation();await removeRecent(name);draw()};chip.append(b,x);chips.append(chip)});
    wrap.append(chips);V.insertBefore(wrap,box.nextSibling||null)};
   paintChips(readRecentLS());
   loadRecent().then(r=>{if(ST.step==='user')paintChips(r)});
   V.append(attrib());
   if(cleanUser(inp.value).length>=UMIN)verify('init')}
- function fileStep(){V.replaceChildren();V.append(top(t('viaFile')),el('p','muted sm',t('fileHelp')));
+ function fileStep(){V.replaceChildren();V.append(top(t('viaFile')),el('p','muted sm',tr('fileHelp')));
   const box=el('div','card ibggdrop');const ic=el('div','ibggico','📎');const b=el('b',null,t('filePick'));const inp=el('input');inp.type='file';inp.accept='.csv,text/csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';inp.className='ibggfile';
-  inp.onchange=async()=>{const f=inp.files&&inp.files[0];if(!f)return;if(/\.xlsx$/i.test(f.name)||/sheet|excel/i.test(f.type)){toast(t('xlsx'));inp.value='';return}
-   if(f.size>MAXB){toast(t('troppoGrande'));return}let text;try{text=await f.text()}catch(e){toast('⚠️ File non leggibile');return}
+  inp.onchange=async()=>{const f=inp.files&&inp.files[0];if(!f)return;
+   if(f.size>MAXB){toast(t('troppoGrande'));return}let text;try{text=await textFromFile(f)}catch(e){toast(t('xlsx'));inp.value='';return}
    if((text.match(/\n/g)||[]).length>MAXR){toast(t('troppoRighe'));return}
-   const parsed=rowsFromCsv(text);if(parsed===null){toast('⚠️ Intestazioni CSV non riconosciute (servono objectid e objectname)');return}
+   const parsed=rowsFromCsv(text,isRpg()?'gdr':undefined);if(parsed===null){toast('⚠️ Intestazioni CSV non riconosciute (servono objectid e objectname)');return}
    if(!parsed.length){toast(t('nessunId'));return}
    ST.rows=await enrichStatus(parsed);ST.filter='all';ST.sel=new Set(ST.rows.filter(r=>r.status==='new').map(r=>r.bggId));ST.step='preview';draw()};
   box.append(ic,b,inp);box.onclick=e=>{if(e.target!==inp)inp.click()};V.append(box,el('p','muted sm',t('fileHint')))}
@@ -182,7 +199,7 @@ function userStep(){V.replaceChildren();V.append(top(t('viaUser')),el('p','muted
  async function doImport(){if(!can())return toast(t('soloAdmin'));const pick=ST.rows.filter(r=>ST.sel.has(r.bggId)&&r.status!=='dup').slice(0,MAXI);
   if(!pick.length)return;const btn=V.querySelector('button.p');if(btn){btn.disabled=true;btn.textContent='…'}
   let ok=0,err=0;const added=[];const have=new Set((await DB.games()).filter(g=>g.bggId).map(g=>+g.bggId));
-  const rows=pick.filter(g=>!have.has(+g.bggId)).map(g=>({name:g.name,min:g.min,max:g.max,minT:g.minT,maxT:g.maxT,age:g.age,coop:!!g.coop,isExp:!!g.isExp,playTime:g.playTime,year:g.year,bggId:g.bggId,thumb:g.thumb||null,best:[],rec:[],categories:[],mechanics:[]}));
+  const rows=pick.filter(g=>!have.has(+g.bggId)).map(g=>({name:g.name,min:g.min,max:g.max,minT:g.minT,maxT:g.maxT,age:g.age,coop:!!g.coop,isExp:!!g.isExp,playTime:g.playTime,year:g.year,bggId:g.bggId,thumb:g.thumb||null,best:[],rec:[],categories:[],mechanics:[],kind:g.kind==='gdr'?'gdr':'gdt',rpgSystem:g.kind==='gdr'?(g.rpgSystem||[]):[],rpgGenre:g.kind==='gdr'?(g.rpgGenre||[]):[],rpgPublisher:g.kind==='gdr'?(g.rpgPublisher||[]):[],rpgLang:g.kind==='gdr'?(g.rpgLang||[]):[]}));
   try{
    if(DB.remote&&DB.remote.client&&typeof DB.remote.importGamesBgg==='function'){
     try{const r=await DB.remote.importGamesBgg(rows);ok=+(r&&r.ok)||0;err=+(r&&r.err)||0;(r&&r.ids||[]).forEach(id=>added.push(id))}
@@ -194,6 +211,7 @@ function userStep(){V.replaceChildren();V.append(top(t('viaUser')),el('p','muted
   ST.result={ok,err,skip,expSkip};ST.step='done';draw();kickMeta(added)}
 
  function kickMeta(ids){const c=DB.remote&&DB.remote.client;if(!c||!c.functions||!ids.length)return;
+  if(isRpg())return;
   (async()=>{for(const id of ids.slice(0,25)){try{await c.functions.invoke('bgg-meta',{body:{game_id:id}})}catch(e){}await new Promise(r=>setTimeout(r,1600))}})()}
 
  function act(r,f){r.tabIndex=0;r.setAttribute('role','button');r.onclick=e=>{if(e.target.closest('button.ibggck'))return;f()};r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}}}
@@ -201,4 +219,4 @@ function userStep(){V.replaceChildren();V.append(top(t('viaUser')),el('p','muted
 
  views.importbgg=async function(){if(!can()){V.replaceChildren();V.append(top(t('titolo')),el('div','card',t('soloAdmin')));return}
   reset();draw()};
- window.IBGG={DEF,t,parseCsv,rowsFromCsv,MAXB,MAXR,MAXI,UMAX,UMIN,URE,cleanUser,avatarOk,draw,ST,loadRecent,saveRecent,pushRecent,removeRecent}})();
+ window.IBGG={DEF,t,tr,parseCsv,rowsFromCsv,textFromFile,MAXB,MAXR,MAXI,UMAX,UMIN,URE,cleanUser,avatarOk,draw,ST,isRpg,loadRecent,saveRecent,pushRecent,removeRecent}})();

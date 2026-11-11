@@ -847,3 +847,6 @@ header .brand,header .sub,body.adm header .brand,body.adm header .sub{padding-ri
 
 /* anteprima — Lista desideri: «Salva scadenza» e «Chiudi ora» sulla stessa riga, stessa altezza */
 .dsbtns{margin-top:10px;align-items:stretch}.dsbtns button{margin:0;width:auto;flex:1 1 0;min-height:44px}
+
+/* v41.15 — filtri GDR e inserimento da RPGGeek */
+.gmac{margin:10px 0 8px}.gexp.ggdr{color:var(--b);border-color:color-mix(in srgb,var(--b) 40%,#ccc)}.gdrc{margin:4px 0 14px;padding-bottom:12px;border-bottom:1px solid color-mix(in srgb,var(--m,#888) 22%,transparent)}.gdrc #grr{display:flex;flex-direction:column;gap:6px;margin-top:8px}.gdrhit{text-align:left}#gdrf{margin-top:8px}.ibggsrc{margin:0 0 12px}

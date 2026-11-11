@@ -11,7 +11,7 @@ const T={titSocio:'Altro',titStaff:'Gestione',account:'Il mio account',accCon:'A
  nuovo:'Nuovo socio',modifica:'Modifica socio',hint:'ⓘ L\'elenco dei soci compare dopo la ricerca.',nessuno:'Nessun socio trovato.',btnMod:'✏️ Modifica',
  tabs:{soci:['👥','Soci'],partite:['🎲','Partite'],account:['🔑','Codici'],mods:['🛡️','Moderatori']},
  btns:{ast:['📊','Statistiche associazione'],alib:['📚','Libri sociali','soci e volontari'],aant:['⚖️',null],acfg:['⚙️','Configurazione']},
- impTit:'Importa da BoardGameGeek',impSub:'File CSV/Excel o nome utente BGG',
+ impTit:'Importa da BGG e RPGGeek',impSub:'File CSV/Excel o nome utente BGG e RPGGeek',
  adm:'🔧 Statistiche complete',admChip:'solo admin',req:' *'};
 let OPEN=null,Q='';window.AL416={T};
 const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e};

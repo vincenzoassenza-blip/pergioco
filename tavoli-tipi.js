@@ -320,10 +320,8 @@ window.agSheet=async function(opts){
           res.textContent='Cerco…';
           try{
             const c=DB.remote&&DB.remote.client;if(!c||!c.functions){res.textContent='Scrivi il nome a mano (ricerca non disponibile).';return}
-            const{data,error}=await c.functions.invoke('bgg-meta',{body:{mode:'rpg',q:s}});
+            let items;try{items=await GDRC.search(s)}catch(e){if(iq.value.trim()===s)res.textContent='Nessun risultato: puoi scrivere il nome a mano.';return}
             if(iq.value.trim()!==s)return;
-            if(error||!data){res.textContent='Nessun risultato: puoi scrivere il nome a mano.';return}
-            const items=Array.isArray(data.items)?data.items:[];
             res.replaceChildren();
             if(!items.length){res.textContent='Nessun risultato: puoi scrivere il nome a mano.';return}
             items.forEach(it=>{
