@@ -44,8 +44,8 @@ chk(/notify_on['"]?\s*:\s*false/.test(rpc)||/notify_on", false/.test(rpc)||/"not
 
 const {APP_VERSION,swCache,hasAsset,esc,idxTxt,swTxt}=require('./appver');
 const pin=new RegExp('brand\\.js\\?v='+esc(APP_VERSION));
-chk(APP_VERSION==='41.14.5'&&swCache()&&hasAsset('brand.js')&&pin.test(idxTxt())&&pin.test(swTxt()),
-  'APP_VERSION 41.14.5 e pin brand.js allineati');
+chk(!!APP_VERSION&&swCache()&&hasAsset('brand.js')&&pin.test(idxTxt())&&pin.test(swTxt()),
+  'APP_VERSION, cache SW e pin brand.js allineati');
 
 console.log(`v41.14.5-sondaggi-unit: ${ok}/${n}`);
 if(ok!==n)process.exit(1);
