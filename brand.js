@@ -2,7 +2,7 @@
 // Fonte: public.app_settings chiave 'brand' (lettura solo utenti autenticati; scrittura solo admin + CHECK lato server).
 // Prima del login (o se il DB non risponde) si usano l'ultima copia salvata sul telefono o i valori PerGioco.
 // Tutti i valori sono testo dell'utente: mostrarli SEMPRE con esc()/textContent; i loghi solo in <img src> validati.
-const APP_VERSION='41.14.1';
+const APP_VERSION='41.14.2';
 // Logo ufficiale Powered by BGG (stesso markup ovunque si usano dati BGG).
 function bggPwrHtml(){return '<div class="ibggpwr"><a href="https://boardgamegeek.com" target="_blank" rel="noopener noreferrer" title="Dati giochi da BoardGameGeek"><img src="img/powered-by-bgg.png" alt="Powered by BoardGameGeek" width="120" height="36" loading="lazy"></a></div>'}
 const BRAND_DEF=Object.freeze({nome:'PerGioco',motto:'Gioca, prenota, condividi',citta:'Ragusa',instagram:'pergiocoets',email:'info@pergioco.org',logo:'',logo_barra:'',
