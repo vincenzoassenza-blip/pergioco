@@ -26,12 +26,12 @@ let r=await p.evaluate(()=>({h2:V.querySelector('h2').textContent,on:document.qu
  dday:!!V.querySelector('.dday'),sdVis:!!document.querySelector('#sd')&&document.querySelector('#sd').getBoundingClientRect().width>2,heads:[...V.querySelectorAll('.agday')].map(h=>h.textContent),
  lv:V.querySelectorAll('#tl .lv').length,nm:/\d\/\d/.test(document.getElementById('tl').innerText),hostOnce:[...V.querySelectorAll('[data-t="t1"] a.pv')].filter(a=>a.textContent==='Giulia Rossi').length,
  sd:!!V.querySelector('[data-sd="t1"]'),full:!!V.querySelector('[data-sd="t2"]'),j:V.querySelectorAll('[data-j]').length,o1:!!V.querySelector('[data-o="t1"],[data-c="t1"]'),o3:!!V.querySelector('[data-o="t3"]')&&!!V.querySelector('[data-c="t3"]'),
- lvBtn:!!V.querySelector('[data-lv="t3"]'),nt:!!document.getElementById('nt'),fab:!!document.getElementById('tfab'),seg:!!V.querySelector('.evseg'),cov:V.querySelectorAll('#tl .gcov').length,xss:window.XSS,
+ lvBtn:!!V.querySelector('[data-lv="t3"]'),cancel:!!V.querySelector('[data-cancel="t3"]'),nt:!!document.getElementById('nt'),fab:!!document.getElementById('tfab'),seg:!!V.querySelector('.evseg'),cov:V.querySelectorAll('#tl .gcov').length,xss:window.XSS,
  noteEsc:/&lt;b&gt;x/.test(V.querySelector('[data-t="t3"]').innerHTML)}));
 chk(r.h2==='📅 Agenda','titolo «📅 Agenda»');chk(/^Oggi/.test(r.first)&&/^Oggi/.test(r.on),'si apre su Oggi, primo giorno');chk(!r.dday&&!r.sdVis,'niente campo data né data ripetuta');
 chk(r.heads.length===3&&/^Oggi, \S+ \d+ novembre · 1 tavolo/.test(r.heads[0])&&/ospiti inclusi/.test(r.heads[1]),'gruppi per giorno con intestazione italiana: '+r.heads.join(' | '));
 chk(r.lv===0&&!r.nm,'niente livelli né N/M');chk(r.hostOnce===1,'host una sola volta');chk(r.sd&&!r.full,'Siediti solo se c’è posto');chk(r.j===0,'socio: nessun picker di tutti i soci');
-chk(!r.o1&&r.o3,'+ Ospite / Chiudi e registra solo all’host');chk(r.lvBtn,'Lascia il posto se seduto');chk(!r.nt&&r.fab,'il + è l’unico modo');chk(r.seg,'tab Tavoli/Eventi');chk(r.cov===5,'copertine');chk(!r.xss&&(SH||r.noteEsc),'XSS escape');
+chk(!r.o1&&r.o3,'+ Ospite / Chiudi e registra solo all’host');chk(!r.lvBtn&&r.cancel,'il creatore non lascia il posto, può annullare il tavolo');chk(!r.nt&&r.fab,'il + è l’unico modo');chk(r.seg,'tab Tavoli/Eventi');chk(r.cov===5,'copertine');chk(!r.xss&&(SH||r.noteEsc),'XSS escape');
 if(SH)await p.screenshot({path:OUT+'agenda-a-socio.png'});
 await p.evaluate(()=>{const x=document.querySelector('[data-t="t1"]').closest('.agsec');document.querySelector('.agdays [data-d="'+x.dataset.day+'"]').click()});await p.click('[data-sd="t1"]');await p.waitForTimeout(500);r=await p.evaluate(()=>SAVED[0]);
 chk(r&&r.seat==='t1'&&r.a==='join'&&r.me==='m0','Siediti usa la RPC solo per me');
