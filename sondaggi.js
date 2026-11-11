@@ -131,7 +131,7 @@ function voteHtml(p,inner){
   const btn=p.typ==='date'?T.salvaDisp:p.typ==='classifica'?T.salvaCl:T.invia;
   const help=p.help?`<p class="muted" style="margin-top:-6px">${esc(p.help)}</p>`:'';
   const wrap=`${inner?'':'<button type="button" class="psbk" id="psback">'+T.indietro+'</button>'}
-    <div class="${inner?'':'card'}" data-psv="${esc(p.id)}"><h2 style="margin-top:0">${esc(p.title)}</h2>${help}${meta(p)}
+    <div class="${inner?'':'card'}" data-psv="${esc(p.id)}">${inner?help:`<h2 style="margin-top:0">${esc(p.title)}</h2>${help}${meta(p)}`}
     <div class="optlist">${body}</div>
     ${p.anonymous?`<p class="muted">${T.noCambia}</p>`:`<p class="muted">${T.cambia}</p>`}
     <button type="button" class="p" id="psinvia">${btn}</button></div>`;
@@ -173,8 +173,8 @@ function resultsHtml(p,inner){
     link=`<div class="card" style="box-shadow:none;border:1px solid #e7ecf7;margin:12px 0 0;padding:12px"><b>${T.collega}</b><p class="muted" style="margin:4px 0 8px">${T.collegaH}</p><button type="button" class="s" style="width:100%" data-pslink="${esc(p.id)}" data-psopt="${esc(top.id)}">${esc(T.proponi(top.label))}</button></div>`;
   }
   return`${inner?'':'<button type="button" class="psbk" id="psback">'+T.indietro+'</button>'}
-    <div class="${inner?'cmdet':'card'}"><${inner?'h3':'h2'} style="margin-top:0">${esc(p.title)}</${inner?'h3':'h2'}>
-    <p class="part muted">${esc(byline(p))}${p.can_see?'':' · risultati non ancora visibili'}</p>
+    <div class="${inner?'cmdet':'card'}">${inner?(p.can_see?'':'<p class="part muted">Risultati non ancora visibili</p>'):`<h2 style="margin-top:0">${esc(p.title)}</h2>
+    <p class="part muted">${esc(byline(p))}${p.can_see?'':' · risultati non ancora visibili'}</p>`}
     ${bars}${who}${link}</div>`;
 }
 function nameOf(id){

@@ -844,3 +844,6 @@ header .brand,header .sub,body.adm header .brand,body.adm header .sub{padding-ri
 .mpdl>b{flex:1;font-weight:650;overflow-wrap:anywhere}
 .mpnames{display:flex;flex-wrap:wrap;gap:6px}
 .mpn{display:inline-block;background:color-mix(in srgb,var(--b) 8%,var(--c));border-radius:999px;padding:4px 10px;font-size:13px}
+
+/* anteprima — Lista desideri: «Salva scadenza» e «Chiudi ora» sulla stessa riga, stessa altezza */
+.dsbtns{margin-top:10px;align-items:stretch}.dsbtns button{margin:0;width:auto;flex:1 1 0;min-height:44px}

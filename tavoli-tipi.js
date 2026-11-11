@@ -216,6 +216,8 @@ window.agSheet=async function(opts){
   await TT.load();
   const {gs,ms,meM,staff,S,oggi}=opts;
   if(document.querySelector('.agov'))return;
+  const pf=opts.prefill||window._agPrefill||null;window._agPrefill=null;
+  const pfIds=pf&&Array.isArray(pf.memberIds)?pf.memberIds.filter(id=>ms.some(m=>m.id===id)):[];
   let D=isoOk(S.date)&&S.date>=oggi?S.date:oggi;
   let typeId=TT.attivo()[0]?.id||'board';
   const o=document.createElement('div');o.className='agov';
@@ -374,7 +376,20 @@ window.agSheet=async function(opts){
       if(rem>0){pieno.hidden=true;goBtn.disabled=false;goBtn.classList.remove('off')}
     }
   };
-  const paintNow=()=>{paintSeg();paintFields();refreshCap()};
+  const paintNow=()=>{paintSeg();paintFields();refreshCap();applyPf()};
+  // anteprima — precompilazione da Sfida equilibrata
+  let pfBox=null;
+  const applyPf=()=>{if(!pf)return;const t=TT.byId(typeId);if(t.kind!=='board')return;const sg=$('#tg');
+    if(sg&&pf.gameId&&[...sg.options].some(o=>o.value===pf.gameId)){sg.value=pf.gameId;sg.dispatchEvent(new Event('change'))}
+    const ip=$('#tp');if(ip&&pfIds.length)ip.value=String(Math.max(+ip.value||1,pfIds.length));
+    const altri=pfIds.filter(id=>!meM||id!==meM.id);
+    if(!pfBox){pfBox=document.createElement('div');pfBox.className='sfb';pfBox.id='agpf';fields.after(pfBox)}
+    const nomi=altri.map(id=>memberName(ms.find(m=>m.id===id))).join(', ');
+    pfBox.textContent='';const b=document.createElement('b');b.textContent='⚖️ Dalla sfida equilibrata';pfBox.append(b);
+    const p=document.createElement('p');p.style.margin='4px 0 0';
+    p.textContent=staff?('Al tavolo: tu'+(nomi?' + '+nomi:'')+'. Come staff li siedi subito.'):('Ti siedi tu. '+(nomi?nomi+' si siederanno dall’Agenda: condividi il tavolo dopo averlo aperto.':''));
+    pfBox.append(p);
+    const inn=$('#tn');if(inn&&!inn.value&&nomi)inn.value=('Sfida equilibrata con '+nomi).slice(0,120)};
   paintNow();
 
   goBtn.onclick=async()=>{
@@ -387,6 +402,7 @@ window.agSheet=async function(opts){
     const t=TT.byId(typeId);
     const rem=await TT.remaining(D,typeId);if(rem<=0)return toast(TT.pienoMsg(typeId));
     const payload={date:D,evening:dayName(D),hostId:h,seats,time,note:($('#tn')&&$('#tn').value||'').trim().slice(0,120),typeId,players:[{memberId:h}],status:'open'};
+    if(pf&&staff&&t.kind==='board'&&pfIds.length){const ex=pfIds.filter(id=>id!==h);payload.players=[{memberId:h},...ex.map(memberId=>({memberId}))].slice(0,seats);if(ex.length+1>seats)return toast('Aumenta i posti: servono '+(ex.length+1)+' posti per la sfida')}
     if(t.kind==='board'){
       const gid=$('#tg')&&$('#tg').value;if(!gid)return toast('Scegli un gioco');payload.gameId=gid;
     }else if(t.kind==='gdr'){
