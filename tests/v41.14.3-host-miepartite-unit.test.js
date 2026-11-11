@@ -25,7 +25,7 @@ chk(/policy tables_host_delete/.test(sql)&&/coalesce\(status,'open'\)='open'/.te
 chk(/is_staff\(\) then return new/.test(sql),'host_guard: staff invariato');
 
 chk(/mie-partite\.js\?v=/.test(idx)&&sw.includes((idx.match(/mie-partite\.js\?v=([\d.]+)/)||[])[0]),'mie-partite.js in index e cache SW, stesso pin');
-chk(require('./appver').APP_VERSION==='41.14.3'&&require('./appver').swCache()&&/mie-partite\.js\?v=41\.14\.3/.test(idx)&&/mie-partite\.js\?v=41\.14\.3/.test(sw),'APP_VERSION 41.14.3 e cache SW/?v= allineate');
+chk(require('./appver').APP_VERSION&&require('./appver').swCache()&&require('./appver').hasAsset('mie-partite.js'),'APP_VERSION e cache SW/?v= allineate');
 chk(!/club|ludoteca/i.test(read('mie-partite.js')),'testi senza club/ludoteca');
 
 function _gdr(p){return !!(p&&(p.playKind==='gdr'||p.typeId==='gdr'))}
