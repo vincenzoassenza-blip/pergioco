@@ -95,7 +95,7 @@ export function parseSearch(xml: string): SearchHit[] {
     const attrs = m[1], block = m[2];
     const id = int((attrs.match(/\bid="(\d+)"/) || [])[1], 1, 99999999);
     if (!id) continue;
-    const n = block.match(/<name[^>]*value="([^"]*)"/);
+    const n = block.match(/<name[^>]*type="primary"[^>]*value="([^"]*)"/) || block.match(/<name[^>]*value="([^"]*)"/);
     const y = block.match(/<yearpublished[^>]*value="(\d+)"/);
     const nome = txt(decodeXml(n?.[1] || ""), 100);
     if (!nome) continue;
@@ -140,6 +140,9 @@ export function rankRpgSearch(items: SearchHit[], q: string): SearchHit[] {
     if ((it.tipo || "") === "rpg") s += 30;
     if (q5 && /\b(5e|5th|fifth)\b/.test(n)) s += 25;
     if (qdd && n.includes("dungeons") && n.includes("dragons")) s += 25;
+    // Edizione ufficiale attuale: «Dungeons & Dragons (5th Edition)» (rpg 17181),
+    // non la 3.5/4e né i playtest, quando la query non precisa l'edizione.
+    if (n.includes("dungeons") && n.includes("dragons") && n === "dungeons dragons 5th edition") s += 40;
     return { it, s };
   });
   scored.sort((a, b) => b.s - a.s || ((a.it.tipo === "rpg" ? 0 : 1) - (b.it.tipo === "rpg" ? 0 : 1)) || a.it.nome.localeCompare(b.it.nome, "en"));
