@@ -2,7 +2,7 @@
 // Rimosso: api.geekdo.com, search/boardgame scraping, Wikidata come canale dati giochi.
 // Cache server su public.bgg_api_cache (TTL). Token mai nel client / mai nei log.
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
-import { bggXml, int, parseSearch, parseThing, rankRpgSearch, txt } from "../_shared/bgg.ts";
+import { bggXml, int, parseRpgThing, parseSearch, parseThing, rankRpgSearch, txt } from "../_shared/bgg.ts";
 
 const ORIGINS = ["https://app.pergioco.org", "https://vincenzoassenza-blip.github.io", "http://localhost:8765", "http://localhost:8799", "http://127.0.0.1:8799"];
 const cors = (o: string | null) => ({
@@ -72,6 +72,20 @@ async function thingInfo(admin: SB, id: number) {
   if (r.status !== 200) throw new Error(`BGG ${r.status}`);
   const parsed = parseThing(r.body, id);
   if (!parsed) throw new Error("dati BGG assenti");
+  await cacheSet(admin, key, parsed, TTL_THING_MS);
+  return parsed;
+}
+
+// v41.15 — scheda GDR per la collezione (stesso token, cache come thing).
+async function rpgInfo(admin: SB, id: number) {
+  const key = "rpgthing:" + id;
+  const hit = await cacheGet(admin, key);
+  if (hit && typeof hit === "object") return hit as any;
+  const token = await requireToken();
+  const r = await bggXml(`/xmlapi2/thing?id=${id}`, token, { accept202: false, maxAttempt: 4 });
+  if (r.status !== 200) throw new Error(`BGG ${r.status}`);
+  const parsed = parseRpgThing(r.body, id);
+  if (!parsed) throw new Error("dati RPGGeek assenti");
   await cacheSet(admin, key, parsed, TTL_THING_MS);
   return parsed;
 }
@@ -157,7 +171,7 @@ Deno.serve(async (req) => {
   const user = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: auth } }, auth: { persistSession: false } });
   const { data: u } = await user.auth.getUser();
 
-  if (body?.mode === "cerca" || body?.mode === "info" || body?.mode === "rpg") {
+  if (body?.mode === "cerca" || body?.mode === "info" || body?.mode === "rpg" || body?.mode === "rpginfo") {
     if (!u?.user) return new Response('{"error":"non autorizzato"}', { status: 401, headers: h });
     try {
       if (!Deno.env.get("BGG_TOKEN")) return new Response('{"error":"BGG_TOKEN assente"}', { status: 503, headers: h });
@@ -172,6 +186,11 @@ Deno.serve(async (req) => {
         if (q.length < 2) return new Response('{"items":[]}', { headers: h });
         const items = await cercaRpg(admin, q);
         return new Response(JSON.stringify({ items }), { headers: h });
+      }
+      if (body.mode === "rpginfo") {
+        const rid = int(body.bgg_id, 1, 99999999);
+        if (!rid) return new Response('{"error":"bgg_id non valido"}', { status: 400, headers: h });
+        return new Response(JSON.stringify(await rpgInfo(admin, rid)), { headers: h });
       }
       const id = int(body.bgg_id, 1, 99999999);
       if (!id) return new Response('{"error":"bgg_id non valido"}', { status: 400, headers: h });

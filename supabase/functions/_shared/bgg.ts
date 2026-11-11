@@ -271,3 +271,26 @@ export function parseCollectionItems(xml: string, exp: boolean) {
   }
   return out;
 }
+
+/**
+ * v41.15 — scheda RPGGeek (XML API2 thing, type rpg o rpgitem).
+ * Sistema, genere, editore e lingua dai <link>, se presenti; altrimenti liste vuote.
+ * rpgitem: link type="rpg" (linea/edizione) e "rpgsystem"; rpg: è esso stesso il sistema.
+ */
+export function parseRpgThing(xml: string, id: number) {
+  const item = xml.match(new RegExp(`<item\\b[^>]*id="${id}"[^>]*>([\\s\\S]*?)<\\/item>`)) || xml.match(/<item\b[^>]*>([\s\S]*?)<\/item>/);
+  if (!item) return null;
+  const block = item[1];
+  const itemTag = (xml.match(new RegExp(`<item\\b[^>]*id="${id}"[^>]*>`)) || xml.match(/<item\b[^>]*>/) || [""])[0];
+  const type = attr(itemTag, "type") || "";
+  const name = txt(decodeXml((block.match(/<name[^>]*type="primary"[^>]*value="([^"]*)"/) || block.match(/<name[^>]*value="([^"]*)"/) || [])[1] || ""), 100);
+  if (!name) return null;
+  const year = int((block.match(/<yearpublished[^>]*value="(\d+)"/) || [])[1], 1800, 2100);
+  const th = thumbOk((block.match(/<thumbnail>([^<]+)<\/thumbnail>/) || [])[1]);
+  const uniq = (a: string[], n: number, len: number) => [...new Set(a.map((x) => txt(x, len)).filter(Boolean))].slice(0, n);
+  const sys = uniq([...(type === "rpg" ? [name] : []), ...linkNames(block, "rpg", 10), ...linkNames(block, "rpgsystem", 10)], 10, 100);
+  const genre = uniq([...linkNames(block, "rpggenre", 20), ...linkNames(block, "rpgsetting", 10)], 20, 60);
+  const pub = uniq([...linkNames(block, "rpgpublisher", 10), ...linkNames(block, "boardgamepublisher", 10)], 10, 100);
+  const lang = uniq([...linkNames(block, "language", 10), ...linkNames(block, "rpgitemlanguage", 10)], 10, 40);
+  return { bgg_id: id, nome: name, anno: year, thumb: th, tipo: type, sistema: sys, genere: genre, editore: pub, lingua: lang };
+}
