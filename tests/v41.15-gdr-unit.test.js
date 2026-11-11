@@ -21,7 +21,7 @@ const tt=read('tavoli-tipi.js');
 
 chk(/mode === "rpg"/.test(meta)&&/type=rpg,rpgitem/.test(meta)&&/rpgsearch-v2:/.test(meta),'ricerca v41.14.2 invariata (mode rpg, type rpg,rpgitem, cache v2)');
 chk(/mode === "rpginfo"/.test(meta)&&/parseRpgThing/.test(meta)&&/xmlapi2\/thing\?id=/.test(meta),'bgg-meta mode rpginfo legge la scheda via XML API2');
-chk(/rpgthing:/.test(meta),'cache scheda rpgthing:');
+chk(/rpgthing-v3:/.test(meta)&&/xmlapi2\/family\?id=/.test(meta)&&/type=rpg/.test(meta)&&/xmlapi2\/thing\?id=/.test(meta)&&/type=rpgitem/.test(meta)&&/maxBytes: 400_000/.test(meta),'cache scheda rpgthing-v3, family rpg e thing rpgitem, lettura limitata');
 chk(/mode === "rpg"/.test(coll)&&/subtype=rpgitem/.test(coll)&&/rpgcollection:/.test(coll),'bgg-collection mode rpg: own=1 subtype=rpgitem, cache dedicata');
 chk(/is_admin/.test(coll),'collection (anche rpg) resta solo admin');
 chk(/export function parseRpgThing/.test(shared),'parseRpgThing nello shared server');
@@ -98,6 +98,15 @@ const it=parseRpgThing(xmlItem,216437);
 chk(it&&it.tipo==='rpgitem'&&it.sistema[0]==='Dungeons & Dragons (5th Edition)','parser rpgitem: sistema dal link type=rpg');
 chk(it.genere.includes('Fantasy')&&it.genere.includes('Adventure')&&it.lingua.includes('English'),'parser rpgitem: genere e lingua');
 chk(parseRpgThing('<items></items>',1)===null,'parser: xml vuoto → null');
+const mixed=`<items>
+  <item type="boardgame" id="17181"><name type="primary" value="Stad - Land - Rivier"/><link type="boardgamepublisher" id="9" value="Milton Bradley"/></item>
+  <item type="rpg" id="17181"><name type="primary" value="Dungeons &amp; Dragons (5th Edition)"/><link type="rpggenre" id="1" value="Fantasy"/><link type="rpgpublisher" id="2" value="Wizards of the Coast"/></item>
+</items>`;
+const pref=parseRpgThing(mixed,17181);
+chk(pref&&pref.tipo==='rpg'&&pref.nome==='Dungeons & Dragons (5th Edition)'&&pref.sistema.includes('Dungeons & Dragons (5th Edition)'),'parser: a parità di id preferisce il type rpg, non il boardgame');
+const trunc=xmlRpg.replace('</item>','<!--no-close');const pt=parseRpgThing(trunc,17181);
+chk(pt&&pt.nome==='Dungeons & Dragons (5th Edition)'&&pt.tipo==='rpg','parser: xml troncato senza chiusura item');
+
 
 // rowsFromCsv (BGG invariato + GDR)
 function loadIBGG(){

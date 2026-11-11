@@ -1,5 +1,6 @@
 // Shared BGG XML API2 helpers (server-only). No client import.
 export const BGG_HOST = "https://boardgamegeek.com";
+export const RPG_HOST = "https://rpggeek.com";
 export const UA = "PerGioco/1.0 (APS Ragusa; +https://app.pergioco.org)";
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -57,21 +58,45 @@ export function parseUser(xml: string) {
 
 
 /** Fetch XML API2 with Bearer. Handles 202 (collection queue), 429/5xx with bounded backoff. Never logs token. */
+async function readBody(r: Response, maxBytes?: number) {
+  const cap = maxBytes ?? 5_000_000;
+  if (maxBytes && r.body) {
+    const reader = r.body.getReader();
+    const dec = new TextDecoder();
+    let out = "";
+    let n = 0;
+    while (n < cap) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      n += value.byteLength;
+      out += dec.decode(value, { stream: true });
+      if (n >= cap) {
+        try { await reader.cancel(); } catch { /* ignore */ }
+        break;
+      }
+    }
+    out += dec.decode();
+    return out.length > cap ? out.slice(0, cap) : out;
+  }
+  const body = await r.text();
+  if (body.length > cap) throw new Error("risposta troppo grande");
+  return body;
+}
+
 export async function bggXml(
   pathAndQuery: string,
   token: string,
-  opts: { maxAttempt?: number; accept202?: boolean } = {},
+  opts: { maxAttempt?: number; accept202?: boolean; maxBytes?: number } = {},
 ): Promise<{ status: number; body: string }> {
   const maxAttempt = opts.maxAttempt ?? 8;
   const accept202 = opts.accept202 ?? true;
   let attempt = 1;
   while (attempt <= maxAttempt) {
-    const r = await fetch(`${BGG_HOST}${pathAndQuery}`, {
+    const r = await fetch(`${opts.host || BGG_HOST}${pathAndQuery}`, {
       headers: { Authorization: `Bearer ${token}`, "User-Agent": UA, Accept: "application/xml" },
       signal: AbortSignal.timeout(30000),
     });
-    const body = await r.text();
-    if (body.length > 5_000_000) throw new Error("risposta troppo grande");
+    const body = await readBody(r, opts.maxBytes);
     if (r.status === 202 && accept202 && attempt < maxAttempt) {
       await sleep(Math.min(3000 * 2 ** (attempt - 1), 30000));
       attempt++;
@@ -278,17 +303,17 @@ export function parseCollectionItems(xml: string, exp: boolean) {
  * rpgitem: link type="rpg" (linea/edizione) e "rpgsystem"; rpg: è esso stesso il sistema.
  */
 export function parseRpgThing(xml: string, id: number) {
-  const item = xml.match(new RegExp(`<item\\b[^>]*id="${id}"[^>]*>([\\s\\S]*?)<\\/item>`)) || xml.match(/<item\b[^>]*>([\s\S]*?)<\/item>/);
-  if (!item) return null;
-  const block = item[1];
-  const itemTag = (xml.match(new RegExp(`<item\\b[^>]*id="${id}"[^>]*>`)) || xml.match(/<item\b[^>]*>/) || [""])[0];
-  const type = attr(itemTag, "type") || "";
-  const name = txt(decodeXml((block.match(/<name[^>]*type="primary"[^>]*value="([^"]*)"/) || block.match(/<name[^>]*value="([^"]*)"/) || [])[1] || ""), 100);
+  const tagged=[...xml.matchAll(/<item\b([^>]*)>([\s\S]*?)(?:<\/item>|$)/g)].map(m=>({tag:m[1],block:m[2],type:attr("<item "+m[1], "type")||"",iid:int(attr("<item "+m[1],"id"),1,99999999)}));
+  const pool=tagged.filter(x=>x.iid===id);
+  const hit=pool.find(x=>x.type==="rpg"||x.type==="rpgitem")||pool[0];
+  if(!hit) return null;
+  const block = hit.block;
+  const type = hit.type;  const name = txt(decodeXml((block.match(/<name[^>]*type="primary"[^>]*value="([^"]*)"/) || block.match(/<name[^>]*value="([^"]*)"/) || [])[1] || ""), 100);
   if (!name) return null;
   const year = int((block.match(/<yearpublished[^>]*value="(\d+)"/) || [])[1], 1800, 2100);
   const th = thumbOk((block.match(/<thumbnail>([^<]+)<\/thumbnail>/) || [])[1]);
   const uniq = (a: string[], n: number, len: number) => [...new Set(a.map((x) => txt(x, len)).filter(Boolean))].slice(0, n);
-  const sys = uniq([...(type === "rpg" ? [name] : []), ...linkNames(block, "rpg", 10), ...linkNames(block, "rpgsystem", 10)], 10, 100);
+  const sys = uniq([...(type === "rpg" ? [name] : linkNames(block, "rpg", 10)), ...linkNames(block, "rpgsystem", 10)], 10, 100);
   const genre = uniq([...linkNames(block, "rpggenre", 20), ...linkNames(block, "rpgsetting", 10)], 20, 60);
   const pub = uniq([...linkNames(block, "rpgpublisher", 10), ...linkNames(block, "boardgamepublisher", 10)], 10, 100);
   const lang = uniq([...linkNames(block, "language", 10), ...linkNames(block, "rpgitemlanguage", 10)], 10, 40);
