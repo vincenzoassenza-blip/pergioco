@@ -1,6 +1,25 @@
 # Procedura di rilascio
 
-Ogni pubblicazione segue questi passi, in questo ordine.
+Ogni modifica all'app o al database si prova prima sull'ambiente di TEST e va in produzione solo dopo il via.
+
+## Ambienti
+
+- **Produzione** (app ufficiale): https://app.pergioco.org — repo `vincenzoassenza-blip/pergioco`, progetto Supabase di produzione. Non si pubblica qui prima del via.
+- **Test** (copia di prova): https://vincenzoassenza-blip.github.io/pergioco-test/ — repo `vincenzoassenza-blip/pergioco-test`, progetto Supabase `pergioco-test`. Ha un banner arancione «AMBIENTE DI TEST», il nome «PerGioco TEST» e un database separato. Non ha un dominio personalizzato.
+
+## Pubblicare sul test
+
+1. Sviluppo su un worktree locale del repo di produzione, come sempre.
+2. Suite completa verde: `scripts/test-all.sh`.
+3. Se serve una migrazione, applicarla **solo** al database di test e verificarla lì.
+4. Pubblicare sul test: `scripts/publish-test.sh` (dallo stesso worktree; lo script copia i file nel repo `pergioco-test`, applica banner e configurazione di test, e fa il push). Non tocca l'app ufficiale.
+5. Provare su https://vincenzoassenza-blip.github.io/pergioco-test/ (se vedi ancora la versione precedente, chiudi e riapri l'app o svuota la cache).
+6. Solo dopo il via, si pubblica in produzione con i passi seguenti.
+
+## Pubblicare in produzione
+
+Ogni pubblicazione in produzione segue questi passi, in questo ordine.
+
 
 1. **Backup** del `origin/main` corrente: tag annotato `backup-pre-vX`, bundle git e copia di `app_settings` (solo chiavi e lunghezze in output; mai token né valori).
 2. **Suite completa verde**, obbligatoria: `scripts/test-all.sh` (oppure `npm test`). Esegue tutte le unit e tutti i Playwright. Se un test fallisce, non si pubblica.
