@@ -37,10 +37,12 @@ const SupabaseAdapter={
    if(error&&MAP[k].cols&&(error.code==='42703'||/column/i.test(error.message||''))){DB.v6Missing=true;({data,error}=await this.client.from(MAP[k].t).select('*'))}else if(MAP[k].cols)DB.v6Missing=false;if(error&&k==='tables'&&isMissing(error)){DB.tablesMissing=true;d.tables=[];continue}if(error)throw error;d[k]=data.map(MAP[k].from)}
   if(DB.v6Missing===false&&this.adminCached){const {data}=await this.client.rpc('admin_member_tessere');if(data){const t=new Map(data.map(x=>[x.id,x.tessera||'']));d.members.forEach(m=>{if(t.has(m.id))m.tessera=t.get(m.id)})}}
   if(this.queue().length)return;await this.cache.replaceAll(d);try{const u=await this.user();if(u)localStorage.setItem('pergioco-cache-uid',u.id)}catch(e){}},
- async init(){const c=window.PERGIOCO_CONFIG||{};if(!c.supabaseUrl||!c.supabaseAnonKey)return 'local';
+ async statoAccesso(){if(!this.client)return null;try{const {data,error}=await this.client.rpc('accesso_stato');if(error)return null;this.accesso=data;if(typeof ACC!=='undefined')ACC.apply(data);return data}catch(e){return null}},
+async init(){const c=window.PERGIOCO_CONFIG||{};if(!c.supabaseUrl||!c.supabaseAnonKey)return 'local';
   if(!window.supabase)return 'nolib';
   this.client=window.supabase.createClient(c.supabaseUrl,c.supabaseAnonKey);
   const {data:ss}=await this.client.auth.getSession();if(!ss.session)return 'auth';
+  {const st=await this.statoAccesso();if(st&&st.blocca_app)return 'blocked'}
   // v40: avvio immediato dalla copia locale (solo se è dello stesso account) e aggiornamento in sottofondo
   const uid=ss.session.user&&ss.session.user.id,UK='pergioco-cache-uid';
   if(uid&&this.cache._load()&&localStorage.getItem(UK)===uid){this.bg=this.refresh().then(()=>{DB.setStatus&&DB.setStatus('online');document.dispatchEvent(new Event('pergioco-refreshed'))}).catch(e=>{if(isNet(e)&&DB.setStatus)DB.setStatus('offline')});return 'online'}
@@ -66,10 +68,10 @@ const SupabaseAdapter={
  redirect(){return location.origin+location.pathname},
  async user(){if(!this.client)return null;const {data}=await this.client.auth.getSession();return data.session?data.session.user:null},
  // registrazione: il database rifiuta qualsiasi iscrizione senza un codice valido (nessuna email inviata)
- async signUp(code,email,password){const {data,error}=await this.client.auth.signUp({email,password,options:{data:{code}}});if(error)throw error;if(!data.session){const r=await this.client.auth.signInWithPassword({email,password});if(r.error)throw r.error}await this.refresh();return data},
+ async signUp(code,email,password){const {data,error}=await this.client.auth.signUp({email,password,options:{data:{code}}});if(error)throw error;if(!data.session){const r=await this.client.auth.signInWithPassword({email,password});if(r.error)throw r.error}{const st=await this.statoAccesso();if(!(st&&st.blocca_app))await this.refresh()}return data},
  async resetWithCode(code,email,password){const {error}=await this.client.rpc('reset_password_with_code',{p_code:code,p_email:email,p_password:password});if(error)throw error},
- async setStatsPub(v){const {error}=await this.client.rpc('set_stats_pubbliche',{p:!!v});if(error)throw error;await this.refresh()},
- async updateProfile(p){const a={p_soprannome:p.soprannome,p_avatar:p.avatar,p_color:p.color,p_fav_game_id:p.favGameId};if('photoUrl' in p)a.p_photo_url=p.photoUrl||null;const {error}=await this.client.rpc('update_my_profile',a);if(error)throw error;await this.refresh();try{if(window.HD417&&typeof HD417.av==='function')await HD417.av()}catch(e){}},
+ async setStatsPub(v){if(typeof ACC!=='undefined'&&!ACC.guardAzioni())throw new Error(ACC.msgSospeso);const {error}=await this.client.rpc('set_stats_pubbliche',{p:!!v});if(error)throw error;await this.refresh()},
+ async updateProfile(p){if(typeof ACC!=='undefined'&&!ACC.guardAzioni())throw new Error(ACC.msgSospeso);const a={p_soprannome:p.soprannome,p_avatar:p.avatar,p_color:p.color,p_fav_game_id:p.favGameId};if('photoUrl' in p)a.p_photo_url=p.photoUrl||null;const {error}=await this.client.rpc('update_my_profile',a);if(error)throw error;await this.refresh();try{if(window.HD417&&typeof HD417.av==='function')await HD417.av()}catch(e){}},
  async uploadPhoto(blob){const u=await this.user();if(!u||!u.id)throw new Error('Devi prima accedere');if(!blob||!blob.size)throw new Error('Scegli una foto.');const typ=blob.type==='image/png'?'image/png':blob.type==='image/jpeg'?'image/jpeg':'image/webp';const ext=typ==='image/png'?'png':typ==='image/jpeg'?'jpg':'webp';const path=u.id+'/avatar.'+ext;const {error}=await this.client.storage.from('profile-photos').upload(path,blob,{upsert:true,contentType:typ,cacheControl:'60'});if(error)throw error;const {data}=this.client.storage.from('profile-photos').getPublicUrl(path);const url=typeof photoUrlOk==='function'?photoUrlOk(data&&data.publicUrl):'';if(!url)throw new Error('Foto non valida');return url},
  async removePhotoFile(){const u=await this.user();if(!u||!u.id)return;try{await this.client.storage.from('profile-photos').remove(['webp','jpg','jpeg','png'].map(e=>u.id+'/avatar.'+e))}catch(e){}},
  async codes(){const {data,error}=await this.client.rpc('admin_codes');if(error)throw error;return data||[]},
