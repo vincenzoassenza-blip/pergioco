@@ -13,7 +13,7 @@ const RC={
  LAB:{titolo:'Titolo',icona:'Icona',colore:'Colore del nome',cornice:'Cornice',sfondo:'Sfondo del profilo'},
  lkey:'pergioco-ricompense',
  data:{catalogo:[],assegnate:[],scelte:[]},
- extra:{},ready:false,_p:null,
+ extra:{},ready:false,_p:null,_selOpen:false,
  icoOk(s){return this.ICONE.includes(s)},
  avOk(s){return this.AVATAR.includes(s)||this.BASE.includes(s)},
  colOk(s){return this.COLORI.some(c=>c.v===s)},
@@ -193,8 +193,9 @@ const RC={
   const avs=[...this.BASE,...e.avatar];
   const avSel=avs.length?`<label>Avatar a tema</label><div class="rcgrid rcavsel">${avs.map(v=>`<button type="button" class="rcpick${this.avSlug(m)===v?' on':''}" data-rcav="${v}"><img src="${this.avSrc(v)}" alt=""></button>`).join('')}<button type="button" class="rcpick${this.avSlug(m)?'':' on'}" data-rcav="">Iniziali o foto</button></div>`:'';
   if(!tipi&&!avSel)return'';
-  return`<div class="card rcsel"><b>Le tue ricompense</b>${e.owned.map(r=>`<div class="rec"><span>${r.icona&&this.icoSrc(r.icona)?`<img class="rcico" src="${this.icoSrc(r.icona)}" alt="" width="20" height="20">`:''}${esc(r.nome)}${r.titolo?` <span class="muted">· ${esc(r.titolo)}</span>`:''}</span></div>`).join('')}${tipi?'<p class="muted sm">Hai più effetti dello stesso tipo: scegli quale mostrare.</p>'+tipi:''}${avSel}</div>`},
+  return`<details class="card rcsel"${this._selOpen?' open':''}><summary><b>Le tue ricompense</b></summary>${e.owned.map(r=>`<div class="rec"><span>${r.icona&&this.icoSrc(r.icona)?`<img class="rcico" src="${this.icoSrc(r.icona)}" alt="" width="20" height="20">`:''}${esc(r.nome)}${r.titolo?` <span class="muted">· ${esc(r.titolo)}</span>`:''}</span></div>`).join('')}${tipi?'<p class="muted sm">Hai più effetti dello stesso tipo: scegli quale mostrare.</p>'+tipi:''}${avSel}</details>`},
  bindSel(root,m,onAv){if(!root||!m)return;
+  if(root.tagName==='DETAILS'){root.addEventListener('toggle',()=>{this._selOpen=!!root.open});this._selOpen=!!root.open}
   root.querySelectorAll('[data-rcsc]').forEach(s=>s.onchange=async()=>{try{await this.scegli(s.dataset.rcsc,s.value);toast('Scelta salvata');if(typeof go==='function')go('profilo')}catch(e){toastErr(e,'APP')}});
   root.querySelectorAll('[data-rcav]').forEach(b=>b.onclick=()=>{if(onAv)onAv(b.dataset.rcav||'')})},
  // dialogo sospensione

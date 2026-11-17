@@ -13,9 +13,10 @@ const brand=read('brand.js');
 const sw=read('sw.js');
 const idx=read('index.html');
 
-chk(/APP_VERSION='41\.17'/.test(brand)&&/pergioco-v41\.17/.test(sw),'versione 41.17 in brand.js e cache SW');
+const {APP_VERSION,swCache,hasAsset}=require('./appver');
+chk(/^41\.17/.test(APP_VERSION)&&swCache(),'versione 41.17+ in brand.js allineata alla cache SW');
 chk(/accesso\.js\?v=41\.17/.test(idx)&&/accesso\.js\?v=41\.17/.test(sw),'accesso.js pinnato in index e SW');
-chk(/styles\.css\?v=41\.17/.test(idx)&&/app\.js\?v=41\.17/.test(idx)&&/ricompense\.js\?v=41\.17/.test(idx),'asset modificati con ?v=41.17');
+chk(hasAsset('styles.css')&&hasAsset('app.js')&&hasAsset('ricompense.js'),'asset modificati con ?v= allineato a index e SW');
 
 chk(/function public\.accesso_stato\(/.test(sql)&&/security definer/.test(sql)&&/non_in_regola/.test(sql)&&/blocca_app/.test(sql)&&/blocca_azioni/.test(sql),'RPC accesso_stato security definer con stato del chiamante');
 chk(!/libro_soci s[\s\S]{0,40}member_id <>/.test(sql)&&/s\.member_id = m\.id/.test(sql),'accesso_stato usa solo il libro del chiamante');

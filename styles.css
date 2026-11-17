@@ -905,3 +905,8 @@ header .brand,header .sub,body.adm header .brand,body.adm header .sub{padding-ri
 .rclck{font-size:14px;margin-left:4px}
 .rclock{opacity:.85}
 /* v41.17 — tab attivo: pillola #e3e9f7, testo #14254a; altezza barra invariata */
+
+/* v41.17.1 — riquadro «Le tue ricompense» del profilo: details come gli altri, freccia ▸/▾ */
+.rcsel>summary{align-items:center}
+.rcsel>summary b{font-weight:800;color:var(--b)}
+.rcsel[open]>summary{margin-bottom:6px}
