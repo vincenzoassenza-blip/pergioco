@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Il Golem di dadi — d6">
+  <title>Il Golem di dadi — d6</title>
+  <defs><clipPath id="gol-c"><circle cx="64" cy="64" r="64"/></clipPath></defs>
+  <g clip-path="url(#gol-c)">
+    <circle cx="64" cy="64" r="64" fill="#0f1c3d"/>
+    <circle cx="64" cy="64" r="52" fill="none" stroke="#1f3d7a" stroke-width="12"/>
+    <circle cx="64" cy="64" r="45" fill="none" stroke="#f2b134" stroke-width="2.5"/>
+
+    <g stroke="#14254a" stroke-width="3" stroke-linejoin="round">
+      <path fill="#fff6d4" d="M64 28 L96 44 L64 60 L32 44Z"/>
+      <path fill="#f2b134" d="M32 44 L64 60 L64 100 L32 84Z"/>
+      <path fill="#c98d1f" d="M64 60 L96 44 L96 84 L64 100Z"/>
+    </g>
+    <ellipse cx="64" cy="44" rx="6" ry="3.6" fill="#d9472b"/>
+    <g fill="#14254a">
+      <ellipse cx="41" cy="58" rx="3.6" ry="4.4"/><ellipse cx="55" cy="86" rx="3.6" ry="4.4"/>
+      <ellipse cx="73" cy="64" rx="3.6" ry="4.4"/><ellipse cx="80" cy="72" rx="3.6" ry="4.4"/><ellipse cx="87" cy="80" rx="3.6" ry="4.4"/>
+    </g>
+  </g>
+</svg>

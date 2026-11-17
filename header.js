@@ -12,12 +12,14 @@ function avEmoji(m){const a=m&&m.avatar!=null?String(m.avatar):'';return a&&a.le
 function avColor(m){return m&&m.color&&/^#[0-9a-f]{6}$/i.test(m.color)?m.color:''}
 function face(b){let f=b.querySelector('.havin');if(!f){f=document.createElement('span');f.className='havin';f.setAttribute('aria-hidden','true');b.insertBefore(f,b.firstChild)}return f}
 function syncBadge(b){if(!b)return;b.classList.toggle('adm',typeof adminMode==='function'&&!!adminMode())}
-function paintAv(b,m,u){const t=ini(m,u),emo=avEmoji(m),src=typeof photoUrlOk==='function'?photoUrlOk(m&&m.photoUrl):'';
+function paintAv(b,m,u){const t=ini(m,u),slug=typeof RC!=='undefined'&&RC.avSlug?RC.avSlug(m):'',emo=avEmoji(m),src=slug&&RC.avSrc(slug)?RC.avSrc(slug):(typeof photoUrlOk==='function'?photoUrlOk(m&&m.photoUrl):'');
  b.setAttribute('data-ini',t);if(emo)b.setAttribute('data-av',emo);else b.removeAttribute('data-av');
  const f=face(b);f.querySelectorAll('img').forEach(i=>i.remove());f.textContent='';
  const col=avColor(m);
- if(src){const img=document.createElement('img');img.className='avimg';img.alt='';img.width=36;img.height=36;img.decoding='async';img.referrerPolicy='no-referrer';
-  b.style.background='';b.style.color='';b.style.fontSize='';f.style.background='';f.style.color='';f.style.fontSize='';f.append(img);img.src=src+(m&&m.photoRev?('?v='+encodeURIComponent(m.photoRev)):'');b.hidden=false}
+ ['rcfr-oro','rcfr-navy','rcfr-doppio','rcfr-alloro'].forEach(c=>b.classList.remove(c));
+ const fr=typeof RC!=='undefined'&&RC.frameClass?RC.frameClass(m).trim():'';if(fr)fr.split(/\s+/).filter(Boolean).forEach(c=>b.classList.add(c));
+ if(src){const img=document.createElement('img');img.className='avimg';img.alt='';img.width=36;img.height=36;img.decoding='async';if(!slug)img.referrerPolicy='no-referrer';
+  b.style.background='';b.style.color='';b.style.fontSize='';f.style.background='';f.style.color='';f.style.fontSize='';f.append(img);img.src=src+((!slug&&m&&m.photoRev)?('?v='+encodeURIComponent(m.photoRev)):'');b.hidden=false}
  else{f.textContent=emo||t;if(emo&&col){b.style.background=col;b.style.color='#fff';b.style.fontSize='18px'}else{b.style.background='';b.style.color='';b.style.fontSize=''}b.hidden=!(emo||t)}
  syncBadge(b)}
 let menuEl=null,menuOn=null,menuOff=null;
