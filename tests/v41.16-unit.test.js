@@ -4,12 +4,12 @@ const root=path.join(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 let n=0,ok=0;const chk=(c,m)=>{n++;if(c){ok++;console.log('OK',m)}else{console.error('FAIL',m);process.exitCode=1}};
 
-const mig=read('supabase/migrate-v41.16.sql');
+const mig=read('supabase/migrate-v41.16.sql'),mig1161=read('supabase/migrate-v41.16.1.sql');
 const data=read('data.js'),app=read('app.js'),xp=read('xp.js'),libri=read('libri.js'),altro=read('altro.js');
 const rc=read('ricompense.js'),sb=read('sb.js'),hdr=read('header.js'),css=read('styles.css');
 const {APP_VERSION,swCache,hasAsset}=require('./appver');
 
-chk(APP_VERSION==='41.16'&&swCache()&&hasAsset('ricompense.js')&&hasAsset('data.js')&&hasAsset('app.js'),'APP_VERSION 41.16, cache SW e asset allineati');
+chk(APP_VERSION&&swCache()&&hasAsset('ricompense.js')&&hasAsset('data.js')&&hasAsset('app.js')&&hasAsset('brand.js')&&hasAsset('styles.css'),'APP_VERSION, cache SW e asset allineati');
 chk(/grant execute on function public\.ricompense_stato\(\) to authenticated/.test(mig)
   &&/revoke all on function public\.ricompense_stato\(\) from public, anon/.test(mig)
   &&/revoke all on function public\.ricompensa_salva\(jsonb\) from public, anon/.test(mig)
@@ -25,6 +25,9 @@ chk(/grant select \(sospeso\) on public\.members/.test(mig)
 chk(!/alter table public\.(plays|games|game_meta)/.test(mig)&&!/create or replace function public\.member_xp/.test(mig),'migrazione non altera plays/games/game_meta né member_xp');
 chk(/rc_icona_ok|rc_avatar_ok|rc_colore_ok/.test(mig)&&/Avatar non sbloccato/.test(mig),'allowlist icone/avatar/colori e blocco avatar non sbloccato');
 chk(/pioniere-2026/.test(mig)&&/socio-fondatore/.test(mig)&&/escludi.:\[.socio-fondatore/.test(mig),'seed Fondatore, Pioniere 2026 (esclusi i fondatori), Tester');
+chk(/dado-5/.test(mig1161)&&/'presidente'/.test(mig1161)&&/, 110/.test(mig1161)&&/manuale/.test(mig1161),'migrazione v41.16.1: allowlist dado-5 e seed Presidente prio 110');
+chk(/dado-5/.test(rc)&&/id:'presidente'/.test(rc)&&/priorita:110/.test(rc)&&require('fs').existsSync(path.join(root,'img/ricompense/icone/dado-5.svg')),'catalogo JS e file SVG dado-5');
+
 chk(!/club|ludoteca/i.test(mig+rc+altro+css),'niente club/ludoteca nei testi nuovi');
 
 chk(/function socioAttivo|const socioAttivo=/.test(data)&&/sospeso/.test(data),'socioAttivo in data.js');
@@ -85,10 +88,25 @@ chk(e.titolo==='Socio fondatore'&&e.icona==='socio-fondatore-b'&&e.colore==='#c4
 chk(e.avatar.includes('custode-arco')&&e.avatar.includes('inventore'),'avatar di tipi diversi (fondatore+tester) si sommano');
 RC.data.scelte=[{member_id:'m1',tipo:'titolo',ricompensa_id:'tester'}];
 chk(RC.effetti('m1').titolo==='Tester','la scelta del socio batte la priorità');
-chk(RC.icoSrc('tester')==='img/ricompense/icone/tester.svg'&&!RC.icoSrc('../x')&&!RC.icoSrc('foo')&&!RC.avSrc('javascript:alert(1)'),'src solo da allowlist');
+chk(RC.icoSrc('tester')==='img/ricompense/icone/tester.svg'&&RC.icoSrc('dado-5')==='img/ricompense/icone/dado-5.svg'&&!RC.icoSrc('../x')&&!RC.icoSrc('foo')&&!RC.avSrc('javascript:alert(1)'),'src solo da allowlist, incluso dado-5');
+chk(RC.seed().catalogo[0].id==='presidente'&&RC.seed().catalogo[0].priorita===110&&RC.seed().catalogo[0].modo==='manuale'&&RC.seed().catalogo[0].icona==='dado-5','seed Presidente: manuale, icona dado-5, priorità 110');
 const html=RC.nameHtml(ms[0],sandbox.esc('Anna Verdi'));
 chk(/rcico/.test(html)&&/tester\.svg/.test(html)===false&&/socio-fondatore-b\.svg/.test(html),'icona nel nome, file consentito');
 chk(!RC.titleHtml(ms[0]).includes('<')||/rctit/.test(RC.titleHtml(ms[0])),'titolo escapato nel markup');
 
-console.log(`v41.16 unit: ${ok}/${n} ok`);
-if(ok!==n)process.exit(1);
+// v41.16.1 — riga assegnazione toccabile, interruttore, salvataggio locale
+chk(/class="rcaln"/.test(rc)&&/class="rcalnm"/.test(rc)&&/class="rcsw"/.test(rc)&&/data-am=/.test(rc),'assignHtml: label rcaln, nome, interruttore');
+chk(/display:flex/.test(css)&&/min-height:44px/.test(css)&&/\.rcaln/.test(css),'CSS riga flex, min-height 44px');
+chk(/\.rcsw\{[^}]*width:44px!important/.test(css)&&/\.rcsw\{[^}]*appearance:none/.test(css),'interruttore 44×26, non width 100%');
+chk(/data-rcass=/.test(rc)&&/class="rctog"/.test(rc)&&/id="rcvis"/.test(rc),'riquadro socio e Visibile in app usano lo stesso interruttore');
+sandbox.DB={remote:null,status:'local'};
+(async()=>{
+  RC.data=RC.norm(RC.seed());
+  RC.setLocal(RC.data);
+  await RC.assegna('m1','tester',true);
+  chk(RC.data.assegnate.some(a=>a.member_id==='m1'&&a.ricompensa_id==='tester'),'assegna locale: crea la riga');
+  await RC.assegna('m1','tester',false);
+  chk(!RC.data.assegnate.some(a=>a.member_id==='m1'&&a.ricompensa_id==='tester'),'assegna locale: rimuove la riga');
+  console.log(`v41.16 unit: ${ok}/${n} ok`);
+  if(ok!==n)process.exit(1);
+})().catch(e=>{console.error(e);process.exit(1)});

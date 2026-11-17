@@ -1,7 +1,7 @@
 // v41.16 — Ricompense in app: effetti visibili, pannello Gestione, scelta nel profilo.
 // Catalogo e assegnazioni arrivano da RPC (o da localStorage in modalità locale).
 const RC={
- ICONE:Object.freeze(['socio-fondatore-b','pioniere','tester','coppa','d20','pergamena','clessidra','lanterna']),
+ ICONE:Object.freeze(['socio-fondatore-b','pioniere','tester','dado-5','coppa','d20','pergamena','clessidra','lanterna']),
  AVATAR:Object.freeze(['custode-arco','esploratore-e','re-dei-meeple','inventore','golem-dadi','cartografa','cavaliere','maga','ladra','drago','pirata','alchimista']),
  BASE:Object.freeze(['base-meeple-navy','base-meeple-oro','base-meeple-teal']),
  COLORI:Object.freeze([
@@ -24,6 +24,7 @@ const RC={
  local(){try{return JSON.parse(localStorage.getItem(this.lkey)||'')}catch(e){return null}},
  setLocal(d){try{localStorage.setItem(this.lkey,JSON.stringify(d))}catch(e){}this.data=d},
  seed(){return{catalogo:[
+  {id:'presidente',nome:'Presidente',titolo:'Presidente',icona:'dado-5',colore:'#c4921a',cornice:'oro',sfondo:'navy-gold',avatar:[],visibile:true,modo:'manuale',modo_param:{},priorita:110},
   {id:'socio-fondatore',nome:'Socio fondatore',titolo:'Socio fondatore',icona:'socio-fondatore-b',colore:'#c4921a',cornice:'oro',sfondo:'navy-gold',avatar:['custode-arco','re-dei-meeple'],visibile:true,modo:'manuale',modo_param:{},priorita:100},
   {id:'pioniere-2026',nome:'Pioniere 2026',titolo:'Pioniere 2026',icona:'pioniere',colore:'#0e6b8a',cornice:'navy',sfondo:'teal',avatar:['esploratore-e','cartografa'],visibile:true,modo:'tessera_entro',modo_param:{entro:'2026-12-31',escludi:['socio-fondatore']},priorita:80},
   {id:'tester',nome:'Tester',titolo:'Tester',icona:'tester',colore:'#3d2c8a',cornice:'doppio',sfondo:'viola',avatar:['inventore','golem-dadi'],visibile:true,modo:'manuale',modo_param:{},priorita:60}
@@ -128,7 +129,7 @@ const RC={
    <p class="muted sm" style="margin-top:-6px">${this.CORNICI.map(c=>c.v+': '+c.l).join(' · ')}</p>
    <label>Sfondo del profilo</label>${grid(this.SFONDI.map(c=>c.v),'sfondo',()=>1,()=>'',r.sfondo)}
    <label>Avatar a tema sbloccati</label><div class="rcgrid">${avAll.map(v=>`<button type="button" class="rcpick${(r.avatar||[]).includes(v)?' on':''}" data-av="${v}"><img src="${this.avSrc(v)}" alt="${esc(v)}"></button>`).join('')}</div>
-   <label class="lchk"><input type="checkbox" id="rcvis"${r.visibile!==false?' checked':''}> Visibile in app</label>
+   <label class="rctog"><span>Visibile in app</span><input type="checkbox" class="rcsw" id="rcvis"${r.visibile!==false?' checked':''}></label>
    <label>Come si ottiene</label><select id="rcmodo"><option value="manuale"${r.modo==='manuale'?' selected':''}>Assegnata a mano dallo staff</option><option value="tessera_entro"${r.modo==='tessera_entro'?' selected':''}>Automatica: tessera pagata entro una data</option></select>
    <div id="rcparam"${r.modo==='tessera_entro'?'':' hidden'}><label>Entro il</label><input id="rcentro" type="date" value="${esc((r.modo_param&&r.modo_param.entro)||'')}">
    <label>Escludi chi ha già (identificativi, separati da virgola)</label><input id="rcescl" maxlength="200" value="${esc(((r.modo_param&&r.modo_param.escludi)||[]).join(', '))}"></div>
@@ -156,17 +157,18 @@ const RC={
   if($('#rcdel'))$('#rcdel').onclick=async()=>{if(!await ask('Eliminare «'+r.nome+'»? Le assegnazioni verranno tolte.'))return;try{await this.elimina(r.id);toast('Ricompensa eliminata');this.draw()}catch(e){toastErr(e,'SOCI')}};
   this.bindAssign(r,ms)},
  assignHtml(r,ms){const has=id=>this.data.assegnate.some(a=>a.member_id===id&&a.ricompensa_id===r.id);
+  const list=[...ms].sort((a,b)=>memberName(a).localeCompare(memberName(b),'it',{sensitivity:'base'}));
   return`<div class="card"><b>Assegna a un socio</b>
    <input id="rcaq" type="search" maxlength="80" placeholder="🔍 Cerca per nome" autocomplete="off">
-   <div id="rcal" class="rcal">${ms.map(m=>`<label class="rcaln" data-q="${esc([m.nome,m.cognome,m.soprannome,memberName(m)].filter(Boolean).join(' ').toLowerCase())}"><input type="checkbox" data-am="${esc(m.id)}"${has(m.id)?' checked':''}> ${esc(memberName(m))}</label>`).join('')}</div></div>`},
+   <div id="rcal" class="rcal">${list.map(m=>{const nm=memberName(m);return`<label class="rcaln" data-q="${esc([m.nome,m.cognome,m.soprannome,nm].filter(Boolean).join(' ').toLowerCase())}"><span class="rcalnm">${esc(nm)}</span><input type="checkbox" class="rcsw" data-am="${esc(m.id)}"${has(m.id)?' checked':''} aria-label="Assegna a ${esc(nm)}"></label>`}).join('')}</div></div>`},
  bindAssign(r,ms){const q=$('#rcaq'),box=$('#rcal');if(!q||!box)return;
   const filt=()=>{const v=q.value.trim().toLowerCase();box.querySelectorAll('.rcaln').forEach(l=>{l.hidden=!!v&&!((l.dataset.q||'').includes(v))})};
   q.oninput=filt;filt();
-  box.querySelectorAll('[data-am]').forEach(cb=>cb.onchange=async()=>{try{await this.assegna(cb.dataset.am,r.id,cb.checked);toast(cb.checked?'Assegnata':'Rimossa')}catch(e){cb.checked=!cb.checked;toastErr(e,'SOCI')}})},
+  box.querySelectorAll('[data-am]').forEach(cb=>cb.onchange=async()=>{cb.disabled=true;try{await this.assegna(cb.dataset.am,r.id,cb.checked);toast(cb.checked?'Assegnata':'Rimossa')}catch(e){cb.checked=!cb.checked;toastErr(e,'SOCI')}finally{cb.disabled=false}})},
  // riquadro nella scheda socio (Gestione)
  boxHtml(m){if(!m)return'';const ids=new Set(this.owned(m.id).map(r=>r.id));
-  return`<div class="rcbox"><b>Ricompense</b>${this.data.catalogo.map(r=>`<label class="lchk"><input type="checkbox" data-rcass="${esc(r.id)}"${ids.has(r.id)?' checked':''}> ${esc(r.nome)}</label>`).join('')||'<p class="muted">Nessuna ricompensa in catalogo.</p>'}</div>`},
- bindBox(root,m){if(!root||!m)return;root.querySelectorAll('[data-rcass]').forEach(cb=>cb.onchange=async()=>{try{await this.assegna(m.id,cb.dataset.rcass,cb.checked);toast(cb.checked?'Ricompensa assegnata':'Ricompensa tolta')}catch(e){cb.checked=!cb.checked;toastErr(e,'SOCI')}})},
+  return`<div class="rcbox"><b>Ricompense</b>${this.data.catalogo.map(r=>`<label class="rcaln"><span class="rcalnm">${esc(r.nome)}</span><input type="checkbox" class="rcsw" data-rcass="${esc(r.id)}"${ids.has(r.id)?' checked':''} aria-label="${esc(r.nome)}"></label>`).join('')||'<p class="muted">Nessuna ricompensa in catalogo.</p>'}</div>`},
+ bindBox(root,m){if(!root||!m)return;root.querySelectorAll('[data-rcass]').forEach(cb=>cb.onchange=async()=>{cb.disabled=true;try{await this.assegna(m.id,cb.dataset.rcass,cb.checked);toast(cb.checked?'Ricompensa assegnata':'Ricompensa tolta')}catch(e){cb.checked=!cb.checked;toastErr(e,'SOCI')}finally{cb.disabled=false}})},
  mountBox(root,m){if(!root||!m||root.querySelector('.rcbox'))return;const wrap=document.createElement('div');wrap.innerHTML=this.boxHtml(m);root.append(...wrap.childNodes);this.bindBox(root,m)},
  // selettore effetti nel profilo del socio
  selHtml(m){const e=this.effetti(m.id);if(!e||e.owned.length<1)return'';
