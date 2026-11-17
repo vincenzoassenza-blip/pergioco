@@ -10,7 +10,7 @@ const T={titSocio:'Altro',titStaff:'Gestione',account:'Il mio account',accCon:'A
  strumenti:'Strumenti avanzati',strSub:'⚠️ Backup, importazione, dati del telefono',soci:'Soci',attivi:'attivi',cerca:'🔍 Cerca socio per nome o tessera',
  nuovo:'Nuovo socio',modifica:'Modifica socio',hint:'ⓘ L\'elenco dei soci compare dopo la ricerca.',nessuno:'Nessun socio trovato.',btnMod:'✏️ Modifica',
  tabs:{soci:['👥','Soci'],partite:['🎲','Partite'],account:['🔑','Codici'],mods:['🛡️','Moderatori']},
- btns:{ast:['📊','Statistiche associazione'],alib:['📚','Libri sociali','soci e volontari'],aant:['⚖️',null],acfg:['⚙️','Configurazione']},
+ btns:{ast:['📊','Statistiche associazione'],alib:['📚','Libri sociali','soci e volontari'],aric:['🏅','Ricompense'],aant:['⚖️',null],acfg:['⚙️','Configurazione']},
  impTit:'Importa da BGG e RPGGeek',impSub:'File CSV/Excel o nome utente BGG e RPGGeek',
  adm:'🔧 Statistiche complete',admChip:'solo admin',req:' *'};
 let OPEN=null,Q='';window.AL416={T};
@@ -79,14 +79,17 @@ function soci(A,L){const mu=[...A.querySelectorAll(':scope>p.muted')];const c=mu
  const q=el('input','alq');q.type='search';q.placeholder=T.cerca;q.setAttribute('aria-label',T.cerca.replace(/^\S+\s/,''));q.value=Q;
  const hint=el('p','alhint',T.hint),none=el('p','alhint',T.nessuno);const res=el('div','alres');
  const recs=list?[...list.querySelectorAll('.rec')]:[];
- recs.forEach(r=>{const nm=r.querySelector(':scope>span:first-child'),ac=r.querySelector(':scope>span:nth-child(2)');const w=el('div','alsoc');r.replaceWith(w);
+ recs.forEach(r=>{const nm=r.querySelector(':scope>span:first-child'),ac=r.querySelector(':scope>span:nth-child(2)');const w=el('div','alsoc');w.dataset.sospeso=r.dataset.sospeso||'0';w.dataset.mid=r.dataset.mid||'';r.replaceWith(w);
   const h=el('div','alr alsr');h.append(el('span','ic','👤'));const t=el('span','t');t.append(...nm.childNodes);h.append(t);w.append(h);res.append(w);
   if(ac&&ac.querySelector('button')){h.append(arrow(false));const sc=el('div','alsch');sc.hidden=true;const e=ac.querySelector('[data-e]');if(e)e.textContent=T.btnMod;const d=ac.querySelector('[data-t]');if(d)d.classList.add('aldis');sc.append(...ac.querySelectorAll('button'));w.append(sc);
-   act(h,()=>{sc.hidden=!sc.hidden;h.querySelector('.ar').textContent=sc.hidden?'▸':'▾';h.setAttribute('aria-expanded',!sc.hidden)});h.setAttribute('aria-expanded','false')}});
+   act(h,()=>{sc.hidden=!sc.hidden;h.querySelector('.ar').textContent=sc.hidden?'▸':'▾';h.setAttribute('aria-expanded',!sc.hidden);
+    if(!sc.hidden&&typeof RC!=='undefined'&&RC.mountBox&&w.dataset.mid&&!sc.querySelector('.rcbox'))RC.mountBox(sc,{id:w.dataset.mid})});
+   h.setAttribute('aria-expanded','false')}});
  
- const nf=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
- const filt=()=>{Q=q.value;const v=nf(q.value.trim());let k=0;res.querySelectorAll('.alsoc').forEach(w=>{const ok=!!v&&nf(w.querySelector('.t').textContent).includes(v);w.hidden=!ok;if(ok)k++});hint.hidden=!!v;none.hidden=!v||k>0};
- q.oninput=filt;const top=el('div','alsoci');top.append(q,nr,fm,hint,none);pk.replaceWith(top);if(list)list.replaceWith(res);else top.after(res);filt();
+ const nf=s=>String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+ const fil=el('select','alfilt');fil.setAttribute('aria-label','Filtro soci');[['tutti','Tutti'],['sospesi','Sospesi']].forEach(([k,l])=>{const o=el('option',null,l);o.value=k;fil.append(o)});
+ const filt=()=>{Q=q.value;const v=nf(q.value.trim()),modo=fil.value;let k=0;res.querySelectorAll('.alsoc').forEach(w=>{const ok=modo==='sospesi'?w.dataset.sospeso==='1':(!!v&&nf(w.querySelector('.t').textContent).includes(v));w.hidden=!ok;if(ok)k++});hint.hidden=modo==='sospesi'||!!v;none.hidden=(modo==='sospesi'?!k:!v||k>0);if(modo==='sospesi'&&!k)none.textContent='Nessun socio sospeso.';else none.textContent=T.nessuno};
+ q.oninput=filt;fil.onchange=filt;const top=el('div','alsoci');top.append(q,fil,nr,fm,hint,none);pk.replaceWith(top);if(list)list.replaceWith(res);else top.after(res);filt();
  // dati del telefono / cambio PIN → Strumenti avanzati
  const sb=document.getElementById('alstrb');const ph=[...A.querySelectorAll(':scope>label')].find(l=>/Dati di questo telefono|Cambia PIN/.test(l.textContent));
  if(sb&&ph){const nx=ph.nextElementSibling;const box=el('div','alphone');box.id='alphone';box.append(ph);if(nx)box.append(nx);const o=sb.querySelector('#alphone');o?o.replaceWith(box):sb.append(box);const s=document.getElementById('alstr');if(s)s.hidden=false}}

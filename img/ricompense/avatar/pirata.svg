@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Il Pirata — teschio e ossa">
+  <title>Il Pirata — teschio e ossa</title>
+  <defs><clipPath id="pir-c"><circle cx="64" cy="64" r="64"/></clipPath></defs>
+  <g clip-path="url(#pir-c)">
+    <circle cx="64" cy="64" r="64" fill="#0f1c3d"/>
+    <circle cx="64" cy="64" r="52" fill="none" stroke="#1f3d7a" stroke-width="12"/>
+    <circle cx="64" cy="64" r="45" fill="none" stroke="#f2b134" stroke-width="2.5"/>
+
+    <g stroke="#f2b134" stroke-width="8" stroke-linecap="round"><path d="M38 76 L90 100 M90 76 L38 100"/></g>
+    <g fill="#f2b134"><circle cx="34" cy="72" r="5.5"/><circle cx="36" cy="80" r="5.5"/><circle cx="94" cy="72" r="5.5"/><circle cx="92" cy="80" r="5.5"/>
+      <circle cx="34" cy="104" r="5.5"/><circle cx="36" cy="96" r="5.5"/><circle cx="94" cy="104" r="5.5"/><circle cx="92" cy="96" r="5.5"/></g>
+    <path fill="#fff6d4" d="M64 26 C80 26 90 37 90 51 C90 60 86 66 80 69 V80 C80 83 78 85 75 85 H53 C50 85 48 83 48 80 V69 C42 66 38 60 38 51 C38 37 48 26 64 26Z"/>
+    <g fill="#14254a"><circle cx="54" cy="52" r="7.5"/><circle cx="74" cy="52" r="7.5"/><path d="M64 60 L68 68 H60Z"/></g>
+    <path d="M57 74 V85 M64 74 V85 M71 74 V85" stroke="#14254a" stroke-width="2.6"/>
+  </g>
+</svg>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="L'Inventore — lampadina">
+  <title>L'Inventore — lampadina</title>
+  <defs><clipPath id="inv-c"><circle cx="64" cy="64" r="64"/></clipPath></defs>
+  <g clip-path="url(#inv-c)">
+    <circle cx="64" cy="64" r="64" fill="#0f1c3d"/>
+    <circle cx="64" cy="64" r="52" fill="none" stroke="#1f3d7a" stroke-width="12"/>
+    <circle cx="64" cy="64" r="45" fill="none" stroke="#f2b134" stroke-width="2.5"/>
+
+    <g stroke="#fff6d4" stroke-width="4" stroke-linecap="round">
+      <path d="M64 20 V26 M34 32 L38.5 36.5 M94 32 L89.5 36.5 M24 58 H30 M104 58 H98"/>
+    </g>
+    <path fill="#f2b134" d="M64 34 C77 34 86 44 86 56 C86 64 82 69 78 73 C75 76 74 79 74 82 H54 C54 79 53 76 50 73 C46 69 42 64 42 56 C42 44 51 34 64 34Z"/>
+    <path d="M55 62 L59.5 54 L64 62 L68.5 54 L73 62 M59 64 V80 M69 64 V80" fill="none" stroke="#14254a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="53" y="84" width="22" height="6" rx="2.5" fill="#fff6d4"/>
+    <rect x="55" y="92" width="18" height="6" rx="2.5" fill="#fff6d4"/>
+    <path d="M59 100 H69 L66 104 H62Z" fill="#f2b134"/>
+  </g>
+</svg>

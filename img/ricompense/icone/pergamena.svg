@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Pergamena">
+  <title>Pergamena</title>
+  <rect x="5" y="4" width="14" height="16" fill="#fff6d4" stroke="#14254a" stroke-width="1.35"/>
+  <path d="M8 8.6 H16 M8 11.6 H16 M8 14.6 H13.4" stroke="#14254a" stroke-width="1.3" stroke-linecap="round"/>
+  <rect x="2.6" y="1.8" width="18.8" height="4.4" rx="2.2" fill="#f2b134" stroke="#14254a" stroke-width="1.35"/>
+  <rect x="2.6" y="17.8" width="18.8" height="4.4" rx="2.2" fill="#f2b134" stroke="#14254a" stroke-width="1.35"/>
+</svg>

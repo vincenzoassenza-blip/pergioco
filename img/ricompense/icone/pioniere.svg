@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Pioniere 2026">
+  <title>Pioniere 2026</title>
+  <!-- Esagono oro grande (tessera) -->
+  <path fill="#f2b134" stroke="#14254a" stroke-width="1.35" stroke-linejoin="round"
+        d="M12 8.05 17.6 11.25 17.6 17.65 12 20.85 6.4 17.65 6.4 11.25Z"/>
+  <!-- Asta oro con bordo navy, esce sopra l'esagono -->
+  <rect x="11.05" y="2" width="1.9" height="12.4" rx=".55" fill="#f2b134" stroke="#14254a" stroke-width=".9"/>
+  <!-- Bandierina crema, grande, soprattutto sopra l'esagono -->
+  <path fill="#fff6d4" stroke="#14254a" stroke-width="1.15" stroke-linejoin="round"
+        d="M12.95 2.15 22.1 5.85 12.95 9.55Z"/>
+  <path fill="#14254a" d="M14.35 4.55 19.15 5.85 14.35 7.15Z"/>
+</svg>

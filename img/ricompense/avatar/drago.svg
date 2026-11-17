@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Il Drago — testa geometrica">
+  <title>Il Drago — testa geometrica</title>
+  <defs><clipPath id="dra-c"><circle cx="64" cy="64" r="64"/></clipPath></defs>
+  <g clip-path="url(#dra-c)">
+    <circle cx="64" cy="64" r="64" fill="#0f1c3d"/>
+    <circle cx="64" cy="64" r="52" fill="none" stroke="#1f3d7a" stroke-width="12"/>
+    <circle cx="64" cy="64" r="45" fill="none" stroke="#f2b134" stroke-width="2.5"/>
+
+    <path fill="#fff6d4" d="M40 58 L14 32 L52 48Z M52 48 L34 18 L64 46Z"/>
+    <path fill="#fff6d4" d="M36 72 L26 70 L33 80Z M38 88 L27 89 L35 97Z"/>
+    <path fill="#f2b134" stroke="#f2b134" stroke-width="2" stroke-linejoin="round" d="M38 108 L34 66 L50 47 L72 46 L100 57 L106 66 L84 70 L68 72 L96 80 L74 88 L68 108Z"/>
+    <path fill="#fff6d4" d="M84 70 L90 70 L87 75Z M94 69 L100 68 L97 73Z M78 84 L84 82 L82 78Z"/>
+    <path fill="#14254a" d="M58 58 C62 52 70 51 76 54 C72 60 64 62 58 58Z"/>
+    <path fill="#d9472b" d="M66 54.5 L70 54 L68.5 59Z"/>
+    <path fill="#14254a" d="M94 59 L100 60 L96 63Z"/>
+  </g>
+</svg>

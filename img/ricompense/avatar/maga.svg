@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="La Maga — cappello a punta">
+  <title>La Maga — cappello a punta</title>
+  <defs><clipPath id="mag-c"><circle cx="64" cy="64" r="64"/></clipPath></defs>
+  <g clip-path="url(#mag-c)">
+    <circle cx="64" cy="64" r="64" fill="#0f1c3d"/>
+    <circle cx="64" cy="64" r="52" fill="none" stroke="#1f3d7a" stroke-width="12"/>
+    <circle cx="64" cy="64" r="45" fill="none" stroke="#f2b134" stroke-width="2.5"/>
+
+    <path fill="#f2b134" d="M66 22 C70 22 72 26 73 30 L88 84 H40 L58 34 C60 28 62 22 66 22Z"/>
+    <path fill="#14254a" d="M43.4 74 H84.6 L87.2 83 H40.8Z"/>
+    <ellipse cx="64" cy="88" rx="38" ry="9" fill="#fff6d4"/>
+    <path fill="#fff6d4" d="M64 44 L66.9 52 L75 52.4 L68.6 57.5 L70.8 65.4 L64 60.8 L57.2 65.4 L59.4 57.5 L53 52.4 L61.1 52Z"/>
+  </g>
+</svg>

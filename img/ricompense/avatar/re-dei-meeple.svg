@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Il Re dei meeple — corona">
+  <title>Il Re dei meeple — corona</title>
+  <defs><clipPath id="re-c"><circle cx="64" cy="64" r="64"/></clipPath></defs>
+  <g clip-path="url(#re-c)">
+    <circle cx="64" cy="64" r="64" fill="#0f1c3d"/>
+    <circle cx="64" cy="64" r="52" fill="none" stroke="#1f3d7a" stroke-width="12"/>
+    <circle cx="64" cy="64" r="45" fill="none" stroke="#f2b134" stroke-width="2.5"/>
+
+    <path fill="#f2b134" d="M30 86 L32 46 L49 64 L64 38 L79 64 L96 46 L98 86Z" stroke="#f2b134" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="28" y="84" width="72" height="14" rx="3" fill="#fff6d4"/>
+    <circle cx="32" cy="44" r="5.5" fill="#fff6d4"/><circle cx="64" cy="36" r="6" fill="#fff6d4"/><circle cx="96" cy="44" r="5.5" fill="#fff6d4"/>
+    <circle cx="64" cy="91" r="4.5" fill="#d9472b"/><circle cx="46" cy="91" r="3.2" fill="#14254a"/><circle cx="82" cy="91" r="3.2" fill="#14254a"/>
+  </g>
+</svg>

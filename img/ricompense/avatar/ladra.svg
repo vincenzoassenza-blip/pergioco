@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="La Ladra — maschera">
+  <title>La Ladra — maschera</title>
+  <defs><clipPath id="lad-c"><circle cx="64" cy="64" r="64"/></clipPath></defs>
+  <g clip-path="url(#lad-c)">
+    <circle cx="64" cy="64" r="64" fill="#0f1c3d"/>
+    <circle cx="64" cy="64" r="52" fill="none" stroke="#1f3d7a" stroke-width="12"/>
+    <circle cx="64" cy="64" r="45" fill="none" stroke="#f2b134" stroke-width="2.5"/>
+    <path fill="#f2b134" fill-rule="evenodd" d="M18 60 C18 44 40 42 64 51 C88 42 110 44 110 60 C110 80 92 88 78 82 C70 79 67 72 64 72 C61 72 58 79 50 82 C36 88 18 80 18 60Z
+      M31 62 C33 53 47 53 56 62 C49 71 36 71 31 62Z M97 62 C95 53 81 53 72 62 C79 71 92 71 97 62Z"/>
+    <circle cx="64" cy="60" r="3" fill="#d9472b"/>
+  </g>
+</svg>

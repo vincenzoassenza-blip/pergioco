@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Il Custode, chiave e arco">
+  <title>Il Custode — chiave e arco</title>
+  <defs>
+    <clipPath id="cb-c"><circle cx="64" cy="64" r="64"/></clipPath>
+  </defs>
+  <g clip-path="url(#cb-c)">
+    <circle cx="64" cy="64" r="64" fill="#0f1c3d"/>
+    <!-- arco / portale, solo geometria -->
+    <path d="M24 128 V70 A40 40 0 0 1 104 70 V128" fill="none" stroke="#1f3d7a" stroke-width="14"/>
+    <path d="M28 128 V70 A36 36 0 0 1 100 70 V128" fill="none" stroke="#f2b134" stroke-width="3"/>
+    <!-- chiave verticale, centrata, grande -->
+    <g transform="translate(64 58)">
+      <circle cx="0" cy="-16" r="16" fill="none" stroke="#f2b134" stroke-width="6"/>
+      <circle cx="0" cy="-16" r="6.5" fill="none" stroke="#fff6d4" stroke-width="3.2"/>
+      <rect x="-4" y="-2" width="8" height="48" rx="2.5" fill="#f2b134"/>
+      <rect x="-4" y="38" width="20" height="8" rx="2" fill="#f2b134"/>
+      <rect x="-4" y="26" width="14" height="8" rx="2" fill="#f2b134"/>
+    </g>
+  </g>
+</svg>

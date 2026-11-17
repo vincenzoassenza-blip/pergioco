@@ -13,8 +13,8 @@ const XP={map:{},rt:[],me:null,p:null,
 const cpCamp=id=>!!id&&typeof CP!=='undefined'&&MOD.on('coppa')&&CP.camp===id;
 const lv=id=>{const k=cpCamp(id)?' <span class="lv lvchamp" title="Campione in carica · '+esc(MOD.nome('coppa'))+'">👑</span>':'';const r=id&&XP.map[id];if(!r)return k;const i=lvInfo(r.level);return` <span class="lv" style="background:${i.color}" title="${i.title} · ${r.xp} XP">Lv ${r.level}</span>`+k};
 const champH=(id,h)=>cpCamp(id)?`<span class="champ">${h}</span>`:h;
-const nmH=m=>champH(m&&m.id,esc(memberName(m)))+(m?lv(m.id):'');
-const lbH=(x,ms)=>champH(x&&x.memberId,esc(Stats.label(x,ms)))+(x&&x.memberId?lv(x.memberId):'');
+const nmH=m=>champH(m&&m.id,(typeof RC!=='undefined'&&RC.nameHtml?RC.nameHtml(m,esc(memberName(m))):esc(memberName(m))))+(m?lv(m.id):'');
+const lbH=(x,ms)=>{const raw=esc(Stats.label(x,ms)),m=x&&x.memberId&&ms?ms.find(z=>z.id===x.memberId):null;return champH(x&&x.memberId,(m&&typeof RC!=='undefined'&&RC.nameHtml?RC.nameHtml(m,raw):raw))+(x&&x.memberId?lv(x.memberId):'')};
 const XP_SRC=[['partite','🎲 Partite',10],['vittorie','🏆 Vittorie',5],['serate','🌙 Serate',15],['eventi','🎟️ Eventi (presente)',25],['tavoli','🏠 Tavoli ospitati e giocati',20],['giochi_nuovi','🧩 Giochi diversi',10],['sfide','⚖️ Sfide',10],['sfide_vinte','🥇 Sfide vinte',5],['sfavorito','🐢 Vinte da sfavorito',15],['coppa','🏆 Coppa Antero',50],['coppa_campione','👑 Campione Coppa Antero',150],['badge','🏅 Badge',30]];
 function xpCard(id){const r=XP.map[id];if(!r)return'';const i=lvInfo(r.level),a=xpFor(r.level),b=xpFor(r.level+1),pc=Math.round((r.xp-a)/(b-a)*100),d=r.dettaglio||{};
  return`<div class="card xpc"><div class="row" style="align-items:center;justify-content:space-between"><div><span class="lv lvb" style="background:${i.color}">Lv ${r.level}</span> <b style="color:${i.color}">${i.title}</b></div><b>${r.xp} XP</b></div>
@@ -66,7 +66,7 @@ const RA={
  top(m){let b=null,w=[];for(const[id,v]of m){if(!(v>0))continue;if(b===null||v>b){b=v;w=[id]}else if(v===b)w.push(id)}return b===null?null:{v:b,ids:w}},
  cnt(arr){const m=new Map();arr.forEach(x=>{if(x!=null&&x!=='')m.set(x,(m.get(x)||0)+1)});return m},
  async server(){try{if(!DB.remote||!DB.remote.client)return[];const{data,error}=await DB.remote.client.rpc('record_assoluti');if(error)throw error;return data||[]}catch(e){console.warn('record_assoluti',e);return[]}},
- async html(){const ps0=await DB.plays(),ps=typeof pf==='function'?pf(ps0):ps0,gs=await DB.games(),ms=await DB.members(),act=new Set(ms.filter(m=>m.active!==false).map(m=>m.id)),gn=id=>{const g=gs.find(x=>x.id===id);return g?g.name:'Gioco'};
+ async html(){const ps0=await DB.plays(),ps=typeof pf==='function'?pf(ps0):ps0,gs=await DB.games(),ms=await DB.members(),act=new Set(ms.filter(m=>typeof socioAttivo==='function'?socioAttivo(m):m.active!==false).map(m=>m.id)),gn=id=>{const g=gs.find(x=>x.id===id);return g?g.name:'Gioco'};
   const gdr=p=>typeof isGdrPlay==='function'&&isGdrPlay(p),board=p=>typeof isBoardGamePlay==='function'?isBoardGamePlay(p):!!(p&&p.gameId)&&!gdr(p);
   const nm=id=>{const m=ms.find(x=>x.id===id);return m?memberName(m):'Socio'},P=[];ps.forEach(p=>{if(gdr(p))return;(p.players||[]).forEach(x=>{if(x.memberId&&act.has(x.memberId))P.push({p,id:x.memberId,w:!!x.winner})})});
   const comp=P.filter(x=>!x.p.coop),out=[],who=t=>{const s=t.ids.slice(0,3).map(id=>`<a class="pv" data-pv="${esc(id)}">${esc(nm(id))}${lv(id)}</a>`).join(', ');return s+(t.ids.length>3?` <span class="muted">+${t.ids.length-3}</span>`:'')},
