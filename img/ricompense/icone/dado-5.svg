@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Dado 5">
+  <title>Dado 5</title>
+  <rect x="1.8" y="1.8" width="20.4" height="20.4" rx="3.4" fill="#1f3d7a" stroke="#14254a" stroke-width="1.5"/>
+  <g fill="#f2b134">
+    <circle cx="7.15" cy="7.15" r="2.05"/>
+    <circle cx="16.85" cy="7.15" r="2.05"/>
+    <circle cx="12" cy="12" r="2.05"/>
+    <circle cx="7.15" cy="16.85" r="2.05"/>
+    <circle cx="16.85" cy="16.85" r="2.05"/>
+  </g>
+</svg>
