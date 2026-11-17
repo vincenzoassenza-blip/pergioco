@@ -73,6 +73,10 @@ addEventListener('popstate',()=>{if(_bkSkip){_bkSkip--;if(!_bkSkip)for(;_bkPend;
 async function confirmLogout(){if(await modal('Vuoi uscire dal tuo account? Dovrai inserire di nuovo email e password.'))DB.logout()}
 const ask=m=>modal(m),askText=(m,d='',num='')=>modal(m,{input:true,def:d,num});
 function isMod(){return !!(admin&&DB.remote&&DB.remote.modCached)}
+function staffStato(x){return x&&x.stato==='account'?'Account registrato, nessun socio collegato':x&&x.stato==='assente'?'Non ancora registrato':''}
+function staffNome(x){return [x&&x.nome,x&&x.cognome].map(s=>String(s||'').trim()).filter(Boolean).join(' ')}
+function staffNorm(x){return !x?{email:'',stato:'assente'}:typeof x==='string'?{email:x,stato:'assente'}:x}
+function staffCard(x,rm){const email=String((x&&x.email)||''),nome=staffNome(x),st=staffStato(x),titolo=nome||email;return `<div class="rec almod"><span class="alstaffp">🛡 <b>${esc(titolo)}</b>${nome&&email?`<span class="muted sm">${esc(email)}</span>`:''}${st?`<span class="muted sm">${esc(st)}</span>`:''}</span>${rm&&email?`<button class="s" data-mr="${esc(email)}" style="flex:0 0 auto">Rimuovi</button>`:''}</div>`}
 function drawOutBtn(){const b=document.getElementById('outbtn');if(!b)return;b.onclick=confirmLogout;if(!DB.remote){b.hidden=true;return}DB.remote.user().then(u=>{b.hidden=!u;if(u)b.title='Esci ('+u.email+')'}).catch(()=>{b.hidden=true})}
 function drawModeBtn(){drawOutBtn();{const n=document.getElementById('navaltro');if(n)n.textContent=admin?'Gestione':'Altro'}const b=document.getElementById('modebtn');if(b){b.hidden=true;b.setAttribute('aria-hidden','true')}document.body.classList.toggle('adm',adminMode())}
 const SFID=v=>typeof v==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
@@ -408,13 +412,26 @@ async altro(){const hp=await DB.hasPin();
  <label>Nuovo socio</label><div class="row"><input id="mn" placeholder="Nome"><input id="mc2" placeholder="Cognome"></div><input id="mso" placeholder="Soprannome (facoltativo)" style="margin-top:6px"><button class="p" id="msv">Aggiungi socio</button>
  <div style="margin-top:12px">${ms.filter(m=>typeof socioAttivo==='function'?socioAttivo(m):m.active).map(m=>`<div class="rec"><span>${avatarHtml(m,24)} ${nmH(m)}</span></div>`).join('')}</div>`;bind();
   $('#msv').onclick=async()=>{const nome=$('#mn').value.trim(),cognome=$('#mc2').value.trim();if(!nome)return toast('Inserisci il nome');try{await DB.saveMember({nome,cognome,soprannome:$('#mso').value.trim()});toast('Socio aggiunto: ora generagli il codice');adminTab='account';go('altro')}catch(e){toastErr(e,'SOCI')}}};
- const drawMods=async()=>{let l=[];try{l=await DB.remote.moderators()}catch(e){A.innerHTML=TB()+'<p class="warn">'+esc((r=>`Non riesco a caricare l\'elenco dei moderatori: ${r.msg} [${r.code}]`)(errSpiega(e,'MOD')))+'</p>';bind();return}
+ const drawMods=async()=>{let l=[],ad=[];try{l=await DB.remote.moderators();if(typeof DB.remote.admins==='function')ad=await DB.remote.admins()}catch(e){A.innerHTML=TB()+'<p class="warn">'+esc((r=>`Non riesco a caricare l\'elenco dei moderatori: ${r.msg} [${r.code}]`)(errSpiega(e,'MOD')))+'</p>';bind();return}
+  l=(l||[]).map(staffNorm);ad=(ad||[]).map(staffNorm);
+  const taken=new Set([...l,...ad].flatMap(x=>[x.member_id,x.memberId].filter(Boolean)));
+  const cand=ms.filter(m=>m.userId&&!taken.has(m.id)&&(typeof socioAttivo==='function'?socioAttivo(m):m.active!==false)).slice().sort((a,b)=>memberName(a).localeCompare(memberName(b),'it'));
+  const opts=cand.map(m=>`<option value="${esc(m.id)}">${esc(memberName(m))}</option>`).join('');
   A.innerHTML=TB()+`<p class="muted">I moderatori possono: aggiungere nuovi soci, generare/rigenerare i codici, gestire i tavoli dell'Agenda e registrare partite per gli altri. <b>Non</b> possono modificare o eliminare nulla né vedere tessere e stato account.</p>
-  <label>Email del nuovo moderatore (quella con cui si registra/accede)</label><input id="me2" type="text" placeholder="nome@email.it" style="width:100%"><button class="p" id="ma" style="width:100%">Nomina moderatore</button>
-  <div style="margin-top:12px">${l.map(e=>`<div class="rec"><span>🛡 ${esc(e)}</span><button class="s" data-mr="${esc(e)}" style="flex:0 0 auto">Rimuovi</button></div>`).join('')||'<p class="muted">Nessun moderatore.</p>'}</div>`;bind();
-  $('#ma').onclick=async()=>{const e=normEmail($('#me2').value);if(!/^\S+@\S+\.\S+$/.test(e))return toastVal('Email non valida: scrivila nel formato nome@dominio.it, senza spazi','E-LOGIN-V1');try{await DB.remote.setModerator(e,true);toast('Moderatore nominato');drawMods()}catch(x){toastErr(x,'MOD')}};
-  A.querySelectorAll('[data-mr]').forEach(b=>b.onclick=async()=>{if(!await ask('Rimuovere il moderatore '+b.dataset.mr+'?'))return;try{await DB.remote.setModerator(b.dataset.mr,false);toast('Moderatore rimosso');drawMods()}catch(x){toastErr(x,'MOD')}})};
- if(isMod()&&(adminTab==='partite'||adminTab==='mods'))adminTab='soci';
+  <h3 class="alsub">Admin</h3>
+  <div class="aladmlist">${ad.map(x=>staffCard(x,false)).join('')||'<p class="muted">Nessun admin.</p>'}</div>
+  <h3 class="alsub">Moderatori</h3>
+  <div>${l.map(x=>staffCard(x,true)).join('')||'<p class="muted">Nessun moderatore.</p>'}</div>
+  <label>Scegli un socio registrato</label>
+  <select id="mmem" style="width:100%"${opts?'':' disabled'}><option value="">${opts?'— scegli —':'Nessun socio registrato disponibile'}</option>${opts}</select>
+  <button class="p" id="mam" style="width:100%"${opts?'':' disabled'}>Nomina dal socio</button>
+  <label>Oppure email (per chi non è ancora iscritto)</label>
+  <input id="me2" type="text" placeholder="nome@email.it" style="width:100%">
+  <button class="p" id="ma" style="width:100%">Nomina per email</button>`;bind();
+  const mam=document.getElementById('mam');if(mam)mam.onclick=async()=>{const id=document.getElementById('mmem').value;if(!id)return toast('Scegli un socio');try{await DB.remote.setModeratorMember(id,true);toast('Moderatore nominato');drawMods()}catch(x){toastErr(x,'MOD')}};
+  document.getElementById('ma').onclick=async()=>{const e=normEmail(document.getElementById('me2').value);if(!/^\S+@\S+\.\S+$/.test(e))return toastVal('Email non valida: scrivila nel formato nome@dominio.it, senza spazi','E-LOGIN-V1');try{await DB.remote.setModerator(e,true);toast('Moderatore nominato');drawMods()}catch(x){toastErr(x,'MOD')}};
+  A.querySelectorAll('[data-mr]').forEach(b=>b.onclick=async()=>{const row=l.find(x=>x.email===b.dataset.mr);const chi=staffNome(row)||b.dataset.mr;if(!await ask('Rimuovere il moderatore '+chi+'?'))return;try{await DB.remote.setModerator(b.dataset.mr,false);toast('Moderatore rimosso');drawMods()}catch(x){toastErr(x,'MOD')}})};
+  if(isMod()&&(adminTab==='partite'||adminTab==='mods'))adminTab='soci';
  const draw=()=>adminTab==='mods'&&R?drawMods():isMod()?(adminTab==='account'&&R?drawAcc():drawSociMod()):adminTab==='partite'?drawPlays():adminTab==='account'&&R?drawAcc():drawSoci();draw()},
 async stats(){if(!adminMode()){V.innerHTML='<h2>Statistiche associazione</h2><p class="muted">Disponibili solo in modalità admin.</p>';return}
  const gs=await DB.games(),ps=pf(await DB.plays()),ms=await DB.members(),ts=pf(await DB.allTables()),ctx={plays:ps,games:gs,tables:ts};

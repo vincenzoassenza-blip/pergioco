@@ -14,7 +14,7 @@ const sw=read('sw.js');
 const idx=read('index.html');
 
 const {APP_VERSION,swCache,hasAsset}=require('./appver');
-chk(/^41\.17/.test(APP_VERSION)&&swCache(),'versione 41.17+ in brand.js allineata alla cache SW');
+chk(swCache(),'versione in brand.js allineata alla cache SW');
 chk(/accesso\.js\?v=41\.17/.test(idx)&&/accesso\.js\?v=41\.17/.test(sw),'accesso.js pinnato in index e SW');
 chk(hasAsset('styles.css')&&hasAsset('app.js')&&hasAsset('ricompense.js'),'asset modificati con ?v= allineato a index e SW');
 

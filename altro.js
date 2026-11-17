@@ -65,7 +65,7 @@ function proc(V){const A=V.querySelector('#adm'),L=V.querySelector('#allist');if
  Object.keys(T.btns).forEach(id=>{const b=A.querySelector(':scope>#'+id);if(!b)return;if(id==='acfg'&&!(adminMode()&&!isMod()))return;const [ic,t,sub]=T.btns[id];
   const r=row(ic,t||b.textContent.replace(/^\S+\s/,''),null,false,'albtn');if(sub)r.querySelector('b').after(el('span','alsm',sub));if(/sola lettura/.test(b.textContent))r.querySelector('b').after(el('span','alsm','sola lettura'));r.dataset.alb=id;act(r,()=>{if(adminMode())b.click()});L.append(r)});
  if(!L.contains(A)){L.after(A);A.hidden=true}else A.hidden=false;}
-function markReq(A){const n=A.querySelector('#mn');if(n&&!/\*$/.test(n.placeholder))n.placeholder+=' *';const e=A.querySelector('#me2');if(e){const l=e.previousElementSibling;if(l&&l.tagName==='LABEL')req(l)}}
+function markReq(A){const n=A.querySelector('#mn');if(n&&!/\*$/.test(n.placeholder))n.placeholder+=' *'}
 // 4-5 · Soci: riepilogo + ricerca, Disattiva nella scheda
 function soci(A,L){const mu=[...A.querySelectorAll(':scope>p.muted')];const c=mu.find(p=>/soci attivi$/.test(p.textContent.trim()));
  L._att=c?parseInt(c.textContent,10):null;if(c)c.remove();
