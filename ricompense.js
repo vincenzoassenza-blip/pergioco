@@ -1,7 +1,7 @@
 // v41.16 — Ricompense in app: effetti visibili, pannello Gestione, scelta nel profilo.
 // Catalogo e assegnazioni arrivano da RPC (o da localStorage in modalità locale).
 const RC={
- ICONE:Object.freeze(['socio-fondatore-b','pioniere','tester','dado-5','coppa','d20','pergamena','clessidra','lanterna']),
+ ICONE:Object.freeze(['socio-fondatore-b','pioniere','tester','dado-5','dado-5-past','coppa','d20','pergamena','clessidra','lanterna']),
  AVATAR:Object.freeze(['custode-arco','esploratore-e','re-dei-meeple','inventore','golem-dadi','cartografa','cavaliere','maga','ladra','drago','pirata','alchimista']),
  BASE:Object.freeze(['base-meeple-navy','base-meeple-oro','base-meeple-teal']),
  COLORI:Object.freeze([
@@ -25,6 +25,7 @@ const RC={
  setLocal(d){try{localStorage.setItem(this.lkey,JSON.stringify(d))}catch(e){}this.data=d},
  seed(){return{catalogo:[
   {id:'presidente',nome:'Presidente',titolo:'Presidente',icona:'dado-5',colore:'#c4921a',cornice:'oro',sfondo:'navy-gold',avatar:[],visibile:true,modo:'manuale',modo_param:{},priorita:110},
+  {id:'past-president',nome:'Past President',titolo:'Past President',icona:'dado-5-past',colore:'#c4921a',cornice:'alloro',sfondo:'gold',avatar:[],visibile:true,modo:'manuale',modo_param:{},priorita:105},
   {id:'socio-fondatore',nome:'Socio fondatore',titolo:'Socio fondatore',icona:'socio-fondatore-b',colore:'#c4921a',cornice:'oro',sfondo:'navy-gold',avatar:['custode-arco','re-dei-meeple'],visibile:true,modo:'manuale',modo_param:{},priorita:100},
   {id:'pioniere-2026',nome:'Pioniere 2026',titolo:'Pioniere 2026',icona:'pioniere',colore:'#0e6b8a',cornice:'navy',sfondo:'teal',avatar:['esploratore-e','cartografa'],visibile:true,modo:'tessera_entro',modo_param:{entro:'2026-12-31',escludi:['socio-fondatore']},priorita:80},
   {id:'tester',nome:'Tester',titolo:'Tester',icona:'tester',colore:'#3d2c8a',cornice:'doppio',sfondo:'viola',avatar:['inventore','golem-dadi'],visibile:true,modo:'manuale',modo_param:{},priorita:60}
@@ -102,6 +103,9 @@ const RC={
   else{m.sospeso=false;m.sospesoNota='';m.sospesoRientro='';m.sospesoDal=''}
   await DB.adapter.replaceAll(d)},
  // —— UI gestione
+ soloAdmin(id){return id==='presidente'||id==='past-president'},
+ isAdmin(){return !!(typeof admin!=='undefined'&&admin&&typeof isMod==='function'&&!isMod())},
+ canEdit(r){return !this.soloAdmin(r&&r.id)||this.isAdmin()},
  slug(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)},
  async draw(id){if(!(typeof adminMode==='function'&&adminMode())){V.innerHTML='<h2>Ricompense</h2><p class="muted">Riservato allo staff.</p>';return}
   await this.load();const ms=await DB.members();
@@ -109,7 +113,7 @@ const RC={
   const cnt=rid=>this.data.assegnate.filter(a=>a.ricompensa_id===rid).length;
   V.innerHTML=`<div class="hrow"><h2>🏅 Ricompense</h2><button class="s" id="rcbk">← Indietro</button></div>
    <p class="muted">Titolo, colore, icona, cornice, sfondo e avatar a tema. Gli effetti di tipo diverso si sommano; per i doppioni il socio sceglie dal profilo.</p>
-   <div id="rcl">${this.data.catalogo.map(r=>`<div class="rec rcr" data-id="${esc(r.id)}"><span>${r.icona&&this.icoSrc(r.icona)?`<img class="rcico" src="${this.icoSrc(r.icona)}" alt="" width="20" height="20">`:''}<b>${esc(r.nome)}</b>${r.titolo&&r.titolo!==r.nome?` <span class="muted">· ${esc(r.titolo)}</span>`:''}<br><span class="muted">${cnt(r.id)} ${cnt(r.id)===1?'socio':'soci'} · ${r.visibile?'visibile':'nascosta'} · ${r.modo==='tessera_entro'?'automatica (tessera)':'manuale'}</span></span><span class="chip">${esc(String(r.priorita))}</span></div>`).join('')||'<p class="muted">Nessuna ricompensa.</p>'}</div>
+   <div id="rcl">${this.data.catalogo.map(r=>`<div class="rec rcr" data-id="${esc(r.id)}"><span>${r.icona&&this.icoSrc(r.icona)?`<img class="rcico" src="${this.icoSrc(r.icona)}" alt="" width="20" height="20">`:''}<b>${esc(r.nome)}</b>${this.soloAdmin(r.id)?' <span class="rclck" title="Solo gli admin possono modificare o assegnare questa ricompensa">🔒</span>':''}${r.titolo&&r.titolo!==r.nome?` <span class="muted">· ${esc(r.titolo)}</span>`:''}<br><span class="muted">${cnt(r.id)} ${cnt(r.id)===1?'socio':'soci'} · ${r.visibile?'visibile':'nascosta'} · ${r.modo==='tessera_entro'?'automatica (tessera)':'manuale'}${this.soloAdmin(r.id)?' · solo admin':''}</span></span><span class="chip">${esc(String(r.priorita))}</span></div>`).join('')||'<p class="muted">Nessuna ricompensa.</p>'}</div>
    <button class="p" id="rcnew">➕ Nuova ricompensa</button>
    <button class="s" id="rcsync" style="width:100%;margin-top:8px">Aggiorna le automatiche</button>`;
   $('#rcbk').onclick=()=>go('altro');
@@ -137,13 +141,22 @@ const RC={
    <button class="p" id="rcsv">Salva</button>${isNew?'':`<button class="s" id="rcdel" style="width:100%;margin-top:8px">Elimina ricompensa</button>`}</div>
    ${isNew?'':this.assignHtml(r,ms)}`;
   $('#rcbk').onclick=()=>this.draw();
-  const pick=key=>{V.querySelectorAll('[data-'+key+']').forEach(b=>b.onclick=()=>{V.querySelectorAll('[data-'+key+']').forEach(x=>x.classList.toggle('on',x===b))})};
+  const locked=!this.canEdit(r);
+  if(locked){
+    const note=document.createElement('p');note.className='card acc-ban';note.id='rc-lock';
+    note.innerHTML='🔒 Solo gli admin possono modificare, assegnare o revocare «'+esc(r.nome||'questa ricompensa')+'».';
+    const form=V.querySelector('.rcsheet');if(form)form.before(note);
+    V.querySelectorAll('.rcsheet input,.rcsheet select,.rcsheet textarea,.rcsheet button,.rcpick').forEach(el=>{el.disabled=true;el.setAttribute('aria-disabled','true')});
+    const sv=document.getElementById('rcsv'),dl=document.getElementById('rcdel');
+    if(sv)sv.remove();if(dl)dl.remove();
+  }
+  const pick=key=>{if(locked)return;V.querySelectorAll('[data-'+key+']').forEach(b=>b.onclick=()=>{V.querySelectorAll('[data-'+key+']').forEach(x=>x.classList.toggle('on',x===b))})};
   pick('icona');pick('colore');pick('cornice');pick('sfondo');
-  V.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
-  $('#rcmodo').onchange=()=>{$('#rcparam').hidden=$('#rcmodo').value!=='tessera_entro'};
+  if(!locked){V.querySelectorAll('[data-av]').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
+  $('#rcmodo').onchange=()=>{$('#rcparam').hidden=$('#rcmodo').value!=='tessera_entro'}};
   if($('#rcid')&&!$('#rcid').value)$('#rcnome').addEventListener('input',()=>{if(!$('#rcid').dataset.lock)$('#rcid').value=this.slug($('#rcnome').value)});
   if($('#rcid'))$('#rcid').addEventListener('input',()=>{$('#rcid').dataset.lock='1'});
-  $('#rcsv').onclick=async()=>{try{if(typeof numForm==='function'&&!numForm(V))return;const nome=$('#rcnome').value.trim();if(nome.length<2)return toast('Il nome è obbligatorio');
+  if($('#rcsv'))$('#rcsv').onclick=async()=>{try{if(typeof numForm==='function'&&!numForm(V))return;const nome=$('#rcnome').value.trim();if(nome.length<2)return toast('Il nome è obbligatorio');
    const id=isNew?this.slug($('#rcid').value||nome):r.id;if(!/^[a-z0-9-]{2,40}$/.test(id))return toast('Identificativo non valido');
    const icona=(V.querySelector('[data-icona].on')||{}).dataset.icona||'';
    const colore=(V.querySelector('[data-colore].on')||{}).dataset.colore||'';
@@ -164,11 +177,13 @@ const RC={
  bindAssign(r,ms){const q=$('#rcaq'),box=$('#rcal');if(!q||!box)return;
   const filt=()=>{const v=q.value.trim().toLowerCase();box.querySelectorAll('.rcaln').forEach(l=>{l.hidden=!!v&&!((l.dataset.q||'').includes(v))})};
   q.oninput=filt;filt();
-  box.querySelectorAll('[data-am]').forEach(cb=>cb.onchange=async()=>{cb.disabled=true;try{await this.assegna(cb.dataset.am,r.id,cb.checked);toast(cb.checked?'Assegnata':'Rimossa')}catch(e){cb.checked=!cb.checked;toastErr(e,'SOCI')}finally{cb.disabled=false}})},
+  const locked=!this.canEdit(r);
+  box.querySelectorAll('[data-am]').forEach(cb=>{if(locked){cb.disabled=true;cb.title='Solo gli admin possono assegnare o revocare questa ricompensa';return}
+   cb.onchange=async()=>{cb.disabled=true;try{await this.assegna(cb.dataset.am,r.id,cb.checked);toast(cb.checked?'Assegnata':'Rimossa')}catch(e){cb.checked=!cb.checked;toastErr(e,'SOCI')}finally{cb.disabled=false}}})},
  // riquadro nella scheda socio (Gestione)
  boxHtml(m){if(!m)return'';const ids=new Set(this.owned(m.id).map(r=>r.id));
-  return`<div class="rcbox"><b>Ricompense</b>${this.data.catalogo.map(r=>`<label class="rcaln"><span class="rcalnm">${esc(r.nome)}</span><input type="checkbox" class="rcsw" data-rcass="${esc(r.id)}"${ids.has(r.id)?' checked':''} aria-label="${esc(r.nome)}"></label>`).join('')||'<p class="muted">Nessuna ricompensa in catalogo.</p>'}</div>`},
- bindBox(root,m){if(!root||!m)return;root.querySelectorAll('[data-rcass]').forEach(cb=>cb.onchange=async()=>{cb.disabled=true;try{await this.assegna(m.id,cb.dataset.rcass,cb.checked);toast(cb.checked?'Ricompensa assegnata':'Ricompensa tolta')}catch(e){cb.checked=!cb.checked;toastErr(e,'SOCI')}finally{cb.disabled=false}})},
+  return`<div class="rcbox"><b>Ricompense</b>${this.data.catalogo.map(r=>{const lock=this.soloAdmin(r.id)&&!this.isAdmin();return`<label class="rcaln${lock?' rclock':''}"><span class="rcalnm">${esc(r.nome)}${lock?' 🔒':''}</span><input type="checkbox" class="rcsw" data-rcass="${esc(r.id)}"${ids.has(r.id)?' checked':''}${lock?' disabled title="Solo gli admin possono assegnare o revocare questa ricompensa"':''} aria-label="${esc(r.nome)}"></label>`}).join('')||'<p class="muted">Nessuna ricompensa in catalogo.</p>'}</div>`},
+ bindBox(root,m){if(!root||!m)return;root.querySelectorAll('[data-rcass]').forEach(cb=>{if(cb.disabled)return;cb.onchange=async()=>{cb.disabled=true;try{await this.assegna(m.id,cb.dataset.rcass,cb.checked);toast(cb.checked?'Ricompensa assegnata':'Ricompensa tolta')}catch(e){cb.checked=!cb.checked;toastErr(e,'SOCI')}finally{cb.disabled=false}}})},
  mountBox(root,m){if(!root||!m||root.querySelector('.rcbox'))return;const wrap=document.createElement('div');wrap.innerHTML=this.boxHtml(m);root.append(...wrap.childNodes);this.bindBox(root,m)},
  // selettore effetti nel profilo del socio
  selHtml(m){const e=this.effetti(m.id);if(!e||e.owned.length<1)return'';

@@ -336,6 +336,7 @@ async function doAct(btn){
   catch(e){toastErr(e,'SOND')}finally{btn.disabled=false}
 }
 async function sendVote(btn,p){
+  if(typeof ACC!=='undefined'&&!ACC.guardAzioni())return;
   if(!p)return;const root=btn.closest('[data-psv],.cmdet,section')||document;
   const ch=collectVote(p,root);if(!ch)return toastVal('Completa il voto prima di inviare','E-SOND-V1');
   if(!PS.d||!PS.d.me)return toastVal(T.noAcc,'E-SOND-V2');
