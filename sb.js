@@ -62,8 +62,11 @@ async init(){const c=window.PERGIOCO_CONFIG||{};if(!c.supabaseUrl||!c.supabaseAn
  async signOut(){await this.client.auth.signOut()},
  async isAdmin(){const {data:s}=await this.client.auth.getSession();if(!s.session){this.modCached=false;return this.adminCached=false}const {data,error}=await this.client.rpc('is_admin');const a=!error&&data===true;if(a&&!this.adminCached){this.adminCached=true;try{await this.refresh()}catch(e){}}this.adminCached=a;let m=false;if(!a){const r=await this.client.rpc('is_moderator');m=!r.error&&r.data===true}this.modCached=m;return a||m},
  async searchMembers(q){const {data,error}=await this.client.rpc('search_members',{p_q:q});if(error)throw error;return (data||[]).map(r=>r.id)},
- async moderators(){const {data,error}=await this.client.rpc('admin_moderators');if(error)throw error;return (data||[]).map(x=>typeof x==='string'?x:x.admin_moderators)},
+ staffRow(x){if(x==null)return null;if(typeof x==='string')return{email:x,user_id:null,member_id:null,nome:null,cognome:null,stato:'assente'};const email=x.email||x.admin_moderators||x.admin_admins||'';if(!email)return null;return{email,user_id:x.user_id||x.userId||null,member_id:x.member_id||x.memberId||null,nome:x.nome||null,cognome:x.cognome||null,stato:x.stato||(x.nome?'collegato':'assente')}},
+ async moderators(){const {data,error}=await this.client.rpc('admin_moderators');if(error)throw error;return (data||[]).map(x=>this.staffRow(x)).filter(Boolean)},
+ async admins(){const {data,error}=await this.client.rpc('admin_admins');if(error)throw error;return (data||[]).map(x=>this.staffRow(x)).filter(Boolean)},
  async setModerator(email,on){const {error}=await this.client.rpc('admin_set_moderator',{p_email:email,p_on:on});if(error)throw error},
+ async setModeratorMember(memberId,on){const {error}=await this.client.rpc('admin_set_moderator_member',{p_member:memberId,p_on:on});if(error)throw error},
  // --- account dei soci ---
  redirect(){return location.origin+location.pathname},
  async user(){if(!this.client)return null;const {data}=await this.client.auth.getSession();return data.session?data.session.user:null},

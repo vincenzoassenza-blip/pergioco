@@ -10,7 +10,7 @@ const SHOT=process.env.SHOT_DIR||'/workspace';
 
 const rc=read('ricompense.js');
 const css=read('styles.css');
-chk(APP_VERSION==='41.17.1'&&swCache(),'versione 41.17.1 in brand.js e cache SW');
+chk(swCache()&&hasAsset('styles.css')&&hasAsset('app.js'),'versione in brand.js allineata a cache SW e pin degli asset');
 chk(hasAsset('ricompense.js')&&hasAsset('styles.css')&&hasAsset('brand.js'),'asset modificati pinnati in index e SW');
 chk(/return`<details class="card rcsel"/.test(rc)&&/<summary><b>Le tue ricompense<\/b><\/summary>/.test(rc),'selHtml usa details e summary come gli altri riquadri');
 chk(/_selOpen/.test(rc)&&/addEventListener\('toggle'/.test(rc),'ricorda aperto/chiuso quando il profilo si ridisegna');
