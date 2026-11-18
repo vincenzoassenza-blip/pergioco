@@ -105,11 +105,9 @@ dst=Path(sys.argv[1])
 html=(dst/'index.html').read_text()
 # CSP: il meta di produzione consente solo il progetto ufficiale; sul test
 # va sostituito, altrimenti il login fallisce (E-LOGIN-01).
-import re
-html=re.sub(
-    r"https://egmrtcezrjyoynlhknpz\.supabase\.co",
-    "https://oosqsjbtlixufqscdwou.supabase.co",
-    html)
+html=html.replace(
+    'egmrtcezrjyoynlhknpz.supabase.co',
+    'oosqsjbtlixufqscdwou.supabase.co')
 if 'egmrtcezrjyoynlhknpz' in html:
     sys.exit("index.html di test contiene ancora l'host di produzione (CSP): mi fermo")
 if 'oosqsjbtlixufqscdwou.supabase.co' not in html:
