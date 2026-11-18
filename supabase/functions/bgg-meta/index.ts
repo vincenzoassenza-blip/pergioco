@@ -101,45 +101,113 @@ async function rpgInfo(admin: SB, id: number) {
   return parsed;
 }
 
+function clipTxtArr(a: unknown, n: number, len: number): string[] {
+  if (!Array.isArray(a)) return [];
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const x of a) {
+    const s = txt(x, len);
+    if (!s || /[<>]/.test(s) || seen.has(s)) continue;
+    seen.add(s);
+    out.push(s);
+    if (out.length >= n) break;
+  }
+  return out;
+}
+function clipIntArr(a: unknown, n: number, lo: number, hi: number): number[] {
+  if (!Array.isArray(a)) return [];
+  const out: number[] = [];
+  const seen = new Set<number>();
+  for (const x of a) {
+    const v = int(x, lo, hi);
+    if (v == null || seen.has(v)) continue;
+    seen.add(v);
+    out.push(v);
+    if (out.length >= n) break;
+  }
+  return out;
+}
+function emptyArr(a: unknown) {
+  return !Array.isArray(a) || a.length === 0;
+}
+
 async function complete(admin: SB, gameId: string) {
-  const { data: g } = await admin.from("games").select("id,name,bgg_id,is_expansion").eq("id", gameId).maybeSingle();
+  const { data: g } = await admin.from("games").select("id,name,bgg_id,is_expansion,kind,thumb,year,categories,mechanics,best_players,rec_players,rpg_system,rpg_genre,rpg_publisher,rpg_lang").eq("id", gameId).maybeSingle();
   if (!g) return { game_id: gameId, status: "missing" };
   const { data: cur } = await admin.from("game_meta").select("attempts").eq("game_id", gameId).maybeSingle();
   try {
+    const isGdr = g.kind === "gdr";
     let id = int(g.bgg_id, 1, 99999999);
     if (!id) {
-      const hits = await cercaBgg(admin, txt(g.name, 60));
+      const hits = isGdr ? await cercaRpg(admin, txt(g.name, 60)) : await cercaBgg(admin, txt(g.name, 60));
       const ex = hits.find((x: any) => String(x.nome).toLowerCase() === String(g.name).toLowerCase()) || hits[0];
       id = ex ? int(ex.bgg_id, 1, 99999999) : null;
     }
-    if (!id) throw new Error("gioco non trovato su BGG: serve l'ID BGG");
-    const m = await thingInfo(admin, id);
-    const row = {
-      game_id: gameId,
-      bgg_id: id,
-      weight: m.weight,
-      best_players: m.best_players,
-      rec_players: m.rec_players,
-      min_age: m.min_age,
-      lang_dep: m.lang_dep,
-      bgg_rank: m.bgg_rank,
-      bgg_avg: m.bgg_avg,
-      mechanics: m.mechanics,
-      categories: m.categories,
-      subdomains: m.subdomains,
-      interaction: m.interaction,
-      luck: m.luck,
-      status: "ok",
-      fetched_at: new Date().toISOString(),
-      attempts: 0,
-      last_error: null,
-    };
-    const { error } = await admin.from("game_meta").upsert(row);
-    if (error) throw error;
+    if (!id) throw new Error(isGdr ? "gioco non trovato su RPGGeek: serve l'ID" : "gioco non trovato su BGG: serve l'ID BGG");
+
     const patch: Record<string, unknown> = {};
     if (!g.bgg_id) patch.bgg_id = id;
-    if (m.thumb) patch.thumb = m.thumb;
-    if (Object.keys(patch).length) await admin.from("games").update(patch).eq("id", gameId);
+
+    if (isGdr) {
+      const info = await rpgInfo(admin, id);
+      const { error } = await admin.from("game_meta").upsert({
+        game_id: gameId,
+        bgg_id: id,
+        status: "ok",
+        fetched_at: new Date().toISOString(),
+        attempts: 0,
+        last_error: null,
+      });
+      if (error) throw error;
+      if (info.thumb && !g.thumb) patch.thumb = info.thumb;
+      if (info.anno && !g.year) patch.year = info.anno;
+      const sys = clipTxtArr(info.sistema, 10, 100);
+      const gen = clipTxtArr(info.genere, 20, 60);
+      const pub = clipTxtArr(info.editore, 10, 100);
+      const lang = clipTxtArr(info.lingua, 10, 40);
+      if (emptyArr(g.rpg_system) && sys.length) patch.rpg_system = sys;
+      if (emptyArr(g.rpg_genre) && gen.length) patch.rpg_genre = gen;
+      if (emptyArr(g.rpg_publisher) && pub.length) patch.rpg_publisher = pub;
+      if (emptyArr(g.rpg_lang) && lang.length) patch.rpg_lang = lang;
+    } else {
+      const m = await thingInfo(admin, id);
+      const row = {
+        game_id: gameId,
+        bgg_id: id,
+        weight: m.weight,
+        best_players: m.best_players,
+        rec_players: m.rec_players,
+        min_age: m.min_age,
+        lang_dep: m.lang_dep,
+        bgg_rank: m.bgg_rank,
+        bgg_avg: m.bgg_avg,
+        mechanics: m.mechanics,
+        categories: m.categories,
+        subdomains: m.subdomains,
+        interaction: m.interaction,
+        luck: m.luck,
+        status: "ok",
+        fetched_at: new Date().toISOString(),
+        attempts: 0,
+        last_error: null,
+      };
+      const { error } = await admin.from("game_meta").upsert(row);
+      if (error) throw error;
+      if (m.thumb && !g.thumb) patch.thumb = m.thumb;
+      const cats = clipTxtArr(m.categories, 20, 60);
+      const mecs = clipTxtArr(m.mechanics, 40, 60);
+      const best = clipIntArr(m.best_players, 20, 1, 100);
+      const rec = clipIntArr(m.rec_players, 20, 1, 100);
+      if (emptyArr(g.categories) && cats.length) patch.categories = cats;
+      if (emptyArr(g.mechanics) && mecs.length) patch.mechanics = mecs;
+      if (emptyArr(g.best_players) && best.length) patch.best_players = best;
+      if (emptyArr(g.rec_players) && rec.length) patch.rec_players = rec;
+    }
+
+    if (Object.keys(patch).length) {
+      const { error: pe } = await admin.from("games").update(patch).eq("id", gameId);
+      if (pe) throw pe;
+    }
     return { game_id: gameId, status: "ok" };
   } catch (e) {
     const att = Math.min(100, (cur?.attempts || 0) + 1);
