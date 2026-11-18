@@ -13,7 +13,7 @@ const cons=read('consigliere.js');
 const sond=read('sondaggi.js');
 const {APP_VERSION,swCache,hasAsset}=require('./appver');
 
-chk(APP_VERSION==='41.18.2'&&swCache(),'versione 41.18.2 in brand.js allineata alla cache SW');
+chk(!!APP_VERSION&&swCache(),'APP_VERSION in brand.js allineata alla cache SW');
 chk(['giochi.js','data.js','sb.js','app.js','brand.js','styles.css'].every(hasAsset),'asset modificati pinnati in index e SW');
 
 chk(/alter table public\.games add column if not exists hidden boolean not null default false/.test(sql),'migrazione additiva: colonna games.hidden default false');

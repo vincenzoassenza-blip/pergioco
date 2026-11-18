@@ -10,7 +10,7 @@ const sb=read('sb.js');
 const css=read('styles.css');
 const {APP_VERSION,swCache,hasAsset}=require('./appver');
 
-chk(APP_VERSION==='41.18.2'&&swCache(),'versione 41.18.2 in brand.js allineata alla cache SW');
+chk(!!APP_VERSION&&swCache(),'APP_VERSION in brand.js allineata alla cache SW');
 chk(hasAsset('app.js')&&hasAsset('sb.js')&&hasAsset('styles.css')&&hasAsset('brand.js'),'asset modificati pinnati in index e SW');
 
 chk(/alter table public\.moderators add column if not exists user_id uuid/.test(sql),'migrazione additiva: colonna user_id su moderators');

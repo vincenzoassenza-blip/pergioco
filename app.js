@@ -11,6 +11,46 @@ const dayName=d=>isoOk(String(d??'').slice(0,10))?GIORNI[new Date(String(d).slic
 const dayLbl=d=>{if(!isoOk(d))return '';const x=new Date(d+'T12:00');return GIORNI[x.getDay()]+' '+x.getDate()+'/'+(x.getMonth()+1)};
 const fmt=d=>{const x=new Date(String(d??'').slice(0,10)+'T12:00');return isNaN(x)?'—':x.toLocaleDateString('it-IT',{day:'numeric',month:'short',year:'numeric'})};
 const toast=(t,err)=>{const e=document.createElement('div');e.className='toast'+(err?' toast-err':'');e.textContent=t;e.setAttribute('role',err?'alert':'status');e.onclick=()=>e.remove();document.body.append(e);setTimeout(()=>e.remove(),Math.min(9000,Math.max(2200,String(t).length*55)))};
+// Mostra/nascondi password. Su iOS, e dopo un incolla da gestore password, il
+// cambio di type sul campo può essere ignorato: in quel caso si clona il campo.
+function revealPw(el,show){
+  if(!el)return;
+  const want=show?'text':'password';
+  const v=el.value,start=el.selectionStart,end=el.selectionEnd,had=document.activeElement===el;
+  const ac=el.getAttribute('autocomplete');
+  try{el.setAttribute('autocomplete','off')}catch(_){}
+  try{el.type=want}catch(_){}
+  if(el.type!==want){try{el.setAttribute('type',want)}catch(_){}}
+  let cur=el;
+  if(el.type!==want){
+    const n=el.cloneNode(false);
+    n.removeAttribute('type');
+    n.type=want;n.setAttribute('type',want);n.value=v;
+    el.replaceWith(n);cur=n;
+  }
+  if(cur.value!==v)cur.value=v;
+  if(had){try{cur.focus({preventScroll:true});if(start!=null&&end!=null)cur.setSelectionRange(start,end)}catch(_){}}
+  if(ac)try{cur.setAttribute('autocomplete',ac)}catch(_){}
+  return cur;
+}
+function bindPwShow(cb,ids){
+  if(!cb)return;
+  const apply=()=>(ids||[]).forEach(id=>{
+    const i=typeof id==='string'?document.getElementById(String(id).replace(/^#/,'')):id;
+    revealPw(i,!!cb.checked);
+  });
+  cb.addEventListener('change',apply);
+  const lab=cb.closest('label');
+  if(lab){
+    if(cb.id&&!lab.getAttribute('for'))lab.setAttribute('for',cb.id);
+    lab.addEventListener('click',e=>{
+      if(e.target===cb)return;
+      const before=cb.checked;
+      setTimeout(()=>{if(cb.checked===before)cb.checked=!before;apply()},0);
+    });
+  }
+}
+
 // v14 — filtro temporale per Record e Statistiche (ricordato sul dispositivo)
 // v41.9.1 — filtri Gestione Partite: combinabili, senza cambiare il periodo delle altre pagine.
 function gestionePlaysFilter(plays,f,today){
@@ -136,7 +176,7 @@ function pwProfilo(V){
   row.onclick=()=>setOpen(form.hidden);
   row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setOpen(form.hidden)}};
   cancel.onclick=()=>{clear();setOpen(false)};
-  cb.onchange=()=>['pwcur','pwnew','pwnew2'].forEach(id=>{const i=document.getElementById(id);if(i)i.type=cb.checked?'text':'password'});
+  bindPwShow(cb,['pwcur','pwnew','pwnew2']);
   goB.onclick=async()=>{
     const cur=(document.getElementById('pwcur')||{}).value||'',neu=(document.getElementById('pwnew')||{}).value||'',neu2=(document.getElementById('pwnew2')||{}).value||'';
     const v=pwChangeVal(cur,neu,neu2);if(!v.ok)return showErr(v.msg,v.code);
@@ -512,12 +552,13 @@ function authForm(){let mode=window._am||'login';const T={login:'Entra',signup:'
  <div class="seg" id="am"><button data-m="login" class="${mode==='login'?'on':''}">Accedi</button><button data-m="signup" class="${mode==='signup'?'on':''}">Registrati con codice</button></div>
  ${mode!=='login'?`<label>Codice</label><input id="ac" class="code" placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false">`:''}
  <label>Email ${mode==='signup'?'(sarà il tuo nome utente)':''}</label><input id="ae" type="text" autocomplete="username"${EMA}>
- <label>${mode==='login'?'Password':'Nuova password (almeno 8 caratteri)'}</label><input id="ap" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}"><label class="gck" style="font-size:13px"><input type="checkbox" id="apshow" style="width:auto"> Mostra password</label>
+ <label>${mode==='login'?'Password':'Nuova password (almeno 8 caratteri)'}</label><input id="ap" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}">
  ${mode!=='login'?`<label>Ripeti password</label><input id="ap2" type="password" autocomplete="new-password">`:''}
+ <label class="gck" for="apshow"><input type="checkbox" id="apshow"> Mostra password</label>
  <button class="p" id="ago">${T[mode]}</button>
  ${mode==='login'?'<button class="s" id="afp" style="width:100%;margin-top:6px">Password dimenticata? (con codice)</button>':mode==='reset'?'<button class="s" id="abk" style="width:100%;margin-top:6px">← Torna all\'accesso</button>':''}</div>`;
  const sw=m=>{window._am=m;authForm()};$('#am').onclick=e=>e.target.dataset.m&&sw(e.target.dataset.m);if($('#afp'))$('#afp').onclick=()=>sw('reset');if($('#abk'))$('#abk').onclick=()=>sw('login');
- if($('#apshow'))$('#apshow').onchange=e=>['#ap','#ap2'].forEach(s=>{const i=$(s);if(i)i.type=e.target.checked?'text':'password'});
+ bindPwShow($('#apshow'),['ap','ap2']);
  if($('#ac'))$('#ac').oninput=e=>{const v=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);e.target.value=v.match(/.{1,4}/g)?.join('-')||''};
  $('#ago').onclick=async()=>{const em=normEmail($('#ae').value),pw=$('#ap').value;$('#ae').value=em;if(!okEmail(em))return toastVal('Email non valida: scrivila nel formato nome@dominio.it, senza spazi','E-LOGIN-V1');
   let code='';if(mode!=='login'){code=$('#ac').value.replace(/-/g,'');if(code.length!==12)return toastVal('Il codice ha 12 caratteri (XXXX-XXXX-XXXX): ricopialo dal messaggio dello staff','E-REG-V1');if(pw.length<8)return toastVal('La password deve avere almeno 8 caratteri','E-REG-V2');if(pw!==$('#ap2').value)return toastVal('Le due password non coincidono: riscrivile uguali','E-REG-V3')}
