@@ -133,7 +133,7 @@ function userStep(){V.replaceChildren();V.append(top(tr('viaUser')),el('p','mute
    const c=DB.remote&&DB.remote.client;if(!c||!c.functions)return toast('⚠️ Funzione non disponibile');goB.disabled=true;goB.textContent=tr('viaUserWait');
    try{const rpg=isRpg();const{data,error}=await c.functions.invoke('bgg-collection',{body:rpg?{username,mode:'rpg'}:{username}});if(error||!data||data.error)throw new Error((data&&data.error)||(rpg?'RPGGeek':'BGG'));
     const items=Array.isArray(data.items)?data.items:[];const mapped=items.map(it=>{const row={bggId:+it.bgg_id,name:escTxt(it.nome),year:it.anno||null,min:+it.min||(rpg?2:1),max:+it.max||(rpg?6:(+it.min||1)),minT:+it.minT||(rpg?120:30),maxT:+it.maxT||(rpg?240:30),playTime:+it.durata||null,age:+it.eta||(rpg?12:0),isExp:rpg?false:!!it.exp,thumb:it.thumb||null,coop:false,kind:rpg?'gdr':'gdt'};
-     if(rpg){row.rpgSystem=[];row.rpgGenre=[];row.rpgPublisher=[];row.rpgLang=[]}return row}).filter(g=>g.bggId&&g.name);
+     if(rpg){row.rpgSystem=Array.isArray(it.sistema)?it.sistema:[];row.rpgGenre=Array.isArray(it.genere)?it.genere:[];row.rpgPublisher=Array.isArray(it.editore)?it.editore:[];row.rpgLang=Array.isArray(it.lingua)?it.lingua:[]}else{row.categories=Array.isArray(it.categories)?it.categories:[];row.mechanics=Array.isArray(it.mechanics)?it.mechanics:[];row.best=Array.isArray(it.best)?it.best:[];row.rec=Array.isArray(it.rec)?it.rec:[]}return row}).filter(g=>g.bggId&&g.name);
     if(!mapped.length){toast(t('nessunId'));goB.disabled=false;goB.textContent=tr('viaUserGo');return}
     await pushRecent(username);ST.lastUser=username;ST.rows=await enrichStatus(mapped);ST.filter='all';ST.sel=new Set(ST.rows.filter(r=>r.status==='new').map(r=>r.bggId));ST.step='preview';draw()}
    catch(e){toast(tr('viaUserErr'));goB.disabled=false;goB.textContent=tr('viaUserGo');setBtn()}};
@@ -199,7 +199,7 @@ function userStep(){V.replaceChildren();V.append(top(tr('viaUser')),el('p','mute
  async function doImport(){if(!can())return toast(t('soloAdmin'));const pick=ST.rows.filter(r=>ST.sel.has(r.bggId)&&r.status!=='dup').slice(0,MAXI);
   if(!pick.length)return;const btn=V.querySelector('button.p');if(btn){btn.disabled=true;btn.textContent='…'}
   let ok=0,err=0;const added=[];const have=new Set((await DB.games()).filter(g=>g.bggId).map(g=>+g.bggId));
-  const rows=pick.filter(g=>!have.has(+g.bggId)).map(g=>({name:g.name,min:g.min,max:g.max,minT:g.minT,maxT:g.maxT,age:g.age,coop:!!g.coop,isExp:!!g.isExp,playTime:g.playTime,year:g.year,bggId:g.bggId,thumb:g.thumb||null,best:[],rec:[],categories:[],mechanics:[],kind:g.kind==='gdr'?'gdr':'gdt',rpgSystem:g.kind==='gdr'?(g.rpgSystem||[]):[],rpgGenre:g.kind==='gdr'?(g.rpgGenre||[]):[],rpgPublisher:g.kind==='gdr'?(g.rpgPublisher||[]):[],rpgLang:g.kind==='gdr'?(g.rpgLang||[]):[]}));
+  const rows=pick.filter(g=>!have.has(+g.bggId)).map(g=>({name:g.name,min:g.min,max:g.max,minT:g.minT,maxT:g.maxT,age:g.age,coop:!!g.coop,isExp:!!g.isExp,playTime:g.playTime,year:g.year,bggId:g.bggId,thumb:g.thumb||null,best:Array.isArray(g.best)?g.best:[],rec:Array.isArray(g.rec)?g.rec:[],categories:Array.isArray(g.categories)?g.categories:[],mechanics:Array.isArray(g.mechanics)?g.mechanics:[],kind:g.kind==='gdr'?'gdr':'gdt',rpgSystem:g.kind==='gdr'?(g.rpgSystem||[]):[],rpgGenre:g.kind==='gdr'?(g.rpgGenre||[]):[],rpgPublisher:g.kind==='gdr'?(g.rpgPublisher||[]):[],rpgLang:g.kind==='gdr'?(g.rpgLang||[]):[]}));
   try{
    if(DB.remote&&DB.remote.client&&typeof DB.remote.importGamesBgg==='function'){
     try{const r=await DB.remote.importGamesBgg(rows);ok=+(r&&r.ok)||0;err=+(r&&r.err)||0;(r&&r.ids||[]).forEach(id=>added.push(id))}
@@ -211,7 +211,6 @@ function userStep(){V.replaceChildren();V.append(top(tr('viaUser')),el('p','mute
   ST.result={ok,err,skip,expSkip};ST.step='done';draw();kickMeta(added)}
 
  function kickMeta(ids){const c=DB.remote&&DB.remote.client;if(!c||!c.functions||!ids.length)return;
-  if(isRpg())return;
   (async()=>{for(const id of ids.slice(0,25)){try{await c.functions.invoke('bgg-meta',{body:{game_id:id}})}catch(e){}await new Promise(r=>setTimeout(r,1600))}})()}
 
  function act(r,f){r.tabIndex=0;r.setAttribute('role','button');r.onclick=e=>{if(e.target.closest('button.ibggck'))return;f()};r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}}}
