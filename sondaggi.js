@@ -385,7 +385,7 @@ async function cercaGioco(s,box,q){
   box.innerHTML='<p class="muted">Cerco…</p>';
   try{
     const gs=(typeof DB!=='undefined'&&DB.games)?await DB.games():[];
-    const loc=gs.filter(g=>(g.name||'').toLowerCase().includes(s.toLowerCase())).slice(0,6);
+    const loc=gamesVis(gs).filter(g=>(g.name||'').toLowerCase().includes(s.toLowerCase())).slice(0,6);
     let html=loc.map(g=>`<div class="rec" data-psg="${esc(g.id)}" data-psn="${esc(g.name)}" data-psth="${esc(g.thumb||g.image||'')}" data-psb="${g.bggId||g.bgg_id||''}"><b>${esc(g.name)}</b> <span class="muted">catalogo dell’app</span></div>`).join('');
     if(typeof DS!=='undefined'&&DS.bgg&&s.length>=2){
       try{const r=await DS.bgg({mode:'cerca',q:s});const items=(r&&r.items)||r||[];
