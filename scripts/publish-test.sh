@@ -50,6 +50,7 @@ if [ "$SRC" != "$DEST" ]; then
     rsync -a --delete \
       --exclude '.git/' \
       --exclude 'CNAME' \
+      --exclude 'README.md' \
       --exclude 'node_modules/' \
       --exclude 'playwright-report/' \
       --exclude 'test-results/' \
@@ -59,7 +60,7 @@ if [ "$SRC" != "$DEST" ]; then
     python3 - "$SRC" "$DEST" << 'COPY'
 import os, shutil, sys
 src, dst = sys.argv[1], sys.argv[2]
-skip = {'.git', 'CNAME', 'node_modules', 'playwright-report', 'test-results', 'config.js'}
+skip = {'.git', 'CNAME', 'README.md', 'node_modules', 'playwright-report', 'test-results', 'config.js'}
 # rimuovi dal dest i file non più presenti in src (come rsync --delete),
 # conservando .git, CNAME e config.js
 for root, dirs, files in os.walk(dst, topdown=True):
