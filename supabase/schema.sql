@@ -74,6 +74,7 @@ on conflict (id) do nothing;
 
 -- ===== v4: modalita' serata (tavoli) e data di arrivo dei giochi =====
 alter table public.games add column if not exists added_at timestamptz;
+alter table public.games add column if not exists hidden boolean not null default false;
 create table if not exists public.tables (
   id text primary key, date date not null, evening text,
   game_id text references public.games(id) on update cascade,

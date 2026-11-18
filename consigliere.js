@@ -171,7 +171,7 @@ const CMODE={s:{n:'Al volo ⚡',d:'Poche domande veloci e via: tre giochi pronti
 function cChoose(){V.innerHTML=`<div class="cwz"><div class="cwz-top"><button class="cwz-back" id="cwb" aria-label="Torna ai giochi">← Giochi</button><span class="muted">Consigliami tu</span></div>
  <h2 id="cwq" tabindex="-1">Come preferite che vi consigli?</h2><div class="cwz-modes" role="group" aria-labelledby="cwq">${Object.entries(CMODE).map(([k,m])=>`<button class="cwz-mode" data-m="${esc(k)}"><b>${esc(m.n)}</b><span>${esc(m.d)}</span></button>`).join('')}</div></div>`;
  $('#cwq').focus();$('#cwb').onclick=()=>go('ludoteca');V.querySelectorAll('.cwz-mode').forEach(b=>b.onclick=()=>{const m=b.dataset.m;if(Object.prototype.hasOwnProperty.call(CMODE,m))cWizard(m)})}
-async function cWizard(mode){if(!CFLOW[mode])return;const gs=await DB.games(),ps=await DB.plays(),meta=await Meta.load();let me=null;
+async function cWizard(mode){if(!CFLOW[mode])return;const gs=gamesVis(await DB.games()),ps=await DB.plays(),meta=await Meta.load();let me=null;
  try{const u=DB.remote&&await DB.remote.user();if(u){const ms=await DB.members();const m=ms.find(x=>x.userId===u.id);me=m?m.id:null}}catch(e){}
  const flow=CFLOW[mode].filter(k=>k!=='x'||ps.length).filter(k=>k!=='v'||(window.Rate&&gs.some(g=>(Rate.avg(g.id)||{}).n))).filter(k=>!(k==='x'&&!me)||true);
  const A={};let i=0;

@@ -22,8 +22,12 @@ function isGdrPlay(p){if(!p)return false;const k=p.playKind||p.play_kind;if(k===
 function isBoardGamePlay(p){return !!(p&&p.gameId)&&!isGdrPlay(p)}
 function setWinners(p){if(isGdrPlay(p)){p.players.forEach(x=>x.winner=false);return}if(!p.coop){const s=p.players.filter(x=>x.score!==null&&x.score!=='');const top=Math.max(...s.map(x=>+x.score));p.players.forEach(x=>x.winner=s.length>0&&+x.score===top)}else p.players.forEach(x=>x.winner=!!p.groupWin)}
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const gamesVis=gs=>(gs||[]).filter(g=>!g.hidden);
 const DB={adapter:LocalAdapter,
  async games(){return (await this.adapter.getAll()).games.slice().sort((a,b)=>a.name.localeCompare(b.name))},
+ _gameRemovePlan(id,d){const plays=(d.plays||[]).filter(p=>p.gameId===id).length,tables=(d.tables||[]).filter(t=>t.gameId===id).length,g=(d.games||[]).find(x=>x.id===id);if(!g)throw new Error('Gioco non trovato');return{id,name:g.name,hidden:!!g.hidden,plays,tables,coppa:0,action:(plays||tables)?'hide':'delete'}},
+ async removeGameInfo(id){if(this.adapter&&typeof this.adapter.removeGameInfo==='function'&&this.adapter.client)return this.adapter.removeGameInfo(id);const d=await this.adapter.getAll();return this._gameRemovePlan(id,d)},
+ async removeGame(id){if(this.adapter&&typeof this.adapter.removeGame==='function'&&this.adapter.client)return this.adapter.removeGame(id);const d=await this.adapter.getAll();const plan=this._gameRemovePlan(id,d);if(plan.action==='hide'){const g=(d.games||[]).find(x=>x.id===id);if(g)g.hidden=true}else{d.games=(d.games||[]).filter(x=>x.id!==id);(d.members||[]).forEach(m=>{if(m.favGameId===id)m.favGameId=''})}await this.adapter.replaceAll(d);return plan},
  async plays(){return (await this.adapter.getAll()).plays.slice().sort((a,b)=>b.date.localeCompare(a.date))},
  async addGame(g){const d=await this.adapter.getAll();g.id=uid();g.addedAt=new Date().toISOString();d.games.push(g);await this.adapter.replaceAll(d);return g},
  async addPlay(p){if(typeof ACC!=='undefined'&&!ACC.guardAzioni())throw new Error(ACC.msgSospeso);const d=await this.adapter.getAll();p.id=uid();p.createdAt=new Date().toISOString();setWinners(p);
