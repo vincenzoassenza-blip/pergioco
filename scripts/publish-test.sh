@@ -46,14 +46,50 @@ if [ "$SRC" != "$DEST" ]; then
     rm -f "$TMPCFG"
     TMPCFG=""
   fi
-  rsync -a --delete \
-    --exclude '.git/' \
-    --exclude 'CNAME' \
-    --exclude 'node_modules/' \
-    --exclude 'playwright-report/' \
-    --exclude 'test-results/' \
-    --exclude 'config.js' \
-    "$SRC"/ "$DEST"/
+  if command -v rsync >/dev/null 2>&1; then
+    rsync -a --delete \
+      --exclude '.git/' \
+      --exclude 'CNAME' \
+      --exclude 'node_modules/' \
+      --exclude 'playwright-report/' \
+      --exclude 'test-results/' \
+      --exclude 'config.js' \
+      "$SRC"/ "$DEST"/
+  else
+    python3 - "$SRC" "$DEST" << 'COPY'
+import os, shutil, sys
+src, dst = sys.argv[1], sys.argv[2]
+skip = {'.git', 'CNAME', 'node_modules', 'playwright-report', 'test-results', 'config.js'}
+# rimuovi dal dest i file non più presenti in src (come rsync --delete),
+# conservando .git, CNAME e config.js
+for root, dirs, files in os.walk(dst, topdown=True):
+    rel = os.path.relpath(root, dst)
+    if rel == '.':
+        dirs[:] = [d for d in dirs if d not in skip]
+    elif rel.split(os.sep)[0] in skip:
+        dirs[:] = []; continue
+    for name in files:
+        if name in skip and rel == '.':
+            continue
+        path = os.path.join(root, name)
+        relf = os.path.relpath(path, dst)
+        if not os.path.exists(os.path.join(src, relf)):
+            os.remove(path)
+for root, dirs, files in os.walk(src, topdown=True):
+    rel = os.path.relpath(root, src)
+    if rel == '.':
+        dirs[:] = [d for d in dirs if d not in skip]
+    elif rel.split(os.sep)[0] in skip:
+        dirs[:] = []; continue
+    dest_root = dst if rel == '.' else os.path.join(dst, rel)
+    os.makedirs(dest_root, exist_ok=True)
+    for name in files:
+        if name in skip and rel == '.':
+            continue
+        s, d = os.path.join(root, name), os.path.join(dest_root, name)
+        shutil.copy2(s, d)
+COPY
+  fi
   rm -f "$DEST/CNAME"
   if [ -n "$TMPCFG" ] && [ -f "$TMPCFG" ]; then
     mv "$TMPCFG" "$DEST/config.js"
@@ -67,6 +103,17 @@ dst=Path(sys.argv[1])
 
 # titoli e manifesto
 html=(dst/'index.html').read_text()
+# CSP: il meta di produzione consente solo il progetto ufficiale; sul test
+# va sostituito, altrimenti il login fallisce (E-LOGIN-01).
+import re
+html=re.sub(
+    r"https://egmrtcezrjyoynlhknpz\.supabase\.co",
+    "https://oosqsjbtlixufqscdwou.supabase.co",
+    html)
+if 'egmrtcezrjyoynlhknpz' in html:
+    sys.exit("index.html di test contiene ancora l'host di produzione (CSP): mi fermo")
+if 'oosqsjbtlixufqscdwou.supabase.co' not in html:
+    sys.exit("index.html di test senza CSP verso il progetto di test: mi fermo")
 html=html.replace('<title>PerGioco – Gioca, prenota, condividi</title>',
                   '<title>PerGioco TEST – ambiente di prova</title>')
 html=html.replace('content="PerGioco">', 'content="PerGioco TEST">')
