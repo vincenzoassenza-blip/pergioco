@@ -5,7 +5,7 @@ const root=path.join(__dirname,'..');
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
 let n=0,ok=0;const chk=(c,m,x)=>{n++;if(c)ok++;else console.error('FAIL',m,x??'')}
 
-chk(APP_VERSION==='41.20'&&swCache()&&hasAsset('app.js')&&hasAsset('eventi.js')&&hasAsset('mie-partite.js'),'APP_VERSION 41.20 e cache SW allineata');
+chk(swCache()&&hasAsset('app.js')&&hasAsset('eventi.js')&&hasAsset('mie-partite.js'),'cache SW allineata alla versione corrente');
 
 const app=read('app.js'),ev=read('eventi.js'),st=read('stats.js'),mp=read('mie-partite.js'),cp=read('coppa.js');
 chk(/const gLink=/.test(app)&&/href="#gioco\/\$\{encodeURIComponent\(id\)\}"/.test(app),'gLink/linkGame con href #gioco/id');

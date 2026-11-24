@@ -12,7 +12,7 @@ const EV={
  async save(e){const q=e.id?EV.c().from('eventi').update(e).eq('id',e.id):EV.c().from('eventi').insert(e);const {error}=await q;if(error)throw error},
  async presenze(mid){const {data}=await EV.c().rpc('evento_presenze',{p_member:mid});return data||{eventi:0,tornei:0}}};
 const TZ='Europe/Rome';
-const evData=iso=>isNaN(new Date(iso))?'—':new Date(iso).toLocaleString('it-IT',{timeZone:TZ,weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const evData=iso=>isNaN(new Date(iso))?'—':new Date(iso).toLocaleString('it-IT',{timeZone:TZ,weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
 const evDay=iso=>{try{if(isNaN(new Date(iso)))return'';return new Intl.DateTimeFormat('en-CA',{timeZone:TZ}).format(new Date(iso))}catch(e){return''}};
 const toInput=iso=>iso&&!isNaN(new Date(iso))?new Date(iso).toLocaleString('sv-SE',{timeZone:TZ}).slice(0,16).replace(' ','T'):'';
 // "2026-11-05T21:00" letto come ora di Roma -> ISO UTC (indipendente dal fuso del telefono)
@@ -83,7 +83,7 @@ function evForm(e){const nuovo=!e.id;
  const o=openPanel(`<h3>${nuovo?'Nuovo evento':'Modifica evento'}</h3><form id="evf" novalidate>
  <label>Titolo *</label><input name="titolo" required maxlength="120" value="${esc(e.titolo||'')}">
  <label>Descrizione</label><textarea name="descrizione" rows="3" maxlength="3000">${esc(e.descrizione||'')}</textarea>
- <div class="row dtrow"><div><label>Inizio (ora italiana) *</label><input name="inizio" type="datetime-local" required value="${toInput(e.inizio)}"></div><div><label>Chiusura prenotazioni *</label><input name="chiusura" type="datetime-local" required value="${toInput(e.chiusura)}"></div></div>
+ <div class="row dtrow"><div><label>Inizio (ora italiana, 24 ore) *</label>${dateTime24Html('ev-inizio',toInput(e.inizio),true)}</div><div><label>Chiusura prenotazioni (24 ore) *</label>${dateTime24Html('ev-chiusura',toInput(e.chiusura),true)}</div></div>
  <label>Luogo</label><input name="luogo" maxlength="150" value="${esc(e.luogo||'')}">
  <label>Locandina (link https, facoltativo)</label><input name="immagine" type="url" maxlength="500" placeholder="https://…" value="${esc(e.immagine||'')}">
  <div class="row"><div><label>Posti massimi *</label><input name="posti"${nA('int',1,1000,'Posti massimi',' required')} value="${e.posti||20}"></div><div><label>Quota € (facolt.)</label><input name="quota"${nA('dec',0,10000,'Quota')} value="${String(e.quota??'').replace('.',',')}"></div><div><label>Caparra € (facolt.)</label><input name="caparra"${nA('dec',0,10000,'Caparra')} value="${String(e.caparra??'').replace('.',',')}"></div></div>
@@ -94,7 +94,7 @@ function evForm(e){const nuovo=!e.id;
  <div class="mbt">${!nuovo&&!e.annullato?'<button type="button" class="danger" id="evdel">Annulla evento</button>':''}<button type="button" class="s" data-close>Chiudi</button><button class="p">Salva</button></div></form>`);
  const f=o.querySelector('#evf');
  f.onsubmit=async ev=>{ev.preventDefault();if(!numForm(f))return;const F=new FormData(f),n=k=>F.get(k).trim()===''?null:+F.get(k).replace(',','.');
-  const d={titolo:F.get('titolo').trim(),descrizione:F.get('descrizione').trim()||null,luogo:F.get('luogo').trim()||null,immagine:F.get('immagine').trim()||null,inizio:fromInput(F.get('inizio')),chiusura:fromInput(F.get('chiusura')),posti:+F.get('posti'),quota:n('quota'),caparra:n('caparra'),solo_soci:!!F.get('solo_soci'),ospiti:!!F.get('ospiti'),torneo:!!F.get('torneo')};
+  const d={titolo:F.get('titolo').trim(),descrizione:F.get('descrizione').trim()||null,luogo:F.get('luogo').trim()||null,immagine:F.get('immagine').trim()||null,inizio:fromInput(dateTime24Val('ev-inizio')),chiusura:fromInput(dateTime24Val('ev-chiusura')),posti:+F.get('posti'),quota:n('quota'),caparra:n('caparra'),solo_soci:!!F.get('solo_soci'),ospiti:!!F.get('ospiti'),torneo:!!F.get('torneo')};
   if(e.id)d.id=e.id;if(!d.titolo)return modal('Il titolo è obbligatorio.',{cancel:false});if(!d.inizio||!d.chiusura)return modal('Inserisci data e ora di inizio e di chiusura prenotazioni valide.',{cancel:false});
   if((nuovo||d.inizio!==e.inizio)&&new Date(d.inizio)<new Date())return modal('La data dell\'evento non può essere nel passato.',{cancel:false});
   if(new Date(d.chiusura)>new Date(d.inizio))return modal('La chiusura delle prenotazioni deve essere prima dell\'inizio.',{cancel:false});

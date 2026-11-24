@@ -6,8 +6,8 @@
 // Riordina il DOM di views.config: campi, id, validazioni e salvataggio restano quelli originali (stessi app_settings).
 // Testo nuovo solo via textContent; nessun HTML iniettato.
 (function(){
-const T={tit:'⚙️ Configurazione',back:'← Configurazione',g:{id:'Identità',fn:'Funzioni',tx:'Testi'},
- assoc:'Associazione',logo:'Logo',colori:'Colori',moduli:'Moduli',tipi:'Tipi di tavolo',gdr:'Record e badge GDR',testi:'Testi dell\'app',
+const T={tit:'⚙️ Configurazione',back:'← Configurazione',g:{id:'Identità',fn:'Funzioni',tx:'Testi',priv:'Privacy'},
+ assoc:'Associazione',logo:'Logo',colori:'Colori',moduli:'Moduli',tipi:'Tipi di tavolo',gdr:'Record e badge GDR',testi:'Testi dell\'app',privacy:'Informativa privacy',
  salva:'💾 Salva',nomod:'Nessuna modifica',mod1:'1 modifica',modn:n=>n+' modifiche',uscire:'Hai modifiche non salvate. Uscire senza salvare?',
  cerca:'🔍 Cerca un testo (es. coppa, tavolo)',gruppo:'Gruppo',tutto:'Tutto',tutti:'Tutti i testi',soloMod:'Solo modificati',modificato:'modificato',orig:'↺ Originale',
  nessuno:'Nessun testo trovato.',scegli:'Scegli immagine',nessunFile:'nessun file scelto',predef:'predefinito',impost:'impostato',attivo:'attivo',spento:'spento',
@@ -17,7 +17,7 @@ const arrow=o=>{const a=el('span','ar',o?'▾':'▸');a.setAttribute('aria-hidde
 const actRow=(r,f)=>{r.tabIndex=0;r.setAttribute('role','button');r.onclick=f;r.onkeydown=e=>{if(e.target===r&&(e.key==='Enter'||e.key===' ')){e.preventDefault();f()}}};
 function row(ic,title,sub,pill){const r=el('div','cfr');r.append(el('span','ic',ic));const t=el('span','t');const b=el('b',null,title);if(pill)b.append(pill);t.append(b);const s=el('span','sub');if(sub!=null)s.textContent=sub;t.append(s);r.append(t,arrow(false));return r}
 const S={on:false,base:null,extra:0,sec:null,V:null,save:null};
-const fields=V=>[...V.querySelectorAll('#cfg2 input:not([type=file]):not(.cfq),#cfg2 textarea')];
+const fields=V=>[...V.querySelectorAll('#cfg2 input:not([type=file]):not(.cfq):not(#priv-tit),#cfg2 textarea:not(#priv-tx)')];
 const val=i=>i.type==='checkbox'?(i.checked?'1':'0'):i.value;
 function snap(V){S.base=new Map(fields(V).map(i=>[i,val(i)]));S.extra=0;count(V)}
 function dirtyN(V){if(!S.base)return 0;let n=S.extra;fields(V).forEach(i=>{if(S.base.has(i)&&S.base.get(i)!==val(i))n++});return n}
@@ -63,14 +63,14 @@ function build(V){const cards=[...V.children];const root=el('div');root.id='cfg2
  const h2=hr.querySelector('h2')||el('h2');hr.replaceChildren(bk,h2);h2.textContent=T.tit;root.append(hr);
  const help=V.querySelector(':scope>p.muted.sm');if(help)help.classList.add('cfhelp');
  const byH=t=>cards.find(c=>c.matches&&c.matches('.card')&&c.querySelector(':scope>h3')&&c.querySelector(':scope>h3').textContent.trim()===t);
- const secs=[['assoc','🏷️',T.assoc,byH('Associazione')],['logo','🖼️',T.logo,byH('Logo')],['colori','🎨',T.colori,byH('Colori')],['moduli','🧩',T.moduli,byH('Moduli')],['gdr','🐉',T.gdr,V.querySelector('#cfgdr')],['testi','✏️',T.testi,V.querySelector('#cftx')]];
+ const secs=[['assoc','🏷️',T.assoc,byH('Associazione')],['logo','🖼️',T.logo,byH('Logo')],['colori','🎨',T.colori,byH('Colori')],['moduli','🧩',T.moduli,byH('Moduli')],['gdr','🐉',T.gdr,V.querySelector('#cfgdr')],['testi','✏️',T.testi,V.querySelector('#cftx')],['privacy','🔒',T.privacy,V.querySelector('#cfpriv')]];
  const I=el('div');I.id='cfidx';if(help)I.append(help);
  const grp=(t,keys)=>{I.append(el('p','cfgh',t));const box=el('div','card cflist');keys.forEach(k=>{if(k==='tipi'){if(typeof views==='undefined'||!views.tavolitipi)return;const r=row('🪑',(typeof TT!=='undefined'&&TT.t&&TT.t('gest'))||T.tipi,(typeof TT!=='undefined'&&TT.attivo?TT.attivo().map(x=>x.nome).join(', '):'')||'');r.dataset.cfs='tipi';
    actRow(r,()=>{window._ttFrom='config';go('tavolitipi')});box.append(r);return}
   const s=secs.find(x=>x[0]===k);if(!s||!s[3])return;let pill=null;if(k==='moduli'||k==='gdr'){pill=el('span','cfpill')}
   const r=row(s[1],s[2],'',pill);r.dataset.cfs=k;if(k==='colori'){const d=el('span','cfdots');d.setAttribute('aria-hidden','true');r.querySelector('b').append(d)}
   actRow(r,()=>openSec(V,s[3]));box.append(r)});I.append(box)};
- grp(T.g.id,['assoc','logo','colori']);grp(T.g.fn,['moduli','tipi','gdr']);grp(T.g.tx,['testi']);root.append(I);
+ grp(T.g.id,['assoc','logo','colori']);grp(T.g.fn,['moduli','tipi','gdr']);grp(T.g.tx,['testi']);grp(T.g.priv,['privacy']);root.append(I);
  secs.forEach(([k,ic,t,c])=>{if(!c)return;c.classList.add('cfsec');c.dataset.tit=ic+' '+t;c.dataset.cfk=k;c.hidden=true;const h=c.querySelector(':scope>h3');if(h)h.hidden=true;root.append(c)});
  // salva: barra fissa
  const err=V.querySelector('#cferr'),sv=V.querySelector('#cfsave');const bar=el('div','cfsb');bar.id='cfsb';const n=el('span',null,T.nomod);n.id='cfsbn';n.setAttribute('role','status');

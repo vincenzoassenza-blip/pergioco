@@ -40,8 +40,8 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
  // 4 · Profilo: livello in evidenza
  {const p=await lvp(b,900);const q=f=>p.evaluate(f);
   const r=await q(()=>{const h=document.querySelector('.card.prof .lvh');return h&&{t:h.textContent,pc:h.querySelector('.lvbar i').style.width,mid:!!document.querySelector('#view>.card.xpc'),nmlv:!!document.querySelector('.pname .lv'),fs:parseFloat(getComputedStyle(h.querySelector('.lvn')).fontSize),bg:getComputedStyle(h.querySelector('.lvbar i')).backgroundColor}});
-  chk(r&&/^Lv 4Novizio300 XP/.test(r.t)&&/Ancora 80 XP per il livello 5▸$/.test(r.t)&&r.fs>=24,'livello grande nella scheda in alto '+(r&&r.t));chk(r&&r.pc==='43%','barra dai numeri già esistenti');chk(r&&!r.mid&&!r.nmlv,'livello tolto dal mezzo');chk(r&&r.bg==='rgb(242, 177, 52)','colore da variabile --a');
-  await p.click('.lvh');await W(200);chk(await q(()=>{const pn=document.querySelector('.lvpan');return !pn.hidden&&/Come guadagnare XP/.test(pn.textContent)&&/Partite/.test(pn.textContent)&&document.querySelector('.lvh .ar').textContent==='▾'}),'tocco → come guadagnare XP');
+  chk(r&&/^Livello 4Novizio300 esperienza/.test(r.t)&&/Ancora 80 punti esperienza per il livello 5▸$/.test(r.t)&&r.fs>=24,'livello grande nella scheda in alto '+(r&&r.t));chk(r&&r.pc==='43%','barra dai numeri già esistenti');chk(r&&!r.mid&&!r.nmlv,'livello tolto dal mezzo');chk(r&&r.bg==='rgb(242, 177, 52)','colore da variabile --a');
+  await p.click('.lvh');await W(200);chk(await q(()=>{const pn=document.querySelector('.lvpan');return !pn.hidden&&/Come si guadagna esperienza/.test(pn.textContent)&&/Partite/.test(pn.textContent)&&document.querySelector('.lvh .ar').textContent==='▾'}),'tocco → come si guadagna esperienza');
   await q(()=>{TXT.v=TXT.norm(Object.assign({},TXT.v,{lv_invito:'Mancano {n} XP: livello {l}'}));window._pv=null;go('profilo')});await W(1500);chk(await q(()=>/Mancano 80 XP: livello 5/.test(document.querySelector('.lvh').textContent)),'testo configurabile');
   chk(await q(()=>!TXT.ok('lv_invito','<b>')&&TXT.ok('lv_invito',TXT_DEF.lv_invito)),'validazione');await p.context().close()}
 

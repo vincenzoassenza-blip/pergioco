@@ -97,15 +97,15 @@ async function gestTavoli(){
     V.append(Object.assign(document.createElement('p'),{className:'muted sm',textContent:'ⓘ Tipi di tavolo, capienza per serata e messaggio quando un tipo è pieno. Valori di default = testi di oggi.'}));
     // cfg card
     const cfg=document.createElement('div');cfg.className='card';
-    const lbOra=document.createElement('label');lbOra.textContent=TT.t('ora_lab')||'Orario della serata';
-    const inOra=document.createElement('input');inOra.type='time';inOra.id='tt-ora';inOra.value=TT.oraDefault();inOra.required=true;
+    const lbOra=document.createElement('label');lbOra.textContent=(TT.t('ora_lab')||'Orario della serata')+' (24 ore)';
+    const inOra=document.createElement('div');inOra.innerHTML=typeof time24Html==='function'?time24Html('tt-ora',TT.oraDefault(),true):'';
     const lbMsg=document.createElement('label');lbMsg.textContent='Messaggio tipo pieno ({tipo} = nome)';
     const taMsg=document.createElement('textarea');taMsg.id='tt-msg';taMsg.maxLength=280;taMsg.rows=3;taMsg.value=TT.cfg.pieno_msg||CFG_DEF.pieno_msg;
     const lbWa=document.createElement('label');lbWa.textContent='Link WhatsApp (facoltativo)';
     const inWa=document.createElement('input');inWa.id='tt-wa';inWa.maxLength=200;inWa.placeholder='https://chat.whatsapp.com/…';inWa.value=TT.cfg.whatsapp_url||'';
     const saveCfg=document.createElement('button');saveCfg.className='p';saveCfg.type='button';saveCfg.textContent='Salva impostazioni serata';
     saveCfg.onclick=async()=>{
-      const ora=inOra.value,msg=escTxt(taMsg.value).slice(0,280),wa=String(inWa.value||'').trim();
+      const ora=(typeof time24Val==='function'?time24Val('tt-ora'):''),msg=escTxt(taMsg.value).slice(0,280),wa=String(inWa.value||'').trim();
       if(!/^[0-2]\d:[0-5]\d$/.test(ora))return toast('Orario non valido');
       if(msg.length<10)return toast('Messaggio troppo corto');
       if(wa&&!/^https:\/\/(chat\.whatsapp\.com|wa\.me)\//.test(wa))return toast('Link WhatsApp non valido');
@@ -285,8 +285,8 @@ window.agSheet=async function(opts){
     const ip=document.createElement('input');ip.id='tp';ip.type='number';ip.min='1';ip.max='100';ip.required=true;ip.value=t.kind==='war'?'2':String((gs[0]&&gs[0].max)||4);
     d1.append(lp,ip);
     const d2=document.createElement('div');
-    const lt=document.createElement('label');lt.htmlFor='tt';lt.textContent='Ora di inizio';
-    const it=document.createElement('input');it.id='tt';it.type='time';it.required=true;it.value=TT.oraDefault();
+    const lt=document.createElement('label');lt.htmlFor='tt-h';lt.textContent='Ora di inizio (24 ore)';
+    const it=document.createElement('div');it.innerHTML=typeof time24Html==='function'?time24Html('tt',TT.oraDefault(),true):'';
     d2.append(lt,it);row.append(d1,d2);fields.append(row);
 
     if(t.kind==='board'){
@@ -395,7 +395,7 @@ window.agSheet=async function(opts){
     if(!isoOk(D)||D<romeEveningDate())return toast('Data non valida');
     const h=$('#th').value;if(!h||!ms.some(m=>m.id===h))return toast('Scegli chi ospita');
     if(!staff&&(!meM||h!==meM.id))return;
-    const time=$('#tt').value;if(!/^[0-2]\d:[0-5]\d$/.test(time))return toast('Orario obbligatorio');
+    const time=typeof time24Val==='function'?time24Val('tt'):($('#tt')&&$('#tt').value||'');if(!/^[0-2]\d:[0-5]\d$/.test(time))return toast('Orario obbligatorio');
     const seats=Math.max(1,Math.min(100,+$('#tp').value||1));
     const t=TT.byId(typeId);
     const rem=await TT.remaining(D,typeId);if(rem<=0)return toast(TT.pienoMsg(typeId));

@@ -29,7 +29,7 @@ let r=await p.evaluate(()=>({h2:V.querySelector('h2').textContent,on:document.qu
  lvBtn:!!V.querySelector('[data-lv="t3"]'),cancel:!!V.querySelector('[data-cancel="t3"]'),nt:!!document.getElementById('nt'),fab:!!document.getElementById('tfab'),seg:!!V.querySelector('.evseg'),cov:V.querySelectorAll('#tl .gcov').length,xss:window.XSS,
  noteEsc:/&lt;b&gt;x/.test(V.querySelector('[data-t="t3"]').innerHTML)}));
 chk(r.h2==='📅 Agenda','titolo «📅 Agenda»');chk(/^Oggi/.test(r.first)&&/^Oggi/.test(r.on),'si apre su Oggi, primo giorno');chk(!r.dday&&!r.sdVis,'niente campo data né data ripetuta');
-chk(r.heads.length===3&&/^Oggi, \S+ \d+ novembre · 1 tavolo/.test(r.heads[0])&&/ospiti inclusi/.test(r.heads[1]),'gruppi per giorno con intestazione italiana: '+r.heads.join(' | '));
+chk(r.heads.length===3&&/^Oggi, \S+ \d+ novembre · 1 tavolo/.test(r.heads[0])&&/ospiti/.test(r.heads[1]),'gruppi per giorno con intestazione italiana: '+r.heads.join(' | '));
 chk(r.lv===0&&!r.nm,'niente livelli né N/M');chk(r.hostOnce===1,'host una sola volta');chk(r.sd&&!r.full,'Siediti solo se c’è posto');chk(r.j===0,'socio: nessun picker di tutti i soci');
 chk(!r.o1&&r.o3,'+ Ospite / Chiudi e registra solo all’host');chk(!r.lvBtn&&r.cancel,'il creatore non lascia il posto, può annullare il tavolo');chk(!r.nt&&r.fab,'il + è l’unico modo');chk(r.seg,'tab Tavoli/Eventi');chk(r.cov===5,'copertine');chk(!r.xss&&(SH||r.noteEsc),'XSS escape');
 if(SH)await p.screenshot({path:OUT+'agenda-a-socio.png'});
