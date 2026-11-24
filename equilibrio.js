@@ -126,7 +126,7 @@ async function eqOpen(){const all=await DB.members(),ms=all.filter(m=>m.active),
    :'<p class="muted">Nessun gioco della collezione va bene per questo numero di giocatori e questo tempo. Prova ad allargare il tempo.</p>'}
   <div class="cwz-btns">${L.length>3?'<button id="eqn">🔄 Altra proposta</button>':''}<button id="eqm">✏️ Cambia partecipanti</button></div></div>`;
   $('#eqh').focus();$('#eqb').onclick=s1;$('#eqm').onclick=s1;if($('#eqn'))$('#eqn').onclick=()=>{st.off+=3;res()};
-  V.querySelectorAll('[data-see]').forEach(b=>b.onclick=()=>{const g=gsAll.find(x=>x.id===b.dataset.see);if(g&&typeof gamePage==='function')gamePage(g,ps)});
+  V.querySelectorAll('[data-see]').forEach(b=>b.onclick=()=>{if(b.dataset.see)openGame(b.dataset.see)});
   V.querySelectorAll('[data-book]').forEach(b=>b.onclick=()=>EQT.book(b.dataset.book,st.ids));
   V.querySelectorAll('[data-play]').forEach(b=>b.onclick=async()=>{const r=show.find(x=>x.g.id===b.dataset.play);if(!r||r.g.coop||noMe||(lock&&!st.ids.includes(lock)))return;b.disabled=true;
    const pron={};st.ids.forEach((id,i)=>{const F=r.per[i]&&r.per[i].F;pron[id]=Math.max(0,Math.min(2,isFinite(F)?F:1))});

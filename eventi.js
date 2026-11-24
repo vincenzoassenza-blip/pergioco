@@ -13,6 +13,7 @@ const EV={
  async presenze(mid){const {data}=await EV.c().rpc('evento_presenze',{p_member:mid});return data||{eventi:0,tornei:0}}};
 const TZ='Europe/Rome';
 const evData=iso=>isNaN(new Date(iso))?'—':new Date(iso).toLocaleString('it-IT',{timeZone:TZ,weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const evDay=iso=>{try{if(isNaN(new Date(iso)))return'';return new Intl.DateTimeFormat('en-CA',{timeZone:TZ}).format(new Date(iso))}catch(e){return''}};
 const toInput=iso=>iso&&!isNaN(new Date(iso))?new Date(iso).toLocaleString('sv-SE',{timeZone:TZ}).slice(0,16).replace(' ','T'):'';
 // "2026-11-05T21:00" letto come ora di Roma -> ISO UTC (indipendente dal fuso del telefono)
 function fromInput(v){if(!v||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(v))return null;const [d,t]=v.split('T'),[y,mo,da]=d.split('-').map(Number),[h,mi]=t.split(':').map(Number);const g=Date.UTC(y,mo-1,da,h,mi);
@@ -52,12 +53,13 @@ async function eventi(){navSerata();
  ${show.map(e=>card(e,myP(e.id),info[e.id])).join('')||`<div class="card"><p class="muted">${arch?'Nessun evento passato.':'Nessun evento in programma. Torna a trovarci presto!'}</p></div>`}`;
  bindSeg();V.querySelectorAll('[data-ar]').forEach(b=>b.onclick=()=>{window._evArch=b.dataset.ar==='1';eventi()});
  if($('#evnew'))$('#evnew').onclick=()=>evForm({});
- V.querySelectorAll('[data-ev]').forEach(c=>c.onclick=()=>evDetail(es.find(e=>e.id===c.dataset.ev),myP(c.dataset.ev),info[c.dataset.ev]))}
-async function evDetail(e,p,i){const staff=adminMode(),ms=await DB.members(),mn=id=>{const m=ms.find(m=>m.id===id);return m?memberName(m):'Socio'};
+ V.querySelectorAll('[data-ev]').forEach(c=>c.onclick=()=>openEvent(c.dataset.ev));
+ if(window._evid){const ex=es.find(e=>e.id===window._evid);if(ex)evDetail(ex,myP(ex.id),info[ex.id])}}
+async function evDetail(e,p,i){if(e&&e.id){window._evid=e.id;const hk='eventi/'+encodeURIComponent(e.id);window._cur=window._cur||'eventi';window._curKey=hk;if(location.hash.slice(1)!==hk)location.hash=hk}const staff=adminMode(),ms=await DB.members(),mn=id=>{const m=ms.find(m=>m.id===id);return m?memberName(m):'Socio'};
  i=i||await EV.info(e.id).catch(()=>null);const aperto=!e.annullato&&new Date(e.chiusura)>new Date(),attiva=p&&ATTIVE.includes(p.stato);
- const nomi=(i&&i.nomi||[]).map(n=>esc(mn(n.member_id))+lv(n.member_id)+(n.ospite?' <span class="muted">+1 ospite</span>':''));
+ const nomi=(i&&i.nomi||[]).map(n=>(n.member_id?mLink(n.member_id,esc(mn(n.member_id))+lv(n.member_id)):esc(mn(n.member_id)))+(n.ospite?' <span class="muted">+1 ospite</span>':''));
  const o=openPanel(`${safeUrl(e.immagine)?`<img class="evimg big" src="${esc(safeUrl(e.immagine))}" alt="" referrerpolicy="no-referrer">`:''}<h3>${esc(e.titolo)}</h3>
- <p>📅 <b>${esc(evData(e.inizio))}</b>${e.luogo?`<br>📍 ${esc(e.luogo)}`:''}<br>⏰ Prenotazioni fino a ${esc(evData(e.chiusura))}</p>
+ <p>📅 <b>${evDay(e.inizio)?linkEvening(evDay(e.inizio),evData(e.inizio)):esc(evData(e.inizio))}</b>${e.luogo?`<br>📍 ${esc(e.luogo)}`:''}<br>⏰ Prenotazioni fino a ${esc(evData(e.chiusura))}</p>
  ${e.descrizione?`<p class="evdesc">${esc(e.descrizione)}</p>`:''}
  <div class="evtags">${e.annullato?'<span class="evb off">Evento annullato</span>':''}${e.torneo?'<span class="evb t">🏆 Torneo</span>':''}${e.solo_soci?'<span class="evb t">Solo soci in regola con la quota</span>':'<span class="evb t">Aperto a tutti</span>'}${e.ospiti?'<span class="evb t">Ospiti ammessi (max 1)</span>':''}${i?`<span class="evb st">${i.occupati}/${e.posti} posti${i.attesa?` · ${i.attesa} in lista d'attesa`:''}</span>`:''}</div>
  ${typeof IG!=='undefined'?IG.link('📸 Foto e aggiornamenti su Instagram','igev'):''}
@@ -103,7 +105,7 @@ async function evStaff(e){const ms=await DB.members(),mn=id=>{const m=ms.find(m=
  let ps;try{ps=await EV.prenotati(e.id)}catch(x){return toast(evMsg(x))}
  const ord={confermata:0,in_attesa_conferma:1,attesa:2,annullata:3,rifiutata:4};ps.sort((a,b)=>ord[a.stato]-ord[b.stato]||a.created_at.localeCompare(b.created_at));
  const occ=ps.filter(p=>p.stato==='confermata'||p.stato==='in_attesa_conferma').reduce((s,p)=>s+1+(p.ospite?1:0),0),pres=ps.filter(p=>p.presente).reduce((s,p)=>s+1+(p.ospite?1:0),0);
- const row=p=>`<div class="evrow"><div><b>${esc(mn(p.member_id))}${lv(p.member_id)}</b>${p.ospite?` <span class="muted">+ ${esc(p.ospite)}</span>`:''}<br>${stBadge(p.stato)}${p.caparra_at?`<br><small class="muted">Caparra ${euro(p.caparra_importo)} ricevuta da ${esc(p.caparra_da)} il ${esc(evData(p.caparra_at))}</small>`:''}${p.caparra_mod_at?`<br><small class="muted">✏️ Ultima modifica caparra: ${esc(p.caparra_mod_da)} il ${esc(evData(p.caparra_mod_at))}</small>`:''}</div><div class="evbtn">
+ const row=p=>`<div class="evrow"><div><b>${p.member_id?mLink(p.member_id,esc(mn(p.member_id))+lv(p.member_id)):esc(mn(p.member_id))}</b>${p.ospite?` <span class="muted">+ ${esc(p.ospite)}</span>`:''}<br>${stBadge(p.stato)}${p.caparra_at?`<br><small class="muted">Caparra ${euro(p.caparra_importo)} ricevuta da ${esc(p.caparra_da)} il ${esc(evData(p.caparra_at))}</small>`:''}${p.caparra_mod_at?`<br><small class="muted">✏️ Ultima modifica caparra: ${esc(p.caparra_mod_da)} il ${esc(evData(p.caparra_mod_at))}</small>`:''}</div><div class="evbtn">
  ${p.stato==='in_attesa_conferma'?`<button class="p" data-cap="${p.id}">💶 Conferma caparra ricevuta</button>`:''}${p.stato==='confermata'&&p.caparra_at?`<button class="s" data-capfix="${p.id}">✏️ Correggi importo</button><button class="s" data-capundo="${p.id}">↩️ Annulla conferma caparra</button>`:''}
  ${p.stato==='confermata'?`<label class="lchk"><input type="checkbox" data-pres="${p.id}"${p.presente?' checked':''}> Presente</label>`:''}
  ${ATTIVE.includes(p.stato)?`<button class="s" data-rif="${p.id}">Annulla</button>`:''}</div></div>`;
@@ -127,10 +129,10 @@ async function evStaff(e){const ms=await DB.members(),mn=id=>{const m=ms.find(m=
 // "I miei eventi" in fondo al proprio Profilo
 async function mieiEventiHtml(){try{const [mine,es]=await Promise.all([EV.mine(),EV.list()]);const u=await DB.remote.user(),me=(await DB.members()).find(m=>u&&m.userId===u.id);const pz=me?await EV.presenze(me.id):{eventi:0,tornei:0};
  const rows=mine.filter(p=>ATTIVE.includes(p.stato)).map(p=>({p,e:es.find(e=>e.id===p.evento_id)})).filter(x=>x.e);
- return`<div class="card" id="mieiev"><h3>🎉 I miei eventi</h3>${rows.map(({p,e})=>`<div class="evrow" data-mev="${e.id}"><div><b>${esc(e.titolo)}</b><br><small class="muted">${esc(evData(e.inizio))}</small></div>${stBadge(p.stato)}</div>`).join('')||'<p class="muted">Nessuna prenotazione attiva.</p>'}
+ return`<div class="card" id="mieiev"><h3>🎉 I miei eventi</h3>${rows.map(({p,e})=>`<div class="evrow" data-mev="${e.id}"><div><b>${linkEvent(e.id,e.titolo)}</b><br><small class="muted">${evDay(e.inizio)?linkEvening(evDay(e.inizio),evData(e.inizio)):esc(evData(e.inizio))}</small></div>${stBadge(p.stato)}</div>`).join('')||'<p class="muted">Nessuna prenotazione attiva.</p>'}
  <div class="evtags"><span class="evb ${pz.eventi>=5?'ok':'off'}">🎟 Presente a 5 eventi ${pz.eventi>=5?'✔':`(${pz.eventi}/5)`}</span><span class="evb ${pz.tornei>=1?'ok':'off'}">🏆 Torneista ${pz.tornei>=1?'✔':'(0/1)'}</span></div>
  <button class="s" id="goev">Vedi tutti gli eventi</button></div>`}catch(e){return''}}
 const _serata=views.serata;views.serata=async(...a)=>{await _serata(...a);{V.insertAdjacentHTML('afterbegin',segHtml('serata'));bindSeg()}};
 const _profilo=views.profilo;views.profilo=async(...a)=>{await _profilo(...a);if(window._pv||!DB.remote||DB.status!=='online'||!(await DB.remote.user()))return;const h=await mieiEventiHtml();if(!h||location.hash!=='#profilo')return;V.insertAdjacentHTML('beforeend',h);
- $('#goev').onclick=()=>go('eventi');V.querySelectorAll('[data-mev]').forEach(r=>r.onclick=()=>go('eventi'))};
+ $('#goev').onclick=()=>{window._evid=null;go('eventi')};V.querySelectorAll('[data-mev]').forEach(r=>r.onclick=e=>{if(e.target.closest('a'))return;openEvent(r.dataset.mev)})};
 views.eventi=eventi;
