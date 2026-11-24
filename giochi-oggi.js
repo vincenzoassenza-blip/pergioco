@@ -13,7 +13,7 @@
    parts=[t('prox'),UX_d(nx),s.lib?s.lib+' '+(s.lib===1?t('lib1'):t('libN')):t('pieni')]}
   const b=document.createElement('button');b.type='button';b.id='g8s';b.className='g8s'+(o.n?'':' g8soft');b.dataset.d=d;
   parts.forEach((p,i)=>{if(i)b.append(sp('g8sep',' · '));b.append(sp(i?'':'g8h',p))});b.append(sp('g8go','▸'));b.setAttribute('aria-label',parts.join(', ')+'. Apri l\'Agenda');
-  b.onclick=()=>{window._ser={date:d};const n=document.querySelector('nav [data-v="serata"]');if(n)n.click();else go('serata')};
+  b.onclick=()=>{if(typeof openEvening==='function')openEvening(d);else{window._ser={date:d};go('serata')}};
   const fl=document.getElementById('uxfil');(top.parentNode===V?top:top.closest('.card')||top).before(b)}
  function sort(){const h=V.querySelector('.uxcolh');if(!h||h.classList.contains('g8'))return;const lb=h.querySelector('.uxsort'),h3=h.querySelector('h3');if(!lb||!h3)return;
   h.classList.add('g8');const tn=h3.firstChild;if(tn&&tn.nodeType===3){const c=(typeof TXT!=='undefined'&&TXT.g('collezione'))||'📚 La nostra collezione';tn.textContent=c+' '}lb.firstChild&&lb.firstChild.nodeType===3&&lb.firstChild.remove();const s=lb.querySelector('select');if(s)s.setAttribute('aria-label',t('ordina'));

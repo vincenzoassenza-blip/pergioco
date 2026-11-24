@@ -48,7 +48,7 @@ function html(m,s,full,per,ms,own){
  <p class="muted sm">Dal ${df(s.first)} al ${df(s.last)}. Ore stimate dalla durata media del gioco (BGG), non misurate${s.minN<s.n?` · ${s.n-s.minN} partite senza durata nota`:''}. Le cooperative contano come vittoria se il gruppo vince.</p>`;
  const mx=s.games[0]?s.games[0].n:1;
  o+=`<details class="std" open><summary>🎲 Giochi (${s.games.length})</summary><div class="stl">${s.games.map((g,i)=>{const sc=g.sc,av=sc.length?sc.reduce((a,b)=>a+b,0)/sc.length:null,f=v=>String(Math.round(v*10)/10).replace('.',',');
-  return `<div class="str"${i>=8?' hidden data-more':''}><div class="strh"><button type="button" class="stlink" data-g="${esc(g.id)}"><b>${esc(g.name)}</b> ▸</button><span>${g.n}×</span></div>${bar(g.n,mx)}<div class="muted sm">Vinte ${g.w} · ${pct(g.w,g.n)} · prima ${df(g.first)} · ultima ${df(g.last)}${sc.length?` · punti: max ${f(Math.max(...sc))}, media ${f(av)}, min ${f(Math.min(...sc))}`:''}</div></div>`}).join('')}</div>${s.games.length>8?`<button type="button" class="s sm" data-all>Mostra tutti (${s.games.length})</button>`:''}
+  return `<div class="str"${i>=8?' hidden data-more':''}><div class="strh"><button type="button" class="stlink" data-g="${esc(g.id)}"><b>${esc(g.name)}</b> ▸</button><span>${g.n}×</span></div>${bar(g.n,mx)}<div class="muted sm">Vinte ${g.w} · ${pct(g.w,g.n)} · prima ${g.first?linkEvening(g.first,df(g.first)):df(g.first)} · ultima ${g.last?linkEvening(g.last,df(g.last)):df(g.last)}${sc.length?` · punti: max ${f(Math.max(...sc))}, media ${f(av)}, min ${f(Math.min(...sc))}`:''}</div></div>`}).join('')}</div>${s.games.length>8?`<button type="button" class="s sm" data-all>Mostra tutti (${s.games.length})</button>`:''}
  ${s.dusty.length?`<p class="sm"><b>🧹 Da rispolverare</b> (non giocati da oltre 60 giorni): ${s.dusty.slice(0,8).map(d=>`${d.id?gLink(d.id,d.name):esc(d.name)} <span class="muted">(${d.ago} gg)</span>`).join(', ')}</p>`:''}</details>`;
  if(full){const so=[...s.opp].sort((a,b)=>b.n-a.n),nm=id=>{const x=ms.find(y=>y.id===id);return x?mLink(x.id,esc(memberName(x))):'Ospite'},omx=so[0]?so[0].n:1;
   o+=`<details class="std"><summary>⚔️ Avversari</summary>
@@ -79,7 +79,7 @@ function gameMine(g,m,plays,gs,ms,full,open){
  const byN=new Map();for(const p of L){const n=p.players.length;const r=byN.get(n)||{n,t:0,w:0};r.t++;if(won(p))r.w++;byN.set(n,r)}
  const bn=[...byN.values()].sort((a,b)=>b.w/b.t-a.w/a.t||b.t-a.t)[0];
  const O=new Map();let guest=0;for(const p of L){const iw=!!me(p).winner;for(const x of p.players){if(x.memberId===mid)continue;if(!x.memberId){guest++;continue}const o=O.get(x.memberId)||{id:x.memberId,n:0,bm:0,b:0};o.n++;if(!p.coop){if(x.winner&&!iw)o.bm++;if(iw&&!x.winner)o.b++}O.set(x.memberId,o)}}
- const nm=id=>{const x=ms.find(y=>y.id===id);return x?esc(memberName(x)):'Ospite'},op=[...O.values()];
+ const nm=id=>{const x=ms.find(y=>y.id===id);return x?mLink(x.id,esc(memberName(x))):'Ospite'},op=[...O.values()];
  const top=op.sort((a,b)=>b.n-a.n)[0],nem=[...op].filter(o=>o.bm).sort((a,b)=>b.bm-a.bm)[0],vit=[...op].filter(o=>o.b).sort((a,b)=>b.b-a.b)[0];
  const box=(v,l)=>`<div class="stn"><b>${v}</b><span>${l}</span></div>`,last=[...L].reverse().slice(0,5);
  const own=m._own;
@@ -115,7 +115,7 @@ window.StatsV33={gameMount,async mount(host,m,{own,staff}){
  const plays=await DB.plays(),gs=await DB.games(),ms=await DB.members();let per='sempre';
  const draw=()=>{const old=host.querySelector('#st33'),h=html(m,calc(m.id,plays,gs,per),full,per,ms,own);if(old)old.outerHTML=h;else host.insertAdjacentHTML('beforeend',h);bind()};
  const bind=()=>{const c=host.querySelector('#st33');c.querySelectorAll('[data-sp]').forEach(b=>b.onclick=()=>{if(!['sempre','12m','m'].includes(b.dataset.sp))return;per=b.dataset.sp;const op=[...c.querySelectorAll('details')].map(d=>d.open);draw();host.querySelectorAll('#st33 details').forEach((d,i)=>d.open=op[i])});
-  c.querySelectorAll('[data-g]').forEach(b=>b.onclick=async()=>{const g=gs.find(x=>x.id===b.dataset.g);if(!g||typeof gamePage!=='function')return;window._gsCtx={m,own,staff,open:true};try{await gamePage(g,plays)}finally{window._gsCtx=null}});
+  c.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{if(!b.dataset.g)return;window._gsCtx={m,own,staff,open:true};openGame(b.dataset.g)});
   const ma=c.querySelector('[data-all]');if(ma)ma.onclick=()=>{c.querySelectorAll('[data-more]').forEach(x=>x.hidden=false);ma.remove()};
   const cb=c.querySelector('#stpub');if(cb)cb.onchange=async()=>{const v=cb.checked;cb.disabled=true;try{if(DB.remote&&DB.remote.setStatsPub)await DB.remote.setStatsPub(v);m.statsPub=v;toast(v?'Statistiche pubbliche: gli altri vedranno solo i numeri aggregati':'Statistiche private')}catch(e){cb.checked=!v;toastErr(e,'STAT','Impostazione non salvata')}finally{cb.disabled=false}}};
  draw()}};

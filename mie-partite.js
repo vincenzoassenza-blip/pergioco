@@ -10,7 +10,11 @@ const T={titolo:'Le mie partite',tutto:'Tutto',periodo:'Periodo',tipo:'Tipo',
 const PAGE=20;
 const PERIODS=[['all',T.tutto],['1m',T.mese],['3m',T.mesi3],['y',T.anno]];
 const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e};
-const keyAct=(r,f)=>{r.tabIndex=0;r.setAttribute('role','button');r.onclick=f;r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}}};
+const stopA=e=>e.stopPropagation();
+const aGame=(id,name)=>{if(!id)return el('span',null,name||'');const a=el('a','gl',name);a.href='#gioco/'+encodeURIComponent(id);a.dataset.gid=id;a.addEventListener('click',stopA);return a};
+const aMember=(id,name)=>{if(!id)return el('span',null,name||'');const a=el('a','pv',name);a.href='#profilo/'+encodeURIComponent(id);a.dataset.pv=id;a.addEventListener('click',stopA);return a};
+const aEve=(d,name)=>{const day=String(d||'').slice(0,10);if(!(typeof isoOk==='function'?isoOk(day):/^\d{4}-\d{2}-\d{2}$/.test(day)))return el('span',null,name||'');const a=el('a','el',name||day);a.href='#serata/'+day;a.dataset.eve=day;a.addEventListener('click',stopA);return a};
+const keyAct=(r,f)=>{r.tabIndex=0;r.setAttribute('role','button');r.onclick=e=>{if(e.target.closest('a'))return;f()};r.onkeydown=e=>{if(e.target.closest('a'))return;if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}}};
 
 function periodRange(k,today){
   const t=today||((typeof romeToday==='function')?romeEveningDate():new Date().toISOString().slice(0,10));
@@ -89,9 +93,10 @@ function renderDetails(box,p,gs,ms,meId,allAsc){
   const me=(p.players||[]).find(x=>x.memberId===meId)||{};
   const gdr=p.gdr||{};
   const add=(lab,val)=>{const r=line(lab,val);if(r)box.append(r)};
-  add(T.gioco,playName(gs,p));
-  const dt=(typeof fmt==='function'?fmt(p.date):p.date)+((typeof dayName==='function'&&p.date)?' · '+dayName(p.date):'');
-  add(T.data,dt);
+  const gLab=playName(gs,p);const gid=(typeof TT!=='undefined'&&TT.label&&TT.label(p,gs||[]).id)||p.gameId;
+  {const r=el('div','mpdl');r.append(el('span','muted',T.gioco),gid?aGame(gid,gLab):el('b',null,gLab));box.append(r)}
+  const dlab=(typeof fmt==='function'?fmt(p.date):p.date);const dt=dlab+((typeof dayName==='function'&&p.date)?' · '+dayName(p.date):'');
+  {const r=el('div','mpdl');r.append(el('span','muted',T.data),aEve(p.date,dt));box.append(r)}
   if(typeof durOk==='function'&&durOk(p.duration))add(T.durata,durOk(p.duration)+' min');
   const typ=(typeof TT!=='undefined'&&TT.byId)?TT.byId(playTypeId(p)):null;
   if(typ&&typ.nome)add(T.tipo,((typ.icona||'')+' '+typ.nome).trim());
@@ -110,7 +115,7 @@ function renderDetails(box,p,gs,ms,meId,allAsc){
     if(me.character)add(T.personaggio,me.character);
     const mid=gdr.masterMemberId||gdr.master_member_id;
     const mname=mid?playerLabel({memberId:mid},ms):(gdr.masterName||'');
-    if(mname)add(T.master,mname);
+    if(mname){const r=el('div','mpdl');r.append(el('span','muted',T.master),mid?aMember(mid,mname):el('b',null,mname));box.append(r)}
   }else if(p.scenario)add('Scenario',p.scenario);
   if(p.note)add(T.note,p.note);
   const plist=el('div','mpdl mppl');plist.append(el('span','muted',T.giocatori));
@@ -118,7 +123,7 @@ function renderDetails(box,p,gs,ms,meId,allAsc){
   (p.players||[]).forEach(x=>{
     const chip=el('span','mpn');
     const lab=playerLabel(x,ms)+(x.memberId===meId?(' ('+T.tu+')'):'');
-    chip.append(el('span',null,lab));
+    chip.append(x.memberId?aMember(x.memberId,lab):el('span',null,lab));
     // Solo il proprio punteggio; gli altri soci restano nome (e personaggio GDR, che è della sessione)
     if(x.memberId===meId&&x.score!=null&&x.score!=='')chip.append(el('span','muted',' · '+String(x.score)));
     if(x.character&&x.memberId===meId)chip.append(el('span','muted',' · '+x.character));
@@ -174,10 +179,11 @@ async function draw(){
     if(typeof isGdrPlay==='function'&&isGdrPlay(p))ic.textContent='🐉';
     else if(playTypeId(p)==='war'||playTypeId(p)==='warhammer')ic.textContent='⚔️';
     row.append(ic);
-    const t=el('span','t');t.append(el('b',null,playName(gs,p)));
+    const t=el('span','t');const gid=(typeof TT!=='undefined'&&TT.label&&TT.label(p,gs||[]).id)||p.gameId;const gn=playName(gs,p);
+    const gb=el('b');if(gid)gb.append(aGame(gid,gn));else gb.textContent=gn;t.append(gb);
     const chips=el('span','pfcs');
     const dlab=(typeof fmt==='function'?fmt(p.date):p.date);
-    chips.append(el('span','pfc','📅 '+dlab));
+    const dc=el('span','pfc');dc.append(document.createTextNode('📅 '),aEve(p.date,dlab));chips.append(dc);
     const es=esitoMine(p,meP);if(es)chips.append(el('span','pfc'+(es===T.vittoria?' g':''),es));
     const xp=playXp(p,me.id,allAsc);chips.append(el('span','pfc y','+'+xp.total+' EXP'));
     t.append(chips);row.append(t);

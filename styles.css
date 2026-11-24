@@ -307,7 +307,7 @@ img.imgko{display:none!important}
 /* v39 */
 .hint{font-size:12px;margin:4px 0 0}.cnt{font-size:11px;text-align:right;margin-top:2px}
 .rclick{cursor:pointer}.rclick:hover,.rclick:focus-visible{background:rgba(42,71,133,.08);outline:2px solid transparent}.rclick:focus-visible{outline:2px solid #2a4785;outline-offset:1px}
-a.gl{color:inherit;text-decoration:underline dotted;text-underline-offset:2px}
+a.gl,a.el,a.evl{color:inherit;text-decoration:underline dotted;text-underline-offset:2px}
 .bdn{background:none;border:0;padding:0;font:inherit;font-weight:700;color:inherit;cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px}
 .bdgdlg{border:0;border-radius:14px;max-width:320px;text-align:center;padding:18px}.bdgdlg .bi{font-size:40px}.bdgdlg::backdrop{background:rgba(0,0,0,.4)}
 details.adl summary{display:flex;justify-content:space-between;padding:6px 0;cursor:pointer}

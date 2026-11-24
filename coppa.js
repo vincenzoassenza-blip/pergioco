@@ -35,7 +35,7 @@ async function cpCard(){if(!CP.cl())return'';if(!CP.d)await CP.load();const d=CP
  ${st&&c.stato==='concluso'?'<button class="s" id="cpnew">➕ Nuova edizione</button>':''}</div>`}
 const cpD=d=>{const x=new Date(d+'T12:00:00');return isNaN(x)?'':x.toLocaleDateString('it-IT',{day:'numeric',month:'short'})};
 const cpDur=c=>c.data_inizio&&c.data_fine?`dal ${cpD(c.data_inizio)} al ${cpD(c.data_fine)}`:c.data_inizio?`dal ${cpD(c.data_inizio)}`:c.data_fine?`fino al ${cpD(c.data_fine)}`:'';
-let _cpMs=[];const cpNome=id=>{const m=_cpMs.find(m=>m.id===id);return m?nmH(m):'<span class="muted">Socio</span>'};
+let _cpMs=[];const cpNome=id=>{const m=_cpMs.find(m=>m.id===id);return m?mLink(m.id,nmH(m)):'<span class="muted">Socio</span>'};
 async function cpBind(){V.querySelectorAll('[data-cp]').forEach(e=>e.onclick=ev=>{if(ev.target.closest('button'))return;window._cpId=e.dataset.cp;go('coppa')});
  const n=$('#cpnew');if(n)n.onclick=async()=>{try{const id=await CP.rpc('coppa_crea',{p_turni:3,p_pool:[],p_formato:'1v1'});await CP.load();window._cpId=id;go('coppa')}catch(e){toast(cpMsg(e))}}}
 const _evv=views.eventi;views.eventi=async(...a)=>{await _evv(...a);if(window._cur!=='eventi'||!MOD.on('coppa'))return;_cpMs=await DB.members();const h=await cpCard();if(!h||window._cur!=='eventi'||$('.cpc'))return;
@@ -44,7 +44,7 @@ views.coppa=async function(){clearInterval(window._cpT);if(!MOD.on('coppa')){go(
  V.innerHTML='<h2>🏆 '+esc(MOD.nome('coppa'))+'</h2><p class="muted">Caricamento…</p>';
  let v,gs;try{[v,gs,_cpMs]=await Promise.all([CP.rpc('coppa_vista',{p:id}),DB.games(),DB.members()])}catch(e){V.innerHTML=`<h2>🏆 ${esc(MOD.nome('coppa'))}</h2><p class="warn">${esc(cpMsg(e))}</p>`;return}
  if(!v||!v.coppa){V.innerHTML='<h2>🏆 '+esc(MOD.nome('coppa'))+'</h2><p class="muted">Torneo non trovato.</p>';return}
- const c=v.coppa,st=!!v.staff,me=v.me,gn=g=>esc((gs.find(x=>x.id===g)||{}).name||'Gioco'),nm=cpNome,inc=v.incontri||[],cur=c.stato==='in_corso'?c.turno:0,F=c.formato||'1v1',T1=F==='1v1',tav=v.tavoli||[];
+ const c=v.coppa,st=!!v.staff,me=v.me,gn=g=>g?gLink(g,(gs.find(x=>x.id===g)||{}).name||'Gioco'):esc('Gioco'),nm=cpNome,inc=v.incontri||[],cur=c.stato==='in_corso'?c.turno:0,F=c.formato||'1v1',T1=F==='1v1',tav=v.tavoli||[];
  const lo=f=>f==='tavoli'?3:2,hi=f=>f==='1v1'?2:4,fit=(g,f)=>(+g.min||1)<=hi(f)&&(+g.max||99)>=lo(f),okG=g=>!g.coop&&!g.isExp&&fit(g,'misto'),pool=c.pool||[];
  const cfg=st&&c.stato!=='concluso'?`<details class="card" ${c.stato==='bozza'?'open':''}><summary><b>⚙️ Configurazione (staff)</b></summary>
   <label>Formato</label><div class="seg" id="cpf">${['1v1','tavoli','misto'].filter(f=>f!=='misto'||CP.MISTO||F==='misto').map(f=>`<button type="button" data-f="${f}" class="${f===F?'on':''}"${c.stato!=='bozza'?' disabled':''}>${esc(CP.FMT[f])}</button>`).join('')}</div><p class="muted" id="cpfh" style="font-size:12px"></p>
