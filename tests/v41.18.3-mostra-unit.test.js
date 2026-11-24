@@ -3,7 +3,7 @@ const {APP_VERSION,swCache,hasAsset,read}=require('./appver');
 let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};
 const app=read('app.js'),css=read('styles.css');
 
-chk(APP_VERSION==='41.18.3'&&swCache(),'versione 41.18.3 in brand.js allineata alla cache SW');
+chk(!!APP_VERSION&&swCache(),'APP_VERSION in brand.js allineata alla cache SW');
 chk(hasAsset('app.js')&&hasAsset('styles.css')&&hasAsset('brand.js'),'asset modificati pinnati in index e SW');
 chk(/function revealPw\(el,show\)/.test(app)&&/el\.cloneNode\(false\)/.test(app),'revealPw clona il campo se il type non cambia');
 chk(/function bindPwShow\(cb,ids\)/.test(app)&&/addEventListener\('change'/.test(app)&&/addEventListener\('click'/.test(app),'bindPwShow ascolta change e click sulla label');

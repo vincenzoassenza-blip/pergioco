@@ -7,7 +7,7 @@ const ANT={MAX:5,NOMI:['zero','1','2','antero-2','antero-1','antero'],SUP:['',''
   const parti=[];for(let k=d.length-1;k>=1;k--){const c=d[k];if(!c)continue;parti.push(k===1?(c===1?'antero':c+' anteri'):c+' antero'+(ANT.SUP[k]||'^'+k))}
   if(d[0])parti.push(ANT.NOMI[d[0]]);return parti.length>1?parti.slice(0,-1).join(', ')+' e '+parti[parti.length-1]:parti[0]},
  MESI:['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'],
- oggi(){const s=(typeof romeToday==='function'?romeToday():new Date().toISOString().slice(0,10));return s},
+ oggi(){const s=(typeof romeToday==='function'?romeEveningDate():new Date().toISOString().slice(0,10));return s},
  data(iso){const [y,m,d]=String(iso).split('-').map(Number);return`${ANT.num(d)} ${ANT.MESI[m-1]}, anno ${ANT.num(y)}`},
  festa(){const f=TXT.v.festa;return !!f&&ANT.oggi().slice(5)===f},
  // meccanica benedetta del giorno: deterministica per data

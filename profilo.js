@@ -35,8 +35,8 @@ function privacy(V){const lb=V.querySelector('label.stpub');const ed=V.querySele
  w.append(l,el('div','hl','ⓘ '+T.visH));if(old)old.replaceWith(w);else if(ed&&ed.querySelector('#esv'))ed.querySelector('#esv').before(w);else lb.after(w);lb.remove()}
 
 // tavoli / organizzati nel periodo scelto (stesse regole di Profile.stats e degli intervalli di stats.js)
-function perFrom(per){const t=romeToday();if(per==='12m'){const d=new Date(t+'T12:00:00Z');d.setUTCFullYear(d.getUTCFullYear()-1);return d.toISOString().slice(0,10)}if(per==='m')return t.slice(0,8)+'01';return '0000'}
-function tavPer(st,ctx){if(!ctx.mid||!Array.isArray(ctx.ts))return null;const on=st.querySelector('.stf [data-sp].on'),per=on?on.dataset.sp:'sempre',f=perFrom(per),today=romeToday(),id=ctx.mid;
+function perFrom(per){const t=romeEveningDate();if(per==='12m'){const d=new Date(t+'T12:00:00Z');d.setUTCFullYear(d.getUTCFullYear()-1);return d.toISOString().slice(0,10)}if(per==='m')return t.slice(0,8)+'01';return '0000'}
+function tavPer(st,ctx){if(!ctx.mid||!Array.isArray(ctx.ts))return null;const on=st.querySelector('.stf [data-sp].on'),per=on?on.dataset.sp:'sempre',f=perFrom(per),today=romeEveningDate(),id=ctx.mid;
  const tb=ctx.ts.filter(t=>((t.players||[]).some(x=>x.memberId===id)||t.hostId===id)&&/^\d{4}-\d{2}-\d{2}$/.test(t.date||'')&&t.date>=f&&t.date<=today);return{tav:tb.length,org:tb.filter(t=>t.hostId===id).length}}
 function stats(V,ctx){const st=V.querySelector('#st33');if(!st||st.dataset.p413)return;st.dataset.p413='1';
  const h3=st.querySelector('h3');const note=[...st.querySelectorAll(':scope>p.muted.sm')][0];

@@ -107,6 +107,10 @@ const BADGES=[
  ['host','🏠','Padrone di casa','Ospita 5 tavoli in serata',s=>s.hosted>=5],
  ['expl','🚀','Esploratore','Gioca un gioco il giorno in cui arriva',s=>s.explorer],
  ['critico','✍️','Critico','Vota 10 giochi',s=>s.rated>=10],
+ ['exp1','🗣️','Primo insegnante','Spiega il gioco in una partita',s=>s.explained>=1],
+ ['exp10','📖','Maestro di regole','Spiega il gioco in 10 partite',s=>s.explained>=10],
+ ['exp25','🎓','Professore','Spiega il gioco in 25 partite',s=>s.explained>=25],
+ ['expg10','🧑‍🏫','Spiega-tutto','Spiega 10 giochi diversi',s=>s.explainedDistinct>=10],
  ['sf1','⚖️',"Bilancia d'esordio",'Gioca la prima sfida equilibrata',s=>s.sfN>=1],
  ['sf10','🗡️','Sfidante seriale','Gioca 10 sfide equilibrate',s=>s.sfN>=10],
  ['sfw5','🥇','Pari e patta? No, vinta!','Vinci 5 sfide equilibrate',s=>s.sfW>=5],
@@ -150,10 +154,10 @@ const Badges={
   const dates=wd=>new Set(mine.filter(p=>new Date(String(p.date).slice(0,10)+'T12:00').getDay()===wd).map(p=>p.date)).size;
   return{plays:mine.length,wins:mine.filter(p=>!isGdrPlay(p)&&me(p).winner).length,distinct:new Set(mine.filter(isBoardGamePlay).map(p=>p.gameId)).size,thu:dates(4),sun:dates(0),
    coopWins:mine.filter(p=>!isGdrPlay(p)&&p.coop&&me(p).winner).length,records:Stats.records(games,plays).filter(r=>Stats.key(r.best.p)===key).length,
-   hosted:(tables||[]).filter(t=>'m:'+t.hostId===key).length,explorer:mine.some(p=>{const g=games.find(g=>g.id===p.gameId);return g&&g.addedAt&&g.addedAt.slice(0,10)===p.date}),rated:(ratings||[]).filter(x=>'m:'+x.member_id===key).length,...SF.stats(key.startsWith('m:')?key.slice(2):null,plays)}},
+   hosted:(tables||[]).filter(t=>'m:'+t.hostId===key).length,explorer:mine.some(p=>{const g=games.find(g=>g.id===p.gameId);return g&&g.addedAt&&g.addedAt.slice(0,10)===p.date}),rated:(ratings||[]).filter(x=>'m:'+x.member_id===key).length,...(()=>{const mid=key.startsWith('m:')?key.slice(2):'';if(!mid)return{explained:0,explainedDistinct:0};const seen=new Set(),ok=[],per={};plays.filter(p=>p.explainedMemberId===mid&&(p.players||[]).some(x=>x.memberId===mid)).sort((a,b)=>String(a.date).localeCompare(b.date)||String(a.gameId).localeCompare(String(b.gameId))).forEach(p=>{const k=p.date+'|'+p.gameId;if(seen.has(k))return;seen.add(k);per[p.date]=(per[p.date]||0)+1;if(per[p.date]<=2)ok.push(p)});return{explained:ok.length,explainedDistinct:new Set(ok.map(p=>p.gameId)).size}})(),...SF.stats(key.startsWith('m:')?key.slice(2):null,plays)}},
  // progresso verso il badge: [valore attuale, obiettivo]
  prog:{prima:s=>[s.plays,1],vittoria:s=>[s.wins,1],p10:s=>[s.plays,10],p25:s=>[s.plays,25],p50:s=>[s.plays,50],g5:s=>[s.distinct,5],g10:s=>[s.distinct,10],g20:s=>[s.distinct,20],
-  gio:s=>[s.thu,5],dom:s=>[s.sun,5],rec:s=>[s.records,1],coop:s=>[s.coopWins,5],host:s=>[s.hosted,5],critico:s=>[s.rated,10],sf1:s=>[s.sfN,1],sf10:s=>[s.sfN,10],sfw5:s=>[s.sfW,5],sfund:s=>[s.sfU,1],sfriv:s=>[+s.sfRiv,1],sfrivali:s=>[s.sfRivali,5],sfnuovo:s=>[s.sfNuovi,3],sfbig:s=>[+s.sfBig,1]},
+  gio:s=>[s.thu,5],dom:s=>[s.sun,5],rec:s=>[s.records,1],coop:s=>[s.coopWins,5],host:s=>[s.hosted,5],critico:s=>[s.rated,10],exp1:s=>[s.explained,1],exp10:s=>[s.explained,10],exp25:s=>[s.explained,25],expg10:s=>[s.explainedDistinct,10],sf1:s=>[s.sfN,1],sf10:s=>[s.sfN,10],sfw5:s=>[s.sfW,5],sfund:s=>[s.sfU,1],sfriv:s=>[+s.sfRiv,1],sfrivali:s=>[s.sfRivali,5],sfnuovo:s=>[s.sfNuovi,3],sfbig:s=>[+s.sfBig,1]},
  list(key,ctx){const s=this.stats(key,ctx);return BADGES.map(([id,icon,name,desc,f])=>{const p=this.prog[id]&&this.prog[id](s);return{id,icon,name,desc,on:!!f(s),cur:p?Math.min(p[0],p[1]):null,goal:p?p[1]:null}})},
  unlocked(key,ctx){return this.list(key,ctx).filter(b=>b.on).map(b=>b.id)}};
 

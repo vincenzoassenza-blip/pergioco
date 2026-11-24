@@ -7,7 +7,7 @@
  async function strip(){const top=document.getElementById('uxtop');if(!top||V.querySelector('#g8s'))return;const tok={};V._g8=tok;
   let ts=[];try{ts=(await DB.allTables()).filter(z=>typeof isoOk!=='function'||isoOk(z.date))}catch(e){return}
   if(V._g8!==tok||!document.getElementById('uxtop')||V.querySelector('#g8s'))return;
-  const oggi=romeToday(),o=stats(ts,oggi);let d=oggi,parts;
+  const oggi=romeEveningDate(),o=stats(ts,oggi);let d=oggi,parts;
   if(o.n){parts=[t('oggi'),o.n+' '+(o.n===1?t('tav1'):t('tavN')),o.lib?o.lib+' '+(o.lib===1?t('lib1'):t('libN')):t('pieni')]}
   else{const nx=ts.filter(z=>z.date>oggi&&z.status==='open').map(z=>z.date).sort()[0];if(!nx)return;d=nx;const s=stats(ts,nx);
    parts=[t('prox'),UX_d(nx),s.lib?s.lib+' '+(s.lib===1?t('lib1'):t('libN')):t('pieni')]}

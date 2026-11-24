@@ -46,7 +46,13 @@ function analyze(rows,existing,isSoci,members=[]){const cols=isSoci?SOCI_COLS.co
  return rep}
 const nk=v=>String(v??'').trim().toLowerCase().replace(/^0+(?=\d)/,'');
 const nn=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
-const omonimi=(r,members)=>members.filter(m=>nn(m.nome)===nn(r.nome)&&nn(m.cognome)===nn(r.cognome));
+const nameKey=(n,c)=>typeof nameTokens==='function'?nameTokens(n,c):[nn(n),nn(c)].filter(Boolean).sort().join(' ');
+const omonimi=(r,members)=>{
+  if(r&&r.numero_tessera){const hit=members.filter(m=>nk(m.tessera)===nk(r.numero_tessera));if(hit.length)return hit}
+  const k=nameKey(r.nome,r.cognome);if(!k)return[];
+  return members.filter(m=>nameKey(m.nome,m.cognome)===k);
+};
+
 const refreshApp=async()=>{try{await DB.remote.refresh()}catch(e){}};
 const li=(a,f)=>a.length?`<ul class="lbl">${a.map(f).join('')}</ul>`:'';
 function repHtml(rep,isSoci){const omo=rep.omo||[];const disc=omo.length+rep.nonRegola.length+rep.diff.length+rep.dup.length+rep.nuovi.length;
@@ -116,7 +122,7 @@ function bindForm(o,r,t,members=[]){if(libRO())return roForm(o);const cf=o.query
  o.querySelector('#lsv').onclick=async()=>{if(!numForm(o))return;const d={};o.querySelectorAll('[data-f]').forEach(i=>d[i.dataset.f]=i.value.trim()||null);d.stato_quote=d.stato_quote||undefined;if(t==='libro_volontari')delete d.stato_quote;
   if(!d.nome||!d.cognome)return toast('Nome e cognome sono obbligatori');if(!cfOk(d.codice_fiscale))return toast('Codice fiscale non valido');if(d.cap&&!/^\d{5}$/.test(d.cap))return toast('CAP non valido');if(d.provincia){d.provincia=d.provincia.toUpperCase();if(!/^[A-Z]{2}$/.test(d.provincia))return toast('Provincia: 2 lettere')}
   if(d.data_uscita&&!d.motivo_uscita)return toast('Indica il motivo dell\'uscita');if(r.id)d.id=r.id;
-  try{const sv=await LB.save(t,d);o.close();await refreshApp();const om=t==='libro_soci'&&!sv.member_id?omonimi(sv,members):[];if(om.length)await modal(`Salvato. Possibile corrispondenza con il socio ${om.map(memberName).join(', ')}: collegalo manualmente con «Collega a socio esistente».`,{cancel:false});else toast(!r.id&&sv.member_id&&t==='libro_soci'?'Salvato e creato il socio per le partite':'Salvato');libri()}catch(e){/duplicate/.test(e.message)?toastErr({message:'Codice fiscale o numero di tessera già presenti nel registro: cerca la persona esistente invece di crearne una nuova'},'LIBRI'):toastErr(e,'LIBRI','Salvataggio non riuscito')}};
+  try{const sv=await LB.save(t,d);o.close();await refreshApp();const om=t==='libro_soci'&&!sv.member_id?omonimi(sv,members):[];if(om.length>1)await modal(`Salvato. Il nome corrisponde a più soci (${om.map(memberName).join(', ')}): scegli a chi collegarlo con «Collega a socio esistente».`,{cancel:false});else if(om.length===1)await modal(`Salvato. Possibile corrispondenza con ${memberName(om[0])}: collegalo con «Collega a socio esistente» se è la stessa persona.`,{cancel:false});else toast(!r.id&&sv.member_id&&t==='libro_soci'?'Salvato e creato il socio per le partite':'Salvato');libri()}catch(e){/duplicate/.test(e.message)?toastErr({message:'Codice fiscale o numero di tessera già presenti nel registro: cerca la persona esistente invece di crearne una nuova'},'LIBRI'):toastErr(e,'LIBRI','Salvataggio non riuscito')}};
  const del=o.querySelector('#ldel');if(del)del.onclick=async()=>{if(!await ask(`Eliminare DEFINITIVAMENTE ${nm(r)}? Per i soci usciti usa invece «Data uscita». L'operazione viene registrata.`))return;const c=await askText('Per confermare scrivi ELIMINA');if(c!=='ELIMINA')return toast('Annullato');try{await LB.del(t,r.id);toast('Eliminato');o.close();libri()}catch(e){toastErr(e,'LIBRI','Eliminazione non riuscita')}};
  o.querySelectorAll('[data-qd]').forEach(b=>b.onclick=async()=>{if(!await ask('Eliminare questa quota?'))return;await LB.del('libro_quote',b.dataset.qd);o.close();libri()});
  const qa=o.querySelector('#qadd');if(qa)qa.onclick=async()=>{if(!numForm(o.querySelector('.qrow')))return;const anno=+o.querySelector('#qa').value;const {error}=await LB.sb().from('libro_quote').upsert({socio_id:r.id,anno,data_pagamento:o.querySelector('#qd').value||null,importo:numOf(o.querySelector('#qi'))},{onConflict:'socio_id,anno'});if(error)return toast('Errore: '+error.message);
@@ -125,7 +131,8 @@ async function auditView(){if(libRO())return;let l;try{l=await LB.audit()}catch(
  openPanel(`<h3>Registro operazioni</h3><p class="muted">Ultime 200 operazioni sui libri sociali.</p><div class="laud">${l.map(x=>`<div class="rec"><span>${A[x.action]||x.action} · ${esc(x.tabella.replace('libro_',''))}<br><span class="muted">${esc(x.dettaglio||'')}</span></span><span class="muted" style="text-align:right">${new Date(x.at).toLocaleString('it-IT',{timeZone:'Europe/Rome',dateStyle:'short',timeStyle:'short'})}<br>${esc(x.email||'')}</span></div>`).join('')||'<p class="muted">Nessuna operazione.</p>'}</div><div class="mbt"><button class="p" data-close>Chiudi</button></div>`,true)}
 // --- vista principale
 async function libri(){if(!adminMode()||!DB.remote){V.innerHTML='<h2>Libri sociali</h2><p class="muted">Disponibili solo ad admin e moderatori, in modalità staff.</p>';return}
- const t=libTab==='soci'?'libro_soci':'libro_volontari';let rows,soci,members=[];try{soci=await LB.list('libro_soci');rows=t==='libro_soci'?soci:await LB.list(t);members=(await DB.members())}catch(e){V.innerHTML='<h2>Libri sociali</h2><p class="warn">Errore: '+esc(e.message)+'</p>';return}
+ const t=libTab==='soci'?'libro_soci':'libro_volontari';let rows,soci,members=[];try{soci=await LB.list('libro_soci');rows=t==='libro_soci'?soci:await LB.list(t);members=(await DB.members());
+  if(t==='libro_soci'){let linked=0;for(const r of soci){if(r.member_id)continue;const om=omonimi(r,members);if(om.length===1){try{await LB.save('libro_soci',{id:r.id,member_id:om[0].id});r.member_id=om[0].id;linked++}catch(e){}}}if(linked)try{members=await DB.members()}catch(e){}}}catch(e){V.innerHTML='<h2>Libri sociali</h2><p class="warn">Errore: '+esc(e.message)+'</p>';return}
  const sosp=new Set((members||[]).filter(m=>m.sospeso).map(m=>m.id));
  const nr=soci.filter(s=>!s.data_uscita&&s.stato_quote==='non_in_regola'&&!(s.member_id&&sosp.has(s.member_id)));
  const draw=()=>{const q=libQ.toLowerCase();const l=rows.filter(r=>(!q||[r.nome,r.cognome,r.codice_fiscale,r.numero_tessera,r.attivita].some(v=>String(v||'').toLowerCase().includes(q)))&&(t!=='libro_soci'||libF==='tutti'||(libF==='usciti'?!!r.data_uscita:!r.data_uscita&&(libF==='attivi'||r.stato_quote===libF))));
