@@ -47,7 +47,7 @@ function stats(V,ctx){const st=V.querySelector('#st33');if(!st||st.dataset.p413)
   const ng=el('div','stg pftiles');const tile=(v,l)=>{const t=el('div','stn');t.append(el('b',null,v),el('span',null,l));return t};
   T.tiles.forEach(([l,i])=>ng.append(tile(val(i),l)));const tv=tavPer(st,ctx);if(tv){ng.append(tile(String(tv.tav),T.tavoli),tile(String(tv.org),T.org))}else{if(ctx.tav!=null)ng.append(tile(ctx.tav,T.tavoli));if(ctx.org!=null)ng.append(tile(ctx.org,T.org))}
   // h-index e ore stimate restano, spostati in «Abitudini»
-  const rest=bx.slice(4);const ag=ab&&ab.querySelector('.stg');if(rest.length&&ag)ag.prepend(...rest);g.replaceWith(ng)}
+  const rest=bx.slice(4);const ag=ab&&ab.querySelector('.stg');if(rest.length&&ag)ag.prepend(...rest);g.replaceWith(ng);if(ctx.exp!=null||ctx.expd!=null){const ex=el('div','stg pfexpl');if(ctx.exp!=null)ex.append(tile(ctx.exp,'spiegazioni'));if(ctx.expd!=null)ex.append(tile(ctx.expd,'giochi spiegati'));ng.after(ex)}}
  // 3 · I miei giochi
  const gd=[...st.querySelectorAll('details.std')].find(d=>/^🎲/.test(d.querySelector('summary').textContent.trim()));
  const host=V.querySelector('#st33h')||st;let card=V.querySelector('#pfgames');const nc=el('div','card pfl');nc.id='pfgames';head(nc,h3&&/Le mie/.test(h3.textContent)?T.giochi:T.giochiAltri);
@@ -92,6 +92,8 @@ const _pf=views.profilo;views.profilo=async(...a)=>{await _pf(...a);try{const V=
  // tavoli / organizzati: dalla riga di riquadri sotto le statistiche (poi tolta, i numeri stanno nelle tessere)
  const ctx={};const rw=[...V.querySelectorAll(':scope>.row')].find(r=>/Tavoli organizzati/.test(r.textContent)&&V.querySelector('#st33'));
  if(rw){rw.querySelectorAll('.card').forEach(c=>{const l=(c.querySelector('.muted')||{}).textContent,v=(c.querySelector('.big')||{}).textContent;if(l==='Tavoli')ctx.tav=v;if(l==='Tavoli organizzati')ctx.org=v});rw.remove()}
+ const rx=[...V.querySelectorAll(':scope>.row')].find(r=>/Giochi spiegati|Spiegazioni/.test(r.textContent)&&V.querySelector('#st33'));
+ if(rx){rx.querySelectorAll('.card').forEach(c=>{const l=(c.querySelector('.muted')||{}).textContent,v=(c.querySelector('.big')||{}).textContent;if(l==='Spiegazioni')ctx.exp=v;if(l==='Giochi spiegati')ctx.expd=v});rx.remove()}
  try{const ms=await DB.members(),u=DB.remote&&DB.status==='online'?await DB.remote.user():null;const m=window._pv?ms.find(x=>x.id===window._pv):(u?ms.find(x=>x.userId===u.id):null);if(m){ctx.mid=m.id;ctx.ts=await DB.allTables()}}catch(e){}
  apply(V,ctx);if(typeof pwProfilo==='function')try{pwProfilo(V)}catch(e){console.warn('cambia-password',e)};const h=V.querySelector('#st33h');if(h&&!h._pfo){h._pfo=new MutationObserver(()=>{if(h.querySelector('#st33:not([data-p413])'))stats(V,ctx)});h._pfo.observe(h,{childList:true,subtree:true})}}catch(e){console.warn('profilo v41.3',e)}};
 window.PF413={apply,T};

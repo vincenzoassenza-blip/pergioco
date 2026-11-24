@@ -920,3 +920,4 @@ header .brand,header .sub,body.adm header .brand,body.adm header .sub{padding-ri
 /* v41.18.2 — Elimina gioco nella scheda */
 .gdel{margin:16px 0 4px;padding:12px}
 .gdel .danger{width:100%}
+.pfexpl{margin-top:8px}.explist{display:flex;flex-direction:column;gap:4px;margin:6px 0 0}.explopt{width:100%;text-align:left}

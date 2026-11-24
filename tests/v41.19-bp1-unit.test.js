@@ -5,9 +5,9 @@ const root=path.join(__dirname,'..');
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
 let n=0,ok=0;const chk=(c,m)=>{n++;if(c)ok++;else console.error('FAIL',m)}
 
-chk(APP_VERSION==='41.19'&&swCache()&&hasAsset('app.js')&&hasAsset('data.js')&&hasAsset('sb.js')&&hasAsset('libri.js'),'APP_VERSION 41.19 e cache SW allineata');
+chk((APP_VERSION==='41.19.1'||String(APP_VERSION).startsWith('41.19'))&&swCache()&&hasAsset('app.js')&&hasAsset('data.js')&&hasAsset('sb.js')&&hasAsset('libri.js'),'APP_VERSION 41.19.x e cache SW allineata');
 
-const app=read('app.js'),data=read('data.js'),sb=read('sb.js'),libri=read('libri.js'),sql=read('supabase/migrate-v41.19.sql');
+const app=read('app.js'),data=read('data.js'),sb=read('sb.js'),libri=read('libri.js'),pf=read('profilo.js'),sql=read('supabase/migrate-v41.19.sql');
 
 chk(/function romeEveningDate\(/.test(app)&&/function nameTokens\(/.test(app)&&/function isSuperadmin\(/.test(app),'helper romeEveningDate, nameTokens, isSuperadmin');
 chk(app.includes("oggi=romeEveningDate()")&&app.includes('gestionePlaysFilter(ps,{...af,game:gf},romeEveningDate())')&&/today\|\|romeEveningDate\(\)/.test(app),'storico, serata e playWarn usano romeEveningDate');
@@ -50,6 +50,18 @@ chk(nt('José','García')===nt('Jose','Garcia'),'senza accenti');
 chk(nt('Giovanni','Rossi')!==nt('Giovanni','Rossi Bianchi'),'nomi parziali non coincidono');
 
 chk(!/\bclub\b/i.test(sql)&&!/\bludoteca\b/i.test(sql),'nessun «club» o «ludoteca» nella migrazione');
+
+
+const sql2=fs.existsSync(path.join(root,'supabase/migrate-v41.19.1.sql'))?read('supabase/migrate-v41.19.1.sql'):'';
+chk(/libro_soci_assign_tessera/.test(sql2)&&/returning tessera into/.test(sql2),'v41.19.1: tessera del socio torna sul libro');
+chk(/Solo soci non ancora collegati/.test(libri)&&/const linkable=/.test(libri)&&/next_tessera/.test(libri),'libro: tendina solo soci da collegare e tessera precompilata');
+chk(/Cerca socio per nome/.test(app)&&/Può anche non essere al tavolo/.test(app),'spiegato: ricerca per nome, anche fuori dal tavolo');
+chk(/Spiegazioni/.test(app)&&/Giochi spiegati/.test(app)&&/explainedDistinct/.test(data),'statistiche personali: spiegazioni e giochi spiegati');
+chk(/stg pfexpl/.test(pf)&&/Spiegazioni/.test(pf)&&/V\.querySelector\('#st33'\)/.test(pf),'profilo: spiegazioni in griglia secondaria, riga tolta solo se c\'è #st33');
+chk(!/ng.append\(tile\(ctx.exp/.test(pf),'profilo: spiegazioni non mescolate alle 6 tessere del mockup');
+chk(!/deve essere uno dei giocatori/.test(sql2),'SQL: niente vincolo explainer tra i giocatori');
+chk(!/p\.explainedMemberId===mid&&\(p\.players/.test(data),'client: spiegazioni conteggiate anche fuori dal tavolo');
+chk(!/\bclub\b/i.test(sql2)&&!/\bludoteca\b/i.test(sql2),'nessun «club» o «ludoteca» nella migrazione 41.19.1');
 
 console.log(`v41.19-bp1-unit: ${ok}/${n} ok`);
 if(ok<n)process.exit(1);
