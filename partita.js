@@ -43,7 +43,7 @@ function ptApply(ed){const card=V.querySelector('.card');if(!card||!$('#save')||
  // 7 — Altro, data, avviso
  const al=$('#uxaltro'),sv=$('#save');if(al){const sm=al.querySelector('summary');const lbl=()=>{sm.textContent='Altro (durata, nota)'};lbl();
   const dt=document.createElement('button');dt.type='button';dt.id='ptdate';dt.className='ptdate';al.after(dt);
-  const dl=()=>{const v=$('#d')&&$('#d').value;dt.textContent='📅 '+(isoOk(v)?(v===romeToday()?'Oggi, ':'')+new Date(v+'T12:00').toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}):'Data non valida')+' ▸';lbl()};dl();
+  const dl=()=>{const v=$('#d')&&$('#d').value;dt.textContent='📅 '+(isoOk(v)?(v===romeEveningDate()?'Oggi, ':'')+new Date(v+'T12:00').toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}):'Data non valida')+' ▸';lbl()};dl();
   // v41.8.1 — la data si mostra una volta sola: il campo nativo vive dentro la pillola (nascosto), etichetta e riepilogo in Altro spariscono
   const di=$('#d');if(di){const lb=di.previousElementSibling;if(lb&&lb.tagName==='LABEL')lb.remove();const dd=$('#dday');if(dd)dd.hidden=true;
    const wr=document.createElement('span');wr.className='ptdw';dt.before(wr);wr.append(dt,di);di.classList.add('agdi','ptdi');di.tabIndex=-1;di.setAttribute('aria-hidden','true');dt.setAttribute('aria-label','Data della partita: cambia');

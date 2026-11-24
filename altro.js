@@ -8,7 +8,7 @@
 const T={titSocio:'Altro',titStaff:'Gestione',account:'Il mio account',accCon:'Accesso con',accNo:'Non hai ancora fatto l\'accesso',accVai:'Accedi o registrati dal Profilo',
  esci:'Esci dall\'account',info:'Info sull\'associazione',ig:'Seguici su Instagram',staff:'Accesso staff',staffH:'Riservato ad admin e moderatori dell\'associazione.',
  strumenti:'Strumenti avanzati',strSub:'⚠️ Backup, importazione, dati del telefono',soci:'Soci',attivi:'attivi',cerca:'🔍 Cerca socio per nome o tessera',
- nuovo:'Nuovo socio',modifica:'Modifica socio',hint:'ⓘ L\'elenco dei soci compare dopo la ricerca.',nessuno:'Nessun socio trovato.',btnMod:'✏️ Modifica',
+ nuovo:'Registrazione d\'emergenza',modifica:'Modifica socio',hint:'ⓘ L\'elenco dei soci compare dopo la ricerca.',nessuno:'Nessun socio trovato.',btnMod:'✏️ Modifica',
  tabs:{soci:['👥','Soci'],partite:['🎲','Partite'],account:['🔑','Codici'],mods:['🛡️','Moderatori']},
  btns:{ast:['📊','Statistiche associazione'],alib:['📚','Libri sociali','soci e volontari'],aric:['🏅','Ricompense'],aant:['⚖️',null],acfg:['⚙️','Configurazione']},
  impTit:'Importa da BGG e RPGGeek',impSub:'File CSV/Excel o nome utente BGG e RPGGeek',
@@ -57,7 +57,7 @@ function proc(V){const A=V.querySelector('#adm'),L=V.querySelector('#allist');if
  // righe
  L.replaceChildren();
  tabs.forEach(b=>{const k=b.dataset.a,[ic,t]=T.tabs[k]||['•',b.textContent],o=OPEN===k&&curK===k;const r=row(ic,t,null,o,'altab');r.dataset.alt=k;r.setAttribute('aria-expanded',o);
-  if(k==='soci'&&L._att!=null){r.querySelector('b').after(el('span','alchip',`${L._att} ${T.attivi}`))}
+  if(k==='soci'&&L._att!=null){r.querySelector('b').after(el('span','alchip',`${L._att} ${T.attivi}`));if(L._libro)r.querySelector('.t').append(el('span','alsm',L._libro))}
   act(r,()=>{const set=o=>{r.querySelector('.ar').textContent=o?'▾':'▸';r.setAttribute('aria-expanded',o)};if(OPEN===k&&!A.hidden){OPEN='';A.hidden=true;L.after(A);set(false)}else if(curK===k){OPEN=k;r.after(A);A.hidden=false;set(true)}else{OPEN=k;b.click()}});L.append(r);if(o)L.append(A)});
  // v41.9 — Import BGG solo admin (non i moderatori)
  if(typeof adminMode==='function'&&adminMode()&&typeof isMod==='function'&&!isMod()){const tit=(typeof TXT!=='undefined'&&TXT.g('ibgg_titolo'))||T.impTit,sub=(typeof TXT!=='undefined'&&TXT.g('ibgg_sub'))||T.impSub;
@@ -67,11 +67,14 @@ function proc(V){const A=V.querySelector('#adm'),L=V.querySelector('#allist');if
  if(!L.contains(A)){L.after(A);A.hidden=true}else A.hidden=false;}
 function markReq(A){const n=A.querySelector('#mn');if(n&&!/\*$/.test(n.placeholder))n.placeholder+=' *'}
 // 4-5 · Soci: riepilogo + ricerca, Disattiva nella scheda
-function soci(A,L){const mu=[...A.querySelectorAll(':scope>p.muted')];const c=mu.find(p=>/soci attivi$/.test(p.textContent.trim()));
- L._att=c?parseInt(c.textContent,10):null;if(c)c.remove();
+function soci(A,L){const mu=[...A.querySelectorAll(':scope>p.muted')];const c=mu.find(p=>/\d+\s+soci attivi/.test(p.textContent));
+ L._att=c?parseInt(c.textContent,10):null;
+ L._libro=(c&&c.textContent.match(/(\d+)\s+soci nel libro/))?(RegExp.$1+' nel libro (con tessera)'):'';
+ if(c&&/ospiti/.test(c.textContent)){const o=c.textContent.match(/(\d+)\s+ospiti/);if(o)L._libro=(L._libro?L._libro+' · ':'')+o[1]+' ospiti nelle partite'}
+ if(c)c.remove();
  const msv=A.querySelector('#msv');if(!msv)return;const list=[...A.querySelectorAll(':scope>div')].find(d=>d.querySelector('.rec'))||null;
  // modulo nuovo socio (o modifica) dentro una riga ▸/▾
- const fl=[...A.querySelectorAll(':scope>label')].find(l=>/^(Nuovo socio|Modifica socio)$/.test(l.textContent.trim()));const ed=/Modifica/.test(fl?fl.textContent:'')||!!A.querySelector('#mx');
+ const fl=[...A.querySelectorAll(':scope>label')].find(l=>/^(Nuovo socio|Modifica socio|Registrazione d'emergenza)$/.test(l.textContent.trim()));const ed=/Modifica/.test(fl?fl.textContent:'')||!!A.querySelector('#mx');
  const fm=el('div','alform');const nodes=[];let n=fl||A.querySelector('#mn').closest('.row');const modTxt=mu.find(p=>/moderatore/.test(p.textContent));if(modTxt)nodes.push(modTxt);
  while(n&&n!==list){nodes.push(n);if(n.id==='mx'||(n.id==='msv'&&!A.querySelector('#mx')))break;n=n.nextElementSibling}
  const pk=el('span');nodes[0].before(pk);const nr=row('➕',ed?T.modifica:T.nuovo,null,ed,'alnew');nr.setAttribute('aria-expanded',ed);fm.append(...nodes);fm.hidden=!ed;

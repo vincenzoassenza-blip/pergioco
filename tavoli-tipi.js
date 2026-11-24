@@ -137,7 +137,7 @@ async function gestTavoli(){
     const capC=document.createElement('div');capC.className='card';
     capC.append(Object.assign(document.createElement('b'),{textContent:'Capienza per una data'}));
     const dLab=document.createElement('label');dLab.textContent='Data';
-    const dIn=document.createElement('input');dIn.type='date';dIn.id='tt-cap-d';dIn.min=romeToday();dIn.value=romeToday();
+    const dIn=document.createElement('input');dIn.type='date';dIn.id='tt-cap-d';dIn.min=romeEveningDate();dIn.value=romeEveningDate();
     const rows=document.createElement('div');rows.id='tt-cap-rows';
     const fillCaps=async()=>{
       rows.replaceChildren();
@@ -392,7 +392,7 @@ window.agSheet=async function(opts){
 
   goBtn.onclick=async()=>{
     if(goBtn.disabled)return;
-    if(!isoOk(D)||D<romeToday())return toast('Data non valida');
+    if(!isoOk(D)||D<romeEveningDate())return toast('Data non valida');
     const h=$('#th').value;if(!h||!ms.some(m=>m.id===h))return toast('Scegli chi ospita');
     if(!staff&&(!meM||h!==meM.id))return;
     const time=$('#tt').value;if(!/^[0-2]\d:[0-5]\d$/.test(time))return toast('Orario obbligatorio');
@@ -495,7 +495,7 @@ async function registraAltro(t,typ,ed){
   const staff=typeof adminMode==='function'&&adminMode();
   const src=ed&&ed.id?ed:null;
   const titlePref=(src&&(src.gameName||src.versione))||(t&&(t.versione||t.gameName))||typ.nome;
-  const date0=(src&&src.date)||(t&&t.date)||romeToday();
+  const date0=(src&&src.date)||(t&&t.date)||romeEveningDate();
   const players0=(src&&src.players)||(t&&t.players)||[];
   V.replaceChildren();
   const h2=el('h2',null,TT.t('reg_altro')||'Registra una partita');
@@ -580,7 +580,7 @@ async function registraGdr(t,ed){
   const staff=typeof adminMode==='function'&&adminMode();
   const src=ed&&ed.id?ed:null;
   const gdr=src&&src.gdr||{};
-  const date0=(src&&src.date)||(t&&t.date)||romeToday();
+  const date0=(src&&src.date)||(t&&t.date)||romeEveningDate();
   const sistema0=(src&&src.gameName)||gdr.sistema||(t&&t.gameName)||'';
   const bgg0=(src&&src.bggRpgId)||gdr.bggRpgId||(t&&t.bggRpgId)||null;
   let rpgSel=bgg0?{id:bgg0,nome:sistema0}:null;

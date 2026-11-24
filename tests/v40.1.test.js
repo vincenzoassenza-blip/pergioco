@@ -6,5 +6,5 @@ at('2026-11-03T23:40:00Z');chk(romeToday()==='2026-11-04','dopo mezzanotte Roma 
 at('2026-07-01T22:30:00Z');chk(romeToday()==='2026-07-02','dopo mezzanotte Roma (estate)');
 at('2026-11-04T22:59:00Z');chk(romeToday()==='2026-11-04','prima di mezzanotte');global.Date=RealDate;
 for(const f of['app.js','equilibrio.js','libri.js','ux40.js'])chk(!/new Date\(\)\.toISOString\(\)\.slice\(0,10\)/.test(fs.readFileSync(f,'utf8')),'no UTC today in '+f);
-const A=fs.readFileSync('app.js','utf8');chk(/const today=romeToday\(\)/.test(A),'nuova usa romeToday');chk(/^const romeToday=/.test(A),'romeToday globale');
+const A=fs.readFileSync('app.js','utf8');chk(/const today=romeEveningDate\(\)/.test(A),'nuova usa romeEveningDate');chk(/^const romeToday=/.test(A),'romeToday globale');
 console.log(ok+'/'+n+' ok');process.exit(ok===n?0:1)

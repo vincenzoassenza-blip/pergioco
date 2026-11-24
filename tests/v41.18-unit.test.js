@@ -38,9 +38,9 @@ chk(/typeof x==='string'/.test(sb)&&/x\.admin_moderators/.test(sb),'sb.js accett
 
 chk(/function staffCard\(/.test(app)&&/function staffStato\(/.test(app)&&/Account registrato, nessun socio collegato/.test(app)&&/Non ancora registrato/.test(app),'stati in italiano nell\'interfaccia');
 chk(/esc\(titolo\)/.test(app)&&/esc\(email\)/.test(app)&&/esc\(st\)/.test(app)&&/esc\(memberName\(m\)\)/.test(app),'nome, email, stato e opzioni del select con escape XSS');
-chk(/<h3 class="alsub">Admin<\/h3>/.test(app)&&/staffCard\(x,false\)/.test(app)&&!/staffCard\(x,false\)[\s\S]{0,80}Rimuovi/.test(app.split('h3 class="alsub">Admin')[1].slice(0,400)),'sezione Admin in sola lettura, senza Rimuovi');
+chk(/<h3 class="alsub">Admin<\/h3>/.test(app)&&/staffCard\(x,superOn&&!x.super,'admin'\)/.test(app)&&/Nomina admin/.test(app)&&/isSuperadmin\(/.test(app),'sezione Admin: nomina e rimozione solo per il superadmin');
 chk(/<h3 class="alsub">Moderatori<\/h3>/.test(app)&&/id="mmem"/.test(app)&&/Nomina dal socio/.test(app)&&/id="me2"/.test(app)&&/Nomina per email/.test(app),'scelta dal socio registrato e campo email per chi non è iscritto');
-chk(/setModeratorMember\(id,true\)/.test(app)&&/staffCard\(x,true\)/.test(app),'nomina dal socio e rimozione per email');
+chk(/setModeratorMember\(id,true\)/.test(app)&&/staffCard\(x,true,'mod'\)/.test(app),'nomina dal socio e rimozione per email');
 chk(/taken\.has\(m\.id\)/.test(app)&&/m\.userId/.test(app),'il select esclude già nominati e soci senza account');
 chk(/user_id is not null and m\.user_id = auth\.uid\(\)/.test(sql),'il ruolo sopravvive al cambio email grazie a user_id');
 

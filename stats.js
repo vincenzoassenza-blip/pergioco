@@ -9,9 +9,9 @@ const days=(a,b)=>Math.round((dd(b)-dd(a))/864e5);
 const df=s=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return'—';const[y,m,d]=s.split('-');return `${+d} ${MN[m-1]} ${y}`};
 const pname=(x,ms)=>{if(!x||!x.memberId)return 'Ospite';const m=ms.find(y=>y.id===x.memberId);return m?memberName(m):'Ospite'};
 const gmin=g=>{if(!g)return null;const pt=+g.playTime,a=+g.minT,b=+g.maxT;if(pt>0&&pt<=1440)return pt;if(a>0&&b>0)return Math.min(1440,(a+b)/2);if(a>0||b>0)return Math.min(1440,a||b);return null};
-function from(per){const t=romeToday();if(per==='12m'){const d=dd(t);d.setUTCFullYear(d.getUTCFullYear()-1);return d.toISOString().slice(0,10)}if(per==='m')return t.slice(0,8)+'01';return '0000'}
+function from(per){const t=romeEveningDate();if(per==='12m'){const d=dd(t);d.setUTCFullYear(d.getUTCFullYear()-1);return d.toISOString().slice(0,10)}if(per==='m')return t.slice(0,8)+'01';return '0000'}
 function calc(mid,plays,gs,per){
- const today=romeToday(),f=from(per),allMine=plays.filter(p=>p.players.some(x=>x.memberId===mid)&&/^\d{4}-\d{2}-\d{2}$/.test(p.date||''));
+ const today=romeEveningDate(),f=from(per),allMine=plays.filter(p=>p.players.some(x=>x.memberId===mid)&&/^\d{4}-\d{2}-\d{2}$/.test(p.date||''));
  const mine=allMine.filter(p=>p.date>=f&&p.date<=today).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
  const me=p=>p.players.find(x=>x.memberId===mid)||{},gdr=p=>typeof isGdrPlay==='function'&&isGdrPlay(p),won=p=>gdr(p)?false:p.coop?!!p.groupWin:!!me(p).winner;
  const G=new Map(),dates=new Set();let w=0,min=0,minN=0;
@@ -35,7 +35,7 @@ function calc(mid,plays,gs,per){
  const topM=[...mo].sort((a,b)=>b[1]-a[1]||(a[0]<b[0]?1:-1))[0]||null;
  return{n:mine.length,w,games,h,dates:dates.size,first:mine[0]&&mine[0].date,last:mine.length?mine[mine.length-1].date:null,min,minN,dusty,opp,guest,nem,vit,wd,mo,bw,cw,bs,cs,topM}}
 const bar=(v,max)=>`<span class="stb"><i style="width:${max?Math.max(3,Math.round(100*v/max)):0}%"></i></span>`;
-function months12(){const t=dd(romeToday()),r=[];for(let i=11;i>=0;i--){const d=new Date(Date.UTC(t.getUTCFullYear(),t.getUTCMonth()-i,1));r.push(d.toISOString().slice(0,7))}return r}
+function months12(){const t=dd(romeEveningDate()),r=[];for(let i=11;i>=0;i--){const d=new Date(Date.UTC(t.getUTCFullYear(),t.getUTCMonth()-i,1));r.push(d.toISOString().slice(0,7))}return r}
 function spark(mo){const ks=months12(),v=ks.map(k=>mo.get(k)||0),mx=Math.max(1,...v),W=300,H=60,dx=W/11;const pts=v.map((y,i)=>`${(i*dx).toFixed(1)},${(H-4-(H-12)*y/mx).toFixed(1)}`).join(' ');
  return `<svg class="stsp" viewBox="-14 0 328 ${H+14}" role="img" aria-label="Partite per mese negli ultimi 12 mesi"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2"/>${v.map((y,i)=>`<circle cx="${(i*dx).toFixed(1)}" cy="${(H-4-(H-12)*y/mx).toFixed(1)}" r="2.5"><title>${MN[+ks[i].slice(5)-1]}: ${y}</title></circle>`).join('')}${ks.map((k,i)=>i%2?'':`<text x="${(i*dx).toFixed(1)}" y="${H+12}" text-anchor="middle">${MN[+k.slice(5)-1]}</text>`).join('')}</svg>`}
 function html(m,s,full,per,ms,own){

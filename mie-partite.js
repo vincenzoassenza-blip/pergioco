@@ -13,7 +13,7 @@ const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=
 const keyAct=(r,f)=>{r.tabIndex=0;r.setAttribute('role','button');r.onclick=f;r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}}};
 
 function periodRange(k,today){
-  const t=today||((typeof romeToday==='function')?romeToday():new Date().toISOString().slice(0,10));
+  const t=today||((typeof romeToday==='function')?romeEveningDate():new Date().toISOString().slice(0,10));
   if(k==='1m'||k==='3m'){const d=new Date(t+'T12:00:00Z');d.setUTCMonth(d.getUTCMonth()-(k==='1m'?1:3));return[d.toISOString().slice(0,10),t]}
   if(k==='y')return[t.slice(0,4)+'-01-01',t];
   return null;
