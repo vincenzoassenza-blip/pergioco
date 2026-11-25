@@ -26,7 +26,7 @@ const seed=async(p,opt={})=>{
       {id:'m3',nome:'Marco',cognome:'Bianchi',active:true}
     ];
     const gs=[{id:'g1',name:'Catan',min:3,max:4},{id:'g2',name:'Azul',min:2,max:4}];
-    const td=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date());
+    const td=romeEveningDate();
     window._TS=[
       {id:'t1',date:td,evening:'Martedì',hostId:'m1',seats:4,time:'21:00',gameId:'g1',typeId:'board',players:[{memberId:'m1'}],status:'open',note:''},
       {id:'tg1',date:td,hostId:'m1',seats:7,time:'21:00',typeId:'gdr',gameName:'Last Sabbath',bggRpgId:402323,masterMemberId:'m1',players:[{memberId:'m1'}],status:'open',note:'Tutti brutti streghe'},
@@ -101,7 +101,7 @@ const seed=async(p,opt={})=>{
     await p.evaluate(async()=>{
       const ms=await DB.members(),gs=await DB.games();
       const meM=ms.find(m=>m.id==='m1');
-      const S={date:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date())};
+      const S={date:romeEveningDate()};
       await window.agSheet({gs,ms,meM,staff:true,S,oggi:S.date});
     });
     await W(300);
@@ -148,7 +148,7 @@ const seed=async(p,opt={})=>{
     await p.evaluate(async()=>{
       const ms=await DB.members(),gs=await DB.games();
       const meM=ms.find(m=>m.id==='m1');
-      const S={date:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date())};
+      const S={date:romeEveningDate()};
       await window.agSheet({gs,ms,meM,staff:true,S,oggi:S.date});
     });
     await W(300);

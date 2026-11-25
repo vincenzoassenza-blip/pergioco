@@ -14,7 +14,7 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
   chk(await q(()=>document.querySelector('.uxcolh h3 #so').value==='p'&&document.querySelector('#gl .gitem')),role+': Ordina funziona');
   chk(await q(()=>{const c=document.getElementById('uxcons'),its=[...document.querySelectorAll('#gl .gitem')];return c&&its[3]&&its[3].nextElementSibling===c}),role+': consigliere dopo il 4° gioco');
   chk(await q(()=>{const ig=document.querySelector('#view>.igcard');return !ig||ig.previousElementSibling===document.getElementById('gl')}),role+': Instagram in fondo');
-  await p.click('#g8s');await W(1500);chk(await q(()=>!!document.querySelector('.agdays [data-d].on')&&document.querySelector('.agdays [data-d].on').dataset.d===romeToday()&&document.querySelector('nav [data-v="serata"]').classList.contains('on')),role+': tocco → Agenda su Oggi');
+  await p.click('#g8s');await W(1500);chk(await q(()=>!!document.querySelector('.agdays [data-d].on')&&document.querySelector('.agdays [data-d].on').dataset.d===romeEveningDate()&&document.querySelector('nav [data-v="serata"]').classList.contains('on')),role+': tocco → Agenda su Oggi');
   chk(errs.length===0,role+': nessun errore JS '+errs.join('|'));await p.context().close()}
  {const p=await gio(b,'socio','prossimo',900);const q=f=>p.evaluate(f);const s=await q(()=>{const e=document.getElementById('g8s');return e&&{t:e.textContent,soft:e.classList.contains('g8soft'),d:e.dataset.d}});
   chk(s&&s.soft&&/^📅 Prossimo tavolo · \S+ \d+ \S+ · 3 posti liberi▸$/.test(s.t),'senza tavoli oggi: striscia discreta col prossimo '+(s&&s.t));

@@ -208,7 +208,7 @@ function formHtml(edit){
     ${typ==='voto'?'':`<label>Opzioni</label><div id="psopts">${opts.map((o,i)=>`<input type="text" maxlength="80" placeholder="Opzione ${i+1}" value="${esc(o.label||'')}" data-gid="${esc(o.game_id||'')}" data-bgg="${o.bgg_id||''}" data-thumb="${esc(o.thumb||'')}">`).join('')}</div>
       <button type="button" class="s" id="psaddopt" style="width:100%">➕ Aggiungi un’opzione</button>`}
     ${typ==='multipla'?`<label>Massimo di scelte</label><input id="psmaxc" type="number" min="1" max="8" value="${+p.max_choices||2}">`:''}
-    <label>Scadenza (facoltativa)</label><input id="pschiude" type="datetime-local" value="${p.closes_at?esc(toLocal(p.closes_at)):''}">
+    <label>Scadenza (facoltativa, ora italiana 24 ore)</label>${dateTime24Html('pschiude',p.closes_at?(typeof toRomeInput==='function'?toRomeInput(p.closes_at):toLocal(p.closes_at)):'',false)}
     <p class="muted" style="margin:4px 0 0">Alla scadenza il sondaggio si chiude da solo. Lascia vuoto se lo chiudi tu.</p>
     <label>Risultati visibili</label>
     <select id="psvis">
@@ -364,7 +364,7 @@ function readForm(){
     anonymous:!sw('anonymous'),allow_add:sw('allow_add'),pinned:sw('pinned'),notify_on:sw('notify_on'),
     remind_hours:$('#psrem')&&$('#psrem').value,xp:$('#psxp')&&$('#psxp').value,max_choices:$('#psmaxc')&&$('#psmaxc').value,
     badge_icon:$('#psbico')&&$('#psbico').value,badge_name:$('#psbname')&&$('#psbname').value,
-    closes_at:$('#pschiude')&&$('#pschiude').value?new Date($('#pschiude').value).toISOString():null,
+    closes_at:(()=>{const v=typeof dateTime24Val==='function'?dateTime24Val('pschiude'):($('#pschiude')&&$('#pschiude').value);if(!v)return null;return typeof fromRomeInput==='function'?fromRomeInput(v):new Date(v).toISOString()})(),
     options:opts
   };
 }

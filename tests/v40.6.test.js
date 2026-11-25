@@ -8,7 +8,7 @@ const mk=async role=>{const errs=[];const p=await (await b.newContext({serviceWo
  await p.evaluate(([role,SHN])=>{document.body.classList.remove('gate');localStorage.clear();if(role==='staff')admin=true;window._ser=null;
   const G=[['g1','Catan',3,4],['g2','Azul',2,4],['g3','Wingspan',1,5],['g4','7 Wonders',2,7],['g5',SHN||'<img src=x onerror=window.XSS=1>',2,4]].map(([id,name,min,max])=>({id,name,min,max}));
   const M=['Vincenzo Assenza','Giulia Rossi','Marco Bianchi','Sara Neri','Luca Greco','Anna Russo','Paolo Gallo'].map((x,i)=>({id:'m'+i,nome:x.split(' ')[0],cognome:x.split(' ')[1],active:true,userId:i?'x'+i:'u1'}));
-  const d=k=>{const x=new Date(new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date())+'T12:00');x.setDate(x.getDate()+k);return x.toLocaleDateString('sv-SE')};
+  const d=k=>{const x=new Date(romeEveningDate()+'T12:00');x.setDate(x.getDate()+k);return x.toLocaleDateString('sv-SE')};
   window.T=[{id:'t0',date:d(0),gameId:'g2',hostId:'m6',seats:2,time:'20:30',status:'open',players:[{memberId:'m6'}]},
    {id:'t1',date:d(1),gameId:'g1',hostId:'m1',seats:4,time:'21:00',note:'Spiego io le regole',status:'open',players:[{memberId:'m1'},{memberId:'m2'}]},
    {id:'t2',date:d(1),gameId:'g3',hostId:'m3',seats:4,time:'21:30',status:'open',players:[{memberId:'m3'},{memberId:'m4'},{memberId:'m5'},{guest:true,name:'Chiara'}]},
@@ -29,14 +29,14 @@ let r=await p.evaluate(()=>({h2:V.querySelector('h2').textContent,on:document.qu
  lvBtn:!!V.querySelector('[data-lv="t3"]'),cancel:!!V.querySelector('[data-cancel="t3"]'),nt:!!document.getElementById('nt'),fab:!!document.getElementById('tfab'),seg:!!V.querySelector('.evseg'),cov:V.querySelectorAll('#tl .gcov').length,xss:window.XSS,
  noteEsc:/&lt;b&gt;x/.test(V.querySelector('[data-t="t3"]').innerHTML)}));
 chk(r.h2==='📅 Agenda','titolo «📅 Agenda»');chk(/^Oggi/.test(r.first)&&/^Oggi/.test(r.on),'si apre su Oggi, primo giorno');chk(!r.dday&&!r.sdVis,'niente campo data né data ripetuta');
-chk(r.heads.length===3&&/^Oggi, \S+ \d+ novembre · 1 tavolo/.test(r.heads[0])&&/ospiti inclusi/.test(r.heads[1]),'gruppi per giorno con intestazione italiana: '+r.heads.join(' | '));
+chk(r.heads.length===3&&/^Oggi, \S+ \d+ novembre · 1 tavolo/.test(r.heads[0])&&/ospiti/.test(r.heads[1]),'gruppi per giorno con intestazione italiana: '+r.heads.join(' | '));
 chk(r.lv===0&&!r.nm,'niente livelli né N/M');chk(r.hostOnce===1,'host una sola volta');chk(r.sd&&!r.full,'Siediti solo se c’è posto');chk(r.j===0,'socio: nessun picker di tutti i soci');
 chk(!r.o1&&r.o3,'+ Ospite / Chiudi e registra solo all’host');chk(!r.lvBtn&&r.cancel,'il creatore non lascia il posto, può annullare il tavolo');chk(!r.nt&&r.fab,'il + è l’unico modo');chk(r.seg,'tab Tavoli/Eventi');chk(r.cov===5,'copertine');chk(!r.xss&&(SH||r.noteEsc),'XSS escape');
 if(SH)await p.screenshot({path:OUT+'agenda-a-socio.png'});
 await p.evaluate(()=>{const x=document.querySelector('[data-t="t1"]').closest('.agsec');document.querySelector('.agdays [data-d="'+x.dataset.day+'"]').click()});await p.click('[data-sd="t1"]');await p.waitForTimeout(500);r=await p.evaluate(()=>SAVED[0]);
 chk(r&&r.seat==='t1'&&r.a==='join'&&r.me==='m0','Siediti usa la RPC solo per me');
 const SRC=require('fs').readFileSync('app.js','utf8'),DSRC=require('fs').readFileSync('data.js','utf8');chk(/DB\.seat\(t\.id,'join'/.test(SRC)&&/DB\.seat\(t\.id,'leave'/.test(SRC)&&!/players:\[\.\.\.pl,\{memberId:meM\.id\}\]/.test(SRC),'Siediti/Lascia usano DB.seat');chk(/rpc\('table_seat'/.test(DSRC),'DB.seat chiama la RPC table_seat');
-await p.evaluate(()=>{T[1].players=[{memberId:'m1'},{memberId:'m2'},{memberId:'m4'},{memberId:'m5'}];SAVED.length=0;window._ser={date:romeToday()};go('serata')});await p.waitForTimeout(800);
+await p.evaluate(()=>{T[1].players=[{memberId:'m1'},{memberId:'m2'},{memberId:'m4'},{memberId:'m5'}];SAVED.length=0;window._ser={date:romeEveningDate()};go('serata')});await p.waitForTimeout(800);
 await p.evaluate(()=>{T[1].players=[{memberId:'m1'},{memberId:'m2'},{memberId:'m4'},{memberId:'m5'}]});
 await p.click('#tfab');await p.waitForTimeout(500);
 r=await p.evaluate(()=>({sh:!!document.querySelector('.agov .agsheet'),th:document.querySelector('#th')?.value,thType:document.querySelector('#th')?.type,db:document.querySelector('#agdb')?.textContent,tn:document.querySelector('#tn')?.maxLength}));

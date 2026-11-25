@@ -35,7 +35,7 @@ const paste=async(p,sel,text)=>{
 };
 
 const clickLabelText=async p=>{
-  const lab=p.locator('label.gck');
+  const lab=p.locator('label.gck').filter({hasText:'Mostra password'});
   const box=await lab.boundingBox();
   if(!box)throw new Error('label.gck assente');
   await p.mouse.click(box.x+Math.min(box.width-12,80), box.y+box.height/2);

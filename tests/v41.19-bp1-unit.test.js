@@ -5,7 +5,7 @@ const root=path.join(__dirname,'..');
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
 let n=0,ok=0;const chk=(c,m)=>{n++;if(c)ok++;else console.error('FAIL',m)}
 
-chk((String(APP_VERSION).startsWith('41.19')||String(APP_VERSION).startsWith('41.20'))&&swCache()&&hasAsset('app.js')&&hasAsset('data.js')&&hasAsset('sb.js')&&hasAsset('libri.js'),'APP_VERSION 41.19+/41.20 e cache SW allineata');
+chk((String(APP_VERSION).startsWith('41.19')||String(APP_VERSION).startsWith('41.20')||String(APP_VERSION).startsWith('41.21'))&&swCache()&&hasAsset('app.js')&&hasAsset('data.js')&&hasAsset('sb.js')&&hasAsset('libri.js'),'APP_VERSION 41.19+ e cache SW allineata');
 
 const app=read('app.js'),data=read('data.js'),sb=read('sb.js'),libri=read('libri.js'),pf=read('profilo.js'),sql=read('supabase/migrate-v41.19.sql');
 

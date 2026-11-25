@@ -25,7 +25,8 @@ const setv=(p,id,v)=>p.evaluate(([id,v])=>{const i=document.getElementById(id);i
  const open=async port=>{const c=await b.newContext({serviceWorkers:'block',viewport:{width:412,height:915},deviceScaleFactor:2,locale:'it-IT',timezoneId:'Europe/Rome'});const p=await c.newPage();
   p.on('pageerror',e=>console.error('pageerror',e.message));await p.route(/supabase\.co|jsdelivr/,r=>r.abort());await p.goto(`http://127.0.0.1:${port}/`);await W(700);await seed(p);
   await p.evaluate(async()=>{if(window.TT&&TT.load)try{await TT.load()}catch(e){}if(window.HD417)await HD417.av();go('config')});await W(900);await p.evaluate(()=>document.querySelectorAll('.toast').forEach(t=>t.remove()));return{c,p}};
- const compat=(o,nw)=>{if(!o.length||!nw.length)return false;const bag=a=>Object.fromEntries(a.map(r=>[r.key,r.value]));const A=bag(o),B=bag(nw);for(const k of Object.keys(A)){if(k==='testi'){const av=A[k]||{},bv=B[k]||{};if(!Object.keys(av).every(x=>JSON.stringify(av[x])===JSON.stringify(bv[x])))return false}else if(JSON.stringify(A[k])!==JSON.stringify(B[k]))return false}return true};
+ /* v41.21: lv_invito/lv_come hanno un default più chiaro (esperienza al posto di XP); le altre chiavi restano identiche. */
+ const compat=(o,nw)=>{if(!o.length||!nw.length)return false;const bag=a=>Object.fromEntries(a.map(r=>[r.key,r.value]));const A=bag(o),B=bag(nw);const skipTx=new Set(['lv_invito','lv_come']);for(const k of Object.keys(A)){if(k==='testi'){const av=A[k]||{},bv=B[k]||{};if(!Object.keys(av).every(x=>skipTx.has(x)||JSON.stringify(av[x])===JSON.stringify(bv[x])))return false}else if(JSON.stringify(A[k])!==JSON.stringify(B[k]))return false}return true};
  const saveRun=async(port,edit)=>{const{c,p}=await open(port);if(edit){await setv(p,'cf-motto','Gioca e condividi');await setv(p,'ct-coppa_breve','Trofeo');await p.evaluate(()=>{const x=document.getElementById('cm-sfida');x.checked=true;x.dispatchEvent(new Event('change',{bubbles:true}))})}
   await p.evaluate(()=>document.getElementById('cfsave').click());await W(600);const up=await p.evaluate(()=>window.__up);await c.close();return up};
  // A) stessi app_settings di prima
@@ -34,8 +35,8 @@ const setv=(p,id,v)=>p.evaluate(([id,v])=>{const i=document.getElementById(id);i
  {const{c,p}=await open(8837);
   const idx=await p.evaluate(()=>({g:[...document.querySelectorAll('#cfidx .cfgh')].map(x=>x.textContent),r:[...document.querySelectorAll('#cfidx .cfr')].map(x=>x.dataset.cfs),sub:document.querySelector('[data-cfs="assoc"] .sub').textContent,
    sec:[...document.querySelectorAll('.cfsec')].every(s=>s.hidden),bar:getComputedStyle(document.getElementById('cfsb')).position,n:document.getElementById('cfsbn').textContent,h:document.documentElement.scrollHeight,deco:[...document.querySelectorAll('#cfidx .cfr')].every(r=>getComputedStyle(r).textDecorationLine==='none')}));
-  chk(idx.g.join('|')==='Identità|Funzioni|Testi','gruppi Identità, Funzioni, Testi');
-  chk(idx.r.join(',')==='assoc,logo,colori,moduli,tipi,gdr,testi','righe dell\'indice, Tipi di tavolo in Funzioni');
+  chk(idx.g.join('|')==='Identità|Funzioni|Testi|Privacy','gruppi Identità, Funzioni, Testi, Privacy');
+  chk(idx.r.join(',')==='assoc,logo,colori,moduli,tipi,gdr,testi,privacy','righe dell\'indice, Tipi di tavolo in Funzioni e Privacy');
   chk(idx.sub==='PerGioco · Ragusa · @pergiocoets','riassunto Associazione');chk(idx.sec,'all\'apertura solo l\'indice');chk(idx.deco,'righe senza sottolineatura');
   chk(idx.bar==='fixed'&&idx.n==='Nessuna modifica','barra Salva fissa: Nessuna modifica');chk(idx.h<1400,'pagina corta ('+idx.h+'px invece di ~7700)');
   const lay=await p.evaluate(()=>{const hit=(a,b)=>{const A=a.getBoundingClientRect(),B=b.getBoundingClientRect();return!(A.right<=B.left+.5||B.right<=A.left+.5||A.bottom<=B.top+.5||B.bottom<=A.top+.5)};const o=[];

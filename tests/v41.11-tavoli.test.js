@@ -107,14 +107,14 @@ const seed=async(p,{fullGdr=false}={})=>{
       h2:(document.querySelector('#view h2, #V h2, h2')||{}).textContent||'',
       tipi:[...document.querySelectorAll('.alr b')].map(x=>x.textContent),
       subs:[...document.querySelectorAll('.alr .sub')].map(x=>x.textContent),
-      labOra:([...document.querySelectorAll('label')].find(l=>l.htmlFor==='tt-ora'||(l.nextElementSibling&&l.nextElementSibling.id==='tt-ora'))||{}).textContent||'',
+      labOra:([...document.querySelectorAll('label')].find(l=>/Orario della serata/.test(l.textContent)||l.htmlFor==='tt-ora'||l.htmlFor==='tt-ora-h')||{}).textContent||'',
       msg:(document.querySelector('#tt-msg')||{}).value||'',
-      ora:(document.querySelector('#tt-ora')||{}).value||''
+      ora:(typeof time24Val==='function'?time24Val('tt-ora'):((document.querySelector('#tt-ora-h')||{}).value||'')+':'+((document.querySelector('#tt-ora-m')||{}).value||''))
     }));
     chk(/Tipi di tavolo/.test(gest.h2),'titolo Gestione Tipi di tavolo');
     chk(gest.tipi.some(t=>/Gioco da tavolo/.test(t))&&gest.tipi.some(t=>/GDR/.test(t))&&gest.tipi.some(t=>/Warhammer/.test(t)),'tipi default in lista');
     chk(/al completo/.test(gest.msg)&&gest.ora==='21:00','cfg messaggio + orario default');
-    chk(gest.labOra==='Orario della serata','etichetta Orario della serata');
+    chk(/Orario della serata/.test(gest.labOra),'etichetta Orario della serata');
     chk(gest.subs.every(s=>/Disponibili per serata: \d+/.test(s)&&!/\b(board|gdr|war)\b/.test(s)),'sottotitoli senza id tecnici');
     chk(!/club|ludoteca/i.test(gest.msg),'niente club/ludoteca nel messaggio');
     await p.screenshot({path:path.join(OUT,'01-gestione-tipi.png'),fullPage:true});
@@ -144,7 +144,7 @@ const seed=async(p,{fullGdr=false}={})=>{
       rpg:!!document.querySelector('#tt-rpgq'),
       logo:!!document.querySelector('#tt-bgglogo .ibggpwr img, #tt-bgglogo img'),
       posti:(document.querySelector('label[for="tp"]')||{}).textContent||'',
-      ora:(document.querySelector('#tt')||{}).value||''
+      ora:(typeof time24Val==='function'?time24Val('tt'):((document.querySelector('#tt-h')||{}).value||'')+':'+((document.querySelector('#tt-m')||{}).value||''))
     }));
     chk(gdrUi.master&&gdrUi.rpg,'campi Master + gioco GDR');
     chk(gdrUi.logo,'logo Powered by BGG su GDR');
@@ -184,7 +184,7 @@ const seed=async(p,{fullGdr=false}={})=>{
     const war=await p.evaluate(()=>({
       noGame:!document.querySelector('#tg')&&!document.querySelector('#tt-rpgq'),
       posti:(document.querySelector('#tp')||{}).value||'',
-      ora:(document.querySelector('#tt')||{}).value||'',
+      ora:(typeof time24Val==='function'?time24Val('tt'):((document.querySelector('#tt-h')||{}).value||'')+':'+((document.querySelector('#tt-m')||{}).value||'')),
       master:!document.querySelector('#tt-master')
     }));
     chk(war.noGame&&war.master,'Warhammer: solo posti+orario');

@@ -17,6 +17,17 @@ const START=location.hash;
 const $=s=>document.querySelector(s),V=$('#view');
 const CLK='<span class="ico-clk" aria-hidden="true">🕒</span>';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtTimeOpts={timeZone:'Europe/Rome',hour:'2-digit',minute:'2-digit',hourCycle:'h23'};
+const toRomeInput=iso=>{if(!iso||isNaN(new Date(iso)))return'';return new Date(iso).toLocaleString('sv-SE',{timeZone:'Europe/Rome'}).slice(0,16).replace(' ','T')};
+function fromRomeInput(v){if(!v||!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(v))return null;const[d,tm]=v.split('T'),[y,mo,da]=d.split('-').map(Number),[h,mi]=tm.split(':').map(Number);const g=Date.UTC(y,mo-1,da,h,mi);const w=new Date(g).toLocaleString('sv-SE',{timeZone:'Europe/Rome'}).replace(' ','T')+'Z';return new Date(g-(Date.parse(w)-g)).toISOString()}
+function time24Html(id,val,req){val=String(val||'');const ok=/^([01]\d|2[0-3]):[0-5]\d$/.test(val),h=ok?val.slice(0,2):'',m=ok?val.slice(3,5):'';
+ const ho=[...Array(24)].map((_,i)=>String(i).padStart(2,'0')),mi=[...Array(60)].map((_,i)=>String(i).padStart(2,'0'));
+ return `<span class="t24" id="${id}-wrap"><select id="${id}-h" aria-label="Ore"${req?' required':''}><option value="">--</option>${ho.map(x=>`<option value="${x}"${x===h?' selected':''}>${x}</option>`).join('')}</select><span class="t24sep" aria-hidden="true">:</span><select id="${id}-m" aria-label="Minuti"${req?' required':''}><option value="">--</option>${mi.map(x=>`<option value="${x}"${x===m?' selected':''}>${x}</option>`).join('')}</select></span>`}
+function time24Val(id){const h=document.getElementById(id+'-h'),m=document.getElementById(id+'-m');if(!h||!m||!h.value||!m.value)return'';return h.value+':'+m.value}
+function dateTime24Html(id,val,req){const d=val&&/^\d{4}-\d{2}-\d{2}/.test(val)?val.slice(0,10):'',tm=val&&val.length>=16?val.slice(11,16):'';
+ return `<div class="dt24" id="${id}-dt"><input type="date" id="${id}-d" lang="it"${req?' required':''} value="${esc(d)}">${time24Html(id,tm,req)}</div>`}
+function dateTime24Val(id){const d=document.getElementById(id+'-d')&&document.getElementById(id+'-d').value,tm=time24Val(id);return d&&tm?d+'T'+tm:''}
+
 const GIORNI=['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
 const isoOk=d=>{d=String(d??'');if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return false;const x=new Date(d+'T12:00');return !isNaN(x)&&x.toLocaleDateString('sv-SE')===d};
 const dayName=d=>isoOk(String(d??'').slice(0,10))?GIORNI[new Date(String(d).slice(0,10)+'T12:00').getDay()]:'';
@@ -296,8 +307,9 @@ async giocatori(){const gs=await DB.games(),ms=await DB.members(),bc=await badge
  <div class="muted" style="margin-top:8px">Preferiti: ${p.fav.slice(0,3).map(([id,n])=>gLink(id,gname(gs,id))+' ('+n+')').join(', ')}</div>${p.member?(()=>{const bl=Badges.list(p.key,bc);return`<details class="bd"><summary>🏅 Badge ${bl.filter(b=>b.on).length}/${bl.length} ${bl.filter(b=>b.on).map(b=>b.icon).join('')}</summary><div class="badges">${bl.map(b=>`<div class="badge${b.on?'':' off'}"><div class="bi">${b.on?b.icon:'🔒'}</div><button type="button" class="bdn" data-bdg="${esc(b.icon)}|${esc(b.name)}|${esc(b.desc)}">${esc(b.name)}</button><small>${esc(b.desc)}</small></div>`).join('')}</div></details>`})():''}</div>`;
  const myId=DB.remote?(await DB.remote.user())?.id:null,me=ms.find(m=>myId&&m.userId===myId),mine=me&&all.find(p=>p.key==='m:'+me.id);
  const mini=m=>`<div class="rec"><a class="pv" data-pv="${m.id}">${avatarHtml(m,28)} ${typeof RC!=='undefined'&&RC.nameHtml?RC.nameHtml(m,esc(`${m.nome} ${m.cognome||''}`.trim())):esc(`${m.nome} ${m.cognome||''}`.trim())}${lv(m.id)}${typeof RC!=='undefined'&&RC.titleHtml?RC.titleHtml(m):''}${m.soprannome?` <span class="muted">(${esc(m.soprannome)})</span>`:''}</a></div>`;
- V.innerHTML=`<h2>Cerca un socio</h2><input id="gq" placeholder="Nome, cognome o soprannome (almeno 2 lettere)" autocomplete="off"><div id="gr" class="card" style="margin-top:8px"><p class="muted">Scrivi almeno 2 lettere per cercare tra i soci.</p></div>`;
- let tk=0;$('#gq').oninput=e=>{const q=e.target.value.trim(),k=++tk,R=$('#gr');if(q.length<2){R.innerHTML='<p class="muted">Scrivi almeno 2 lettere per cercare tra i soci.</p>';return}
+ const attiviHtml=()=>{const l=all.filter(p=>p.member).slice(0,10);return`<p class="muted">Soci più attivi</p>`+(l.map(p=>{const m=ms.find(x=>'m:'+x.id===p.key);return m?mini(m):''}).join('')||'<p class="muted">Nessun socio da mostrare.</p>')+`<p class="muted sm">Scrivi almeno 2 lettere per cercare per nome.</p>`};
+ V.innerHTML=`<h2>Cerca un socio</h2><input id="gq" placeholder="Nome, cognome o soprannome (almeno 2 lettere)" autocomplete="off"><div id="gr" class="card" style="margin-top:8px">${attiviHtml()}</div>`;
+ let tk=0;$('#gq').oninput=e=>{const q=e.target.value.trim(),k=++tk,R=$('#gr');if(q.length<2){R.innerHTML=attiviHtml();return}
   setTimeout(async()=>{if(k!==tk)return;let ids;try{if(DB.remote&&DB.status==='online')ids=await DB.remote.searchMembers(q)}catch(err){}
    if(!ids){const n=norm(q);ids=ms.filter(m=>norm([m.nome,m.cognome,m.soprannome,m.nome].join(' ')).includes(n)).slice(0,20).map(m=>m.id)}
    if(k!==tk)return;const l=ids.map(id=>ms.find(m=>m.id===id)).filter(Boolean);R.innerHTML=l.map(mini).join('')+(l.length===20?'<p class="muted">Mostrati i primi 20: affina la ricerca.</p>':'')||'<p class="muted">Nessun socio trovato.</p>'},250)}},
@@ -325,8 +337,9 @@ async serata(){const gs=gamesVis(await DB.games()),all=await DB.members(),ms=all
   <div class="agtop"><b class="agtit">${g.id?gLink(g.id,g.name):esc(g.name)}</b>${st}</div>
   <div class="agl2"><span class="agi">🕒</span> ${t.time?esc(t.time):'<span class="muted">ora libera</span>'}<span class="agsep">·</span><span class="agi">🏠</span> ${mLink(t.hostId,esc(mn(t.hostId)))}${typLab?`<span class="agsep">·</span>${typLab}`:''}</div>
   ${altri.length?`<div class="agl3">Con ${altri.join(', ')}</div>`:''}${t.note?`<div class="agl3 muted">${esc(t.note)}</div>`:''}</div></div>${act?`<div class="agact">${act}</div>`:''}</div>`};
- const head=d=>{const x=by(d),pers=new Set();x.filter(t=>t.status==='open').forEach(t=>(t.players||[]).forEach(p=>pers.add(p.memberId?'m:'+p.memberId:'g:'+t.id+p.name)));const k=nOpen(d);
-  return`<h3 class="agday" id="agd-${d}">${d===oggi?'Oggi, ':''}${esc(agLbl(d))}<span class="muted"> · ${k} ${k===1?'tavolo':'tavoli'}${pers.size?` · ${pers.size} ${pers.size===1?'persona':'persone'} (ospiti inclusi)`:''}</span></h3>`};
+ const head=d=>{const x=by(d),pers=new Set();let hasG=false;x.filter(t=>t.status==='open').forEach(t=>(t.players||[]).forEach(p=>{if(p.memberId)pers.add('m:'+p.memberId);else{hasG=true;pers.add('g:'+t.id+p.name)}}));const k=nOpen(d);
+  const pl=pers.size?(pers.size===1?'1 persona':pers.size+' persone')+(hasG?', ospiti compresi':''):'';
+  return`<h3 class="agday" id="agd-${d}">${d===oggi?'Oggi, ':''}${esc(agLbl(d))}<span class="muted"> · ${k} ${k===1?'tavolo':'tavoli'}${pl?' · '+pl:''}</span></h3>`};
  const can=staff?ms.length:(meM&&!blocked);
  V.innerHTML=`<h2>📅 Agenda</h2>${DB.tablesMissing?'<p class="warn">Tabella «tables» non ancora creata su Supabase.</p>':''}
  <div class="agdays" role="tablist" aria-label="Giorni">${days.map(d=>`<button type="button" class="chip pick${d===S.date?' on':''}" data-d="${d}">${d===oggi?'Oggi':esc(UX_d(d))}${nOpen(d)?` · ${nOpen(d)}`:''}</button>`).join('')}<button type="button" class="chip pick agcal" id="agcal" aria-label="Scegli un'altra data"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18" stroke="currentColor" stroke-width="1.8"/><rect x="7" y="2.5" width="1.8" height="5" rx=".8" fill="currentColor"/><rect x="15.2" y="2.5" width="1.8" height="5" rx=".8" fill="currentColor"/></svg></button><input type="date" id="sd" lang="it" min="${oggi}" value="${S.date}" class="agdi" tabindex="-1" aria-hidden="true"></div>
@@ -334,10 +347,11 @@ async serata(){const gs=gamesVis(await DB.games()),all=await DB.members(),ms=all
   if(tipiAtt.length>3)return `<div class="agtf agtf-dd" id="agtf"><button type="button" class="chip pick on" id="agtipobtn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(fLab)}">Tipo: ${esc(curLab)} ▾</button></div>`;
   if(tipiAtt.length>1)return `<div class="agtf" id="agtf" role="tablist" aria-label="${esc(fLab)}"><button type="button" class="chip pick${tipoF?'':' on'}" data-tf="" aria-selected="${tipoF?'false':'true'}">${esc(tutto)}</button>${tipiAtt.map(x=>`<button type="button" class="chip pick${tipoF===x.id?' on':''}" data-tf="${esc(x.id)}" aria-selected="${tipoF===x.id?'true':'false'}">${esc((x.icona||'')+' '+x.nome)}</button>`).join('')}</div>`;
   return ''})()}
- <div id="tl">${days.map(d=>`<section class="agsec" data-day="${d}"${d===S.date?'':' hidden'}>`+head(d)+(by(d).map(card).join('')||`<p class="muted agnone">Nessun tavolo${can?': tocca + per aprirne uno.':'.'}</p>`)+'</section>').join('')}</div>${tFab(can)}`;
+ <div id="tl">${days.map(d=>`<section class="agsec" data-day="${d}"${d===S.date?'':' hidden'}>`+head(d)+(by(d).map(card).join('')||(can?`<div class="agnone"><p>Nessun tavolo stasera: apri tu il primo.</p><button type="button" class="p agnew">Apri un tavolo</button></div>`:`<p class="muted agnone">Nessun tavolo stasera.</p>`))+'</section>').join('')}</div>${tFab(can)}`;
  // v41.8.1 — si vede solo il giorno scelto (prima: elenco unico + scroll, che con pochi tavoli lasciava in vista quelli di oggi)
  const go2=d=>{S.date=d;window._eve=d;const hk='serata/'+d;window._curKey=hk;if(location.hash.slice(1)!==hk)location.hash=hk;V.querySelectorAll('.agdays [data-d]').forEach(b=>{const on=b.dataset.d===d;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false')});V.querySelectorAll('#tl .agsec').forEach(x=>x.hidden=x.dataset.day!==d)};
  V.querySelectorAll('.agdays [data-d]').forEach(b=>b.onclick=()=>go2(b.dataset.d));
+ V.querySelectorAll('.agnew').forEach(b=>b.onclick=()=>tFabGo());
  const setTipo=v=>{try{if(v)localStorage.setItem('pergioco-ag-tipo',v);else localStorage.removeItem('pergioco-ag-tipo')}catch(e){}go('serata')};
  V.querySelectorAll('#agtf [data-tf]').forEach(b=>b.onclick=()=>setTipo(b.dataset.tf));
  if(window._agPopClose)window._agPopClose();
@@ -395,7 +409,15 @@ async config(){if(!adminMode()||isMod()){V.innerHTML='<div class="card"><p class
  <details class="card cftx" id="cftx"><summary><h3>Testi avanzati</h3> <span class="muted sm">nomi propri, regolamenti, dati dell'ente</span></summary><p class="muted sm">ⓘ Lasciali così per i testi originali. Niente &lt; &gt; nei testi.</p>
  ${[['Sfida tra meccaniche',['santo','festa','antero','anteri']],['Torneo a coppa',['coppa_breve','coppa_plur','coppa_intro','coppa_regole_tavoli','coppa_regole_1v1']],['Libri sociali',['ente_nome','ente_cf']],['Pagina Giochi',['gm_tutto','gm_gdt','gm_gdr','collezione','g8_oggi','g8_prox','g8_tav1','g8_tavn','g8_lib1','g8_libn','g8_pieni']],['Profilo · livello',['lv_invito','lv_come','lv_max']],['Gestione Partite',['gp_period','gp_all','gp_range','gp_member','gp_from','gp_to']],['Import BGG e RPGGeek',['ibgg_titolo','ibgg_sub','ibgg_src','ibgg_viaFile','ibgg_viaUser','ibgg_viaUserSoon','ibgg_viaUserHelp','ibgg_viaUserGo','ibgg_viaUserWait','ibgg_viaUserErr','ibgg_viaUserCheck','ibgg_viaUserOk','ibgg_viaUserMissing','ibgg_viaUserRecent','ibgg_viaUserRemove','ibgg_attrib','ibgg_anteprima','ibgg_mostra','ibgg_tutto','ibgg_importa','ibgg_esito','irpg_src','irpg_titolo','irpg_sub','irpg_viaUser','irpg_viaUserHelp','irpg_viaUserWait','irpg_viaUserErr','irpg_viaUserMissing','irpg_attrib','irpg_fileHelp','irpg_viaFileSub','irpg_viaUserSub']],['Tavoli',['tt_pieno','tt_wa','tt_ora','tt_ora_lab','tt_gest','tt_tipi','tt_cap','tt_master','tt_gioco','tt_nota','tt_posti','tt_versione','tt_versione_ph','tt_filtro','tt_tutto','tt_reg_gdr','tt_reg_altro','tt_sistema','tt_avventura','tt_sessione','tt_oneshot','tt_campagna','tt_sess_n','tt_esito','tt_conclusa','tt_incorso','tt_esito_nota','tt_pg','tt_nome_partita']]].map(([g,ks])=>`<p class="kw cftg">${g}</p>${ks.map(k=>{const L=TXT.LIM[k][1],lg=TXT.LUNGHI.includes(k);return`<label for="ct-${k}">${esc(TXT.L[k])}</label>${lg?`<textarea id="ct-${k}" maxlength="${L}" rows="3">${esc(tv[k])}</textarea>`:`<input id="ct-${k}" maxlength="${L}" placeholder="${esc(TXT_DEF[k])}" value="${esc(tv[k])}">`}`}).join('')}`).join('')}
  <button class="s" type="button" id="ctdef">↺ Testi originali</button></details>
- <p class="muted sm" id="cferr" role="alert"></p><button class="p" id="cfsave" style="width:100%">💾 Salva configurazione</button>`;
+ <p class="muted sm" id="cferr" role="alert"></p><div class="card" id="cfpriv"><h3>Privacy</h3>
+ <p class="muted sm">ⓘ Il testo lo vedono i soci alla registrazione e al primo accesso. Solo gli admin lo modificano. Pubblicando una nuova versione, tutti dovranno accettarla di nuovo.</p>
+ <label for="priv-tit">Titolare del trattamento</label><input id="priv-tit" maxlength="200" placeholder="Da compilare dopo il parere del Direttivo">
+ <label for="priv-tx">Testo dell'informativa</label><textarea id="priv-tx" maxlength="20000" rows="14"></textarea>
+ <p class="muted sm" id="priv-now">Versione in vigore: —</p>
+ <button class="p" type="button" id="priv-pub">Pubblica una nuova versione</button>
+ <p class="muted sm">I soci già registrati la vedranno al prossimo accesso.</p>
+ <div id="priv-cons"></div></div>
+ <button class="p" id="cfsave" style="width:100%">💾 Salva configurazione</button>`;
  const rdt=()=>{for(const k in TXT_DEF)tv[k]=$('#ct-'+k).value.trim();return tv};
  const rd=()=>{for(const k of ['nome','motto','citta','instagram','email'])v[k]=$('#cf-'+k).value.trim();v.instagram=v.instagram.replace(/^@/,'');for(const[k]of C)v.colori[k]=$('#cfc-'+k).value;return v};
  const rdm=()=>{for(const k of Object.keys(mv)){mv[k].attivo=$('#cm-'+k).checked;if('nome' in mv[k]){mv[k].nome=$('#cm-'+k+'-nome').value.trim();mv[k].desc=$('#cm-'+k+'-desc').value.trim();$('#cmf-'+k).hidden=!mv[k].attivo}}return mv};
@@ -405,11 +427,12 @@ async config(){if(!adminMode()||isMod()){V.innerHTML='<div class="card"><p class
  for(const k of ['logo','logo_barra']){$('#cff-'+k).onchange=e=>{const f=e.target.files[0];if(!f)return;if(f.size>110*1024)return toast('⚠️ Logo troppo grande (max ~110 KB)');const r=new FileReader();r.onload=()=>{const u=String(r.result);if(!BRAND.LOGO.test(u)||(/^data:image\/svg/.test(u)&&BRAND.svgBad(u)))return toast('⚠️ Logo non valido o non sicuro');v[k]=u;$('#cfi-'+k).innerHTML='<img alt="">';$('#cfi-'+k).firstChild.src=u;prev()};r.readAsDataURL(f)}}
  V.querySelectorAll('[data-cfx]').forEach(b=>b.onclick=()=>{v[b.dataset.cfx]='';$('#cfi-'+b.dataset.cfx).textContent='—'});
  $('#cfdef').onclick=()=>{for(const[k]of C)$('#cfc-'+k).value=BRAND_DEF.colori[k];prev()};
- $('#cfsave').onclick=async()=>{prev();const gv=typeof GDRB!=='undefined'?GDRB.read():null,ge=gv?GDRB.errors(gv):[];const e=[...BRAND.errors(v),...MOD.errors(mv),...TXT.errors(tv),...ge];if(e.length){if(TXT.errors(tv).length)$('#cftx').open=true;if(ge.length){const c=document.getElementById('cfgdr');if(c)c.scrollIntoView({block:'nearest'})}return toastVal(e[0],'E-CFG-V')}try{await BRAND.save(v);await MOD.save(mv);await TXT.save(tv);if(gv)await GDRB.save(gv);toast('✅ Configurazione salvata')}catch(err){err.val?toastVal(err.message,'E-CFG-V'):toastErr(err,'CONFIG','Salvataggio non riuscito')}}},
+ $('#cfsave').onclick=async()=>{prev();const gv=typeof GDRB!=='undefined'?GDRB.read():null,ge=gv?GDRB.errors(gv):[];const e=[...BRAND.errors(v),...MOD.errors(mv),...TXT.errors(tv),...ge];if(e.length){if(TXT.errors(tv).length)$('#cftx').open=true;if(ge.length){const c=document.getElementById('cfgdr');if(c)c.scrollIntoView({block:'nearest'})}return toastVal(e[0],'E-CFG-V')}try{await BRAND.save(v);await MOD.save(mv);await TXT.save(tv);if(gv)await GDRB.save(gv);toast('✅ Configurazione salvata')}catch(err){err.val?toastVal(err.message,'E-CFG-V'):toastErr(err,'CONFIG','Salvataggio non riuscito')}};
+ if(typeof PRIV!=='undefined'&&PRIV.mountConfig)await PRIV.mountConfig(V)},
 async altro(){const hp=await DB.hasPin();
  V.innerHTML=`<div id="bkp" hidden><h2>Backup dei dati</h2><div class="card"><p class="muted">I dati sono salvati sul server dell'associazione. Qui puoi scaricarne una copia manuale in JSON (non include i Libri sociali).</p>
  <button class="p" id="ex">⬇️ Esporta JSON</button><label>Importa un backup (sostituisce i dati attuali)</label><input type="file" id="im" accept="application/json"></div></div>
- <div class="hrow"><h2 id="pt">🔒 Pannello admin</h2></div><div class="card" id="adm"></div><div class="card muted">Associazione ${esc(BRAND.v.nome)}${BRAND.v.citta?' · '+esc(BRAND.v.citta):''} · v${APP_VERSION}</div>`;
+ <div class="hrow" id="pth" hidden><h2 id="pt">🔒 Pannello admin</h2></div><div class="card" id="adm"></div><div class="card muted">Associazione ${esc(BRAND.v.nome)}${BRAND.v.citta?' · '+esc(BRAND.v.citta):''} · v${APP_VERSION}</div>`;
  
  $('#ex').onclick=async()=>{const b=new Blob([await DB.export()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='pergioco-backup-'+romeToday()+'.json';a.click()};
  $('#im').onchange=async e=>{const f=e.target.files[0];if(f&&f.size>IMP_MAX_MB*1048576)return modal(`⚠️ Il file è troppo grande (massimo ${IMP_MAX_MB} MB).`,{cancel:false});if(!f||!await ask('Sostituire tutti i dati con il backup?'))return;try{await DB.import(await f.text());admin=false;toast('Backup importato');go('altro')}catch(err){toastErr(err,'BACKUP')}};
@@ -418,7 +441,7 @@ async altro(){const hp=await DB.hasPin();
  $('#bkp').hidden=!(admin&&adminMode()&&!isMod());
  if(isMod())$('#pt').textContent='🛡 Pannello moderatore';
  if(admin&&uiMode()==='user'){A.innerHTML=`<p class="muted">Sei in <b>modalità utente</b>: vedi l'app come un socio qualsiasi.</p><button class="p" id="tm">${isMod()?'🛡 Passa a modalità moderatore':'🔧 Passa a modalità admin'}</button>`;$('#tm').onclick=()=>setMode('admin');return}
- if(R&&!admin){A.innerHTML=`<p class="muted">Accesso admin con l'account Supabase.</p><label>Email</label><input id="le" type="text" autocomplete="username"${EMA}><label>Password</label><input id="lp" type="password" autocomplete="current-password"><button class="p" id="lg">Entra</button>`;
+ if(R&&!admin){A.innerHTML=`<p class="muted">Accesso admin con l'account Supabase.</p><label>Email</label><input id="le" type="email" autocomplete="username"${EMA}><label>Password</label><input id="lp" type="password" autocomplete="current-password"><button class="p" id="lg">Entra</button>`;
   $('#lg').onclick=async()=>{let ok;try{ok=await DB.remote.signIn(normEmail($('#le').value),$('#lp').value)}catch(err){return toastErr(err,'LOGIN','Accesso non riuscito')}
    if(!ok){await DB.remote.signOut();return toastVal('Questo account non ha il ruolo di admin o moderatore: chiedi a un admin di abilitarlo','E-LOGIN-V2')}admin=true;drawModeBtn();go('altro')};return}
  if(!R&&!admin){A.innerHTML='<p class="muted">Il pannello è disponibile solo con la connessione a internet.</p>';return}
@@ -509,7 +532,7 @@ async altro(){const hp=await DB.hasPin();
   <select id="amem" style="width:100%"${opts?'':' disabled'}><option value="">${opts?'— scegli —':'Nessun socio registrato disponibile'}</option>${opts}</select>
   <button class="p" id="aad" style="width:100%"${opts?'':' disabled'}>Nomina admin</button>
   <label>Oppure email</label>
-  <input id="ae2" type="text" placeholder="nome@email.it" style="width:100%">
+  <input id="ae2" type="email" inputmode="email" placeholder="nome@email.it" style="width:100%" autocomplete="off">
   <button class="p" id="aae" style="width:100%">Nomina admin per email</button>`:''}
   <h3 class="alsub">Moderatori</h3>
   <div>${l.map(x=>staffCard(x,true,'mod')).join('')||'<p class="muted">Nessun moderatore.</p>'}</div>
@@ -517,7 +540,7 @@ async altro(){const hp=await DB.hasPin();
   <select id="mmem" style="width:100%"${opts?'':' disabled'}><option value="">${opts?'— scegli —':'Nessun socio registrato disponibile'}</option>${opts}</select>
   <button class="p" id="mam" style="width:100%"${opts?'':' disabled'}>Nomina dal socio</button>
   <label>Oppure email (per chi non è ancora iscritto)</label>
-  <input id="me2" type="text" placeholder="nome@email.it" style="width:100%">
+  <input id="me2" type="email" inputmode="email" placeholder="nome@email.it" style="width:100%" autocomplete="off">
   <button class="p" id="ma" style="width:100%">Nomina per email</button>`;bind();
   const mam=document.getElementById('mam');if(mam)mam.onclick=async()=>{const id=document.getElementById('mmem').value;if(!id)return toast('Scegli un socio');try{await DB.remote.setModeratorMember(id,true);toast('Moderatore nominato');drawMods()}catch(x){toastErr(x,'MOD')}};
   document.getElementById('ma').onclick=async()=>{const e=normEmail(document.getElementById('me2').value);if(!/^\S+@\S+\.\S+$/.test(e))return toastVal('Email non valida: scrivila nel formato nome@dominio.it, senza spazi','E-LOGIN-V1');try{await DB.remote.setModerator(e,true);toast('Moderatore nominato');drawMods()}catch(x){toastErr(x,'MOD')}};
@@ -604,22 +627,26 @@ function _profileHtml(m,ctx,ms,gs,pub){const s=Profile.stats(m.id,ctx),bl=Badges
  <div class="card"><b>👥 Compagni di gioco più frequenti</b>${s.partners.map(p=>`<div class="rec"><span>${pn(p.x)}</span><b>${p.n}</b></div>`).join('')||'<p class="muted">—</p>'}</div>
  <div class="card"><b>🕑 Storico partite</b>${s.plays.map(p=>{const me=p.players.find(x=>x.memberId===m.id)||{};return`<div class="rec"><span>${playTitle(gs,p)}<br><span class="muted prd">${linkEvening(p.date,fmt(p.date))} · ${dayName(p.date)}${me.score!=null&&me.score!==''?' · '+esc(me.score)+' punti':''}</span></span><span class="win">${(typeof isGdrPlay==='function'&&isGdrPlay(p))?'':me.winner?'🏆 Vittoria':(p.coop?'Sconfitta':'')}</span></div>`}).join('')||'<p class="muted">Ancora nessuna partita.</p>'}</div>`}
 function authForm(){let mode=window._am||'login';const T={login:'Entra',signup:'Crea account',reset:'Imposta nuova password'};
- const G=document.body.classList.contains('gate');V.innerHTML=`${G?'<div class="login-hero"><img src="icons/icon-192.png" alt=""><h1>'+esc(BRAND.v.nome)+'</h1><p>'+(BRAND.v.motto?esc(BRAND.v.motto)+'<br>':'')+'Accesso riservato ai soci</p></div>':'<h2>Profilo</h2>'}<div class="card"><p class="muted">${mode==='signup'?'Per registrarti ti serve il <b>codice</b> personale che ti ha dato un admin di '+esc(BRAND.v.nome)+'.':mode==='reset'?'Chiedi a un admin un nuovo codice e usalo qui con la tua email per scegliere una nuova password.':'Accedi con la tua email e password. Nuovo socio? Tocca «Registrati con codice».'}</p>
+ const G=document.body.classList.contains('gate');V.innerHTML=`${G?'<div class="login-hero"><img src="icons/icon-192.png" alt=""><h1>'+esc(BRAND.v.nome)+'</h1><p>'+(BRAND.v.motto?esc(BRAND.v.motto)+'<br>':'')+'Accesso riservato ai soci</p></div>':'<h2>Profilo</h2>'}<div class="card"><p class="muted">${mode==='signup'?'Per registrarti ti serve il <b>codice</b> che ti fornisce lo staff dell\'associazione.':mode==='reset'?'Chiedi a un admin un nuovo codice e usalo qui con la tua email per scegliere una nuova password.':'Accedi con la tua email e password. Nuovo socio? Tocca «Registrati con codice».'}</p>
  <div class="seg" id="am"><button data-m="login" class="${mode==='login'?'on':''}">Accedi</button><button data-m="signup" class="${mode==='signup'?'on':''}">Registrati con codice</button></div>
  ${mode!=='login'?`<label>Codice</label><input id="ac" class="code" placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off" autocapitalize="characters" spellcheck="false">`:''}
- <label>Email ${mode==='signup'?'(sarà il tuo nome utente)':''}</label><input id="ae" type="text" autocomplete="username"${EMA}>
+ <label>Email ${mode==='signup'?'(sarà il tuo nome utente)':''}</label><input id="ae" type="email" autocomplete="username"${EMA}>
  <label>${mode==='login'?'Password':'Nuova password (almeno 8 caratteri)'}</label><input id="ap" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}">
  ${mode!=='login'?`<label>Ripeti password</label><input id="ap2" type="password" autocomplete="new-password">`:''}
  <label class="gck" for="apshow"><input type="checkbox" id="apshow"> Mostra password</label>
+ ${mode==='signup'?`<div class="priv-reg" id="priv-reg"><label class="gck" for="priv-ok"><input type="checkbox" id="priv-ok"> Ho letto e accetto l'informativa privacy</label> <button type="button" class="s" id="priv-leggi">Leggi l'informativa</button></div>`:''}
  <button class="p" id="ago">${T[mode]}</button>
  ${mode==='login'?'<button class="s" id="afp" style="width:100%;margin-top:6px">Password dimenticata? (con codice)</button>':mode==='reset'?'<button class="s" id="abk" style="width:100%;margin-top:6px">← Torna all\'accesso</button>':''}</div>`;
  const sw=m=>{window._am=m;authForm()};$('#am').onclick=e=>e.target.dataset.m&&sw(e.target.dataset.m);if($('#afp'))$('#afp').onclick=()=>sw('reset');if($('#abk'))$('#abk').onclick=()=>sw('login');
  bindPwShow($('#apshow'),['ap','ap2']);
  if($('#ac'))$('#ac').oninput=e=>{const v=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);e.target.value=v.match(/.{1,4}/g)?.join('-')||''};
+ if($('#priv-leggi'))$('#priv-leggi').onclick=async()=>{if(typeof PRIV!=='undefined'){await PRIV.loadTesto();PRIV.apriTesto()}};
+ if(mode==='signup'&&typeof PRIV!=='undefined')PRIV.loadTesto();
  $('#ago').onclick=async()=>{const em=normEmail($('#ae').value),pw=$('#ap').value;$('#ae').value=em;if(!okEmail(em))return toastVal('Email non valida: scrivila nel formato nome@dominio.it, senza spazi','E-LOGIN-V1');
   let code='';if(mode!=='login'){code=$('#ac').value.replace(/-/g,'');if(code.length!==12)return toastVal('Il codice ha 12 caratteri (XXXX-XXXX-XXXX): ricopialo dal messaggio dello staff','E-REG-V1');if(pw.length<8)return toastVal('La password deve avere almeno 8 caratteri','E-REG-V2');if(pw!==$('#ap2').value)return toastVal('Le due password non coincidono: riscrivile uguali','E-REG-V3')}
+  if(mode==='signup'&&typeof PRIV!=='undefined'){const ck=PRIV.checkReg();if(!ck.ok)return toastVal(ck.msg,'E-REG-PRIV')}
   $('#ago').disabled=true;
-  try{if(mode==='signup')await DB.remote.signUp(code,em,pw);else if(mode==='reset'){await DB.remote.resetWithCode(code,em,pw);await DB.remote.signIn(em,pw)}else await DB.remote.signIn(em,pw);
+  try{if(mode==='signup'){await DB.remote.signUp(code,em,pw);if(typeof PRIV!=='undefined')await PRIV.accettaDopoSignup()}else if(mode==='reset'){await DB.remote.resetWithCode(code,em,pw);await DB.remote.signIn(em,pw)}else await DB.remote.signIn(em,pw);
    window._am='login';toast(mode==='signup'?'Benvenuto in '+BRAND.v.nome+'! 🎉':mode==='reset'?'Password aggiornata':'Bentornato!');sessionStorage.setItem('pg-welcome',mode);setTimeout(()=>{location.replace(location.pathname+'#'+(mode==='signup'?'profilo':'ludoteca'));location.reload()},700)}
   catch(e){$('#ago').disabled=false;const m=errTesto(e),A=mode==='signup'?'REG':mode==='reset'?'PWD':'LOGIN';if(/already registered/i.test(m))return toastErr({message:'Questa email è già registrata: usa «Accedi», oppure «Password dimenticata?» se non ricordi la password'},A);if(/Database error|Codice non valido/i.test(m))return toastErr({message:'Codice non valido o già usato: controlla le 12 lettere e cifre, oppure chiedi allo staff un codice nuovo'},A);toastErr(e,A)}}}
 const bars=(rows,unit='')=>{const mx=Math.max(1,...rows.map(r=>r[1]));return`<div class="bars">${rows.map(([l,v,v2])=>`<div class="bar"><span>${esc(l)}</span><i style="width:${Math.round(v/mx*100)}%"></i><b>${v}${v2!=null?` <small class="muted">· ${v2}${unit}</small>`:''}</b></div>`).join('')||'<p class="muted">—</p>'}</div>`};
@@ -693,7 +720,7 @@ DB.onStatus=()=>{const el=$('#status');if(!el)return;const q=DB.remote?DB.remote
  else if(DB.status==='local'&&cfg)t='⚠️ Database non raggiungibile: i dati restano su questo telefono.';
  else if(q)t=`🔄 ${q} modifiche in sincronizzazione…`;el.textContent=t;el.hidden=!t};
 $('#modebtn').onclick=()=>setMode(uiMode()==='user'?'admin':'user');
-(async()=>{if(document.readyState==='loading')await new Promise(r=>addEventListener('DOMContentLoaded',r,{once:true}));try{await DB.init();if(DB.mode==='blocked'){if(typeof ACC!=='undefined')return ACC.showBlocco();return}if(DB.remote&&DB.status==='online'){admin=await DB.remote.isAdmin();drawModeBtn()}}catch(e){console.warn(e)}if(DB.mode!=='online'&&DB.mode!=='offline')return gate();if(typeof ACC!=='undefined'){const st=await ACC.dopoAvvio();if(st==='blocked')return}{const r=applyRoute(START);go(START.includes('access_token')||START.includes('type=')?'profilo':views[r.v]?r.v:'ludoteca')}})();
+(async()=>{if(document.readyState==='loading')await new Promise(r=>addEventListener('DOMContentLoaded',r,{once:true}));try{await DB.init();if(DB.mode==='blocked'){if(typeof ACC!=='undefined')return ACC.showBlocco();return}if(DB.remote&&DB.status==='online'){admin=await DB.remote.isAdmin();drawModeBtn()}}catch(e){console.warn(e)}if(DB.mode!=='online'&&DB.mode!=='offline')return gate();if(typeof ACC!=='undefined'){const st=await ACC.dopoAvvio();if(st==='blocked')return}if(typeof PRIV!=='undefined'){const st=await PRIV.dopoAvvio();if(st==='blocked')return}{const r=applyRoute(START);go(START.includes('access_token')||START.includes('type=')?'profilo':views[r.v]?r.v:'ludoteca')}})();
 if('serviceWorker'in navigator){let rl=false;const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!rl){rl=true;toast('Nuova versione disponibile: aggiorno…');setTimeout(()=>location.reload(),800)}});navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{if(!r)return;r.update();setInterval(()=>r.update(),30*60e3);document.addEventListener('visibilitychange',()=>document.visibilityState==='visible'&&r.update())})}
 
 async function gamePage(g,ps){const ms=await DB.members(),mine=ps.filter(p=>p.gameId===g.id),t=Stats.topScores(g.id,ps),r=Stats.records([g],ps)[0],last=Stats.chrono(mine).reverse().slice(0,5),wins=(typeof Stats.mostWins==='function'&&g&&g.kind!=='gdr')?Stats.mostWins(g.id,ps,ms,2):[];
@@ -745,7 +772,7 @@ function agSheet({gs,ms,meM,staff,S,oggi}){if(document.querySelector('.agov'))re
  ${staff?`<label for="th">Chi ospita</label><select id="th">${ms.slice().sort((a,b)=>memberName(a).localeCompare(memberName(b),'it')).map(m=>`<option value="${esc(m.id)}"${meM&&m.id===meM.id?' selected':''}>${esc(memberName(m))}</option>`).join('')}</select>`:`<div class="agme">🏠 Ospiti tu, ${esc(memberName(meM))}: il tuo posto è già incluso.</div><input type="hidden" id="th" value="${esc(meM.id)}">`}
  <label>Giorno</label><button type="button" class="s agdb" id="agdb"></button><input type="date" id="agdt" lang="it" min="${oggi}" value="${D}" class="agdi" tabindex="-1" aria-hidden="true">
  <label>Gioco</label><select id="tg">${gs.map(g=>`<option value="${esc(g.id)}">${esc(g.name)}</option>`).join('')}</select>
- <div class="row"><div><label for="tp">Posti (te compreso)</label><input id="tp"${nA('int',1,100,'Posti',' required')} value="${gs[0]?.max||4}"></div><div><label for="tt">Ora (facoltativa)</label><input id="tt" type="time"></div></div>
+ <div class="row"><div><label for="tp">Posti (te compreso)</label><input id="tp"${nA('int',1,100,'Posti',' required')} value="${gs[0]?.max||4}"></div><div><label for="tt">Ora (facoltativa, 24 ore)</label>${time24Html('tt','',false)}</div></div>
  <label for="tn">Nota (facoltativa)</label><input id="tn" maxlength="120" placeholder="es. spiego io le regole"><button type="button" class="p" id="tsv">Apri il tavolo</button></div>`;
  document.body.append(o);requestAnimationFrame(()=>o.classList.add('on'));const rel=backClose(()=>o.remove());const close=()=>{rel();o.remove()};
  o.onclick=e=>{if(e.target===o||e.target.closest('.agclose'))close()};
@@ -753,5 +780,5 @@ function agSheet({gs,ms,meM,staff,S,oggi}){if(document.querySelector('.agov'))re
  $('#agdb').onclick=()=>{const i=$('#agdt');try{i.showPicker()}catch(e){i.click()}};$('#agdt').onchange=e=>{const v=e.target.value;if(isoOk(v)&&v>=oggi){D=v;sd()}else{toast('Data non valida');e.target.value=D}};
  gpMount($('#tg'),gs,[],null);$('#tg').onchange=()=>$('#tp').value=(gs.find(g=>g.id===$('#tg').value)||{}).max||4;
  $('#tsv').onclick=async()=>{if(!numForm(o))return;if(!isoOk(D)||D<romeEveningDate())return toast('Data non valida');const h=$('#th').value;if(!h||!ms.some(m=>m.id===h))return toast('Scegli chi ospita');if(!staff&&(!meM||h!==meM.id))return;
-  await DB.saveTable({date:D,evening:dayName(D),gameId:$('#tg').value,hostId:h,seats:Math.max(1,Math.min(100,+$('#tp').value||1)),time:$('#tt').value,note:$('#tn').value.trim().slice(0,120),players:[{memberId:h}]});close();S.date=D;toast('Tavolo aperto');go('serata')};
+  await DB.saveTable({date:D,evening:dayName(D),gameId:$('#tg').value,hostId:h,seats:Math.max(1,Math.min(100,+$('#tp').value||1)),time:time24Val('tt'),note:$('#tn').value.trim().slice(0,120),players:[{memberId:h}]});close();S.date=D;toast('Tavolo aperto');go('serata')};
  setTimeout(()=>{const f=o.querySelector('.agclose');if(f)f.focus({preventScroll:true})},50);return o}

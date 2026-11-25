@@ -4,17 +4,17 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
 (async()=>{const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome'});
  // 1 · Agenda: un altro giorno mostra i suoi tavoli
  for(const role of['socio','staff']){const p=await gio(b,role,'prossimo',900);const errs=[];p.on('pageerror',e=>errs.push(e.message));const q=(f,a)=>p.evaluate(f,a);
-  await q(()=>{_TS.push({id:'o1',date:romeToday(),status:'open',seats:4,gameId:'g4',hostId:'m3',players:[{memberId:'m3'}]})});
+  await q(()=>{_TS.push({id:'o1',date:romeEveningDate(),status:'open',seats:4,gameId:'g4',hostId:'m3',players:[{memberId:'m3'}]})});
   const d=await q(()=>{window._ser=null;return document.getElementById('g8s')&&document.getElementById('g8s').dataset.d});
   await q(()=>go('serata'));await W(1200);
   const vis=()=>q(()=>[...document.querySelectorAll('#tl .agt')].filter(e=>e.offsetParent).map(e=>e.dataset.t).join(','));
   chk(await vis()==='o1',role+': Agenda si apre su Oggi coi tavoli di oggi');
   const days=await q(()=>[...document.querySelectorAll('.agdays [data-d]')].map(b=>b.dataset.d));
   await p.click(`.agdays [data-d="${days[1]}"]`);await W(400);
-  chk(await vis()==='d'&&await q(d=>document.querySelector('.agdays [data-d].on').dataset.d===d&&document.querySelector(`#agd-${d}`).offsetParent!==null&&document.querySelector(`#agd-${romeToday()}`).offsetParent===null,days[1]),role+': altro giorno → solo i suoi tavoli');
+  chk(await vis()==='d'&&await q(d=>document.querySelector('.agdays [data-d].on').dataset.d===d&&document.querySelector(`#agd-${d}`).offsetParent!==null&&document.querySelector(`#agd-${romeEveningDate()}`).offsetParent===null,days[1]),role+': altro giorno → solo i suoi tavoli');
   await p.click(`.agdays [data-d="${days[2]}"]`);await W(400);chk(await vis()==='e',role+': terzo giorno');
   await p.click(`.agdays [data-d="${days[0]}"]`);await W(400);chk(await vis()==='o1',role+': di nuovo Oggi');
-  await q(()=>go('ludoteca'));await W(1200);chk(await q(()=>document.getElementById('g8s')&&document.getElementById('g8s').dataset.d===romeToday()),role+': con tavoli oggi la striscia punta a Oggi');
+  await q(()=>go('ludoteca'));await W(1200);chk(await q(()=>document.getElementById('g8s')&&document.getElementById('g8s').dataset.d===romeEveningDate()),role+': con tavoli oggi la striscia punta a Oggi');
   await q(()=>{_TS.splice(_TS.findIndex(t=>t.id==='o1'),1);go('serata');});await W(600);await q(()=>go('ludoteca'));await W(1200);
   await p.click('#g8s');await W(1300);chk(await vis()==='d'&&await q(d=>document.querySelector('.agdays [data-d].on').dataset.d===d,d),role+': la striscia apre il giorno giusto');
   chk(errs.length===0,role+' agenda: nessun errore JS '+errs.join('|'));await p.context().close()}
@@ -40,8 +40,8 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
  // 4 · Profilo: livello in evidenza
  {const p=await lvp(b,900);const q=f=>p.evaluate(f);
   const r=await q(()=>{const h=document.querySelector('.card.prof .lvh');return h&&{t:h.textContent,pc:h.querySelector('.lvbar i').style.width,mid:!!document.querySelector('#view>.card.xpc'),nmlv:!!document.querySelector('.pname .lv'),fs:parseFloat(getComputedStyle(h.querySelector('.lvn')).fontSize),bg:getComputedStyle(h.querySelector('.lvbar i')).backgroundColor}});
-  chk(r&&/^Lv 4Novizio300 XP/.test(r.t)&&/Ancora 80 XP per il livello 5▸$/.test(r.t)&&r.fs>=24,'livello grande nella scheda in alto '+(r&&r.t));chk(r&&r.pc==='43%','barra dai numeri già esistenti');chk(r&&!r.mid&&!r.nmlv,'livello tolto dal mezzo');chk(r&&r.bg==='rgb(242, 177, 52)','colore da variabile --a');
-  await p.click('.lvh');await W(200);chk(await q(()=>{const pn=document.querySelector('.lvpan');return !pn.hidden&&/Come guadagnare XP/.test(pn.textContent)&&/Partite/.test(pn.textContent)&&document.querySelector('.lvh .ar').textContent==='▾'}),'tocco → come guadagnare XP');
+  chk(r&&/^Livello 4Novizio300 esperienza/.test(r.t)&&/Ancora 80 punti esperienza per il livello 5▸$/.test(r.t)&&r.fs>=24,'livello grande nella scheda in alto '+(r&&r.t));chk(r&&r.pc==='43%','barra dai numeri già esistenti');chk(r&&!r.mid&&!r.nmlv,'livello tolto dal mezzo');chk(r&&r.bg==='rgb(242, 177, 52)','colore da variabile --a');
+  await p.click('.lvh');await W(200);chk(await q(()=>{const pn=document.querySelector('.lvpan');return !pn.hidden&&/Come si guadagna esperienza/.test(pn.textContent)&&/Partite/.test(pn.textContent)&&document.querySelector('.lvh .ar').textContent==='▾'}),'tocco → come si guadagna esperienza');
   await q(()=>{TXT.v=TXT.norm(Object.assign({},TXT.v,{lv_invito:'Mancano {n} XP: livello {l}'}));window._pv=null;go('profilo')});await W(1500);chk(await q(()=>/Mancano 80 XP: livello 5/.test(document.querySelector('.lvh').textContent)),'testo configurabile');
   chk(await q(()=>!TXT.ok('lv_invito','<b>')&&TXT.ok('lv_invito',TXT_DEF.lv_invito)),'validazione');await p.context().close()}
 

@@ -35,7 +35,7 @@ const SHOT=process.env.SHOT_DIR||'/workspace';
         {id:'m2',nome:'Bruno',cognome:'Neri',active:true}
       ];
       const gs=[{id:'catan',name:'Catan',min:3,max:4,minT:60,maxT:90,age:10,coop:false,kind:'gdt'}];
-      const today=(typeof romeToday==='function'?romeToday():'2026-11-17');const ts=[{id:'t1',date:today,evening:'serata',gameId:'catan',hostId:'m2',seats:4,status:'open',players:[{memberId:'m2'}]}];
+      const today=(typeof romeEveningDate==='function'?romeEveningDate():(typeof romeToday==='function'?romeToday():'2026-11-17'));const ts=[{id:'t1',date:today,evening:'serata',gameId:'catan',hostId:'m2',seats:4,status:'open',players:[{memberId:'m2'}]}];
       DB.games=async()=>gs;DB.members=async()=>ms;DB.plays=async()=>[];DB.allTables=async()=>ts;
       DB.hasPin=async()=>true;DB.legacyNames=async()=>[];DB.status='online';
       const R=DB.remote||{};R.user=async()=>({id:'u1'});R.isAdmin=async()=>true;R.modCached=false;R.client=null;DB.remote=R;

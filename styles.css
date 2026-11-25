@@ -1,4 +1,4 @@
-:root{--b:#14254a;--b2:#2a4785;--bg:#f4f6fb;--c:#fff;--t:#1d2433;--m:#6b7489;--a:#f2b134;--hd1:#0f1c3d;--hd2:#1f3d7a;--hdf:#ffd76a}
+:root{--b:#14254a;--b2:#2a4785;--bg:#f4f6fb;--c:#fff;--t:#1d2433;--m:#4a5263;--a:#f2b134;--hd1:#0f1c3d;--hd2:#1f3d7a;--hdf:#ffd76a}
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--t);padding-bottom:calc(70px + env(safe-area-inset-bottom))}
 header{background:var(--b);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 18px 14px;position:sticky;top:0;z-index:5}
 .brand{font-weight:800;font-size:22px;letter-spacing:.5px}.sub{font-size:13px;opacity:.75}
@@ -10,7 +10,7 @@ main{padding:14px;max-width:640px;margin:auto}h2{font-size:18px;margin:6px 0 12p
 input,select,textarea{width:100%;padding:10px;border:1px solid #d5dbe8;border-radius:10px;font-size:16px;background:#fff;color:var(--t)}
 label{font-size:13px;color:var(--m);display:block;margin:10px 0 4px}
 button.p,button.s{border:0;border-radius:10px;padding:12px 14px;font-size:15px;font-weight:600}
-button.p{background:var(--b);color:#fff;width:100%;margin-top:14px}button.s{background:#e7ecf7;color:var(--b)}
+button.p{background:var(--b);color:#fff;width:100%;margin-top:14px}button.s{background:#d4dcec;color:var(--b)}
 .seg{display:flex;background:#e7ecf7;border-radius:10px;padding:3px}.seg button{flex:1;border:0;background:none;padding:9px;border-radius:8px;font-size:14px;color:var(--b)}
 .seg button.on{background:var(--b);color:#fff}
 nav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;border-top:1px solid #e2e6ef;padding-bottom:env(safe-area-inset-bottom)}
@@ -66,7 +66,7 @@ body.gate nav,body.gate #status,body.gate header{display:none}body.gate main{pad
 .rov{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .roc{background:#fff;border-radius:14px;padding:10px 12px;box-shadow:0 1px 4px #0001;display:flex;flex-direction:column;gap:2px;min-width:0}
 .roi{font-size:22px}.rot{font-size:12px;color:#777;text-transform:uppercase;letter-spacing:.03em}
-.roh{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rov2{font-size:13px;color:var(--b);font-weight:600}
+.roh{font-weight:700;white-space:normal;overflow-wrap:anywhere;overflow:visible}.rov2{font-size:13px;color:var(--b);font-weight:600}
 .rgi{width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:28px;flex:none}
 .gpl{cursor:pointer;color:var(--b)}
 .gpg{position:fixed;inset:0;background:var(--bg,#f4f1ea);z-index:900;overflow:auto;animation:fi .15s}
@@ -280,7 +280,7 @@ img.imgko{display:none!important}
 .wrst{margin:8px 0;padding:10px 12px;border-radius:12px;font-weight:700;font-size:15px}.wrst.on{background:#e3f6ea;color:#17673a;border:1px solid #9bd8b2}.wrst.off{background:#eef0f5;color:#4a5266;border:1px solid #d3d8e3}
 .wrcard select{min-width:90px;width:auto}.wrcard .row button:not(.p){background:#fff;color:var(--b);border:1.5px solid var(--b);border-radius:10px;padding:10px 14px;font-weight:700}
 /* v37.4 Ultime partite: gioco e data su una riga (mai spezzati), vincitori sotto allineati a sinistra; a capo solo tra un nome e l'altro */
-.rec.prow{display:block}.prh{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px;row-gap:0}.prh .prg{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.prd{white-space:nowrap}
+.rec.prow{display:block}.prh{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px;row-gap:0}.prh .prg{white-space:normal;overflow:visible;overflow-wrap:anywhere;max-width:100%}.prd{white-space:nowrap}
 .prw{display:block;margin-top:3px;text-align:left;line-height:1.5}.pwn{white-space:nowrap}.pws{white-space:normal}
 /* v37.4 classifica XP paginata */
 .xppg{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}.xppg .s{flex:0 0 auto;margin:0}.xppg span{white-space:nowrap;text-align:center}.xppg .s:disabled{opacity:.4}
@@ -412,7 +412,7 @@ details[open]>summary::after{content:'▾'}
 .pt .gpchip{border:1px solid color-mix(in srgb,var(--b2) 25%,#fff);background:var(--c);border-radius:999px;padding:6px 12px 6px 6px;font-weight:600;color:var(--t)}
 .pt .gpq{border-radius:10px}
 .pt .gpon{background:color-mix(in srgb,var(--b2) 6%,#fff);border:2px solid var(--b);border-radius:12px}
-.pt .gpchg{background:none;border:0;color:var(--b2);font-weight:700;width:auto;padding:8px 4px;margin:0 0 0 auto;min-height:44px}
+.pt .gpchg{background:color-mix(in srgb,var(--b2) 22%,var(--c));border:0;color:var(--b);font-weight:600;width:auto;padding:8px 12px;margin:0 0 0 auto;min-height:44px;border-radius:10px}
 .pt .gpchg::after{content:' ▸'}
 .pt .seg{margin-bottom:6px}.pt .hint{font-size:12px;margin:0 0 8px}
 .pt #pl>p.muted{display:none}
@@ -921,3 +921,19 @@ header .brand,header .sub,body.adm header .brand,body.adm header .sub{padding-ri
 .gdel{margin:16px 0 4px;padding:12px}
 .gdel .danger{width:100%}
 .pfexpl{margin-top:8px}.explist{display:flex;flex-direction:column;gap:4px;margin:6px 0 0}.explopt{width:100%;text-align:left}
+
+/* v41.21 — ora 24h, contrasto, privacy, nomi lunghi */
+.t24{display:inline-flex;align-items:center;gap:4px}
+.t24 select{width:auto;min-width:4.6em;flex:0 0 auto}
+.t24sep{font-weight:700;padding:0 2px}
+.dt24{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dt24 input[type=date]{width:auto;flex:1;min-width:10em}
+.rec>span:first-child,.rec a{min-width:0;overflow-wrap:anywhere}
+body.priv-lock nav,body.priv-lock header{pointer-events:none;opacity:.45}
+.priv-overlay{position:fixed;inset:0;z-index:10000;background:var(--bg);overflow:auto;-webkit-overflow-scrolling:touch;padding:20px 16px 48px}
+.priv-overlay .priv-box{max-width:40rem;margin:0 auto}
+.priv-text{white-space:pre-wrap;overflow-wrap:anywhere;max-height:50vh;overflow:auto;background:#fff;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.45;color:var(--t)}
+.priv-reg{margin-top:12px}
+.priv-reg .s{width:auto;margin:8px 0 0;padding:8px 12px}
+.agnone .agnew,.agnone button.p{width:auto;margin-top:8px;display:inline-block}
+.gpchg{background:#d4dcec;color:var(--b);font-weight:600}

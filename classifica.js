@@ -25,7 +25,7 @@ function podio(V){const d=V.querySelector('details.accx');if(!d||d.dataset.cl)re
  const all=Object.values(XP.map||{}).sort((a,b)=>b.xp-a.xp),x=d.querySelector('.xptop');if(!all.length||!x)return;
  DB.members().then(ms=>{const M=id=>ms.find(m=>m.id===id),box=el('div','clpod');
   [1,0,2].forEach(i=>{const r=all[i];if(!r)return;const c=el('div','clp p'+(i+1)+(r.member_id===XP.me?' me':''));c.dataset.pv=r.member_id;c.setAttribute('role','button');c.tabIndex=0;
-   c.append(el('span','md',['🥇','🥈','🥉'][i]),el('b',null,r.member_id===XP.me?T.tu:short(M(r.member_id))),el('span','xp',`${(+r.xp||0).toLocaleString('it-IT')} XP`));box.append(c)});
+   c.append(el('span','md',['🥇','🥈','🥉'][i]),el('b',null,r.member_id===XP.me?T.tu:short(M(r.member_id))),el('span','xp',`${(+r.xp||0).toLocaleString('it-IT')} esperienza`));box.append(c)});
   const rows=el('div','cllist');const i=all.findIndex(r=>r.member_id===XP.me);
   if(i>=0){const r=el('div','clln clme');r.append(el('span','ic','🙂'));const t=el('span','t');t.append(el('b',null,`${T.tu}: ${i+1}° · `),el('span','pill',`${(+all[i].xp||0).toLocaleString('it-IT')} XP`));r.append(t,arrow(false));
    act(r,()=>{OPEN.add('xpall');show();const b=x.querySelector('[data-xpme]');if(b)b.click()});rows.append(r)}
