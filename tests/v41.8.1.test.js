@@ -4,17 +4,17 @@ let ok=0,n=0;const chk=(c,m)=>{n++;if(c)ok++;else console.log('FAIL',m)};const W
 (async()=>{const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome'});
  // 1 · Agenda: un altro giorno mostra i suoi tavoli
  for(const role of['socio','staff']){const p=await gio(b,role,'prossimo',900);const errs=[];p.on('pageerror',e=>errs.push(e.message));const q=(f,a)=>p.evaluate(f,a);
-  await q(()=>{_TS.push({id:'o1',date:romeToday(),status:'open',seats:4,gameId:'g4',hostId:'m3',players:[{memberId:'m3'}]})});
+  await q(()=>{_TS.push({id:'o1',date:romeEveningDate(),status:'open',seats:4,gameId:'g4',hostId:'m3',players:[{memberId:'m3'}]})});
   const d=await q(()=>{window._ser=null;return document.getElementById('g8s')&&document.getElementById('g8s').dataset.d});
   await q(()=>go('serata'));await W(1200);
   const vis=()=>q(()=>[...document.querySelectorAll('#tl .agt')].filter(e=>e.offsetParent).map(e=>e.dataset.t).join(','));
   chk(await vis()==='o1',role+': Agenda si apre su Oggi coi tavoli di oggi');
   const days=await q(()=>[...document.querySelectorAll('.agdays [data-d]')].map(b=>b.dataset.d));
   await p.click(`.agdays [data-d="${days[1]}"]`);await W(400);
-  chk(await vis()==='d'&&await q(d=>document.querySelector('.agdays [data-d].on').dataset.d===d&&document.querySelector(`#agd-${d}`).offsetParent!==null&&document.querySelector(`#agd-${romeToday()}`).offsetParent===null,days[1]),role+': altro giorno → solo i suoi tavoli');
+  chk(await vis()==='d'&&await q(d=>document.querySelector('.agdays [data-d].on').dataset.d===d&&document.querySelector(`#agd-${d}`).offsetParent!==null&&document.querySelector(`#agd-${romeEveningDate()}`).offsetParent===null,days[1]),role+': altro giorno → solo i suoi tavoli');
   await p.click(`.agdays [data-d="${days[2]}"]`);await W(400);chk(await vis()==='e',role+': terzo giorno');
   await p.click(`.agdays [data-d="${days[0]}"]`);await W(400);chk(await vis()==='o1',role+': di nuovo Oggi');
-  await q(()=>go('ludoteca'));await W(1200);chk(await q(()=>document.getElementById('g8s')&&document.getElementById('g8s').dataset.d===romeToday()),role+': con tavoli oggi la striscia punta a Oggi');
+  await q(()=>go('ludoteca'));await W(1200);chk(await q(()=>document.getElementById('g8s')&&document.getElementById('g8s').dataset.d===romeEveningDate()),role+': con tavoli oggi la striscia punta a Oggi');
   await q(()=>{_TS.splice(_TS.findIndex(t=>t.id==='o1'),1);go('serata');});await W(600);await q(()=>go('ludoteca'));await W(1200);
   await p.click('#g8s');await W(1300);chk(await vis()==='d'&&await q(d=>document.querySelector('.agdays [data-d].on').dataset.d===d,d),role+': la striscia apre il giorno giusto');
   chk(errs.length===0,role+' agenda: nessun errore JS '+errs.join('|'));await p.context().close()}

@@ -30,7 +30,7 @@ const seed=async(p,opt={})=>{
       {id:'m3',nome:'Marco',cognome:'Bianchi',active:true}
     ];
     const gs=[{id:'g1',name:'Catan',min:3,max:4}];
-    const td=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date());
+    const td=romeEveningDate();
     window._TS=[
       {id:'tg1',date:td,hostId:'m1',seats:5,time:'21:00',typeId:'gdr',gameName:'Dungeons & Dragons (5th Edition)',bggRpgId:17181,masterMemberId:'m1',players:[{memberId:'m1'}],status:'open',note:''},
       {id:'t1',date:td,evening:'Mercoledì',hostId:'m3',seats:4,time:'21:00',gameId:'g1',typeId:'board',players:[{memberId:'m3'},{memberId:'m1'}],status:'open',note:''},

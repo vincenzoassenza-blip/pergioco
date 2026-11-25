@@ -17,7 +17,7 @@ chk(/min-height:44px/.test(css),'target tattili 44px');
  const b=await pw.chromium.launch({executablePath:'/usr/bin/google-chrome'});const errs=[];
  const c=await b.newContext({serviceWorkers:'block',viewport:{width:390,height:844}});const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));
  await p.route(/supabase|jsdelivr/,r=>r.abort());await p.goto('http://localhost:8799/',{waitUntil:'load'});await p.waitForTimeout(2500);
- await p.evaluate(()=>{document.body.classList.remove('gate');const T=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date());
+ await p.evaluate(()=>{document.body.classList.remove('gate');const T=romeEveningDate();
   const gs=Array.from({length:90},(_,i)=>({id:'g'+i,name:'Gioco <b>'+i,min:2,max:4,minT:30,maxT:60,age:10,coop:i===1}));const ms=['Vincenzo','Giulia'].map((x,i)=>({id:'m'+i,nome:x,cognome:'',active:true}));
   const ps=[{id:'p1',gameId:'g0',date:'2026-10-01',players:[{memberId:'m0',score:5},{memberId:'m1',score:3}],coop:false}];
   DB.games=async()=>gs;DB.plays=async()=>ps;DB.members=async()=>ms;DB.allTables=async()=>[{id:'t1',date:T,status:'open',gameId:'g0',hostId:'m0',seats:4,players:[{memberId:'m0'}],time:'21:00'}]});
@@ -43,7 +43,7 @@ chk(/min-height:44px/.test(css),'target tattili 44px');
  await t(()=>go('ludoteca'),800);chk(await p.evaluate(()=>getComputedStyle(document.getElementById('hback')).display==='none'&&!document.body.classList.contains('insub')),'pagine principali: intestazione normale');
  await p.evaluate(async()=>{const gs=await DB.games();await gamePage(gs[3],await DB.plays())});await p.waitForTimeout(800);
  chk(await p.evaluate(()=>document.querySelector('.gpg .gpb').textContent==='← Gioco <b>3'),'scheda gioco: «← nome» (testo, non HTML)');
- await p.evaluate(()=>document.querySelector('.gpg .gpb').click());await t(()=>{window._ser={date:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date())};go('serata')});
+ await p.evaluate(()=>document.querySelector('.gpg .gpb').click());await t(()=>{window._ser={date:romeEveningDate()};go('serata')});
  chk(await p.evaluate(()=>/Oggi · 1/.test(document.querySelector('.agdays')?.textContent||'')),'Agenda: giorni con tavoli in alto');
  chk(errs.length===0,'nessun errore JS: '+errs.join(' | '));
  if(process.env.SHOT){await t(()=>{localStorage.removeItem('pergioco-acc');go('nuova')});await p.screenshot({path:process.env.SHOT})}
